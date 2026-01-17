@@ -292,11 +292,8 @@ class _OnboardingStep1State extends State<OnboardingStep1>
               ),
             ),
           ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            child: _breedDropdownOpen
-                ? Container(
+          if (_breedDropdownOpen)
+            Container(
                     margin: const EdgeInsets.only(top: 8),
                     decoration: BoxDecoration(
                       color: AppColors.white,
@@ -425,9 +422,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                         ),
                       ],
                     ),
-                  )
-                : const SizedBox.shrink(),
-          ),
+                  ),
           const SizedBox(height: AppSpacing.md),
           const LabeledTextField(
             label: 'Age (years)',

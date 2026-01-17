@@ -63,63 +63,58 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
             onTap: () => setState(() => _selected = 'custom'),
           ),
           // Custom rate input field
-          AnimatedSize(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            child: _selected == 'custom'
-                ? Padding(
-                    padding: const EdgeInsets.only(top: AppSpacing.md),
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              controller: _customController,
-                              keyboardType: TextInputType.number,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                                LengthLimitingTextInputFormatter(3),
-                              ],
-                              decoration: InputDecoration(
-                                filled: true,
-                                fillColor: const Color(0xFFFFE8A8),
-                                hintText: 'Enter BPM',
-                                hintStyle: AppTextStyles.body
-                                    .copyWith(color: AppColors.textMuted),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: BorderSide.none,
-                                ),
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 14,
-                                ),
-                              ),
-                              style: AppTextStyles.body.copyWith(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'BPM',
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.burgundy,
-                            ),
-                          ),
+          if (_selected == 'custom')
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.md),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _customController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                          LengthLimitingTextInputFormatter(3),
                         ],
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: const Color(0xFFFFE8A8),
+                          hintText: 'Enter BPM',
+                          hintStyle: AppTextStyles.body
+                              .copyWith(color: AppColors.textMuted),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                        ),
+                        style: AppTextStyles.body.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 18,
+                        ),
                       ),
                     ),
-                  )
-                : const SizedBox.shrink(),
-          ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'BPM',
+                      style: AppTextStyles.body.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.burgundy,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );

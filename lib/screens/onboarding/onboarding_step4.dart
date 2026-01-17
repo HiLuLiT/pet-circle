@@ -181,56 +181,51 @@ class _InviteSectionState extends State<_InviteSection>
                 chevronController: _chevronController,
                 onTap: _toggleRoleDropdown,
               ),
-              AnimatedSize(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                child: _roleOpen
-                    ? Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.offWhite,
-                          borderRadius: BorderRadius.circular(12),
+              if (_roleOpen)
+                Container(
+                  margin: const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.offWhite,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: _roles.map((role) {
+                      final isSelected = role == _selectedRole;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedRole = role;
+                            _roleOpen = false;
+                          });
+                          _chevronController.reverse();
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? const Color(0xFFFFE8A8)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            role,
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: isSelected
+                                  ? FontWeight.w600
+                                  : FontWeight.w400,
+                            ),
+                          ),
                         ),
-                        child: Column(
-                          children: _roles.map((role) {
-                            final isSelected = role == _selectedRole;
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _selectedRole = role;
-                                  _roleOpen = false;
-                                });
-                                _chevronController.reverse();
-                              },
-                              child: Container(
-                                width: double.infinity,
-                                margin: const EdgeInsets.only(bottom: 4),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 10,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? const Color(0xFFFFE8A8)
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  role,
-                                  style: AppTextStyles.body.copyWith(
-                                    fontWeight: isSelected
-                                        ? FontWeight.w600
-                                        : FontWeight.w400,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-              ),
+                      );
+                    }).toList(),
+                  ),
+                ),
               const SizedBox(height: AppSpacing.md),
               _AddCareCircleButton(onPressed: _addToCareCircle),
             ],
