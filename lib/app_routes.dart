@@ -1,0 +1,9 @@
+class AppRoutes {
+  static const welcome = '/';
+  static const onboarding = '/onboarding';
+  static const dashboard = '/dashboard'; // Legacy, redirects based on role
+  static const vetDashboard = '/vet-dashboard';
+  static const ownerDashboard = '/owner-dashboard';
+  static const petDetail = '/pet-detail';
+  static const measurement = '/measurement';
+}
