@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/widgets/primary_button.dart';
 
 class OnboardingStep4 extends StatelessWidget {
   const OnboardingStep4({super.key, this.onBack, this.onComplete});
@@ -79,7 +77,8 @@ class _InviteSection extends StatefulWidget {
   State<_InviteSection> createState() => _InviteSectionState();
 }
 
-class _InviteSectionState extends State<_InviteSection> {
+class _InviteSectionState extends State<_InviteSection>
+    with SingleTickerProviderStateMixin {
   final _roles = const [
     'Viewer (View Only)',
     'Caregiver',
@@ -87,6 +86,67 @@ class _InviteSectionState extends State<_InviteSection> {
   ];
   bool _roleOpen = false;
   String _selectedRole = 'Viewer (View Only)';
+  final _emailController = TextEditingController();
+  late AnimationController _chevronController;
+
+  @override
+  void initState() {
+    super.initState();
+    _chevronController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _chevronController.dispose();
+    super.dispose();
+  }
+
+  void _toggleRoleDropdown() {
+    setState(() {
+      _roleOpen = !_roleOpen;
+      if (_roleOpen) {
+        _chevronController.forward();
+      } else {
+        _chevronController.reverse();
+      }
+    });
+  }
+
+  void _addToCareCircle() {
+    final email = _emailController.text.trim();
+    final message = email.isNotEmpty
+        ? 'Invitation sent to $email as $_selectedRole'
+        : 'Please enter an email address';
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(
+              email.isNotEmpty ? Icons.check_circle : Icons.info_outline,
+              color: AppColors.white,
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor:
+            email.isNotEmpty ? AppColors.successGreen : AppColors.warningAmber,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+
+    if (email.isNotEmpty) {
+      _emailController.clear();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -111,58 +171,68 @@ class _InviteSectionState extends State<_InviteSection> {
               _InputRow(
                 label: 'Email Address',
                 hint: 'email@example.com',
+                controller: _emailController,
               ),
               const SizedBox(height: AppSpacing.md),
-              _SelectRow(
+              _AnimatedSelectRow(
                 label: 'Role',
                 value: _selectedRole,
                 isOpen: _roleOpen,
-                onTap: () => setState(() => _roleOpen = !_roleOpen),
+                chevronController: _chevronController,
+                onTap: _toggleRoleDropdown,
               ),
-              if (_roleOpen) ...[
-                const SizedBox(height: AppSpacing.sm),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: _roles.map((role) {
-                      final isSelected = role == _selectedRole;
-                      return GestureDetector(
-                        onTap: () => setState(() {
-                          _selectedRole = role;
-                          _roleOpen = false;
-                        }),
-                        child: Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 6),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? const Color(0xFFFFE8A8)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            role,
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight:
-                                  isSelected ? FontWeight.w600 : FontWeight.w400,
-                            ),
-                          ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeInOut,
+                child: _roleOpen
+                    ? Container(
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.offWhite,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ],
+                        child: Column(
+                          children: _roles.map((role) {
+                            final isSelected = role == _selectedRole;
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedRole = role;
+                                  _roleOpen = false;
+                                });
+                                _chevronController.reverse();
+                              },
+                              child: Container(
+                                width: double.infinity,
+                                margin: const EdgeInsets.only(bottom: 4),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? const Color(0xFFFFE8A8)
+                                      : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  role,
+                                  style: AppTextStyles.body.copyWith(
+                                    fontWeight: isSelected
+                                        ? FontWeight.w600
+                                        : FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
               const SizedBox(height: AppSpacing.md),
-              _AddCareCircleButton(onPressed: () {}),
+              _AddCareCircleButton(onPressed: _addToCareCircle),
             ],
           ),
         ),
@@ -172,21 +242,29 @@ class _InviteSectionState extends State<_InviteSection> {
 }
 
 class _InputRow extends StatelessWidget {
-  const _InputRow({required this.label, required this.hint});
+  const _InputRow({
+    required this.label,
+    required this.hint,
+    required this.controller,
+  });
 
   final String label;
   final String hint;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
+        Text(label,
+            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: AppSpacing.sm),
         SizedBox(
           height: 40,
           child: TextField(
+            controller: controller,
+            keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color(0xFFFFE8A8),
@@ -207,25 +285,28 @@ class _InputRow extends StatelessWidget {
   }
 }
 
-class _SelectRow extends StatelessWidget {
-  const _SelectRow({
+class _AnimatedSelectRow extends StatelessWidget {
+  const _AnimatedSelectRow({
     required this.label,
     required this.value,
     required this.onTap,
     required this.isOpen,
+    required this.chevronController,
   });
 
   final String label;
   final String value;
   final VoidCallback onTap;
   final bool isOpen;
+  final AnimationController chevronController;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
+        Text(label,
+            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: AppSpacing.sm),
         GestureDetector(
           onTap: onTap,
@@ -240,11 +321,17 @@ class _SelectRow extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(value, style: AppTextStyles.body),
-                Icon(
-                  isOpen
-                      ? Icons.keyboard_arrow_up
-                      : Icons.keyboard_arrow_down,
-                  color: AppColors.burgundy,
+                RotationTransition(
+                  turns: Tween(begin: 0.0, end: 0.5).animate(
+                    CurvedAnimation(
+                      parent: chevronController,
+                      curve: Curves.easeInOut,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.keyboard_arrow_down,
+                    color: AppColors.burgundy,
+                  ),
                 ),
               ],
             ),
@@ -312,7 +399,8 @@ class _Footer extends StatelessWidget {
           style: TextButton.styleFrom(
             backgroundColor: AppColors.burgundy,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
           child: Row(
             children: [

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_assets.dart';
+import 'package:flutter/services.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
@@ -15,6 +15,13 @@ class OnboardingStep3 extends StatefulWidget {
 
 class _OnboardingStep3State extends State<OnboardingStep3> {
   String _selected = '30';
+  final _customController = TextEditingController();
+
+  @override
+  void dispose() {
+    _customController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +61,64 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
             subtitle: null,
             selected: _selected == 'custom',
             onTap: () => setState(() => _selected = 'custom'),
+          ),
+          // Custom rate input field
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            child: _selected == 'custom'
+                ? Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.md),
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _customController,
+                              keyboardType: TextInputType.number,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                                LengthLimitingTextInputFormatter(3),
+                              ],
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: const Color(0xFFFFE8A8),
+                                hintText: 'Enter BPM',
+                                hintStyle: AppTextStyles.body
+                                    .copyWith(color: AppColors.textMuted),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 14,
+                                ),
+                              ),
+                              style: AppTextStyles.body.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            'BPM',
+                            style: AppTextStyles.body.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.burgundy,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : const SizedBox.shrink(),
           ),
         ],
       ),
