@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pet_circle/theme/app_theme.dart';
@@ -61,7 +62,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
 
   String? _selectedBreed;
   bool _breedDropdownOpen = false;
-  XFile? _selectedImage;
+  Uint8List? _selectedImageBytes;
   late AnimationController _chevronController;
 
   @override
@@ -94,7 +95,9 @@ class _OnboardingStep1State extends State<OnboardingStep1>
     final picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      setState(() => _selectedImage = image);
+      // Read bytes - works on all platforms including web
+      final bytes = await image.readAsBytes();
+      setState(() => _selectedImageBytes = bytes);
     }
   }
 
@@ -232,12 +235,14 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                   strokeAlign: BorderSide.strokeAlignInside,
                 ),
               ),
-              child: _selectedImage != null
+              child: _selectedImageBytes != null
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(14),
-                      child: Image.file(
-                        File(_selectedImage!.path),
+                      child: Image.memory(
+                        _selectedImageBytes!,
                         fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: double.infinity,
                       ),
                     )
                   : Column(
