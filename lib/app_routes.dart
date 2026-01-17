@@ -1,5 +1,7 @@
 class AppRoutes {
   static const welcome = '/';
+  static const auth = '/auth';
+  static const verifyEmail = '/verify-email';
   static const onboarding = '/onboarding';
   static const dashboard = '/dashboard'; // Legacy, redirects based on role
   static const vetDashboard = '/vet-dashboard';

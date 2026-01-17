@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
@@ -34,8 +35,10 @@ class WelcomeScreen extends StatelessWidget {
               children: [
                 PrimaryButton(
                   label: "I'm a Veterinarian",
-                  onPressed: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.vetDashboard),
+                  onPressed: () => Navigator.of(context).pushNamed(
+                    AppRoutes.auth,
+                    arguments: AppUserRole.vet,
+                  ),
                   backgroundColor: AppColors.burgundy,
                   textStyle: AppTextStyles.button.copyWith(fontSize: 20),
                   icon: Icons.medical_services_outlined,
@@ -43,8 +46,10 @@ class WelcomeScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 PrimaryButton(
                   label: "I'm a Pet Owner",
-                  onPressed: () =>
-                      Navigator.of(context).pushNamed(AppRoutes.onboarding),
+                  onPressed: () => Navigator.of(context).pushNamed(
+                    AppRoutes.auth,
+                    arguments: AppUserRole.owner,
+                  ),
                   backgroundColor: AppColors.white,
                   textStyle: AppTextStyles.button
                       .copyWith(fontSize: 20, color: AppColors.burgundy),

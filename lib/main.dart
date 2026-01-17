@@ -1,7 +1,11 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/firebase_options.dart';
+import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/pet.dart';
-import 'package:pet_circle/screens/dashboard/care_circle_dashboard.dart';
+import 'package:pet_circle/screens/auth/auth_screen.dart';
+import 'package:pet_circle/screens/auth/verify_email_screen.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
 import 'package:pet_circle/screens/measurement/measurement_screen.dart';
@@ -10,7 +14,13 @@ import 'package:pet_circle/screens/pet_detail/pet_detail_screen.dart';
 import 'package:pet_circle/screens/welcome_screen.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
   runApp(const PetCircleApp());
 }
 
@@ -28,6 +38,15 @@ class PetCircleApp extends StatelessWidget {
         switch (settings.name) {
           case AppRoutes.welcome:
             return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+
+          case AppRoutes.auth:
+            final role = settings.arguments as AppUserRole? ?? AppUserRole.owner;
+            return MaterialPageRoute(
+              builder: (_) => AuthScreen(role: role),
+            );
+
+          case AppRoutes.verifyEmail:
+            return MaterialPageRoute(builder: (_) => const VerifyEmailScreen());
 
           case AppRoutes.onboarding:
             return MaterialPageRoute(builder: (_) => const OnboardingFlow());
