@@ -12,7 +12,9 @@ import 'package:pet_circle/widgets/round_icon_button.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 
 class VetDashboard extends StatelessWidget {
-  const VetDashboard({super.key});
+  const VetDashboard({super.key, this.showScaffold = true});
+
+  final bool showScaffold;
 
   @override
   Widget build(BuildContext context) {
@@ -23,72 +25,78 @@ class VetDashboard extends StatelessWidget {
     final normalCount = pets.where((p) => p.statusLabel == 'Normal').length;
     final elevatedCount = pets.where((p) => p.statusLabel != 'Normal').length;
 
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _Header(userName: user.name),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  'Clinic Overview',
-                  style: AppTextStyles.heading2.copyWith(color: AppColors.burgundy),
-                ),
-                Text(
-                  '${pets.length} patients in your care',
-                  style: AppTextStyles.bodyMuted,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                _ResponsiveGrid(
-                  maxCrossAxisCount: 3,
-                  minItemWidth: 280,
-                  children: pets
-                      .map(
-                        (pet) => _PetCard(
-                          data: pet,
-                          onTap: () => Navigator.of(context).pushNamed(
-                            AppRoutes.petDetail,
-                            arguments: pet,
-                          ),
+    final content = SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _Header(userName: user.name),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Clinic Overview',
+                style: AppTextStyles.heading2.copyWith(color: AppColors.burgundy),
+              ),
+              Text(
+                '${pets.length} patients in your care',
+                style: AppTextStyles.bodyMuted,
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _ResponsiveGrid(
+                maxCrossAxisCount: 3,
+                minItemWidth: 280,
+                children: pets
+                    .map(
+                      (pet) => _PetCard(
+                        data: pet,
+                        onTap: () => Navigator.of(context).pushNamed(
+                          AppRoutes.petDetail,
+                          arguments: pet,
                         ),
-                      )
-                      .toList(),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                _ResponsiveGrid(
-                  maxCrossAxisCount: 3,
-                  minItemWidth: 280,
-                  childAspectRatio: 3.3,
-                  children: [
-                    _SummaryCard(
-                      iconColor: const Color(0x267FBA7A),
-                      icon: Icons.check_circle_outline,
-                      value: '$normalCount',
-                      label: 'Normal Status',
-                    ),
-                    _SummaryCard(
-                      iconColor: const Color(0x26F39C12),
-                      icon: Icons.warning_amber_outlined,
-                      value: '$elevatedCount',
-                      label: 'Need Attention',
-                    ),
-                    _SummaryCard(
-                      iconColor: const Color(0x1A5B9BD5),
-                      icon: Icons.bar_chart,
-                      value: '${pets.length * 6}',
-                      label: 'Measurements This Week',
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _ResponsiveGrid(
+                maxCrossAxisCount: 3,
+                minItemWidth: 280,
+                childAspectRatio: 3.3,
+                children: [
+                  _SummaryCard(
+                    iconColor: const Color(0x267FBA7A),
+                    icon: Icons.check_circle_outline,
+                    value: '$normalCount',
+                    label: 'Normal Status',
+                  ),
+                  _SummaryCard(
+                    iconColor: const Color(0x26F39C12),
+                    icon: Icons.warning_amber_outlined,
+                    value: '$elevatedCount',
+                    label: 'Need Attention',
+                  ),
+                  _SummaryCard(
+                    iconColor: const Color(0x1A5B9BD5),
+                    icon: Icons.bar_chart,
+                    value: '${pets.length * 6}',
+                    label: 'Measurements This Week',
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
+    );
+
+    if (!showScaffold) {
+      return Container(color: AppColors.white, child: content);
+    }
+
+    return Scaffold(
+      backgroundColor: AppColors.white,
+      body: content,
     );
   }
 }

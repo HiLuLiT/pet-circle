@@ -6,7 +6,9 @@ import 'package:pet_circle/widgets/neumorphic_card.dart';
 import 'package:pet_circle/widgets/round_icon_button.dart';
 
 class MeasurementScreen extends StatefulWidget {
-  const MeasurementScreen({super.key});
+  const MeasurementScreen({super.key, this.showScaffold = true});
+
+  final bool showScaffold;
 
   @override
   State<MeasurementScreen> createState() => _MeasurementScreenState();
@@ -18,33 +20,39 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              _Header(),
-              const SizedBox(height: AppSpacing.lg),
-              _TabSelector(
-                selectedIndex: _selectedTab,
-                onChanged: (index) => setState(() => _selectedTab = index),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Expanded(
-                child: _selectedTab == 0
-                    ? _ManualMode(
-                        selectedDuration: _selectedDuration,
-                        onDurationChanged: (value) =>
-                            setState(() => _selectedDuration = value),
-                      )
-                    : const _VisionMode(),
-              ),
-            ],
-          ),
+    final content = SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            _Header(),
+            const SizedBox(height: AppSpacing.lg),
+            _TabSelector(
+              selectedIndex: _selectedTab,
+              onChanged: (index) => setState(() => _selectedTab = index),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Expanded(
+              child: _selectedTab == 0
+                  ? _ManualMode(
+                      selectedDuration: _selectedDuration,
+                      onDurationChanged: (value) =>
+                          setState(() => _selectedDuration = value),
+                    )
+                  : const _VisionMode(),
+            ),
+          ],
         ),
       ),
+    );
+
+    if (!widget.showScaffold) {
+      return Container(color: AppColors.white, child: content);
+    }
+
+    return Scaffold(
+      backgroundColor: AppColors.white,
+      body: content,
     );
   }
 }

@@ -1,86 +1,78 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/data/mock_data.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
-import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
-import 'package:pet_circle/widgets/round_icon_button.dart';
-import 'package:pet_circle/widgets/status_badge.dart';
 
 class OwnerDashboard extends StatelessWidget {
-  const OwnerDashboard({super.key});
+  const OwnerDashboard({super.key, this.showScaffold = true});
+
+  final bool showScaffold;
 
   @override
   Widget build(BuildContext context) {
     final pets = MockData.hilaPets;
     final user = MockData.currentOwnerUser;
 
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.of(context).pushNamed(AppRoutes.onboarding),
-        backgroundColor: AppColors.burgundy,
-        icon: const Icon(Icons.add, color: AppColors.white),
-        label: Text(
-          'Add Pet',
-          style: AppTextStyles.body.copyWith(color: AppColors.white),
-        ),
-      ),
-      body: SafeArea(
+    final content = SafeArea(
+      child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _Header(userName: user.name, avatarUrl: user.avatarUrl),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  'My Pets',
-                  style: AppTextStyles.heading2.copyWith(color: AppColors.burgundy),
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 24),
+              _Header(avatarUrl: user.avatarUrl),
+              const SizedBox(height: 40),
+              Text(
+                'My pets',
+                style: AppTextStyles.heading2.copyWith(
+                  color: AppColors.burgundy,
+                  letterSpacing: -0.96,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${pets.length} pet${pets.length > 1 ? 's' : ''} in your care',
-                  style: AppTextStyles.bodyMuted,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                ...pets.map(
-                  (pet) => Padding(
-                    padding: const EdgeInsets.only(bottom: 24),
-                    child: _OwnerPetCard(
-                      data: pet,
-                      onMeasure: () => Navigator.of(context).pushNamed(
-                        AppRoutes.measurement,
-                        arguments: pet,
-                      ),
-                      onEdit: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Edit profile coming soon')),
-                        );
-                      },
+              ),
+              const SizedBox(height: 24),
+              ...pets.map(
+                (pet) => Padding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  child: _PetCard(
+                    data: pet,
+                    onMeasure: () => Navigator.of(context).pushNamed(
+                      AppRoutes.measurement,
+                      arguments: pet,
                     ),
+                    onTrends: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Trends coming soon')),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                _QuickActions(),
-              ],
-            ),
+              ),
+              const SizedBox(height: 24),
+            ],
           ),
         ),
       ),
+    );
+
+    if (!showScaffold) {
+      return Container(color: AppColors.white, child: content);
+    }
+
+    return Scaffold(
+      backgroundColor: AppColors.white,
+      body: content,
     );
   }
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.userName, required this.avatarUrl});
+  const _Header({required this.avatarUrl});
 
-  final String userName;
   final String avatarUrl;
 
   @override
@@ -88,206 +80,253 @@ class _Header extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: AppColors.pink,
-                shape: BoxShape.circle,
-              ),
-              child: SvgPicture.asset(AppAssets.appLogo, width: 48, height: 48),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hello,',
-                  style: AppTextStyles.caption.copyWith(color: AppColors.textMuted),
-                ),
-                Text(
-                  userName,
-                  style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
-                ),
-              ],
-            ),
-          ],
+        // Profile avatar on left
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(color: AppColors.white, width: 2),
+          ),
+          child: ClipOval(
+            child: Image.network(avatarUrl, fit: BoxFit.cover),
+          ),
         ),
-        Row(
-          children: [
-            RoundIconButton(
-              icon: const Icon(Icons.notifications_none, color: AppColors.burgundy),
-            ),
-            const SizedBox(width: 8),
-            CircleAvatar(
-              radius: 22,
-              backgroundImage: NetworkImage(avatarUrl),
-            ),
-          ],
+        // Notification bell on right
+        Container(
+          width: 36,
+          height: 36,
+          decoration: const BoxDecoration(
+            color: AppColors.offWhite,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(
+            Icons.notifications_outlined,
+            color: AppColors.burgundy,
+            size: 20,
+          ),
         ),
       ],
     );
   }
 }
 
-class _OwnerPetCard extends StatelessWidget {
-  const _OwnerPetCard({
+class _PetCard extends StatelessWidget {
+  const _PetCard({
     required this.data,
     required this.onMeasure,
-    required this.onEdit,
+    required this.onTrends,
   });
 
   final Pet data;
   final VoidCallback onMeasure;
-  final VoidCallback onEdit;
+  final VoidCallback onTrends;
 
   @override
   Widget build(BuildContext context) {
     return NeumorphicCard(
-      radius: BorderRadius.circular(20),
+      radius: BorderRadius.circular(16),
+      padding: EdgeInsets.zero,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Pet image with status
-          Stack(
-            children: [
-              Container(
-                height: 200,
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Color(0x33E8B4B8), Color(0x00000000)],
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                  child: DogPhoto(endpoint: data.imageUrl),
-                ),
-              ),
-              Positioned(
-                top: 16,
-                right: 16,
-                child: StatusBadge(
-                  label: data.statusLabel,
-                  color: Color(data.statusColorHex),
-                ),
-              ),
-              // Edit button
-              Positioned(
-                top: 16,
-                left: 16,
-                child: GestureDetector(
-                  onTap: onEdit,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.white.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(Icons.edit_outlined, size: 20, color: AppColors.burgundy),
-                  ),
-                ),
-              ),
-            ],
+          // Pet image
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            child: SizedBox(
+              height: 216,
+              width: double.infinity,
+              child: DogPhoto(endpoint: data.imageUrl),
+            ),
           ),
           // Pet info
           Padding(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          data.name,
-                          style: AppTextStyles.heading2.copyWith(color: AppColors.textPrimary),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(data.breedAndAge, style: AppTextStyles.bodyMuted),
-                      ],
-                    ),
-                    // Latest BPM display
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppColors.offWhite,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.favorite,
-                            color: Color(data.statusColorHex),
-                            size: 24,
-                          ),
-                          const SizedBox(width: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '${data.latestMeasurement.bpm}',
-                                style: AppTextStyles.heading3
-                                    .copyWith(color: AppColors.textPrimary),
-                              ),
-                              Text('BPM', style: AppTextStyles.caption),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
+                // Name and breed
                 Text(
-                  'Last measured: ${data.latestMeasurement.recordedAtLabel}',
-                  style: AppTextStyles.caption.copyWith(color: AppColors.textMuted),
+                  data.name,
+                  style: AppTextStyles.heading2.copyWith(
+                    color: AppColors.burgundy,
+                    letterSpacing: -0.96,
+                  ),
                 ),
-                const SizedBox(height: 20),
-                // Measure Now button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: onMeasure,
-                    icon: const Icon(Icons.favorite_border, size: 22),
-                    label: const Text('Measure Now'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.burgundy,
-                      foregroundColor: AppColors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      textStyle: AppTextStyles.button.copyWith(fontSize: 16),
-                    ),
+                const SizedBox(height: 4),
+                Text(
+                  data.breedAndAge,
+                  style: AppTextStyles.body.copyWith(
+                    color: AppColors.burgundy,
+                    fontSize: 14,
+                    letterSpacing: -0.15,
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Divider(color: Color(0x26E8B4B8), height: 1),
-                const SizedBox(height: 12),
-                // Care circle
+                // BPM row
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.group, size: 16, color: AppColors.textMuted),
-                        const SizedBox(width: 8),
-                        Text('Care Circle', style: AppTextStyles.caption),
+                        // Heart icon in circle
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: const BoxDecoration(
+                            color: AppColors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.favorite_border,
+                            color: AppColors.pink,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${data.latestMeasurement.bpm}',
+                              style: AppTextStyles.heading2.copyWith(
+                                color: AppColors.burgundy,
+                                fontSize: 24,
+                                height: 1.33,
+                              ),
+                            ),
+                            Text(
+                              'BPM',
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.burgundy,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Text(
+                      data.latestMeasurement.recordedAtLabel,
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.burgundy,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 17),
+                // Care Circle divider
+                Container(
+                  height: 1,
+                  color: AppColors.burgundy,
+                ),
+                const SizedBox(height: 17),
+                // Care Circle row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.people_outline,
+                          size: 12,
+                          color: AppColors.burgundy,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Care Circle',
+                          style: AppTextStyles.caption.copyWith(
+                            color: AppColors.burgundy,
+                            fontSize: 12,
+                          ),
+                        ),
                       ],
                     ),
                     _AvatarStack(avatars: data.careCircle),
+                  ],
+                ),
+                const SizedBox(height: 17),
+                // Buttons divider
+                Container(
+                  height: 1,
+                  color: AppColors.burgundy,
+                ),
+                const SizedBox(height: 17),
+                // Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: _ActionButton(
+                        label: 'Measure',
+                        icon: Icons.favorite_border,
+                        isPrimary: true,
+                        onTap: onMeasure,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _ActionButton(
+                        label: 'Trends',
+                        icon: Icons.bar_chart,
+                        isPrimary: false,
+                        onTap: onTrends,
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.label,
+    required this.icon,
+    required this.isPrimary,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool isPrimary;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 40,
+        decoration: BoxDecoration(
+          color: isPrimary ? AppColors.pink : AppColors.white,
+          borderRadius: BorderRadius.circular(100),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: AppColors.burgundy,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: AppTextStyles.body.copyWith(
+                color: AppColors.burgundy,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                letterSpacing: -0.15,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -300,22 +339,23 @@ class _AvatarStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double avatarSize = 31;
+    const double overlap = 12;
+
     return SizedBox(
-      height: 32,
-      width: 32 + (avatars.length - 1) * 20,
+      height: avatarSize,
+      width: avatarSize + (avatars.length - 1) * (avatarSize - overlap),
       child: Stack(
         children: [
           for (var i = 0; i < avatars.length; i++)
             Positioned(
-              left: i * 20.0,
+              right: i * (avatarSize - overlap),
               child: Container(
-                width: 32,
-                height: 32,
-                padding: const EdgeInsets.all(2),
+                width: avatarSize,
+                height: avatarSize,
                 decoration: BoxDecoration(
-                  color: AppColors.white,
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.offWhite, width: 2),
+                  border: Border.all(color: AppColors.white, width: 2),
                 ),
                 child: ClipOval(
                   child: Image.network(avatars[i].avatarUrl, fit: BoxFit.cover),
@@ -328,87 +368,3 @@ class _AvatarStack extends StatelessWidget {
   }
 }
 
-class _QuickActions extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Quick Actions',
-          style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _ActionCard(
-                icon: Icons.history,
-                label: 'History',
-                color: AppColors.accentBlue,
-                onTap: () {},
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _ActionCard(
-                icon: Icons.person_add_outlined,
-                label: 'Invite',
-                color: AppColors.successGreen,
-                onTap: () {},
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _ActionCard(
-                icon: Icons.settings_outlined,
-                label: 'Settings',
-                color: AppColors.warningAmber,
-                onTap: () {},
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _ActionCard extends StatelessWidget {
-  const _ActionCard({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: NeumorphicCard(
-        radius: BorderRadius.circular(16),
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(height: 10),
-            Text(label, style: AppTextStyles.caption.copyWith(fontWeight: FontWeight.w500)),
-          ],
-        ),
-      ),
-    );
-  }
-}
