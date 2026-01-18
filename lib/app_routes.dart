@@ -7,6 +7,7 @@ class AppRoutes {
   static const vetDashboard = '/vet-dashboard';
   static const ownerDashboard = '/owner-dashboard';
   static const mainShell = '/main-shell';
+  static const settings = '/settings';
   static const trends = '/trends';
   static const messages = '/messages';
   static const petDetail = '/pet-detail';

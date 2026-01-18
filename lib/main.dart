@@ -13,6 +13,7 @@ import 'package:pet_circle/screens/measurement/measurement_screen.dart';
 import 'package:pet_circle/screens/messages/messages_screen.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_flow.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_screen.dart';
+import 'package:pet_circle/screens/settings/settings_screen.dart';
 import 'package:pet_circle/screens/trends/trends_screen.dart';
 import 'package:pet_circle/screens/welcome_screen.dart';
 import 'package:pet_circle/theme/app_theme.dart';
@@ -73,7 +74,15 @@ class PetCircleApp extends StatelessWidget {
             );
 
           case AppRoutes.mainShell:
-            final role = settings.arguments as AppUserRole? ?? AppUserRole.owner;
+            final args = settings.arguments;
+            if (args is Map<String, dynamic>) {
+              final role = args['role'] as AppUserRole? ?? AppUserRole.owner;
+              final initialIndex = args['initialIndex'] as int? ?? 0;
+              return MaterialPageRoute(
+                builder: (_) => MainShell(role: role, initialIndex: initialIndex),
+              );
+            }
+            final role = args as AppUserRole? ?? AppUserRole.owner;
             return MaterialPageRoute(builder: (_) => MainShell(role: role));
 
           case AppRoutes.trends:
@@ -81,6 +90,10 @@ class PetCircleApp extends StatelessWidget {
 
           case AppRoutes.messages:
             return MaterialPageRoute(builder: (_) => const MessagesScreen());
+
+          case AppRoutes.settings:
+            final role = settings.arguments as AppUserRole? ?? AppUserRole.owner;
+            return MaterialPageRoute(builder: (_) => SettingsScreen(role: role));
 
           case AppRoutes.petDetail:
             final pet = settings.arguments as Pet;

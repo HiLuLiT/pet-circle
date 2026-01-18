@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_assets.dart';
@@ -32,7 +33,13 @@ class VetDashboard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _Header(userName: user.name),
+              _Header(
+                userName: user.name,
+                onSettingsTap: () => Navigator.of(context).pushNamed(
+                  AppRoutes.settings,
+                  arguments: AppUserRole.vet,
+                ),
+              ),
               const SizedBox(height: AppSpacing.md),
               Text(
                 'Clinic Overview',
@@ -102,9 +109,10 @@ class VetDashboard extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.userName});
+  const _Header({required this.userName, this.onSettingsTap});
 
   final String userName;
+  final VoidCallback? onSettingsTap;
 
   @override
   Widget build(BuildContext context) {
@@ -137,16 +145,21 @@ class _Header extends StatelessWidget {
             ),
           ],
         ),
-        Row(
-          children: [
-            RoundIconButton(
-              icon: const Icon(Icons.search, color: AppColors.burgundy),
+        GestureDetector(
+          onTap: onSettingsTap,
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: const BoxDecoration(
+              color: AppColors.offWhite,
+              shape: BoxShape.circle,
             ),
-            const SizedBox(width: 8),
-            RoundIconButton(
-              icon: const Icon(Icons.notifications_none, color: AppColors.burgundy),
+            child: const Icon(
+              Icons.settings,
+              color: AppColors.burgundy,
+              size: 20,
             ),
-          ],
+          ),
         ),
       ],
     );

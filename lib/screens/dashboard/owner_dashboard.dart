@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
-import 'package:pet_circle/widgets/neumorphic_card.dart';
+
+const _bpmIconAsset = 'assets/figma/bpm_icon.svg';
+const _careCircleIconAsset = 'assets/figma/care_circle_icon.svg';
+const _measureIconAsset = 'assets/figma/measure_icon.svg';
+const _trendsIconAsset = 'assets/figma/trends_icon.svg';
 
 class OwnerDashboard extends StatelessWidget {
   const OwnerDashboard({super.key, this.showScaffold = true});
@@ -25,7 +31,13 @@ class OwnerDashboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              _Header(avatarUrl: user.avatarUrl),
+              _Header(
+                avatarUrl: user.avatarUrl,
+                onSettingsTap: () => Navigator.of(context).pushNamed(
+                  AppRoutes.settings,
+                  arguments: AppUserRole.owner,
+                ),
+              ),
               const SizedBox(height: 40),
               Text(
                 'My pets',
@@ -71,9 +83,13 @@ class OwnerDashboard extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.avatarUrl});
+  const _Header({
+    required this.avatarUrl,
+    this.onSettingsTap,
+  });
 
   final String avatarUrl;
+  final VoidCallback? onSettingsTap;
 
   @override
   Widget build(BuildContext context) {
@@ -92,18 +108,21 @@ class _Header extends StatelessWidget {
             child: Image.network(avatarUrl, fit: BoxFit.cover),
           ),
         ),
-        // Notification bell on right
-        Container(
-          width: 36,
-          height: 36,
-          decoration: const BoxDecoration(
-            color: AppColors.offWhite,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.notifications_outlined,
-            color: AppColors.burgundy,
-            size: 20,
+        // Settings icon on right
+        GestureDetector(
+          onTap: onSettingsTap,
+          child: Container(
+            width: 36,
+            height: 36,
+            decoration: const BoxDecoration(
+              color: AppColors.offWhite,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.settings,
+              color: AppColors.burgundy,
+              size: 20,
+            ),
           ),
         ),
       ],
@@ -124,161 +143,165 @@ class _PetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return NeumorphicCard(
-      radius: BorderRadius.circular(16),
-      padding: EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Pet image
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            child: SizedBox(
-              height: 216,
-              width: double.infinity,
-              child: DogPhoto(endpoint: data.imageUrl),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        color: AppColors.offWhite,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Pet image
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              child: SizedBox(
+                height: 216,
+                width: double.infinity,
+                child: DogPhoto(endpoint: data.imageUrl),
+              ),
             ),
-          ),
-          // Pet info
-          Padding(
-            padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Name and breed
-                Text(
-                  data.name,
-                  style: AppTextStyles.heading2.copyWith(
-                    color: AppColors.burgundy,
-                    letterSpacing: -0.96,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  data.breedAndAge,
-                  style: AppTextStyles.body.copyWith(
-                    color: AppColors.burgundy,
-                    fontSize: 14,
-                    letterSpacing: -0.15,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                // BPM row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        // Heart icon in circle
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: const BoxDecoration(
-                            color: AppColors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.favorite_border,
-                            color: AppColors.pink,
-                            size: 20,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${data.latestMeasurement.bpm}',
-                              style: AppTextStyles.heading2.copyWith(
-                                color: AppColors.burgundy,
-                                fontSize: 24,
-                                height: 1.33,
-                              ),
-                            ),
-                            Text(
-                              'BPM',
-                              style: AppTextStyles.caption.copyWith(
-                                color: AppColors.burgundy,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+            // Pet info
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name and breed
+                  Text(
+                    data.name,
+                    style: AppTextStyles.heading2.copyWith(
+                      color: AppColors.burgundy,
+                      letterSpacing: -0.96,
                     ),
-                    Text(
-                      data.latestMeasurement.recordedAtLabel,
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.burgundy,
-                        fontSize: 12,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    data.breedAndAge,
+                    style: AppTextStyles.body.copyWith(
+                      color: AppColors.burgundy,
+                      fontSize: 14,
+                      letterSpacing: -0.15,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // BPM row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          // Heart icon in circle
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: const BoxDecoration(
+                              color: AppColors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: SvgPicture.asset(
+                                _bpmIconAsset,
+                                width: 20,
+                                height: 20,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${data.latestMeasurement.bpm}',
+                                style: AppTextStyles.heading2.copyWith(
+                                  color: AppColors.burgundy,
+                                  fontSize: 24,
+                                  height: 1.33,
+                                ),
+                              ),
+                              Text(
+                                'BPM',
+                                style: AppTextStyles.caption.copyWith(
+                                  color: AppColors.burgundy,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 17),
-                // Care Circle divider
-                Container(
-                  height: 1,
-                  color: AppColors.burgundy,
-                ),
-                const SizedBox(height: 17),
-                // Care Circle row
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.people_outline,
-                          size: 12,
+                      Text(
+                        data.latestMeasurement.recordedAtLabel,
+                        style: AppTextStyles.caption.copyWith(
                           color: AppColors.burgundy,
+                          fontSize: 12,
                         ),
-                        const SizedBox(width: 4),
-                        Text(
-                          'Care Circle',
-                          style: AppTextStyles.caption.copyWith(
-                            color: AppColors.burgundy,
-                            fontSize: 12,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 17),
+                  // Care Circle divider
+                  Container(
+                    height: 1,
+                    color: AppColors.burgundy,
+                  ),
+                  const SizedBox(height: 17),
+                  // Care Circle row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          SvgPicture.asset(
+                            _careCircleIconAsset,
+                            width: 12,
+                            height: 12,
                           ),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Care Circle',
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.burgundy,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                      _AvatarStack(avatars: data.careCircle),
+                    ],
+                  ),
+                  const SizedBox(height: 17),
+                  // Buttons divider
+                  Container(
+                    height: 1,
+                    color: AppColors.burgundy,
+                  ),
+                  const SizedBox(height: 17),
+                  // Action buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _ActionButton(
+                          label: 'Measure',
+                          iconAsset: _measureIconAsset,
+                          isPrimary: true,
+                          onTap: onMeasure,
                         ),
-                      ],
-                    ),
-                    _AvatarStack(avatars: data.careCircle),
-                  ],
-                ),
-                const SizedBox(height: 17),
-                // Buttons divider
-                Container(
-                  height: 1,
-                  color: AppColors.burgundy,
-                ),
-                const SizedBox(height: 17),
-                // Action buttons
-                Row(
-                  children: [
-                    Expanded(
-                      child: _ActionButton(
-                        label: 'Measure',
-                        icon: Icons.favorite_border,
-                        isPrimary: true,
-                        onTap: onMeasure,
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _ActionButton(
-                        label: 'Trends',
-                        icon: Icons.bar_chart,
-                        isPrimary: false,
-                        onTap: onTrends,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: _ActionButton(
+                          label: 'Trends',
+                          iconAsset: _trendsIconAsset,
+                          isPrimary: false,
+                          onTap: onTrends,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -287,13 +310,13 @@ class _PetCard extends StatelessWidget {
 class _ActionButton extends StatelessWidget {
   const _ActionButton({
     required this.label,
-    required this.icon,
+    required this.iconAsset,
     required this.isPrimary,
     required this.onTap,
   });
 
   final String label;
-  final IconData icon;
+  final String iconAsset;
   final bool isPrimary;
   final VoidCallback onTap;
 
@@ -310,10 +333,10 @@ class _ActionButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
-              size: 16,
-              color: AppColors.burgundy,
+            SvgPicture.asset(
+              iconAsset,
+              width: 16,
+              height: 16,
             ),
             const SizedBox(width: 8),
             Text(
