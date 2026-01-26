@@ -36,7 +36,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   Widget build(BuildContext context) {
     return PageView(
       controller: _controller,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: const PageScrollPhysics(),
+      onPageChanged: (index) => setState(() => _currentIndex = index),
       children: [
         OnboardingStep1(onNext: () => _goTo(1)),
         OnboardingStep2(onBack: () => _goTo(0), onNext: () => _goTo(2)),

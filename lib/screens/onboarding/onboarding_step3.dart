@@ -48,14 +48,14 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
             trailingLabel: 'Most popular',
             onTap: () => setState(() => _selected = '30'),
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 12),
           _TargetOption(
             title: '35 BPM',
             subtitle: 'For pets with mild conditions',
             selected: _selected == '35',
             onTap: () => setState(() => _selected = '35'),
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: 12),
           _TargetOption(
             title: 'Custom Rate',
             subtitle: null,
@@ -70,7 +70,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   children: [
@@ -84,12 +84,12 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                         ],
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: const Color(0xFFFFE8A8),
+                          fillColor: AppColors.lightYellow,
                           hintText: 'Enter BPM',
                           hintStyle: AppTextStyles.body
                               .copyWith(color: AppColors.textMuted),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(4),
                             borderSide: BorderSide.none,
                           ),
                           contentPadding: const EdgeInsets.symmetric(
@@ -140,12 +140,12 @@ class _TargetOption extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,12 +155,25 @@ class _TargetOption extends StatelessWidget {
               height: 16,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: selected ? AppColors.burgundy : AppColors.white,
-                border: Border.all(color: AppColors.burgundy, width: 1),
+                color: AppColors.white,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x1A000000),
+                    blurRadius: 10,
+                    offset: Offset(0, 1),
+                  ),
+                ],
               ),
               child: selected
-                  ? const Center(
-                      child: Icon(Icons.circle, size: 6, color: AppColors.white),
+                  ? Center(
+                      child: Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF146FD9),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                     )
                   : null,
             ),
@@ -169,12 +182,18 @@ class _TargetOption extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: AppTextStyles.body
-                          .copyWith(fontWeight: FontWeight.w600)),
+                  Text(
+                    title,
+                    style:
+                        AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+                  ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 4),
-                    Text(subtitle!, style: AppTextStyles.caption),
+                    Text(
+                      subtitle!,
+                      style:
+                          AppTextStyles.caption.copyWith(color: AppColors.burgundy),
+                    ),
                   ],
                 ],
               ),
@@ -184,12 +203,11 @@ class _TargetOption extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
                   color: AppColors.lightYellow,
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   trailingLabel!,
-                  style:
-                      AppTextStyles.caption.copyWith(color: AppColors.burgundy),
+                  style: AppTextStyles.caption.copyWith(color: AppColors.burgundy),
                 ),
               ),
           ],

@@ -1,88 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/widgets/onboarding_shell.dart';
 
-class OnboardingStep4 extends StatelessWidget {
+class OnboardingStep4 extends StatefulWidget {
   const OnboardingStep4({super.key, this.onBack, this.onComplete});
 
   final VoidCallback? onBack;
   final VoidCallback? onComplete;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: Center(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 24),
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: AppColors.offWhite,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _Header(),
-              const SizedBox(height: AppSpacing.lg),
-              const _InviteSection(),
-              const SizedBox(height: AppSpacing.lg),
-              const Divider(height: 1, color: AppColors.burgundy),
-              const SizedBox(height: AppSpacing.md),
-              _Footer(onBack: onBack, onComplete: onComplete),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+  State<OnboardingStep4> createState() => _OnboardingStep4State();
 }
 
-class _Header extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text('Setup pet profile', style: AppTextStyles.heading2),
-            ),
-            Text('Step 4 of 4', style: AppTextStyles.body),
-          ],
-        ),
-        const SizedBox(height: 12),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(999),
-          child: Container(
-            height: 8,
-            color: AppColors.burgundy.withOpacity(0.08),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: FractionallySizedBox(
-                widthFactor: 1,
-                child: Container(color: AppColors.pink),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _InviteSection extends StatefulWidget {
-  const _InviteSection();
-
-  @override
-  State<_InviteSection> createState() => _InviteSectionState();
-}
-
-class _InviteSectionState extends State<_InviteSection>
+class _OnboardingStep4State extends State<OnboardingStep4>
     with SingleTickerProviderStateMixin {
+  static const _primaryBlue = Color(0xFF146FD9);
   final _roles = const [
     'Viewer (View Only)',
     'Caregiver',
     'Owner',
+  ];
+  final _invites = const [
+    _InviteStatus(name: 'Guest 01', status: 'Status: invited'),
   ];
   bool _roleOpen = false;
   String _selectedRole = 'Viewer (View Only)';
@@ -145,93 +84,200 @@ class _InviteSectionState extends State<_InviteSection>
 
     if (email.isNotEmpty) {
       _emailController.clear();
+      widget.onComplete?.call();
     }
+  }
+
+  void _resetInvite() {
+    setState(() {
+      _roleOpen = false;
+      _selectedRole = _roles.first;
+      _emailController.clear();
+    });
+    _chevronController.reverse();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text('Invite Your Care Circle', style: AppTextStyles.heading3),
-        const SizedBox(height: AppSpacing.sm),
-        const Text(
-          'Invite family members, pet sitters, and veterinarians to track SRR together.',
-          style: AppTextStyles.body,
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.circular(16),
+    return OnboardingShell(
+      title: 'Setup pet profile',
+      stepLabel: 'Step 4 of 4',
+      progress: 1,
+      onBack: widget.onBack,
+      onNext: widget.onComplete,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Invite Your Care Circle', style: AppTextStyles.heading3),
+          const SizedBox(height: AppSpacing.sm),
+          const Text(
+            'Invite family members, pet sitters, and veterinarians to collaborate.',
+            style: AppTextStyles.body,
           ),
-          child: Column(
-            children: [
-              _InputRow(
-                label: 'Email Address',
-                hint: 'email@example.com',
-                controller: _emailController,
+          const SizedBox(height: AppSpacing.md),
+          if (_invites.isNotEmpty) ...[
+            _InviteRow(invite: _invites.first),
+            const SizedBox(height: AppSpacing.md),
+          ],
+          _InputRow(
+            label: 'Email Address',
+            hint: 'email@example.com',
+            controller: _emailController,
+          ),
+          const SizedBox(height: AppSpacing.md),
+          _SelectRow(
+            label: 'Role',
+            value: _selectedRole,
+            isOpen: _roleOpen,
+            chevronController: _chevronController,
+            onTap: _toggleRoleDropdown,
+          ),
+          if (_roleOpen)
+            Container(
+              margin: const EdgeInsets.only(top: 8),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(4),
               ),
-              const SizedBox(height: AppSpacing.md),
-              _AnimatedSelectRow(
-                label: 'Role',
-                value: _selectedRole,
-                isOpen: _roleOpen,
-                chevronController: _chevronController,
-                onTap: _toggleRoleDropdown,
-              ),
-              if (_roleOpen)
-                Container(
-                  margin: const EdgeInsets.only(top: 8),
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.offWhite,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    children: _roles.map((role) {
-                      final isSelected = role == _selectedRole;
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedRole = role;
-                            _roleOpen = false;
-                          });
-                          _chevronController.reverse();
-                        },
-                        child: Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 4),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? const Color(0xFFFFE8A8)
-                                : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            role,
-                            style: AppTextStyles.body.copyWith(
-                              fontWeight: isSelected
-                                  ? FontWeight.w600
-                                  : FontWeight.w400,
-                            ),
-                          ),
+              child: Column(
+                children: _roles.map((role) {
+                  final isSelected = role == _selectedRole;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedRole = role;
+                        _roleOpen = false;
+                      });
+                      _chevronController.reverse();
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color:
+                            isSelected ? AppColors.lightYellow : Colors.transparent,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        role,
+                        style: AppTextStyles.body.copyWith(
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.w400,
                         ),
-                      );
-                    }).toList(),
-                  ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 40,
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: _primaryBlue,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(56),
                 ),
-              const SizedBox(height: AppSpacing.md),
-              _AddCareCircleButton(onPressed: _addToCareCircle),
-            ],
+              ),
+              onPressed: _addToCareCircle,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.person_add_alt_1,
+                      size: 16, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Add to pet circle',
+                    style:
+                        AppTextStyles.body.copyWith(color: AppColors.white),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 40,
+            width: double.infinity,
+            child: TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: AppColors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100),
+                ),
+              ),
+              onPressed: _resetInvite,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.person_add_alt_1,
+                      size: 16, color: _primaryBlue),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Add another pet circle',
+                    style: AppTextStyles.body.copyWith(color: _primaryBlue),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InviteStatus {
+  const _InviteStatus({required this.name, required this.status});
+
+  final String name;
+  final String status;
+}
+
+class _InviteRow extends StatelessWidget {
+  const _InviteRow({required this.invite});
+
+  final _InviteStatus invite;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(invite.name, style: AppTextStyles.body),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.lightYellow,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              invite.status,
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.burgundy,
+                fontSize: 10,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -256,21 +302,23 @@ class _InputRow extends StatelessWidget {
             style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: AppSpacing.sm),
         SizedBox(
-          height: 40,
+          height: 36,
           child: TextField(
             controller: controller,
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               filled: true,
-              fillColor: const Color(0xFFFFE8A8),
+              fillColor: AppColors.white,
               hintText: hint,
-              hintStyle: AppTextStyles.body.copyWith(color: AppColors.burgundy),
+              hintStyle: AppTextStyles.body.copyWith(
+                color: AppColors.burgundy.withOpacity(0.4),
+              ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(100),
+                borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide.none,
               ),
               contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             ),
             style: AppTextStyles.body,
           ),
@@ -280,8 +328,8 @@ class _InputRow extends StatelessWidget {
   }
 }
 
-class _AnimatedSelectRow extends StatelessWidget {
-  const _AnimatedSelectRow({
+class _SelectRow extends StatelessWidget {
+  const _SelectRow({
     required this.label,
     required this.value,
     required this.onTap,
@@ -306,12 +354,12 @@ class _AnimatedSelectRow extends StatelessWidget {
         GestureDetector(
           onTap: onTap,
           child: Container(
-            height: 40,
+            height: 36,
             decoration: BoxDecoration(
-              color: const Color(0xFFFFE8A8),
-              borderRadius: BorderRadius.circular(100),
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(4),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -326,86 +374,11 @@ class _AnimatedSelectRow extends StatelessWidget {
                   child: const Icon(
                     Icons.keyboard_arrow_down,
                     color: AppColors.burgundy,
+                    size: 18,
                   ),
                 ),
               ],
             ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _AddCareCircleButton extends StatelessWidget {
-  const _AddCareCircleButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 40,
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFF5B041),
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
-        onPressed: onPressed,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.person_add, size: 18, color: AppColors.burgundy),
-            const SizedBox(width: 8),
-            Text(
-              'Add to Care Circle',
-              style: AppTextStyles.body.copyWith(
-                color: AppColors.burgundy,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Footer extends StatelessWidget {
-  const _Footer({this.onBack, this.onComplete});
-
-  final VoidCallback? onBack;
-  final VoidCallback? onComplete;
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        IconButton(
-          onPressed: onBack,
-          icon: const Icon(Icons.arrow_back, color: AppColors.burgundy),
-        ),
-        TextButton(
-          onPressed: onComplete,
-          style: TextButton.styleFrom(
-            backgroundColor: AppColors.burgundy,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          child: Row(
-            children: [
-              Text(
-                'Complete setup',
-                style: AppTextStyles.caption.copyWith(color: AppColors.white),
-              ),
-              const SizedBox(width: 6),
-              const Icon(Icons.arrow_forward, size: 14, color: AppColors.white),
-            ],
           ),
         ),
       ],

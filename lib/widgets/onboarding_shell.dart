@@ -38,10 +38,6 @@ class OnboardingShell extends StatelessWidget {
               _Header(stepLabel: stepLabel, progress: progress, title: title),
               const SizedBox(height: 32),
               Flexible(child: child),
-              const SizedBox(height: 16),
-              const Divider(height: 1, color: AppColors.burgundy),
-              const SizedBox(height: 16),
-              _Footer(onBack: onBack, onNext: onNext),
             ],
           ),
         ),
@@ -83,7 +79,7 @@ class _Header extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: FractionallySizedBox(
                 widthFactor: progress,
-                child: Container(color: AppColors.pink),
+                child: Container(color: const Color(0xFFFFC2B5)),
               ),
             ),
           ),
@@ -93,50 +89,3 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _Footer extends StatelessWidget {
-  const _Footer({this.onBack, this.onNext});
-
-  final VoidCallback? onBack;
-  final VoidCallback? onNext;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        _CircleNavButton(
-          icon: Icons.arrow_back,
-          onTap: onBack,
-        ),
-        _CircleNavButton(
-          icon: Icons.arrow_forward,
-          onTap: onNext,
-        ),
-      ],
-    );
-  }
-}
-
-class _CircleNavButton extends StatelessWidget {
-  const _CircleNavButton({required this.icon, this.onTap});
-
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      customBorder: const CircleBorder(),
-      child: Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: Border.all(color: AppColors.burgundy, width: 1),
-        ),
-        child: Icon(icon, size: 18, color: AppColors.burgundy),
-      ),
-    );
-  }
-}

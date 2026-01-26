@@ -23,13 +23,26 @@ class LabeledTextField extends StatelessWidget {
           style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
         ),
         const SizedBox(height: AppSpacing.sm),
-        TextField(
-          keyboardType: keyboardType,
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+        SizedBox(
+          height: 36,
+          child: TextField(
+            keyboardType: keyboardType,
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: AppColors.white,
+              hintText: hintText,
+              hintStyle: AppTextStyles.body.copyWith(
+                color: AppColors.burgundy.withOpacity(0.3),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            ),
+            style: AppTextStyles.body,
           ),
-          style: AppTextStyles.body,
         ),
       ],
     );
