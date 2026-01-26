@@ -17,14 +17,26 @@ const _settingsInviteAsset = 'assets/figma/settings_invite.svg';
 const _settingsTrashAsset = 'assets/figma/settings_trash.svg';
 const _settingsConfigureAsset = 'assets/figma/settings_configure.svg';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key, required this.role});
 
   final AppUserRole role;
 
   @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  bool _showActivePreview = false;
+
+  @override
   Widget build(BuildContext context) {
     final user = MockData.currentOwnerUser;
+
+    final darkModeOn = _showActivePreview;
+    final pushNotificationsOn = _showActivePreview;
+    final visionRrOn = _showActivePreview;
+    final autoExportOn = _showActivePreview;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -36,7 +48,11 @@ class SettingsScreen extends StatelessWidget {
             children: [
               Align(
                 alignment: Alignment.centerRight,
-                child: _ProfileSelector(avatarUrl: user.avatarUrl),
+                child: _ProfileSelector(
+                  avatarUrl: user.avatarUrl,
+                  onTap: () =>
+                      setState(() => _showActivePreview = !_showActivePreview),
+                ),
               ),
               const SizedBox(height: 24),
               Text(
@@ -64,7 +80,7 @@ class SettingsScreen extends StatelessWidget {
                     _SettingsToggleRow(
                       iconAsset: _settingsMoonAsset,
                       label: 'Dark mode',
-                      isOn: false,
+                      isOn: darkModeOn,
                     ),
                     const SizedBox(height: 12),
                     _LanguageRow(),
@@ -113,7 +129,7 @@ class SettingsScreen extends StatelessWidget {
                     _SettingsToggleRow(
                       label: 'Push notifications',
                       description: 'Receive notifications for measurements',
-                      isOn: false,
+                      isOn: pushNotificationsOn,
                     ),
                     const SizedBox(height: 12),
                     _SettingsToggleRow(
@@ -134,7 +150,7 @@ class SettingsScreen extends StatelessWidget {
                     _SettingsToggleRow(
                       label: 'VisionRR camera mode',
                       description: 'AI-powered camera-based measurement',
-                      isOn: false,
+                      isOn: visionRrOn,
                     ),
                     const SizedBox(height: 12),
                     _ConfigureRow(onTap: () {}),
@@ -150,7 +166,7 @@ class SettingsScreen extends StatelessWidget {
                     _SettingsToggleRow(
                       label: 'Auto-Export Data',
                       description: 'Weekly CSV export to email',
-                      isOn: false,
+                      isOn: autoExportOn,
                     ),
                     const SizedBox(height: 12),
                     _ActionRow(
@@ -203,7 +219,7 @@ class SettingsScreen extends StatelessWidget {
           Navigator.of(context).pushReplacementNamed(
             AppRoutes.mainShell,
             arguments: {
-              'role': role,
+              'role': widget.role,
               'initialIndex': index,
             },
           );
@@ -214,46 +230,54 @@ class SettingsScreen extends StatelessWidget {
 }
 
 class _ProfileSelector extends StatelessWidget {
-  const _ProfileSelector({required this.avatarUrl});
+  const _ProfileSelector({required this.avatarUrl, this.onTap});
 
   final String avatarUrl;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.white, width: 2),
-          ),
-          child: ClipOval(
-            child: Image.network(avatarUrl, fit: BoxFit.cover),
-          ),
-        ),
-        Positioned(
-          right: -2,
-          bottom: -2,
-          child: Container(
-            width: 24,
-            height: 24,
+    return GestureDetector(
+      onTap: onTap,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: AppColors.white,
               shape: BoxShape.circle,
               border: Border.all(color: AppColors.white, width: 2),
             ),
-            child: Center(
-              child: SvgPicture.asset(
-                _settingsDownCircleAsset,
-                width: 20,
-                height: 20,
+            child: ClipOval(
+              child: Image.network(avatarUrl, fit: BoxFit.cover),
+            ),
+          ),
+          Positioned(
+            right: -4,
+            top: -4,
+            child: Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.white, width: 2),
+              ),
+              child: Center(
+                child: Transform.rotate(
+                  angle: -1.57,
+                  child: SvgPicture.asset(
+                    _settingsDownCircleAsset,
+                    width: 20,
+                    height: 20,
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -329,12 +353,14 @@ class _SettingsToggleRow extends StatelessWidget {
     required this.isOn,
     this.description,
     this.iconAsset,
+    this.radius = 12,
   });
 
   final String label;
   final String? description;
   final bool isOn;
   final String? iconAsset;
+  final double radius;
 
   @override
   Widget build(BuildContext context) {
@@ -342,7 +368,7 @@ class _SettingsToggleRow extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(radius),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -362,7 +388,7 @@ class _SettingsToggleRow extends StatelessWidget {
                         label,
                         style: AppTextStyles.body.copyWith(
                           color: AppColors.burgundy,
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.31,
                         ),
@@ -374,6 +400,7 @@ class _SettingsToggleRow extends StatelessWidget {
                           style: AppTextStyles.caption.copyWith(
                             color: AppColors.burgundy,
                             fontSize: 12,
+                            height: 1.3,
                           ),
                         ),
                       ],
@@ -421,7 +448,7 @@ class _LanguageRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: AppColors.pink,
-              borderRadius: BorderRadius.circular(100),
+              borderRadius: BorderRadius.circular(4),
             ),
             child: Row(
               children: [
@@ -430,7 +457,7 @@ class _LanguageRow extends StatelessWidget {
                   style: AppTextStyles.body.copyWith(
                     color: AppColors.burgundy,
                     fontSize: 14,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
                 const SizedBox(width: 6),
@@ -456,8 +483,8 @@ class _InviteButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.warningAmber,
-          borderRadius: BorderRadius.circular(100),
+          color: const Color(0xFF75ACFF),
+          borderRadius: BorderRadius.circular(4),
         ),
         child: Row(
           children: [
@@ -468,7 +495,7 @@ class _InviteButton extends StatelessWidget {
               style: AppTextStyles.body.copyWith(
                 color: AppColors.burgundy,
                 fontSize: 14,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w400,
                 letterSpacing: -0.15,
               ),
             ),
@@ -500,7 +527,7 @@ class _CareCircleItem extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -602,7 +629,7 @@ class _ConfigureRow extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -636,8 +663,8 @@ class _ConfigureRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.warningAmber,
-                borderRadius: BorderRadius.circular(100),
+                color: const Color(0xFF75ACFF),
+                borderRadius: BorderRadius.circular(4),
               ),
               child: Row(
                 children: [
@@ -648,8 +675,8 @@ class _ConfigureRow extends StatelessWidget {
                     'Configure',
                     style: AppTextStyles.body.copyWith(
                       color: AppColors.burgundy,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                 ],
@@ -683,7 +710,7 @@ class _ActionRow extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -738,7 +765,7 @@ class _SimpleRow extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: AppColors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -772,7 +799,7 @@ class _TogglePill extends StatelessWidget {
       height: 36,
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        color: AppColors.burgundy.withOpacity(0.2),
+        color: isOn ? AppColors.burgundy : AppColors.burgundy.withOpacity(0.2),
         borderRadius: BorderRadius.circular(9999),
       ),
       child: Align(
