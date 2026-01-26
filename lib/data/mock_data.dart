@@ -3,6 +3,7 @@ import 'package:pet_circle/models/clinical_note.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/models/user.dart';
+import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 class MockData {
@@ -103,7 +104,7 @@ class MockData {
   static final princess = Pet(
     name: 'Princess',
     breedAndAge: 'Cavalier King Charles • 5 years old',
-    imageUrl: 'https://dog.ceo/api/breed/spaniel/cocker/images/random',
+    imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
     statusColorHex: AppColors.successGreen.value,
     latestMeasurement: Measurement(bpm: 22, recordedAtLabel: '2 hours ago'),
@@ -114,7 +115,7 @@ class MockData {
   static final max = Pet(
     name: 'Max',
     breedAndAge: 'Golden Retriever • 8 years old',
-    imageUrl: 'https://dog.ceo/api/breed/retriever/golden/images/random',
+    imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Elevated',
     statusColorHex: AppColors.warningAmber.value,
     latestMeasurement: Measurement(bpm: 32, recordedAtLabel: '30 min ago'),
@@ -125,7 +126,7 @@ class MockData {
   static final luna = Pet(
     name: 'Luna',
     breedAndAge: 'Labrador • 6 years old',
-    imageUrl: 'https://dog.ceo/api/breed/labrador/images/random',
+    imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
     statusColorHex: AppColors.successGreen.value,
     latestMeasurement: Measurement(bpm: 24, recordedAtLabel: '1 hour ago'),
@@ -136,7 +137,7 @@ class MockData {
   static final rocky = Pet(
     name: 'Rocky',
     breedAndAge: 'German Shepherd • 10 years old',
-    imageUrl: 'https://dog.ceo/api/breed/germanshepherd/images/random',
+    imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
     statusColorHex: AppColors.successGreen.value,
     latestMeasurement: Measurement(bpm: 18, recordedAtLabel: '1 day ago'),

@@ -2,11 +2,12 @@ class AppAssets {
   // Welcome
   static const welcomeGraphic = 'assets/figma/welcome.svg';
   static const appLogo = 'assets/figma/app_logo.svg';
+  static const petPlaceholder = 'assets/figma/pet_placeholder.png';
 
   // Dashboard images
-  static const petMax = 'https://dog.ceo/api/breeds/image/random';
-  static const petLuna = 'https://dog.ceo/api/breeds/image/random';
-  static const petRocky = 'https://dog.ceo/api/breeds/image/random';
+  static const petMax = petPlaceholder;
+  static const petLuna = petPlaceholder;
+  static const petRocky = petPlaceholder;
 
   // Care circle avatars
   static const avatar1 = 'https://ui-avatars.com/api/?name=Owner&size=128&rounded=true';
