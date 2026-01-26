@@ -1,9 +1,6 @@
 import 'dart:async';
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/widgets/neumorphic_card.dart';
-import 'package:pet_circle/widgets/round_icon_button.dart';
 
 class MeasurementScreen extends StatefulWidget {
   const MeasurementScreen({super.key, this.showScaffold = true});
@@ -25,13 +22,11 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            _Header(),
-            const SizedBox(height: AppSpacing.lg),
             _TabSelector(
               selectedIndex: _selectedTab,
               onChanged: (index) => setState(() => _selectedTab = index),
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: 32),
             Expanded(
               child: _selectedTab == 0
                   ? _ManualMode(
@@ -57,56 +52,6 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
   }
 }
 
-class _Header extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: AppColors.pink.withOpacity(0.3),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const CircleAvatar(
-                      radius: 14,
-                      backgroundColor: AppColors.pink,
-                      child: Text('P',
-                          style:
-                              TextStyle(color: AppColors.burgundy, fontSize: 12)),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text('Princess', style: AppTextStyles.body),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Row(
-          children: [
-            RoundIconButton(
-              icon: const Icon(Icons.language, color: AppColors.burgundy, size: 20),
-            ),
-            const SizedBox(width: 8),
-            RoundIconButton(
-              icon: const Icon(Icons.notifications_none,
-                  color: AppColors.burgundy, size: 20),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
 class _TabSelector extends StatelessWidget {
   const _TabSelector({
     required this.selectedIndex,
@@ -122,7 +67,7 @@ class _TabSelector extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: AppColors.offWhite,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         children: [
@@ -163,7 +108,8 @@ class _TabButton extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          height: 29,
+          padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
             color: selected ? AppColors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
@@ -173,13 +119,13 @@ class _TabButton extends StatelessWidget {
             children: [
               Icon(icon,
                   size: 16,
-                  color: selected ? AppColors.warningAmber : AppColors.textMuted),
+                  color: AppColors.burgundy),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: AppTextStyles.caption.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: selected ? AppColors.burgundy : AppColors.textMuted,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.burgundy,
                 ),
               ),
             ],
@@ -209,16 +155,12 @@ class _ManualModeState extends State<_ManualMode>
   int _remainingSeconds = 0;
   int _tapCount = 0;
   Timer? _timer;
-  late AnimationController _pulseController;
+  static const _lightBlue = Color(0xFF75ACFF);
 
   @override
   void initState() {
     super.initState();
     _remainingSeconds = widget.selectedDuration;
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
   }
 
   @override
@@ -232,7 +174,6 @@ class _ManualModeState extends State<_ManualMode>
   @override
   void dispose() {
     _timer?.cancel();
-    _pulseController.dispose();
     super.dispose();
   }
 
@@ -311,27 +252,30 @@ class _ManualModeState extends State<_ManualMode>
     }
     
     setState(() => _tapCount++);
-    
-    // Pulse animation
-    _pulseController.forward(from: 0);
   }
 
   @override
   Widget build(BuildContext context) {
-    final progress = _isRunning
-        ? 1 - (_remainingSeconds / widget.selectedDuration)
-        : 0.0;
+    final progress = widget.selectedDuration == 0
+        ? 0.0
+        : (_remainingSeconds / widget.selectedDuration).clamp(0.0, 1.0);
 
     return Column(
       children: [
         // Timer Duration selector
-        NeumorphicCard(
-          padding: const EdgeInsets.all(20),
-          radius: BorderRadius.circular(16),
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.offWhite,
+            borderRadius: BorderRadius.circular(16),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Timer Duration', style: AppTextStyles.body),
+              Text(
+                'Timer Duration',
+                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+              ),
               const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
@@ -340,13 +284,13 @@ class _ManualModeState extends State<_ManualMode>
                     selected: widget.selectedDuration == 15,
                     onTap: _isRunning ? null : () => widget.onDurationChanged(15),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                   _DurationChip(
                     label: '30s',
                     selected: widget.selectedDuration == 30,
                     onTap: _isRunning ? null : () => widget.onDurationChanged(30),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 16),
                   _DurationChip(
                     label: '60s',
                     selected: widget.selectedDuration == 60,
@@ -358,107 +302,93 @@ class _ManualModeState extends State<_ManualMode>
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        // Timer display
-        Text(
-          '${_remainingSeconds}s',
-          style: TextStyle(
-            fontSize: 48,
-            fontWeight: FontWeight.w300,
-            color: AppColors.warningAmber.withOpacity(0.8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+          decoration: BoxDecoration(
+            color: AppColors.offWhite,
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        // Circular tap area
-        Expanded(
-          child: Center(
-            child: GestureDetector(
-              onTap: _onTap,
-              child: NeumorphicCard(
-                radius: BorderRadius.circular(1000),
-                padding: EdgeInsets.zero,
-                child: SizedBox(
-                  width: 240,
-                  height: 240,
-                  child: Stack(
-                    alignment: Alignment.center,
+          child: Column(
+            children: [
+              Text(
+                '${_remainingSeconds}s',
+                style: const TextStyle(
+                  fontSize: 44,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.burgundy,
+                  height: 1.2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.maxWidth;
+                  return Stack(
+                    alignment: Alignment.centerLeft,
                     children: [
-                      // Progress ring
-                      SizedBox(
-                        width: 220,
-                        height: 220,
-                        child: CustomPaint(
-                          painter: _CircularProgressPainter(
-                            progress: progress,
-                            strokeWidth: 8,
-                            backgroundColor: AppColors.offWhite,
-                            progressColor: AppColors.warningAmber,
-                          ),
+                      Container(
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: AppColors.burgundy.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(999),
                         ),
                       ),
-                      // Inner circle with count
-                      AnimatedBuilder(
-                        animation: _pulseController,
-                        builder: (context, child) {
-                          final scale = 1.0 +
-                              (0.05 *
-                                  math.sin(_pulseController.value * math.pi));
-                          return Transform.scale(
-                            scale: scale,
-                            child: child,
-                          );
-                        },
-                        child: Container(
-                          width: 180,
-                          height: 180,
-                          decoration: BoxDecoration(
-                            color: AppColors.white,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 20,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                '$_tapCount',
-                                style: const TextStyle(
-                                  fontSize: 56,
-                                  fontWeight: FontWeight.w300,
-                                  color: AppColors.burgundy,
-                                ),
-                              ),
-                              Text(
-                                _isRunning ? 'Tap for each breath' : 'Tap to begin',
-                                style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.textMuted,
-                                ),
-                              ),
-                            ],
-                          ),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        height: 8,
+                        width: width * progress,
+                        decoration: BoxDecoration(
+                          color: _lightBlue,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: _onTap,
+                child: Container(
+                  width: 206,
+                  height: 206,
+                  decoration: BoxDecoration(
+                    color: AppColors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '$_tapCount',
+                        style: const TextStyle(
+                          fontSize: 80,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.burgundy,
+                          height: 1.0,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _isRunning ? 'Tap to stop' : 'Tap to begin',
+                        style: AppTextStyles.body.copyWith(
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
-        if (_isRunning) ...[
-          const SizedBox(height: AppSpacing.md),
-          TextButton(
-            onPressed: _stopTimer,
-            child: Text(
-              'Stop & Calculate',
-              style: AppTextStyles.body.copyWith(color: AppColors.burgundy),
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -481,22 +411,17 @@ class _DurationChip extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          height: 60,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? AppColors.burgundy : AppColors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(
-              color: selected ? AppColors.burgundy : AppColors.offWhite,
-              width: 2,
-            ),
+            color: selected ? const Color(0xFF75ACFF) : AppColors.white,
+            borderRadius: BorderRadius.circular(12),
           ),
-          child: Center(
-            child: Text(
-              label,
-              style: AppTextStyles.body.copyWith(
-                fontWeight: FontWeight.w600,
-                color: selected ? AppColors.white : AppColors.textPrimary,
-              ),
+          child: Text(
+            label,
+            style: AppTextStyles.body.copyWith(
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+              color: AppColors.burgundy,
             ),
           ),
         ),
@@ -505,66 +430,17 @@ class _DurationChip extends StatelessWidget {
   }
 }
 
-class _CircularProgressPainter extends CustomPainter {
-  _CircularProgressPainter({
-    required this.progress,
-    required this.strokeWidth,
-    required this.backgroundColor,
-    required this.progressColor,
-  });
-
-  final double progress;
-  final double strokeWidth;
-  final Color backgroundColor;
-  final Color progressColor;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.width - strokeWidth) / 2;
-
-    // Background circle
-    final bgPaint = Paint()
-      ..color = backgroundColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round;
-
-    canvas.drawCircle(center, radius, bgPaint);
-
-    // Progress arc
-    if (progress > 0) {
-      final progressPaint = Paint()
-        ..color = progressColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth
-        ..strokeCap = StrokeCap.round;
-
-      final rect = Rect.fromCircle(center: center, radius: radius);
-      canvas.drawArc(
-        rect,
-        -math.pi / 2, // Start from top
-        2 * math.pi * progress,
-        false,
-        progressPaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _CircularProgressPainter oldDelegate) {
-    return oldDelegate.progress != progress;
-  }
-}
-
 class _VisionMode extends StatelessWidget {
   const _VisionMode();
 
   @override
   Widget build(BuildContext context) {
-    return NeumorphicCard(
+    return Container(
       padding: const EdgeInsets.all(24),
-      radius: BorderRadius.circular(16),
+      decoration: BoxDecoration(
+        color: AppColors.offWhite,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: const [
