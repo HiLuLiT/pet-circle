@@ -5,6 +5,7 @@ import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/screens/auth/auth_screen.dart';
+import 'package:pet_circle/screens/auth/role_selection_screen.dart';
 import 'package:pet_circle/screens/auth/verify_email_screen.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
@@ -53,6 +54,11 @@ class PetCircleApp extends StatelessWidget {
             final role = settings.arguments as AppUserRole? ?? AppUserRole.owner;
             return MaterialPageRoute(
               builder: (_) => AuthScreen(role: role),
+            );
+
+          case AppRoutes.roleSelection:
+            return MaterialPageRoute(
+              builder: (_) => const RoleSelectionScreen(),
             );
 
           case AppRoutes.verifyEmail:
