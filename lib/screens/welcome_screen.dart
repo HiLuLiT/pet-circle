@@ -1,83 +1,131 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
-import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/widgets/primary_button.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
 
-  void _handleVetTap(BuildContext context) {
-    if (kEnableFirebase) {
-      Navigator.of(context).pushNamed(AppRoutes.auth, arguments: AppUserRole.vet);
-    } else {
-      // Skip auth - go directly to main shell
-      Navigator.of(context).pushReplacementNamed(
-        AppRoutes.mainShell,
-        arguments: AppUserRole.vet,
-      );
-    }
-  }
-
-  void _handleOwnerTap(BuildContext context) {
-    if (kEnableFirebase) {
-      Navigator.of(context).pushNamed(AppRoutes.auth, arguments: AppUserRole.owner);
-    } else {
-      // Skip auth - go directly to main shell
-      Navigator.of(context).pushReplacementNamed(
-        AppRoutes.mainShell,
-        arguments: AppUserRole.owner,
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.pink,
-      body: Stack(
-        children: [
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 120),
-              child: SvgPicture.asset(
-                AppAssets.welcomeGraphic,
-                width: 248,
-                height: 248,
-                fit: BoxFit.contain,
+      backgroundColor: const Color(0xFFFFC2B5),
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  width: 248,
+                  height: 248,
+                  child: SvgPicture.asset(
+                    AppAssets.welcomeGraphic,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
             ),
-          ),
-          Positioned(
-            left: 24,
-            right: 24,
-            bottom: 80,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                PrimaryButton(
-                  label: "I'm a Veterinarian",
-                  onPressed: () => _handleVetTap(context),
-                  backgroundColor: AppColors.burgundy,
-                  textStyle: AppTextStyles.button.copyWith(fontSize: 20),
-                  icon: Icons.medical_services_outlined,
-                ),
-                const SizedBox(height: 16),
-                PrimaryButton(
-                  label: "I'm a Pet Owner",
-                  onPressed: () => _handleOwnerTap(context),
-                  backgroundColor: AppColors.white,
-                  textStyle: AppTextStyles.button
-                      .copyWith(fontSize: 20, color: AppColors.burgundy),
-                  icon: Icons.pets,
-                ),
-              ],
+            Padding(
+              padding: const EdgeInsets.only(bottom: 40),
+              child: Column(
+                children: [
+                  _PrimaryPillButton(
+                    label: 'Sign up',
+                    textColor: AppColors.white,
+                    backgroundColor: AppColors.burgundy,
+                    onTap: () =>
+                        Navigator.of(context).pushNamed(AppRoutes.roleSelection),
+                  ),
+                  const SizedBox(height: 12),
+                  _GoogleButton(
+                    onTap: () =>
+                        Navigator.of(context).pushNamed(AppRoutes.roleSelection),
+                  ),
+                ],
+              ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PrimaryPillButton extends StatelessWidget {
+  const _PrimaryPillButton({
+    required this.label,
+    required this.textColor,
+    required this.backgroundColor,
+    required this.onTap,
+  });
+
+  final String label;
+  final Color textColor;
+  final Color backgroundColor;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 247,
+      height: 58,
+      child: TextButton(
+        onPressed: onTap,
+        style: TextButton.styleFrom(
+          backgroundColor: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(172),
           ),
-        ],
+        ),
+        child: Text(
+          label,
+          style: AppTextStyles.body.copyWith(
+            color: textColor,
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
+            letterSpacing: -0.48,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _GoogleButton extends StatelessWidget {
+  const _GoogleButton({required this.onTap});
+
+  final VoidCallback onTap;
+  static const _googleLogoAsset = 'assets/figma/google_logo.png';
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 247,
+      height: 58,
+      child: TextButton(
+        onPressed: onTap,
+        style: TextButton.styleFrom(
+          backgroundColor: AppColors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(172),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(_googleLogoAsset, width: 18, height: 18),
+            const SizedBox(width: 8),
+            Text(
+              'Sign in with Google',
+              style: AppTextStyles.body.copyWith(
+                color: AppColors.burgundy,
+                fontSize: 16,
+                letterSpacing: -0.32,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
