@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -35,8 +36,13 @@ class CareCircleDashboard extends StatelessWidget {
                       .map(
                         (pet) => _PetCard(
                           data: pet,
-                          onTap: () => Navigator.of(context)
-                              .pushNamed(AppRoutes.measurement),
+                          onTap: () => Navigator.of(context).pushNamed(
+                            AppRoutes.mainShell,
+                            arguments: {
+                              'role': AppUserRole.vet,
+                              'initialIndex': 2,
+                            },
+                          ),
                         ),
                       )
                       .toList(),

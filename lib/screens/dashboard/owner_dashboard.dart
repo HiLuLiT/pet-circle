@@ -53,8 +53,11 @@ class OwnerDashboard extends StatelessWidget {
                   child: _PetCard(
                     data: pet,
                     onMeasure: () => Navigator.of(context).pushNamed(
-                      AppRoutes.measurement,
-                      arguments: pet,
+                      AppRoutes.mainShell,
+                      arguments: {
+                        'role': AppUserRole.owner,
+                        'initialIndex': 2,
+                      },
                     ),
                     onTrends: () {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -179,7 +182,7 @@ class _PetCard extends StatelessWidget {
                     style: AppTextStyles.body.copyWith(
                       color: AppColors.burgundy,
                       fontSize: 14,
-                      letterSpacing: -0.15,
+                      letterSpacing: -0.28,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -214,7 +217,7 @@ class _PetCard extends StatelessWidget {
                                 style: AppTextStyles.heading2.copyWith(
                                   color: AppColors.burgundy,
                                   fontSize: 24,
-                                  height: 1.33,
+                                  height: 1.2,
                                 ),
                               ),
                               Text(
@@ -344,8 +347,8 @@ class _ActionButton extends StatelessWidget {
               style: AppTextStyles.body.copyWith(
                 color: AppColors.burgundy,
                 fontSize: 14,
-                fontWeight: FontWeight.w500,
-                letterSpacing: -0.15,
+                fontWeight: FontWeight.w400,
+                letterSpacing: -0.28,
               ),
             ),
           ],
