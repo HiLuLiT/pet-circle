@@ -7,6 +7,8 @@ import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/widgets/app_header.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
 import 'package:pet_circle/widgets/round_icon_button.dart';
@@ -21,6 +23,7 @@ class VetDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     final pets = MockData.vetClinicPets;
     final user = MockData.currentVetUser;
+    final l10n = AppLocalizations.of(context)!;
 
     // Count stats
     final normalCount = pets.where((p) => p.statusLabel == 'Normal').length;
@@ -33,20 +36,24 @@ class VetDashboard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _Header(
+              AppHeader(
                 userName: user.name,
-                onSettingsTap: () => Navigator.of(context).pushNamed(
+                userImageUrl: user.avatarUrl,
+                onAvatarTap: () => Navigator.of(context).pushNamed(
                   AppRoutes.settings,
                   arguments: AppUserRole.vet,
                 ),
+                onNotificationTap: () {
+                  // TODO: Navigate to notifications
+                },
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'Clinic Overview',
+                l10n.clinicOverview,
                 style: AppTextStyles.heading2.copyWith(color: AppColors.burgundy),
               ),
               Text(
-                '${pets.length} patients in your care',
+                l10n.patientsInYourCare(pets.length),
                 style: AppTextStyles.bodyMuted,
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -75,19 +82,19 @@ class VetDashboard extends StatelessWidget {
                     iconColor: const Color(0x267FBA7A),
                     icon: Icons.check_circle_outline,
                     value: '$normalCount',
-                    label: 'Normal Status',
+                    label: l10n.normalStatus,
                   ),
                   _SummaryCard(
                     iconColor: const Color(0x26F39C12),
                     icon: Icons.warning_amber_outlined,
                     value: '$elevatedCount',
-                    label: 'Need Attention',
+                    label: l10n.needAttention,
                   ),
                   _SummaryCard(
                     iconColor: const Color(0x1A5B9BD5),
                     icon: Icons.bar_chart,
                     value: '${pets.length * 6}',
-                    label: 'Measurements This Week',
+                    label: l10n.measurementsThisWeek,
                   ),
                 ],
               ),
@@ -108,64 +115,6 @@ class VetDashboard extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({required this.userName, this.onSettingsTap});
-
-  final String userName;
-  final VoidCallback? onSettingsTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(
-                color: AppColors.pink,
-                shape: BoxShape.circle,
-              ),
-              child: SvgPicture.asset(AppAssets.appLogo, width: 48, height: 48),
-            ),
-            const SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Welcome back,',
-                  style: AppTextStyles.caption.copyWith(color: AppColors.textMuted),
-                ),
-                Text(
-                  userName,
-                  style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
-                ),
-              ],
-            ),
-          ],
-        ),
-        GestureDetector(
-          onTap: onSettingsTap,
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: const BoxDecoration(
-              color: AppColors.offWhite,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.settings,
-              color: AppColors.burgundy,
-              size: 20,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _PetCard extends StatelessWidget {
   const _PetCard({required this.data, this.onTap});
 
@@ -174,6 +123,7 @@ class _PetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onTap,
       child: NeumorphicCard(
@@ -221,7 +171,7 @@ class _PetCard extends StatelessWidget {
                         const Icon(Icons.visibility, size: 12, color: AppColors.white),
                         const SizedBox(width: 4),
                         Text(
-                          'View Only',
+                          l10n.viewOnly,
                           style: AppTextStyles.caption.copyWith(
                             color: AppColors.white,
                             fontSize: 10,
@@ -266,7 +216,7 @@ class _PetCard extends StatelessWidget {
                                 style: AppTextStyles.heading3
                                     .copyWith(color: AppColors.textPrimary),
                               ),
-                              Text('BPM', style: AppTextStyles.caption),
+                              Text(l10n.bpm, style: AppTextStyles.caption),
                             ],
                           ),
                         ],
@@ -288,7 +238,7 @@ class _PetCard extends StatelessWidget {
                           const Icon(Icons.person_outline, size: 14, color: AppColors.textMuted),
                           const SizedBox(width: 6),
                           Text(
-                            'Owner: ${_getOwnerName(data.careCircle)}',
+                            l10n.ownerLabel(_getOwnerName(data.careCircle, l10n.unknown)),
                             style: AppTextStyles.caption,
                           ),
                         ],
@@ -305,9 +255,9 @@ class _PetCard extends StatelessWidget {
     );
   }
 
-  String _getOwnerName(List<CareCircleMember> circle) {
+  String _getOwnerName(List<CareCircleMember> circle, String fallback) {
     final owner = circle.where((m) => m.role == 'Owner').firstOrNull;
-    return owner?.name ?? 'Unknown';
+    return owner?.name ?? fallback;
   }
 }
 

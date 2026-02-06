@@ -5,7 +5,10 @@ import 'package:pet_circle/data/mock_data.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
+import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/widgets/app_header.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 
 const _bpmIconAsset = 'assets/figma/bpm_icon.svg';
@@ -22,6 +25,7 @@ class OwnerDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     final pets = MockData.hilaPets;
     final user = MockData.currentOwnerUser;
+    final l10n = AppLocalizations.of(context)!;
 
     final content = SafeArea(
       child: SingleChildScrollView(
@@ -31,16 +35,22 @@ class OwnerDashboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              _Header(
-                avatarUrl: user.avatarUrl,
-                onSettingsTap: () => Navigator.of(context).pushNamed(
+              AppHeader(
+                userName: user.name,
+                userImageUrl: user.avatarUrl,
+                petName: pets.isNotEmpty ? pets.first.name : null,
+                petImageUrl: pets.isNotEmpty ? pets.first.imageUrl : null,
+                onAvatarTap: () => Navigator.of(context).pushNamed(
                   AppRoutes.settings,
                   arguments: AppUserRole.owner,
                 ),
+                onNotificationTap: () {
+                  // TODO: Navigate to notifications
+                },
               ),
               const SizedBox(height: 40),
               Text(
-                'My pets',
+                l10n.myPets,
                 style: AppTextStyles.heading2.copyWith(
                   color: AppColors.burgundy,
                   letterSpacing: -0.96,
@@ -59,11 +69,13 @@ class OwnerDashboard extends StatelessWidget {
                         'initialIndex': 2,
                       },
                     ),
-                    onTrends: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Trends coming soon')),
-                      );
-                    },
+                    onTrends: () => Navigator.of(context).pushNamed(
+                      AppRoutes.mainShell,
+                      arguments: {
+                        'role': AppUserRole.owner,
+                        'initialIndex': 1,
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -85,54 +97,6 @@ class OwnerDashboard extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({
-    required this.avatarUrl,
-    this.onSettingsTap,
-  });
-
-  final String avatarUrl;
-  final VoidCallback? onSettingsTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        // Profile avatar on left
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(color: AppColors.white, width: 2),
-          ),
-          child: ClipOval(
-            child: Image.network(avatarUrl, fit: BoxFit.cover),
-          ),
-        ),
-        // Settings icon on right
-        GestureDetector(
-          onTap: onSettingsTap,
-          child: Container(
-            width: 36,
-            height: 36,
-            decoration: const BoxDecoration(
-              color: AppColors.offWhite,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.settings,
-              color: AppColors.burgundy,
-              size: 20,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 class _PetCard extends StatelessWidget {
   const _PetCard({
     required this.data,
@@ -146,6 +110,7 @@ class _PetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: Container(
@@ -221,7 +186,7 @@ class _PetCard extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                'BPM',
+                                l10n.bpm,
                                 style: AppTextStyles.caption.copyWith(
                                   color: AppColors.burgundy,
                                   fontSize: 12,
@@ -260,7 +225,7 @@ class _PetCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            'Care Circle',
+                            l10n.careCircle,
                             style: AppTextStyles.caption.copyWith(
                               color: AppColors.burgundy,
                               fontSize: 12,
@@ -283,7 +248,7 @@ class _PetCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _ActionButton(
-                          label: 'Measure',
+                          label: l10n.measure,
                           iconAsset: _measureIconAsset,
                           isPrimary: true,
                           onTap: onMeasure,
@@ -292,7 +257,7 @@ class _PetCard extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _ActionButton(
-                          label: 'Trends',
+                          label: l10n.trends,
                           iconAsset: _trendsIconAsset,
                           isPrimary: false,
                           onTap: onTrends,

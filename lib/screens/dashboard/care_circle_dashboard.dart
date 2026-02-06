@@ -7,6 +7,8 @@ import 'package:pet_circle/models/pet.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/widgets/app_header.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
 import 'package:pet_circle/widgets/round_icon_button.dart';
@@ -18,6 +20,8 @@ class CareCircleDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pets = MockData.pets;
+    final user = MockData.currentOwnerUser;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -27,7 +31,17 @@ class CareCircleDashboard extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                _Header(),
+                AppHeader(
+                  userName: user.name,
+                  userImageUrl: user.avatarUrl,
+                  onAvatarTap: () => Navigator.of(context).pushNamed(
+                    AppRoutes.settings,
+                    arguments: AppUserRole.owner,
+                  ),
+                  onNotificationTap: () {
+                    // TODO: Navigate to notifications
+                  },
+                ),
                 const SizedBox(height: AppSpacing.lg),
                 _ResponsiveGrid(
                   maxCrossAxisCount: 3,
@@ -52,24 +66,24 @@ class CareCircleDashboard extends StatelessWidget {
                   maxCrossAxisCount: 3,
                   minItemWidth: 280,
                   childAspectRatio: 3.3,
-                  children: const [
+                  children: [
                     _SummaryCard(
-                      iconColor: Color(0x267FBA7A),
+                      iconColor: const Color(0x267FBA7A),
                       iconUrl: AppAssets.statusOkIcon,
                       value: '2',
-                      label: 'Normal Status',
+                      label: l10n.normalStatus,
                     ),
                     _SummaryCard(
-                      iconColor: Color(0x26F39C12),
+                      iconColor: const Color(0x26F39C12),
                       iconUrl: AppAssets.attentionIcon,
                       value: '1',
-                      label: 'Need Attention',
+                      label: l10n.needAttention,
                     ),
                     _SummaryCard(
-                      iconColor: Color(0x1A5B9BD5),
+                      iconColor: const Color(0x1A5B9BD5),
                       iconUrl: AppAssets.chartIcon,
                       value: '24',
-                      label: 'Measurements This Week',
+                      label: l10n.measurementsThisWeek,
                     ),
                   ],
                 ),
@@ -82,36 +96,6 @@ class CareCircleDashboard extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(4),
-          decoration: const BoxDecoration(
-            color: AppColors.pink,
-            shape: BoxShape.circle,
-          ),
-          child: SvgPicture.asset(AppAssets.appLogo, width: 60, height: 60),
-        ),
-        Row(
-          children: [
-            RoundIconButton(
-              icon: const Icon(Icons.language, color: AppColors.burgundy),
-            ),
-            const SizedBox(width: 8),
-            RoundIconButton(
-              icon: const Icon(Icons.notifications_none, color: AppColors.burgundy),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
 class _PetCard extends StatelessWidget {
   const _PetCard({required this.data, this.onTap});
 
@@ -120,6 +104,7 @@ class _PetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onTap,
       child: NeumorphicCard(
@@ -182,7 +167,7 @@ class _PetCard extends StatelessWidget {
                             Text('${data.latestMeasurement.bpm}',
                                 style: AppTextStyles.heading3
                                     .copyWith(color: AppColors.textPrimary)),
-                            Text('BPM', style: AppTextStyles.caption),
+                            Text(l10n.bpm, style: AppTextStyles.caption),
                           ],
                         ),
                       ],
@@ -201,7 +186,7 @@ class _PetCard extends StatelessWidget {
                       children: [
                         const Icon(Icons.group, size: 12, color: AppColors.textMuted),
                         const SizedBox(width: 6),
-                        Text('Care Circle', style: AppTextStyles.caption),
+                        Text(l10n.careCircle, style: AppTextStyles.caption),
                       ],
                     ),
                     _AvatarStack(avatars: data.careCircle),
