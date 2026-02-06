@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -31,6 +35,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final content = SafeArea(
       child: SingleChildScrollView(
         child: Padding(
@@ -38,15 +43,21 @@ class _TrendsScreenState extends State<TrendsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _TopBar(),
-              const SizedBox(height: 40),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text('Health Trends', style: AppTextStyles.heading2),
-                  _PetPill(),
-                ],
+              AppHeader(
+                userName: MockData.currentOwnerUser.name,
+                userImageUrl: MockData.currentOwnerUser.avatarUrl,
+                petName: MockData.princess.name,
+                petImageUrl: MockData.princess.imageUrl,
+                onAvatarTap: () {
+                  // Navigate to settings
+                  Navigator.of(context).pushNamed('/settings', arguments: 'owner');
+                },
+                onNotificationTap: () {
+                  // TODO: Navigate to notifications
+                },
               ),
+              const SizedBox(height: 40),
+              Text(l10n.healthTrends, style: AppTextStyles.heading2),
               const SizedBox(height: 32),
               _TrendsTabs(
                 selectedIndex: _selectedTab,
@@ -82,93 +93,6 @@ class _TrendsScreenState extends State<TrendsScreen> {
   }
 }
 
-class _TopBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const [
-        _AvatarCircle(),
-        _BellCircle(),
-      ],
-    );
-  }
-}
-
-class _AvatarCircle extends StatelessWidget {
-  const _AvatarCircle();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
-        image: const DecorationImage(
-          image: NetworkImage('https://ui-avatars.com/api/?name=Hila&size=128'),
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
-}
-
-class _BellCircle extends StatelessWidget {
-  const _BellCircle();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 36,
-      height: 36,
-      decoration: BoxDecoration(
-        color: AppColors.offWhite,
-        shape: BoxShape.circle,
-        border: Border.all(color: Colors.white, width: 2),
-      ),
-      child: const Icon(Icons.notifications_none, color: AppColors.burgundy),
-    );
-  }
-}
-
-class _PetPill extends StatelessWidget {
-  const _PetPill();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.lightYellow,
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Row(
-        children: [
-          ClipOval(
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: DogPhoto(
-                endpoint: 'https://dog.ceo/api/breeds/image/random',
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            'Princess',
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.burgundy,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class _TrendsTabs extends StatelessWidget {
   const _TrendsTabs({
@@ -247,31 +171,32 @@ class _TrendsOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         _SectionCard(
           child: _MetricRow(
-            label: 'Average SRR',
+            label: l10n.averageSrr,
             value: '31',
-            subLabel: 'Breaths per minute',
+            subLabel: l10n.breathsPerMinute,
             icon: Icons.show_chart,
           ),
         ),
         const SizedBox(height: 24),
         _SectionCard(
           child: _MetricRow(
-            label: '7-Day Trend',
+            label: l10n.sevenDayTrend,
             value: '+4',
-            subLabel: 'BPM change',
+            subLabel: l10n.bpmChange,
             icon: Icons.trending_up,
           ),
         ),
         const SizedBox(height: 24),
         _SectionCard(
           child: _MetricRow(
-            label: '7-Day Trend',
+            label: l10n.sevenDayTrend,
             value: '1',
-            subLabel: 'Active treatments',
+            subLabel: l10n.activeTreatments,
             icon: Icons.medication,
           ),
         ),
@@ -279,15 +204,15 @@ class _TrendsOverview extends StatelessWidget {
         _SectionCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
-                'Sleeping Respiratory Rate (SRR) Over Time',
+                l10n.srrOverTime,
                 style: AppTextStyles.heading3,
               ),
-              SizedBox(height: 16),
-              _BadgeRow(),
-              SizedBox(height: 8),
-              _BadgeRowSecond(),
+              const SizedBox(height: 16),
+              const _BadgeRow(),
+              const SizedBox(height: 8),
+              const _BadgeRowSecond(),
             ],
           ),
         ),
@@ -296,7 +221,7 @@ class _TrendsOverview extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Medication Timeline', style: AppTextStyles.heading3),
+              Text(l10n.medicationTimeline, style: AppTextStyles.heading3),
               const SizedBox(height: 4),
               Text(
                 'Customize the look and feel',
@@ -347,7 +272,7 @@ class _TrendsOverview extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    'Add Medication',
+                    l10n.addMedication,
                     style: AppTextStyles.body.copyWith(
                       color: AppColors.burgundy,
                     ),
@@ -407,6 +332,59 @@ class _MetricRow extends StatelessWidget {
   }
 }
 
+void _exportMedicationLog(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+  const csvData = 'Medication,Dosage,Frequency,Start Date,End Date,Prescribed By\n'
+      'Pimobendan,5mg,Twice daily,2025-01-01,Ongoing,Dr. Smith DVM\n'
+      'Furosemide,20mg,Once daily,2025-01-15,2025-03-15,Dr. Smith DVM\n'
+      'Enalapril,2.5mg,Once daily,2025-02-01,Ongoing,Dr. Johnson DVM\n';
+
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(l10n.exportMedicationLog, style: AppTextStyles.heading3),
+      content: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.csvPreview, style: AppTextStyles.body),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.offWhite,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(csvData, style: AppTextStyles.caption.copyWith(fontFamily: 'monospace', fontSize: 10)),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: AppColors.burgundy)),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.medicationLogExported)),
+            );
+          },
+          style: TextButton.styleFrom(
+            backgroundColor: const Color(0xFF75ACFF),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          child: Text(l10n.downloadCsv, style: AppTextStyles.body.copyWith(color: AppColors.burgundy)),
+        ),
+      ],
+    ),
+  );
+}
+
 class _MedicationManagement extends StatelessWidget {
   const _MedicationManagement({required this.onAddMedication});
 
@@ -414,13 +392,14 @@ class _MedicationManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Medication\nManagement', style: AppTextStyles.heading3),
+            Text(l10n.medicationManagement, style: AppTextStyles.heading3),
             SizedBox(
               height: 32,
               child: TextButton.icon(
@@ -433,7 +412,7 @@ class _MedicationManagement extends StatelessWidget {
                 ),
                 icon: const Icon(Icons.add, color: AppColors.burgundy, size: 16),
                 label: Text(
-                  'Add Medication',
+                  l10n.addMedication,
                   style: AppTextStyles.caption.copyWith(
                     color: AppColors.burgundy,
                   ),
@@ -461,8 +440,8 @@ class _MedicationManagement extends StatelessWidget {
                 child: const Icon(Icons.medication, color: AppColors.burgundy),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'No Medications Recorded',
+              Text(
+                l10n.noMedicationsRecorded,
                 style: AppTextStyles.heading3,
                 textAlign: TextAlign.center,
               ),
@@ -486,7 +465,7 @@ class _MedicationManagement extends StatelessWidget {
                   ),
                   icon: const Icon(Icons.add, color: AppColors.burgundy, size: 16),
                   label: Text(
-                    'Add Medication',
+                    l10n.addMedication,
                     style: AppTextStyles.body.copyWith(
                       color: AppColors.burgundy,
                     ),
@@ -511,8 +490,8 @@ class _MedicationManagement extends StatelessWidget {
                     color: Color(0xFF146FD9)),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Clinical Record Information',
+              Text(
+                l10n.clinicalRecordInformation,
                 style: AppTextStyles.heading3,
                 textAlign: TextAlign.center,
               ),
@@ -528,7 +507,9 @@ class _MedicationManagement extends StatelessWidget {
               SizedBox(
                 height: 40,
                 child: TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    _exportMedicationLog(context);
+                  },
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF75ACFF),
                     shape: RoundedRectangleBorder(
@@ -538,7 +519,7 @@ class _MedicationManagement extends StatelessWidget {
                   icon: const Icon(Icons.file_download,
                       color: AppColors.burgundy, size: 16),
                   label: Text(
-                    'Export Medication Log',
+                    l10n.exportMedicationLog,
                     style: AppTextStyles.body.copyWith(
                       color: AppColors.burgundy,
                     ),
@@ -553,17 +534,34 @@ class _MedicationManagement extends StatelessWidget {
   }
 }
 
-class _MeasurementHistory extends StatelessWidget {
+class _MeasurementHistory extends StatefulWidget {
   const _MeasurementHistory({required this.onExport});
 
   final VoidCallback onExport;
 
   @override
+  State<_MeasurementHistory> createState() => _MeasurementHistoryState();
+}
+
+class _MeasurementHistoryState extends State<_MeasurementHistory> {
+  String? _selectedPeriod;
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final periodOptions = [
+      l10n.last24Hours,
+      l10n.last3Days,
+      l10n.last7Days,
+      l10n.last30Days,
+      l10n.last90Days,
+      l10n.customRange,
+    ];
+    _selectedPeriod ??= l10n.last7Days;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Measurement History', style: AppTextStyles.heading3),
+        Text(l10n.measurementHistory, style: AppTextStyles.heading3),
         const SizedBox(height: 8),
         const Text('Princess • 7 recordings', style: AppTextStyles.body),
         const SizedBox(height: 16),
@@ -571,13 +569,35 @@ class _MeasurementHistory extends StatelessWidget {
           spacing: 8,
           runSpacing: 12,
           children: [
-            _FilterChipButton(
-              label: 'Last 7 days',
-              onTap: () {},
+            Container(
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: AppColors.offWhite,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _selectedPeriod,
+                  icon: const Icon(Icons.keyboard_arrow_down, size: 16),
+                  style: AppTextStyles.body,
+                  items: periodOptions
+                      .map((option) => DropdownMenuItem(
+                            value: option,
+                            child: Text(option),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _selectedPeriod = value);
+                    }
+                  },
+                ),
+              ),
             ),
             _FilterChipButton(
-              label: 'Export',
-              onTap: onExport,
+              label: l10n.exportLabel,
+              onTap: widget.onExport,
               icon: Icons.file_download,
               filled: true,
             ),
@@ -588,18 +608,18 @@ class _MeasurementHistory extends StatelessWidget {
           child: Column(
             children: [
               Row(
-                children: const [
-                  _StatCard(title: 'Average SRR', value: '31', footnote: 'BPM'),
-                  SizedBox(width: 8),
-                  _StatCard(title: 'Range', value: '29-33', footnote: 'Min-Max'),
+                children: [
+                  _StatCard(title: l10n.averageSrr, value: '31', footnote: l10n.bpm),
+                  const SizedBox(width: 8),
+                  _StatCard(title: l10n.range, value: '29-33', footnote: l10n.minMax),
                 ],
               ),
               const SizedBox(height: 8),
               Row(
-                children: const [
-                  _StatCard(title: 'Trend', value: '+2', footnote: 'BPM change'),
-                  SizedBox(width: 8),
-                  _StatusCard(),
+                children: [
+                  _StatCard(title: l10n.trend, value: '+2', footnote: l10n.bpmChange),
+                  const SizedBox(width: 8),
+                  const _StatusCard(),
                 ],
               ),
             ],
@@ -609,17 +629,17 @@ class _MeasurementHistory extends StatelessWidget {
         _SectionCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
-                'Sleeping Respiratory Rate (SRR) Over Time',
+                l10n.srrOverTime,
                 style: AppTextStyles.heading3,
               ),
-              SizedBox(height: 16),
-              _BadgeRow(),
-              SizedBox(height: 8),
-              _BadgeRowSecond(),
-              SizedBox(height: 16),
-              _SrrChart(),
+              const SizedBox(height: 16),
+              const _BadgeRow(),
+              const SizedBox(height: 8),
+              const _BadgeRowSecond(),
+              const SizedBox(height: 16),
+              const _SrrChart(),
             ],
           ),
         ),
@@ -809,6 +829,7 @@ class _StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Expanded(
       child: Container(
         height: 109,
@@ -820,7 +841,7 @@ class _StatusCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Status', style: AppTextStyles.caption.copyWith(fontSize: 12)),
+            Text(l10n.status, style: AppTextStyles.caption.copyWith(fontSize: 12)),
             const SizedBox(height: 16),
             Row(
               children: [
@@ -902,18 +923,33 @@ class _SrrChart extends StatelessWidget {
         margin: EdgeInsets.zero,
         primaryXAxis: CategoryAxis(
           axisLine: const AxisLine(width: 1, color: AppColors.burgundy),
-          majorGridLines: const MajorGridLines(width: 0),
+          majorGridLines: const MajorGridLines(
+            width: 0.5,
+            color: Color(0xFFE0E0E0),
+            dashArray: [3, 3],
+          ),
           majorTickLines: const MajorTickLines(size: 6, width: 1),
-          labelStyle: AppTextStyles.caption.copyWith(color: AppColors.burgundy),
+          labelStyle: AppTextStyles.caption.copyWith(
+            color: AppColors.burgundy,
+            fontSize: 10,
+          ),
+          labelRotation: 0,
         ),
         primaryYAxis: NumericAxis(
           minimum: 0,
           maximum: 50,
-          interval: 15,
+          interval: 10,
           axisLine: const AxisLine(width: 1, color: AppColors.burgundy),
           majorTickLines: const MajorTickLines(size: 6, width: 1),
-          majorGridLines: const MajorGridLines(width: 0),
-          labelStyle: AppTextStyles.caption.copyWith(color: AppColors.burgundy),
+          majorGridLines: const MajorGridLines(
+            width: 0.5,
+            color: Color(0xFFE0E0E0),
+            dashArray: [3, 3],
+          ),
+          labelStyle: AppTextStyles.caption.copyWith(
+            color: AppColors.burgundy,
+            fontSize: 10,
+          ),
           plotBands: [
             PlotBand(
               start: 30,
@@ -946,15 +982,23 @@ class _SrrChart extends StatelessWidget {
             dataSource: data,
             xValueMapper: (_SrrPoint point, _) => point.label,
             yValueMapper: (_SrrPoint point, _) => point.value,
-            color: const Color(0xFF146FD9).withOpacity(0.15),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color(0x40146FD9),
+                Color(0x00146FD9),
+              ],
+            ),
             borderColor: const Color(0xFF146FD9),
             borderWidth: 2,
             markerSettings: const MarkerSettings(
               isVisible: true,
-              width: 6,
-              height: 6,
+              width: 8,
+              height: 8,
               color: Color(0xFF146FD9),
-              borderWidth: 0,
+              borderWidth: 2,
+              borderColor: Colors.white,
             ),
           ),
         ],
@@ -983,6 +1027,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
@@ -1008,9 +1053,9 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                 const SizedBox(height: 8),
                 Center(
                   child: Column(
-                    children: const [
-                      Text('Add New Medication', style: AppTextStyles.heading2),
-                      SizedBox(height: 8),
+                    children: [
+                      Text(l10n.addNewMedication, style: AppTextStyles.heading2),
+                      const SizedBox(height: 8),
                       Text(
                         'Record a new medication or treatment for Princess’ care plan',
                         style: AppTextStyles.body,
@@ -1020,41 +1065,41 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _FormField(label: 'Medication Name *', hint: 'e.g., Pimobendan'),
+                _FormField(label: l10n.medicationNameRequired, hint: 'e.g., Pimobendan'),
                 const SizedBox(height: 16),
-                _FormField(label: 'Dosage *', hint: 'e.g., 5mg'),
+                _FormField(label: l10n.dosageRequired, hint: 'e.g., 5mg'),
                 const SizedBox(height: 16),
                 _DropdownField(
-                  label: 'Frequency *',
+                  label: l10n.frequencyRequired,
                   value: _frequency,
                   onChanged: (value) =>
                       setState(() => _frequency = value ?? _frequency),
                 ),
                 const SizedBox(height: 16),
                 Row(
-                  children: const [
+                  children: [
                     Expanded(
-                      child: _FormField(label: 'Start Date *', hint: ''),
+                      child: _FormField(label: l10n.startDateRequired, hint: ''),
                     ),
-                    SizedBox(width: 16),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: _FormField(
-                        label: 'End Date (Optional)',
+                        label: l10n.endDateOptional,
                         hint: '',
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                _FormField(label: 'Prescribed By', hint: 'e.g., Dr. Smith, DVM'),
+                _FormField(label: l10n.prescribedBy, hint: 'e.g., Dr. Smith, DVM'),
                 const SizedBox(height: 16),
                 _FormField(
-                  label: 'Purpose / Condition',
+                  label: l10n.purposeCondition,
                   hint: 'e.g., Congestive Heart Failure',
                 ),
                 const SizedBox(height: 16),
                 _TextArea(
-                  label: 'Additional Notes',
+                  label: l10n.additionalNotes,
                   hint:
                       'Any special instructions, side effects to monitor, or additional information...',
                 ),
@@ -1076,7 +1121,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                           borderRadius: BorderRadius.circular(100),
                         ),
                       ),
-                      child: const Text('Cancel'),
+                      child: Text(l10n.cancel),
                     ),
                     const SizedBox(width: 8),
                     TextButton(
@@ -1087,9 +1132,9 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                           borderRadius: BorderRadius.circular(100),
                         ),
                       ),
-                      child: const Text(
-                        'Add Medication',
-                        style: TextStyle(color: Colors.white),
+                      child: Text(
+                        l10n.addMedication,
+                        style: const TextStyle(color: Colors.white),
                       ),
                     ),
                   ],
@@ -1236,6 +1281,7 @@ class _ReminderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1253,12 +1299,12 @@ class _ReminderCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Medication Reminders',
+                    l10n.medicationReminders,
                     style:
                         AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
                   ),
-                  const Text(
-                    'Notify care circle when doses are due',
+                  Text(
+                    l10n.medicationRemindersDesc,
                     style: AppTextStyles.caption,
                   ),
                 ],
