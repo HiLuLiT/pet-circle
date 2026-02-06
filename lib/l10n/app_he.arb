@@ -86,6 +86,8 @@
   "breathCountMessage": "ספרת {taps} נשימות ב-{seconds} שניות.",
   "@breathCountMessage": { "placeholders": { "taps": { "type": "int" }, "seconds": { "type": "int" } } },
   "done": "סיום",
+  "addToGraph": "הוסף לגרף",
+  "measureAgain": "מדוד שוב",
   "healthTrends": "מגמות בריאות",
   "measurementHistory": "היסטוריית מדידות",
   "medicationManagement": "ניהול תרופות",

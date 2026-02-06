@@ -68,19 +68,19 @@ class CareCircleDashboard extends StatelessWidget {
                   childAspectRatio: 3.3,
                   children: [
                     _SummaryCard(
-                      iconColor: const Color(0x267FBA7A),
+                      iconColor: AppColors.lightBlue.withValues(alpha: 0.15),
                       iconUrl: AppAssets.statusOkIcon,
                       value: '2',
                       label: l10n.normalStatus,
                     ),
                     _SummaryCard(
-                      iconColor: const Color(0x26F39C12),
+                      iconColor: AppColors.cherry.withValues(alpha: 0.15),
                       iconUrl: AppAssets.attentionIcon,
                       value: '1',
                       label: l10n.needAttention,
                     ),
                     _SummaryCard(
-                      iconColor: const Color(0x1A5B9BD5),
+                      iconColor: AppColors.lightBlue.withValues(alpha: 0.1),
                       iconUrl: AppAssets.chartIcon,
                       value: '24',
                       label: l10n.measurementsThisWeek,
@@ -116,11 +116,11 @@ class _PetCard extends StatelessWidget {
               Container(
                 height: 192,
                 width: double.infinity,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0x335B9BD5), Color(0x00000000)],
+                    colors: [AppColors.lightBlue.withValues(alpha: 0.2), Colors.transparent],
                   ),
                 ),
                 child: ClipRRect(
@@ -144,7 +144,7 @@ class _PetCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(data.name,
-                    style: AppTextStyles.heading3.copyWith(color: AppColors.textPrimary)),
+                    style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate)),
                 const SizedBox(height: 4),
                 Text(data.breedAndAge, style: AppTextStyles.bodyMuted),
                 const SizedBox(height: 16),
@@ -155,10 +155,10 @@ class _PetCard extends StatelessWidget {
                       children: [
                         NeumorphicCard(
                           inner: true,
-                          color: const Color(0xFFF7F9FC),
+                          color: AppColors.offWhite,
                           padding: const EdgeInsets.all(12),
                           child: const Icon(Icons.favorite_border,
-                              size: 20, color: AppColors.burgundy),
+                              size: 20, color: AppColors.chocolate),
                         ),
                         const SizedBox(width: 12),
                         Column(
@@ -166,7 +166,7 @@ class _PetCard extends StatelessWidget {
                           children: [
                             Text('${data.latestMeasurement.bpm}',
                                 style: AppTextStyles.heading3
-                                    .copyWith(color: AppColors.textPrimary)),
+                                    .copyWith(color: AppColors.chocolate)),
                             Text(l10n.bpm, style: AppTextStyles.caption),
                           ],
                         ),
@@ -177,14 +177,14 @@ class _PetCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Divider(color: Color(0x265B9BD5), height: 1),
+                Divider(color: AppColors.lightBlue.withValues(alpha: 0.15), height: 1),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.group, size: 12, color: AppColors.textMuted),
+                        const Icon(Icons.group, size: 12, color: AppColors.chocolate),
                         const SizedBox(width: 6),
                         Text(l10n.careCircle, style: AppTextStyles.caption),
                       ],
@@ -225,11 +225,11 @@ class _AvatarStack extends StatelessWidget {
                   color: AppColors.white,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: i == 0 ? AppColors.accentBlue : AppColors.offWhite,
+                    color: i == 0 ? AppColors.lightBlue : AppColors.offWhite,
                     width: 2,
                   ),
                   boxShadow: i == 0
-                      ? const [BoxShadow(color: Color(0x4D5B9BD5), blurRadius: 0)]
+                      ? [BoxShadow(color: AppColors.lightBlue.withValues(alpha: 0.3), blurRadius: 0)]
                       : null,
                 ),
                 child: ClipOval(
@@ -274,7 +274,7 @@ class _SummaryCard extends StatelessWidget {
               child: Icon(
                 _summaryIcon(iconUrl),
                 size: 24,
-                color: AppColors.burgundy,
+                color: AppColors.chocolate,
               ),
             ),
           ),
@@ -283,7 +283,7 @@ class _SummaryCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(value,
-                  style: AppTextStyles.heading3.copyWith(color: AppColors.textPrimary)),
+                  style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate)),
               Text(label, style: AppTextStyles.bodyMuted),
             ],
           ),

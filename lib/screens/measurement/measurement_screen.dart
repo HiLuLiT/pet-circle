@@ -122,13 +122,13 @@ class _TabButton extends StatelessWidget {
             children: [
               Icon(icon,
                   size: 16,
-                  color: AppColors.burgundy),
+                  color: AppColors.chocolate),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: AppColors.burgundy,
+                  color: AppColors.chocolate,
                 ),
               ),
             ],
@@ -158,8 +158,6 @@ class _ManualModeState extends State<_ManualMode>
   int _remainingSeconds = 0;
   int _tapCount = 0;
   Timer? _timer;
-  static const _lightBlue = Color(0xFF75ACFF);
-
   late AnimationController _scaleController;
   late Animation<double> _scaleAnimation;
 
@@ -240,7 +238,7 @@ class _ManualModeState extends State<_ManualMode>
               style: const TextStyle(
                 fontSize: 64,
                 fontWeight: FontWeight.bold,
-                color: AppColors.burgundy,
+                color: AppColors.chocolate,
               ),
             ),
             Text(l10n.breathsPerMinute, style: AppTextStyles.body),
@@ -256,9 +254,20 @@ class _ManualModeState extends State<_ManualMode>
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              setState(() => _remainingSeconds = widget.selectedDuration);
+              setState(() {
+                _remainingSeconds = widget.selectedDuration;
+                _tapCount = 0;
+              });
             },
-            child: Text(l10n.done),
+            child: Text(l10n.measureAgain),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() => _remainingSeconds = widget.selectedDuration);
+              // TODO: Add the measurement to the graph
+            },
+            child: Text(l10n.addToGraph),
           ),
         ],
       ),
@@ -341,7 +350,7 @@ class _ManualModeState extends State<_ManualMode>
                 style: const TextStyle(
                   fontSize: 44,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.burgundy,
+                  color: AppColors.chocolate,
                   height: 1.2,
                 ),
               ),
@@ -355,7 +364,7 @@ class _ManualModeState extends State<_ManualMode>
                       Container(
                         height: 8,
                         decoration: BoxDecoration(
-                          color: AppColors.burgundy.withOpacity(0.08),
+                          color: AppColors.chocolate.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(999),
                         ),
                       ),
@@ -364,7 +373,7 @@ class _ManualModeState extends State<_ManualMode>
                         height: 8,
                         width: width * progress,
                         decoration: BoxDecoration(
-                          color: _lightBlue,
+                          color: AppColors.lightBlue,
                           borderRadius: BorderRadius.circular(999),
                         ),
                       ),
@@ -403,7 +412,7 @@ class _ManualModeState extends State<_ManualMode>
                           style: const TextStyle(
                             fontSize: 80,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.burgundy,
+                            color: AppColors.chocolate,
                             height: 1.0,
                           ),
                         ),
@@ -447,14 +456,14 @@ class _DurationChip extends StatelessWidget {
           height: 60,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? const Color(0xFF75ACFF) : AppColors.white,
+            color: selected ? AppColors.lightBlue : AppColors.white,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             label,
             style: AppTextStyles.body.copyWith(
               fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-              color: AppColors.burgundy,
+              color: AppColors.chocolate,
             ),
           ),
         ),
@@ -487,7 +496,7 @@ class _VisionMode extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           const Expanded(
             child: Center(
-              child: Icon(Icons.videocam, size: 64, color: AppColors.textMuted),
+              child: Icon(Icons.videocam, size: 64, color: AppColors.chocolate),
             ),
           ),
         ],

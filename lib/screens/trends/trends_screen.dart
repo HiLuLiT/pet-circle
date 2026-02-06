@@ -15,10 +15,6 @@ class TrendsScreen extends StatefulWidget {
 }
 
 class _TrendsScreenState extends State<TrendsScreen> {
-  static const _lightBlue = Color(0xFF75ACFF);
-  static const _blue = Color(0xFF146FD9);
-  static const _yellow = Color(0xFFFFE476);
-  static const _cherry = Color(0xFFE64E60);
 
   int _selectedTab = 0;
 
@@ -142,7 +138,7 @@ class _TrendsTab extends StatelessWidget {
             color: selected ? AppColors.white : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Icon(icon, color: AppColors.burgundy, size: 18),
+          child: Icon(icon, color: AppColors.chocolate, size: 18),
         ),
       ),
     );
@@ -224,7 +220,7 @@ class _TrendsOverview extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.medication, color: AppColors.burgundy),
+                        const Icon(Icons.medication, color: AppColors.chocolate),
                         const SizedBox(width: 8),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -239,7 +235,7 @@ class _TrendsOverview extends StatelessWidget {
                     Text(
                       'Jan 6',
                       style: AppTextStyles.caption.copyWith(
-                        color: AppColors.burgundy,
+                        color: AppColors.chocolate,
                       ),
                     ),
                   ],
@@ -251,7 +247,7 @@ class _TrendsOverview extends StatelessWidget {
                 child: TextButton(
                   onPressed: onOpenMedication,
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF75ACFF),
+                    backgroundColor: AppColors.lightBlue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
@@ -259,7 +255,7 @@ class _TrendsOverview extends StatelessWidget {
                   child: Text(
                     l10n.addMedication,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                     ),
                   ),
                 ),
@@ -310,7 +306,7 @@ class _MetricRow extends StatelessWidget {
             color: AppColors.white,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: const Color(0xFF146FD9)),
+          child: Icon(icon, color: AppColors.blue),
         ),
       ],
     );
@@ -350,7 +346,7 @@ void _exportMedicationLog(BuildContext context) {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: AppColors.burgundy)),
+          child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: AppColors.chocolate)),
         ),
         TextButton(
           onPressed: () {
@@ -360,10 +356,10 @@ void _exportMedicationLog(BuildContext context) {
             );
           },
           style: TextButton.styleFrom(
-            backgroundColor: const Color(0xFF75ACFF),
+            backgroundColor: AppColors.lightBlue,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          child: Text(l10n.downloadCsv, style: AppTextStyles.body.copyWith(color: AppColors.burgundy)),
+          child: Text(l10n.downloadCsv, style: AppTextStyles.body.copyWith(color: AppColors.chocolate)),
         ),
       ],
     ),
@@ -390,16 +386,16 @@ class _MedicationManagement extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: onAddMedication,
                 style: TextButton.styleFrom(
-                  backgroundColor: const Color(0xFF75ACFF),
+                  backgroundColor: AppColors.lightBlue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
-                icon: const Icon(Icons.add, color: AppColors.burgundy, size: 16),
+                icon: const Icon(Icons.add, color: AppColors.chocolate, size: 16),
                 label: Text(
                   l10n.addMedication,
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.burgundy,
+                    color: AppColors.chocolate,
                   ),
                 ),
               ),
@@ -422,7 +418,7 @@ class _MedicationManagement extends StatelessWidget {
                   color: AppColors.white,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.medication, color: AppColors.burgundy),
+                child: const Icon(Icons.medication, color: AppColors.chocolate),
               ),
               const SizedBox(height: 12),
               Text(
@@ -443,16 +439,16 @@ class _MedicationManagement extends StatelessWidget {
                 child: TextButton.icon(
                   onPressed: onAddMedication,
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF75ACFF),
+                    backgroundColor: AppColors.lightBlue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
-                  icon: const Icon(Icons.add, color: AppColors.burgundy, size: 16),
+                  icon: const Icon(Icons.add, color: AppColors.chocolate, size: 16),
                   label: Text(
                     l10n.addMedication,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                     ),
                   ),
                 ),
@@ -472,7 +468,7 @@ class _MedicationManagement extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.info_outline,
-                    color: Color(0xFF146FD9)),
+                    color: AppColors.blue),
               ),
               const SizedBox(height: 12),
               Text(
@@ -496,17 +492,17 @@ class _MedicationManagement extends StatelessWidget {
                     _exportMedicationLog(context);
                   },
                   style: TextButton.styleFrom(
-                    backgroundColor: const Color(0xFF75ACFF),
+                    backgroundColor: AppColors.lightBlue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
                   icon: const Icon(Icons.file_download,
-                      color: AppColors.burgundy, size: 16),
+                      color: AppColors.chocolate, size: 16),
                   label: Text(
                     l10n.exportMedicationLog,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                     ),
                   ),
                 ),
@@ -654,14 +650,14 @@ class _FilterChipButton extends StatelessWidget {
         height: 40,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: filled ? const Color(0xFF75ACFF) : AppColors.offWhite,
+          color: filled ? AppColors.lightBlue : AppColors.offWhite,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 16, color: AppColors.burgundy),
+              Icon(icon, size: 16, color: AppColors.chocolate),
               const SizedBox(width: 8),
             ],
             Text(label, style: AppTextStyles.body),
@@ -702,12 +698,12 @@ class _BadgeRow extends StatelessWidget {
     return Row(
       children: const [
         _LegendBadge(
-          color: Color(0xFF75ACFF),
+          color: AppColors.lightBlue,
           label: 'Normal (<30)',
         ),
         SizedBox(width: 8),
         _LegendBadge(
-          color: Color(0xFFFFE476),
+          color: AppColors.lightYellow,
           label: 'Elevated (30-40)',
         ),
       ],
@@ -721,7 +717,7 @@ class _BadgeRowSecond extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const _LegendBadge(
-      color: Color(0xFFE64E60),
+      color: AppColors.cherry,
       label: 'Alert (>40)',
     );
   }
@@ -753,7 +749,7 @@ class _LegendBadge extends StatelessWidget {
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 4),
-          Text(label, style: AppTextStyles.caption.copyWith(color: AppColors.burgundy)),
+          Text(label, style: AppTextStyles.caption.copyWith(color: AppColors.chocolate)),
         ],
       ),
     );
@@ -800,7 +796,7 @@ class _StatCard extends StatelessWidget {
               right: 8,
               top: 8,
               child: Icon(Icons.notifications_none,
-                  size: 18, color: AppColors.burgundy),
+                  size: 18, color: AppColors.chocolate),
             ),
           ],
         ),
@@ -830,11 +826,11 @@ class _StatusCard extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                _StatusPill(value: '1', color: Color(0xFF75ACFF)),
+                _StatusPill(value: '1', color: AppColors.lightBlue),
                 const SizedBox(width: 8),
-                _StatusPill(value: '6', color: Color(0xFFFFE476)),
+                _StatusPill(value: '6', color: AppColors.lightYellow),
                 const SizedBox(width: 8),
-                _StatusPill(value: '0', color: Color(0xFFE64E60), muted: true),
+                _StatusPill(value: '0', color: AppColors.cherry, muted: true),
               ],
             ),
           ],
@@ -907,15 +903,15 @@ class _SrrChart extends StatelessWidget {
         plotAreaBorderWidth: 0,
         margin: EdgeInsets.zero,
         primaryXAxis: CategoryAxis(
-          axisLine: const AxisLine(width: 1, color: AppColors.burgundy),
+          axisLine: const AxisLine(width: 1, color: AppColors.chocolate),
           majorGridLines: const MajorGridLines(
             width: 0.5,
-            color: Color(0xFFE0E0E0),
+            color: AppColors.offWhite,
             dashArray: [3, 3],
           ),
           majorTickLines: const MajorTickLines(size: 6, width: 1),
           labelStyle: AppTextStyles.caption.copyWith(
-            color: AppColors.burgundy,
+            color: AppColors.chocolate,
             fontSize: 10,
           ),
           labelRotation: 0,
@@ -924,39 +920,39 @@ class _SrrChart extends StatelessWidget {
           minimum: 0,
           maximum: 50,
           interval: 10,
-          axisLine: const AxisLine(width: 1, color: AppColors.burgundy),
+          axisLine: const AxisLine(width: 1, color: AppColors.chocolate),
           majorTickLines: const MajorTickLines(size: 6, width: 1),
           majorGridLines: const MajorGridLines(
             width: 0.5,
-            color: Color(0xFFE0E0E0),
+            color: AppColors.offWhite,
             dashArray: [3, 3],
           ),
           labelStyle: AppTextStyles.caption.copyWith(
-            color: AppColors.burgundy,
+            color: AppColors.chocolate,
             fontSize: 10,
           ),
           plotBands: [
             PlotBand(
               start: 30,
               end: 30,
-              borderColor: AppColors.burgundy,
+              borderColor: AppColors.chocolate,
               borderWidth: 1,
               dashArray: const [4, 4],
               text: 'Normal Threshold (30 BPM)',
               textStyle:
-                  AppTextStyles.caption.copyWith(color: AppColors.burgundy),
+                  AppTextStyles.caption.copyWith(color: AppColors.chocolate),
               horizontalTextAlignment: TextAnchor.end,
               verticalTextAlignment: TextAnchor.middle,
             ),
             PlotBand(
               start: 40,
               end: 40,
-              borderColor: AppColors.burgundy,
+              borderColor: AppColors.chocolate,
               borderWidth: 1,
               dashArray: const [4, 4],
               text: 'Alert Threshold (40 BPM)',
               textStyle:
-                  AppTextStyles.caption.copyWith(color: AppColors.burgundy),
+                  AppTextStyles.caption.copyWith(color: AppColors.chocolate),
               horizontalTextAlignment: TextAnchor.end,
               verticalTextAlignment: TextAnchor.middle,
             ),
@@ -967,23 +963,23 @@ class _SrrChart extends StatelessWidget {
             dataSource: data,
             xValueMapper: (_SrrPoint point, _) => point.label,
             yValueMapper: (_SrrPoint point, _) => point.value,
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color(0x40146FD9),
-                Color(0x00146FD9),
+                AppColors.blue.withValues(alpha: 0.25),
+                AppColors.blue.withValues(alpha: 0.0),
               ],
             ),
-            borderColor: const Color(0xFF146FD9),
+            borderColor: AppColors.blue,
             borderWidth: 2,
             markerSettings: const MarkerSettings(
               isVisible: true,
               width: 8,
               height: 8,
-              color: Color(0xFF146FD9),
+              color: AppColors.blue,
               borderWidth: 2,
-              borderColor: Colors.white,
+              borderColor: AppColors.white,
             ),
           ),
         ],
@@ -1112,14 +1108,14 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(
-                        backgroundColor: const Color(0xFF146FD9),
+                        backgroundColor: AppColors.blue,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),
                         ),
                       ),
                       child: Text(
                         l10n.addMedication,
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: AppColors.white),
                       ),
                     ),
                   ],
@@ -1157,7 +1153,7 @@ class _FormField extends StatelessWidget {
               fillColor: AppColors.offWhite,
               hintText: hint,
               hintStyle:
-                  AppTextStyles.body.copyWith(color: AppColors.burgundy.withOpacity(0.3)),
+                  AppTextStyles.body.copyWith(color: AppColors.chocolate.withOpacity(0.3)),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide.none,
@@ -1242,7 +1238,7 @@ class _TextArea extends StatelessWidget {
             fillColor: AppColors.offWhite,
             hintText: hint,
             hintStyle:
-                AppTextStyles.body.copyWith(color: AppColors.burgundy.withOpacity(0.3)),
+                AppTextStyles.body.copyWith(color: AppColors.chocolate.withOpacity(0.3)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(4),
               borderSide: BorderSide.none,
@@ -1278,7 +1274,7 @@ class _ReminderCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.notifications_none, color: AppColors.burgundy),
+              const Icon(Icons.notifications_none, color: AppColors.chocolate),
               const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1299,7 +1295,7 @@ class _ReminderCard extends StatelessWidget {
           Switch(
             value: enabled,
             onChanged: onChanged,
-            activeColor: AppColors.burgundy,
+            activeColor: AppColors.chocolate,
           ),
         ],
       ),

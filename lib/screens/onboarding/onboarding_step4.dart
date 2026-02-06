@@ -15,7 +15,7 @@ class OnboardingStep4 extends StatefulWidget {
 
 class _OnboardingStep4State extends State<OnboardingStep4>
     with SingleTickerProviderStateMixin {
-  static const _primaryBlue = Color(0xFF146FD9);
+
   final _roles = const [
     'Viewer (View Only)',
     'Caregiver',
@@ -77,7 +77,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
           ],
         ),
         backgroundColor:
-            email.isNotEmpty ? AppColors.successGreen : AppColors.warningAmber,
+            email.isNotEmpty ? AppColors.lightBlue : AppColors.cherry,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
@@ -187,7 +187,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
             width: double.infinity,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: _primaryBlue,
+                backgroundColor: AppColors.blue,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(56),
@@ -225,11 +225,11 @@ class _OnboardingStep4State extends State<OnboardingStep4>
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.person_add_alt_1,
-                      size: 16, color: _primaryBlue),
+                      size: 16, color: AppColors.blue),
                   const SizedBox(width: 8),
                   Text(
                     l10n.addAnotherPetCircle,
-                    style: AppTextStyles.body.copyWith(color: _primaryBlue),
+                    style: AppTextStyles.body.copyWith(color: AppColors.blue),
                   ),
                 ],
               ),
@@ -274,7 +274,7 @@ class _InviteRow extends StatelessWidget {
             child: Text(
               invite.status,
               style: AppTextStyles.caption.copyWith(
-                color: AppColors.burgundy,
+                color: AppColors.chocolate,
                 fontSize: 10,
               ),
             ),
@@ -314,7 +314,7 @@ class _InputRow extends StatelessWidget {
               fillColor: AppColors.white,
               hintText: hint,
               hintStyle: AppTextStyles.body.copyWith(
-                color: AppColors.burgundy.withOpacity(0.4),
+                color: AppColors.chocolate.withOpacity(0.4),
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
@@ -376,7 +376,7 @@ class _SelectRow extends StatelessWidget {
                   ),
                   child: const Icon(
                     Icons.keyboard_arrow_down,
-                    color: AppColors.burgundy,
+                    color: AppColors.chocolate,
                     size: 18,
                   ),
                 ),

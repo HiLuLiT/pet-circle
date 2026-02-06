@@ -23,7 +23,7 @@ class BottomNavBar extends StatelessWidget {
       decoration: const BoxDecoration(
         color: AppColors.white,
         border: Border(
-          top: BorderSide(color: AppColors.burgundy, width: 1),
+          top: BorderSide(color: AppColors.chocolate, width: 1),
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),

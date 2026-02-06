@@ -67,13 +67,13 @@ class AppHeader extends StatelessWidget {
                   Text(
                     petName!,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.burgundy),
+                  const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.chocolate),
                 ],
               ),
             ),
@@ -92,7 +92,7 @@ class AppHeader extends StatelessWidget {
             ),
             child: const Icon(
               Icons.notifications_none,
-              color: AppColors.burgundy,
+              color: AppColors.chocolate,
               size: 20,
             ),
           ),

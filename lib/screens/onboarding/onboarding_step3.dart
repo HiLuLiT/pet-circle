@@ -88,7 +88,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                           fillColor: AppColors.lightYellow,
                           hintText: l10n.enterBpm,
                           hintStyle: AppTextStyles.body
-                              .copyWith(color: AppColors.textMuted),
+                              .copyWith(color: AppColors.chocolate),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(4),
                             borderSide: BorderSide.none,
@@ -109,7 +109,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                       l10n.bpm,
                       style: AppTextStyles.body.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.burgundy,
+                        color: AppColors.chocolate,
                       ),
                     ),
                   ],
@@ -157,9 +157,9 @@ class _TargetOption extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: AppColors.white,
-                boxShadow: const [
+                boxShadow: [
                   BoxShadow(
-                    color: Color(0x1A000000),
+                    color: AppColors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: Offset(0, 1),
                   ),
@@ -171,7 +171,7 @@ class _TargetOption extends StatelessWidget {
                         width: 8,
                         height: 8,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF146FD9),
+                          color: AppColors.blue,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -193,7 +193,7 @@ class _TargetOption extends StatelessWidget {
                     Text(
                       subtitle!,
                       style:
-                          AppTextStyles.caption.copyWith(color: AppColors.burgundy),
+                          AppTextStyles.caption.copyWith(color: AppColors.chocolate),
                     ),
                   ],
                 ],
@@ -208,7 +208,7 @@ class _TargetOption extends StatelessWidget {
                 ),
                 child: Text(
                   trailingLabel!,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.burgundy),
+                  style: AppTextStyles.caption.copyWith(color: AppColors.chocolate),
                 ),
               ),
           ],

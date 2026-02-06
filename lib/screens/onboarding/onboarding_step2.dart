@@ -93,8 +93,8 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                       _selectedDiagnosis ?? l10n.selectDiagnosis,
                       style: AppTextStyles.body.copyWith(
                         color: _selectedDiagnosis == null
-                            ? AppColors.burgundy.withOpacity(0.5)
-                            : AppColors.burgundy,
+                            ? AppColors.chocolate.withOpacity(0.5)
+                            : AppColors.chocolate,
                       ),
                     ),
                   ),
@@ -107,7 +107,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                     ),
                     child: const Icon(
                       Icons.keyboard_arrow_down,
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                       size: 18,
                     ),
                   ),

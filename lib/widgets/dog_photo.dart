@@ -23,7 +23,7 @@ class _DogPhotoState extends State<DogPhoto> {
       return Container(
         color: AppColors.offWhite,
         alignment: Alignment.center,
-        child: const Icon(Icons.pets, color: AppColors.textMuted),
+        child: const Icon(Icons.pets, color: AppColors.chocolate),
       );
     }
 

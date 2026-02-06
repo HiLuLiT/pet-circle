@@ -37,7 +37,7 @@ class VetDashboard extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
               Text(
                 l10n.clinicOverview,
-                style: AppTextStyles.heading2.copyWith(color: AppColors.burgundy),
+                style: AppTextStyles.heading2.copyWith(color: AppColors.chocolate),
               ),
               Text(
                 l10n.patientsInYourCare(pets.length),
@@ -66,19 +66,19 @@ class VetDashboard extends StatelessWidget {
                 childAspectRatio: 3.3,
                 children: [
                   _SummaryCard(
-                    iconColor: const Color(0x267FBA7A),
+                    iconColor: AppColors.lightBlue.withValues(alpha: 0.15),
                     icon: Icons.check_circle_outline,
                     value: '$normalCount',
                     label: l10n.normalStatus,
                   ),
                   _SummaryCard(
-                    iconColor: const Color(0x26F39C12),
+                    iconColor: AppColors.cherry.withValues(alpha: 0.15),
                     icon: Icons.warning_amber_outlined,
                     value: '$elevatedCount',
                     label: l10n.needAttention,
                   ),
                   _SummaryCard(
-                    iconColor: const Color(0x1A5B9BD5),
+                    iconColor: AppColors.lightBlue.withValues(alpha: 0.1),
                     icon: Icons.bar_chart,
                     value: '${pets.length * 6}',
                     label: l10n.measurementsThisWeek,
@@ -122,11 +122,11 @@ class _PetCard extends StatelessWidget {
                 Container(
                   height: 180,
                   width: double.infinity,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Color(0x335B9BD5), Color(0x00000000)],
+                      colors: [AppColors.lightBlue.withValues(alpha: 0.2), Colors.transparent],
                     ),
                   ),
                   child: ClipRRect(
@@ -149,7 +149,7 @@ class _PetCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.burgundy.withOpacity(0.9),
+                      color: AppColors.chocolate.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -177,7 +177,7 @@ class _PetCard extends StatelessWidget {
                 children: [
                   Text(
                     data.name,
-                    style: AppTextStyles.heading3.copyWith(color: AppColors.textPrimary),
+                    style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
                   ),
                   const SizedBox(height: 4),
                   Text(data.breedAndAge, style: AppTextStyles.bodyMuted),
@@ -189,10 +189,10 @@ class _PetCard extends StatelessWidget {
                         children: [
                           NeumorphicCard(
                             inner: true,
-                            color: const Color(0xFFF7F9FC),
+                            color: AppColors.offWhite,
                             padding: const EdgeInsets.all(10),
                             child: const Icon(Icons.favorite_border,
-                                size: 18, color: AppColors.burgundy),
+                                size: 18, color: AppColors.chocolate),
                           ),
                           const SizedBox(width: 10),
                           Column(
@@ -201,7 +201,7 @@ class _PetCard extends StatelessWidget {
                               Text(
                                 '${data.latestMeasurement.bpm}',
                                 style: AppTextStyles.heading3
-                                    .copyWith(color: AppColors.textPrimary),
+                                    .copyWith(color: AppColors.chocolate),
                               ),
                               Text(l10n.bpm, style: AppTextStyles.caption),
                             ],
@@ -215,14 +215,14 @@ class _PetCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  const Divider(color: Color(0x265B9BD5), height: 1),
+                  Divider(color: AppColors.lightBlue.withValues(alpha: 0.15), height: 1),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.person_outline, size: 14, color: AppColors.textMuted),
+                          const Icon(Icons.person_outline, size: 14, color: AppColors.chocolate),
                           const SizedBox(width: 6),
                           Text(
                             l10n.ownerLabel(_getOwnerName(data.careCircle, l10n.unknown)),
@@ -230,7 +230,7 @@ class _PetCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const Icon(Icons.chevron_right, size: 18, color: AppColors.textMuted),
+                      const Icon(Icons.chevron_right, size: 18, color: AppColors.chocolate),
                     ],
                   ),
                 ],
@@ -276,7 +276,7 @@ class _SummaryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Center(
-              child: Icon(icon, size: 24, color: AppColors.burgundy),
+              child: Icon(icon, size: 24, color: AppColors.chocolate),
             ),
           ),
           const SizedBox(width: 16),
@@ -286,7 +286,7 @@ class _SummaryCard extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: AppTextStyles.heading3.copyWith(color: AppColors.textPrimary),
+                style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
               ),
               Text(label, style: AppTextStyles.bodyMuted),
             ],

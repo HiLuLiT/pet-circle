@@ -62,7 +62,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.clinicalNoteAdded),
-        backgroundColor: AppColors.successGreen,
+        backgroundColor: AppColors.lightBlue,
       ),
     );
   }
@@ -98,7 +98,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     return SliverAppBar(
       expandedHeight: 280,
       pinned: true,
-      backgroundColor: AppColors.burgundy,
+      backgroundColor: AppColors.chocolate,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: AppColors.white),
         onPressed: () => Navigator.of(context).pop(),
@@ -115,7 +115,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    AppColors.burgundy.withOpacity(0.8),
+                    AppColors.chocolate.withOpacity(0.8),
                   ],
                 ),
               ),
@@ -163,7 +163,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         children: [
           Text(
             l10n.latestReading,
-            style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
+            style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
           ),
           const SizedBox(height: 16),
           Row(
@@ -180,7 +180,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               Expanded(
                 child: _InfoTile(
                   icon: Icons.access_time,
-                  iconColor: AppColors.accentBlue,
+                  iconColor: AppColors.lightBlue,
                   value: widget.pet.latestMeasurement.recordedAtLabel,
                   label: l10n.lastMeasured,
                 ),
@@ -209,13 +209,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             children: [
               Text(
                 l10n.measurementHistory,
-                style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
+                style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
               ),
               TextButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.show_chart, size: 18),
                 label: Text(l10n.viewGraph),
-                style: TextButton.styleFrom(foregroundColor: AppColors.accentBlue),
+                style: TextButton.styleFrom(foregroundColor: AppColors.lightBlue),
               ),
             ],
           ),
@@ -238,7 +238,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                           '${m.bpm}',
                           style: AppTextStyles.caption.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: isElevated ? AppColors.warningAmber : AppColors.successGreen,
+                            color: isElevated ? AppColors.cherry : AppColors.lightBlue,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -246,11 +246,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                           height: height.clamp(20, 60),
                           decoration: BoxDecoration(
                             color: isElevated
-                                ? AppColors.warningAmber.withOpacity(0.3)
-                                : AppColors.successGreen.withOpacity(0.3),
+                                ? AppColors.cherry.withOpacity(0.3)
+                                : AppColors.lightBlue.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(
-                              color: isElevated ? AppColors.warningAmber : AppColors.successGreen,
+                              color: isElevated ? AppColors.cherry : AppColors.lightBlue,
                               width: 2,
                             ),
                           ),
@@ -291,11 +291,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.note_alt_outlined, color: AppColors.burgundy),
+              const Icon(Icons.note_alt_outlined, color: AppColors.chocolate),
               const SizedBox(width: 8),
               Text(
                 l10n.clinicalNotes,
-                style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
+                style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
               ),
             ],
           ),
@@ -314,7 +314,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   maxLines: 3,
                   decoration: InputDecoration(
                     hintText: l10n.addClinicalNoteHint,
-                    hintStyle: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                    hintStyle: AppTextStyles.body.copyWith(color: AppColors.chocolate),
                     border: InputBorder.none,
                     isDense: true,
                   ),
@@ -328,7 +328,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                     icon: const Icon(Icons.add, size: 18),
                     label: Text(l10n.addNote),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.burgundy,
+                      backgroundColor: AppColors.chocolate,
                       foregroundColor: AppColors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       shape: RoundedRectangleBorder(
@@ -351,11 +351,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             Center(
               child: Column(
                 children: [
-                  Icon(Icons.notes, size: 40, color: AppColors.textMuted.withOpacity(0.5)),
+                  Icon(Icons.notes, size: 40, color: AppColors.chocolate.withOpacity(0.5)),
                   const SizedBox(height: 8),
                   Text(
                     l10n.noClinicalNotesYet,
-                    style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                    style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
                   ),
                 ],
               ),
@@ -376,11 +376,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.group, color: AppColors.burgundy),
+              const Icon(Icons.group, color: AppColors.chocolate),
               const SizedBox(width: 8),
               Text(
                 l10n.careCircle,
-                style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
+                style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
               ),
             ],
           ),
@@ -432,7 +432,7 @@ class _InfoTile extends StatelessWidget {
               children: [
                 Text(
                   value,
-                  style: AppTextStyles.heading3.copyWith(color: AppColors.textPrimary),
+                  style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(label, style: AppTextStyles.caption),
@@ -475,7 +475,7 @@ class _NoteCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       note.timeAgo,
-                      style: AppTextStyles.caption.copyWith(color: AppColors.textMuted),
+                      style: AppTextStyles.caption.copyWith(color: AppColors.chocolate),
                     ),
                   ],
                 ),
@@ -516,7 +516,7 @@ class _MemberTile extends StatelessWidget {
                 ),
                 Text(
                   member.role,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.textMuted),
+                  style: AppTextStyles.caption.copyWith(color: AppColors.chocolate),
                 ),
               ],
             ),
@@ -536,13 +536,13 @@ class _RoleBadge extends StatelessWidget {
   Color get _color {
     switch (role.toLowerCase()) {
       case 'owner':
-        return AppColors.accentBlue;
+        return AppColors.lightBlue;
       case 'veterinarian':
-        return AppColors.burgundy;
+        return AppColors.chocolate;
       case 'caregiver':
-        return AppColors.successGreen;
+        return AppColors.lightBlue;
       default:
-        return AppColors.textMuted;
+        return AppColors.chocolate;
     }
   }
 

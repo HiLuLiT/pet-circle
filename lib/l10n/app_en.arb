@@ -86,6 +86,8 @@
   "breathCountMessage": "You counted {taps} breaths in {seconds} seconds.",
   "@breathCountMessage": { "placeholders": { "taps": { "type": "int" }, "seconds": { "type": "int" } } },
   "done": "Done",
+  "addToGraph": "Add to Graph",
+  "measureAgain": "Measure Again",
   "healthTrends": "Health Trends",
   "measurementHistory": "Measurement History",
   "medicationManagement": "Medication Management",

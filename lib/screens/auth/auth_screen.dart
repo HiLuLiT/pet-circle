@@ -149,7 +149,7 @@ class _AuthScreenState extends State<AuthScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.passwordResetSent(email)),
-          backgroundColor: AppColors.successGreen,
+          backgroundColor: AppColors.lightBlue,
         ),
       );
     } else {
@@ -190,7 +190,7 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(height: 24),
               Text(
                 _isSignUp ? l10n.createAccount : 'Welcome Back',
-                style: AppTextStyles.heading1.copyWith(color: AppColors.burgundy),
+                style: AppTextStyles.heading1.copyWith(color: AppColors.chocolate),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
@@ -209,12 +209,12 @@ class _AuthScreenState extends State<AuthScreen> {
                           ? Icons.medical_services_outlined
                           : Icons.pets,
                       size: 18,
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       l10n.signingUpAs(roleLabel),
-                      style: AppTextStyles.body.copyWith(color: AppColors.burgundy),
+                      style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
                     ),
                   ],
                 ),
@@ -227,18 +227,18 @@ class _AuthScreenState extends State<AuthScreen> {
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
+                    color: AppColors.cherry.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.red.shade200),
+                    border: Border.all(color: AppColors.cherry.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                      Icon(Icons.error_outline, color: AppColors.cherry, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _error!,
-                          style: AppTextStyles.body.copyWith(color: Colors.red.shade700),
+                          style: AppTextStyles.body.copyWith(color: AppColors.cherry),
                         ),
                       ),
                     ],
@@ -290,7 +290,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                          color: AppColors.textMuted,
+                          color: AppColors.chocolate,
                         ),
                         onPressed: () =>
                             setState(() => _obscurePassword = !_obscurePassword),
@@ -318,7 +318,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             _obscureConfirmPassword
                                 ? Icons.visibility_off
                                 : Icons.visibility,
-                            color: AppColors.textMuted,
+                            color: AppColors.chocolate,
                           ),
                           onPressed: () => setState(
                               () => _obscureConfirmPassword = !_obscureConfirmPassword),
@@ -343,7 +343,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     onPressed: _isLoading ? null : _handleForgotPassword,
                     child: Text(
                       l10n.forgotPassword,
-                      style: AppTextStyles.body.copyWith(color: AppColors.burgundy),
+                      style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
                     ),
                   ),
                 ),
@@ -355,7 +355,7 @@ class _AuthScreenState extends State<AuthScreen> {
               PrimaryButton(
                 label: _isSignUp ? l10n.createAccount : l10n.signIn,
                 onPressed: _isLoading ? null : _handleEmailAuth,
-                backgroundColor: AppColors.burgundy,
+                backgroundColor: AppColors.chocolate,
               ),
 
               const SizedBox(height: 24),
@@ -363,15 +363,15 @@ class _AuthScreenState extends State<AuthScreen> {
               // Divider
               Row(
                 children: [
-                  Expanded(child: Divider(color: AppColors.textMuted.withOpacity(0.3))),
+                  Expanded(child: Divider(color: AppColors.chocolate.withOpacity(0.3))),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       l10n.orContinueWith,
-                      style: AppTextStyles.caption.copyWith(color: AppColors.textMuted),
+                      style: AppTextStyles.caption.copyWith(color: AppColors.chocolate),
                     ),
                   ),
-                  Expanded(child: Divider(color: AppColors.textMuted.withOpacity(0.3))),
+                  Expanded(child: Divider(color: AppColors.chocolate.withOpacity(0.3))),
                 ],
               ),
 
@@ -408,7 +408,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 children: [
                   Text(
                     _isSignUp ? l10n.alreadyHaveAccount : l10n.dontHaveAccount,
-                    style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                    style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
                   ),
                   TextButton(
                     onPressed: _isLoading
@@ -420,7 +420,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     child: Text(
                       _isSignUp ? l10n.signIn : l10n.signUp,
                       style: AppTextStyles.body.copyWith(
-                        color: AppColors.burgundy,
+                        color: AppColors.chocolate,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -433,7 +433,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 Container(
                   margin: const EdgeInsets.only(top: 16),
                   child: const Center(
-                    child: CircularProgressIndicator(color: AppColors.burgundy),
+                    child: CircularProgressIndicator(color: AppColors.chocolate),
                   ),
                 ),
             ],
@@ -469,8 +469,8 @@ class _AuthScreenState extends State<AuthScreen> {
           style: AppTextStyles.body,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: AppTextStyles.body.copyWith(color: AppColors.textMuted),
-            prefixIcon: Icon(icon, color: AppColors.textMuted, size: 20),
+            hintStyle: AppTextStyles.body.copyWith(color: AppColors.chocolate),
+            prefixIcon: Icon(icon, color: AppColors.chocolate, size: 20),
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: AppColors.offWhite,
@@ -480,11 +480,11 @@ class _AuthScreenState extends State<AuthScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.burgundy, width: 2),
+              borderSide: const BorderSide(color: AppColors.chocolate, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.red.shade300, width: 1),
+              borderSide: BorderSide(color: AppColors.cherry.withValues(alpha: 0.4), width: 1),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
@@ -511,17 +511,17 @@ class _SocialButton extends StatelessWidget {
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 14),
-        side: BorderSide(color: AppColors.textMuted.withOpacity(0.3)),
+        side: BorderSide(color: AppColors.chocolate.withOpacity(0.3)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: AppColors.textPrimary, size: 24),
+          Icon(icon, color: AppColors.chocolate, size: 24),
           const SizedBox(width: 8),
           Text(
             label,
-            style: AppTextStyles.body.copyWith(color: AppColors.textPrimary),
+            style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
           ),
         ],
       ),

@@ -239,8 +239,8 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                       _selectedBreed ?? 'e.g., Golden Retriever',
                       style: AppTextStyles.body.copyWith(
                         color: _selectedBreed == null
-                            ? AppColors.burgundy.withOpacity(0.3)
-                            : AppColors.burgundy,
+                            ? AppColors.chocolate.withOpacity(0.3)
+                            : AppColors.chocolate,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -255,7 +255,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                     ),
                     child: const Icon(
                       Icons.keyboard_arrow_down,
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                       size: 18,
                     ),
                   ),
@@ -318,7 +318,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                               Text(
                                 _capitalize(breed.breed),
                                 style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.burgundy,
+                                  color: AppColors.chocolate,
                                   fontSize: 10,
                                 ),
                               ),

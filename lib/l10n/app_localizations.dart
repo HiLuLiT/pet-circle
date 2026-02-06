@@ -596,6 +596,18 @@ abstract class AppLocalizations {
   /// **'Done'**
   String get done;
 
+  /// No description provided for @addToGraph.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Graph'**
+  String get addToGraph;
+
+  /// No description provided for @measureAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Measure Again'**
+  String get measureAgain;
+
   /// No description provided for @healthTrends.
   ///
   /// In en, this message translates to:

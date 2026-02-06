@@ -74,12 +74,12 @@ class _Header extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           child: Container(
             height: 8,
-            color: AppColors.burgundy.withOpacity(0.08),
+            color: AppColors.chocolate.withOpacity(0.08),
             child: Align(
               alignment: Alignment.centerLeft,
               child: FractionallySizedBox(
                 widthFactor: progress,
-                child: Container(color: const Color(0xFFFFC2B5)),
+                child: Container(color: AppColors.pink),
               ),
             ),
           ),

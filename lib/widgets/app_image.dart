@@ -50,7 +50,7 @@ class _Fallback extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       alignment: Alignment.center,
-      child: Icon(icon, color: AppColors.textMuted, size: 20),
+      child: Icon(icon, color: AppColors.chocolate, size: 20),
     );
   }
 }

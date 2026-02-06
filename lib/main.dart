@@ -27,6 +27,9 @@ const bool kEnableFirebase = false;
 /// Global locale notifier – updated from Settings language switcher.
 final ValueNotifier<Locale> appLocale = ValueNotifier(const Locale('en'));
 
+/// Global dark-mode notifier – updated from Settings dark mode toggle.
+final ValueNotifier<bool> appDarkMode = ValueNotifier(false);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -47,10 +50,12 @@ class PetCircleApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder<Locale>(
       valueListenable: appLocale,
-      builder: (context, locale, _) => MaterialApp(
+      builder: (context, locale, _) => ValueListenableBuilder<bool>(
+        valueListenable: appDarkMode,
+        builder: (context, isDark, _) => MaterialApp(
       title: 'Pet Circle',
       debugShowCheckedModeBanner: false,
-      theme: buildAppTheme(),
+      theme: isDark ? buildDarkTheme() : buildAppTheme(),
       locale: locale,
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -135,6 +140,7 @@ class PetCircleApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => const WelcomeScreen());
         }
       },
+    ),
     ),
     );
   }

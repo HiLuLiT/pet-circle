@@ -24,7 +24,7 @@ class MessagesScreen extends StatelessWidget {
             Text(
               l10n.notifications,
               style: AppTextStyles.heading2.copyWith(
-                color: AppColors.burgundy,
+                color: AppColors.chocolate,
                 letterSpacing: -0.96,
               ),
             ),
@@ -32,7 +32,7 @@ class MessagesScreen extends StatelessWidget {
             Text(
               l10n.unreadNotifications(notifications.where((n) => !n.isRead).length),
               style: AppTextStyles.body.copyWith(
-                color: AppColors.burgundy,
+                color: AppColors.chocolate,
               ),
             ),
             const SizedBox(height: 24),
@@ -165,13 +165,13 @@ class _NotificationCard extends StatelessWidget {
   Color get _iconColor {
     switch (notification.type) {
       case NotificationType.medicationReminder:
-        return const Color(0xFF146FD9);
+        return AppColors.blue;
       case NotificationType.measurementAlert:
-        return const Color(0xFFE64E60);
+        return AppColors.cherry;
       case NotificationType.careCircleInvitation:
-        return AppColors.successGreen;
+        return AppColors.lightBlue;
       case NotificationType.generalMessage:
-        return AppColors.warningAmber;
+        return AppColors.cherry;
     }
   }
 
@@ -214,7 +214,7 @@ class _NotificationCard extends StatelessWidget {
                       child: Text(
                         notification.title,
                         style: AppTextStyles.body.copyWith(
-                          color: AppColors.burgundy,
+                          color: AppColors.chocolate,
                           fontWeight: notification.isRead ? FontWeight.w400 : FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -225,7 +225,7 @@ class _NotificationCard extends StatelessWidget {
                         width: 8,
                         height: 8,
                         decoration: const BoxDecoration(
-                          color: Color(0xFF146FD9),
+                          color: AppColors.blue,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -235,7 +235,7 @@ class _NotificationCard extends StatelessWidget {
                 Text(
                   notification.description,
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.burgundy,
+                    color: AppColors.chocolate,
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -244,7 +244,7 @@ class _NotificationCard extends StatelessWidget {
                 Text(
                   notification.timeAgo,
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.textMuted,
+                    color: AppColors.chocolate,
                     fontSize: 11,
                   ),
                 ),

@@ -13,7 +13,7 @@ class WelcomeScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFC2B5),
+      backgroundColor: AppColors.pink,
       body: SafeArea(
         child: Column(
           children: [
@@ -36,7 +36,7 @@ class WelcomeScreen extends StatelessWidget {
                   _PrimaryPillButton(
                     label: l10n.signUp,
                     textColor: AppColors.white,
-                    backgroundColor: AppColors.burgundy,
+                    backgroundColor: AppColors.chocolate,
                     onTap: () =>
                         Navigator.of(context).pushNamed(AppRoutes.roleSelection),
                   ),
@@ -122,7 +122,7 @@ class _GoogleButton extends StatelessWidget {
             Text(
               AppLocalizations.of(context)!.signInWithGoogle,
               style: AppTextStyles.body.copyWith(
-                color: AppColors.burgundy,
+                color: AppColors.chocolate,
                 fontSize: 16,
                 letterSpacing: -0.32,
               ),

@@ -264,6 +264,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get done => 'סיום';
 
   @override
+  String get addToGraph => 'הוסף לגרף';
+
+  @override
+  String get measureAgain => 'מדוד שוב';
+
+  @override
   String get healthTrends => 'מגמות בריאות';
 
   @override

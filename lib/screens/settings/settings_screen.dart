@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/main.dart' show appLocale;
+import 'package:pet_circle/main.dart' show appLocale, appDarkMode;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
@@ -36,9 +36,9 @@ class SettingsDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
-      initialChildSize: 0.92,
+      initialChildSize: 1.0,
       minChildSize: 0.4,
-      maxChildSize: 0.92,
+      maxChildSize: 1.0,
       builder: (context, scrollController) {
         return ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
@@ -98,7 +98,6 @@ class _SettingsContent extends StatefulWidget {
 }
 
 class _SettingsContentState extends State<_SettingsContent> {
-  bool _darkMode = false;
   bool _pushNotifications = false;
   bool _emergencyAlerts = false;
   bool _visionRR = false;
@@ -126,7 +125,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                       Text(
                         l10n.settings,
                         style: AppTextStyles.heading2.copyWith(
-                          color: AppColors.burgundy,
+                          color: AppColors.chocolate,
                           letterSpacing: -0.96,
                         ),
                       ),
@@ -134,7 +133,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                       Text(
                         l10n.managePreferences,
                         style: AppTextStyles.body.copyWith(
-                          color: AppColors.burgundy,
+                          color: AppColors.chocolate,
                           fontSize: 14,
                           letterSpacing: -0.15,
                         ),
@@ -156,7 +155,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                       ),
                       child: const Icon(
                         Icons.keyboard_arrow_down,
-                        color: AppColors.burgundy,
+                        color: AppColors.chocolate,
                         size: 24,
                       ),
                     ),
@@ -172,8 +171,11 @@ class _SettingsContentState extends State<_SettingsContent> {
                     _SettingsToggleRow(
                       iconAsset: _settingsMoonAsset,
                       label: l10n.darkMode,
-                      isOn: _darkMode,
-                      onChanged: () => setState(() => _darkMode = !_darkMode),
+                      isOn: appDarkMode.value,
+                      onChanged: () {
+                        appDarkMode.value = !appDarkMode.value;
+                        setState(() {}); // rebuild to reflect toggle state
+                      },
                     ),
                     const SizedBox(height: 12),
                     _LanguageRow(),
@@ -190,7 +192,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                     _CareCircleItem(
                       email: 'sarah@example.com',
                       roleLabel: l10n.owner,
-                      roleColor: const Color(0xFFA15F3B),
+                      roleColor: AppColors.chocolate,
                       statusLabel: l10n.active,
                       statusColor: AppColors.pink,
                     ),
@@ -198,7 +200,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                     _CareCircleItem(
                       email: 'drsmith@vetclinic.com',
                       roleLabel: l10n.veterinarian,
-                      roleColor: const Color(0xFF146FD9),
+                      roleColor: AppColors.blue,
                       statusLabel: l10n.active,
                       statusColor: AppColors.pink,
                     ),
@@ -255,7 +257,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: AppColors.warningAmber,
+                              color: AppColors.cherry,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
@@ -399,7 +401,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                 children: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
-                    child: Text(l10n.cancel, style: AppTextStyles.body.copyWith(color: AppColors.burgundy)),
+                    child: Text(l10n.cancel, style: AppTextStyles.body.copyWith(color: AppColors.chocolate)),
                   ),
                   const SizedBox(width: 12),
                   TextButton(
@@ -410,11 +412,11 @@ class _SettingsContentState extends State<_SettingsContent> {
                       );
                     },
                     style: TextButton.styleFrom(
-                      backgroundColor: const Color(0xFF75ACFF),
+                      backgroundColor: AppColors.lightBlue,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     ),
-                    child: Text(l10n.save, style: AppTextStyles.body.copyWith(color: AppColors.burgundy)),
+                    child: Text(l10n.save, style: AppTextStyles.body.copyWith(color: AppColors.chocolate)),
                   ),
                 ],
               ),
@@ -438,7 +440,7 @@ class _SettingsContentState extends State<_SettingsContent> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: AppColors.burgundy)),
+            child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: AppColors.chocolate)),
           ),
         ],
       ),
@@ -481,7 +483,7 @@ class _SettingsCard extends StatelessWidget {
                     Text(
                       title,
                       style: AppTextStyles.heading3.copyWith(
-                        color: AppColors.burgundy,
+                        color: AppColors.chocolate,
                         letterSpacing: -0.54,
                       ),
                     ),
@@ -489,7 +491,7 @@ class _SettingsCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: AppTextStyles.body.copyWith(
-                        color: AppColors.burgundy,
+                        color: AppColors.chocolate,
                         fontSize: 14,
                         letterSpacing: -0.15,
                       ),
@@ -553,7 +555,7 @@ class _SettingsToggleRow extends StatelessWidget {
                       Text(
                         label,
                         style: AppTextStyles.body.copyWith(
-                          color: AppColors.burgundy,
+                          color: AppColors.chocolate,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.31,
@@ -564,7 +566,7 @@ class _SettingsToggleRow extends StatelessWidget {
                         Text(
                           description!,
                           style: AppTextStyles.caption.copyWith(
-                            color: AppColors.burgundy,
+                            color: AppColors.chocolate,
                             fontSize: 12,
                             height: 1.3,
                           ),
@@ -612,7 +614,7 @@ class _LanguageRow extends StatelessWidget {
                 Text(
                   l10n.language,
                   style: AppTextStyles.body.copyWith(
-                    color: AppColors.burgundy,
+                    color: AppColors.chocolate,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.31,
@@ -631,7 +633,7 @@ class _LanguageRow extends StatelessWidget {
                   Text(
                     currentLanguageName,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
@@ -657,7 +659,7 @@ class _LanguageRow extends StatelessWidget {
             ListTile(
               title: Text(l10n.english),
               trailing: Localizations.localeOf(context).languageCode == 'en'
-                  ? const Icon(Icons.check, color: AppColors.burgundy)
+                  ? const Icon(Icons.check, color: AppColors.chocolate)
                   : null,
               onTap: () {
                 appLocale.value = const Locale('en');
@@ -667,7 +669,7 @@ class _LanguageRow extends StatelessWidget {
             ListTile(
               title: Text(l10n.hebrew),
               trailing: Localizations.localeOf(context).languageCode == 'he'
-                  ? const Icon(Icons.check, color: AppColors.burgundy)
+                  ? const Icon(Icons.check, color: AppColors.chocolate)
                   : null,
               onTap: () {
                 appLocale.value = const Locale('he');
@@ -694,7 +696,7 @@ class _InviteButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: const Color(0xFF75ACFF),
+          color: AppColors.lightBlue,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(
@@ -704,7 +706,7 @@ class _InviteButton extends StatelessWidget {
             Text(
               l10n.invite,
               style: AppTextStyles.body.copyWith(
-                color: AppColors.burgundy,
+                color: AppColors.chocolate,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 letterSpacing: -0.15,
@@ -750,7 +752,7 @@ class _CareCircleItem extends StatelessWidget {
                 Text(
                   email,
                   style: AppTextStyles.body.copyWith(
-                    color: AppColors.burgundy,
+                    color: AppColors.chocolate,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.31,
@@ -763,14 +765,14 @@ class _CareCircleItem extends StatelessWidget {
                       label: roleLabel,
                       backgroundColor: roleColor,
                       textColor: roleColor == const Color(0xFFFFECB7)
-                          ? AppColors.burgundy
+                          ? AppColors.chocolate
                           : AppColors.white,
                     ),
                     const SizedBox(width: 4),
                     _Badge(
                       label: statusLabel,
                       backgroundColor: statusColor,
-                      textColor: AppColors.burgundy,
+                      textColor: AppColors.chocolate,
                     ),
                   ],
                 ),
@@ -853,7 +855,7 @@ class _ConfigureRow extends StatelessWidget {
                 Text(
                   l10n.alertThresholds,
                   style: AppTextStyles.body.copyWith(
-                    color: AppColors.burgundy,
+                    color: AppColors.chocolate,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.31,
@@ -863,7 +865,7 @@ class _ConfigureRow extends StatelessWidget {
                 Text(
                   l10n.customizeBpmRanges,
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.burgundy,
+                    color: AppColors.chocolate,
                     fontSize: 12,
                   ),
                 ),
@@ -875,7 +877,7 @@ class _ConfigureRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: const Color(0xFF75ACFF),
+                color: AppColors.lightBlue,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Row(
@@ -886,7 +888,7 @@ class _ConfigureRow extends StatelessWidget {
                   Text(
                     l10n.configure,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
@@ -937,7 +939,7 @@ class _ActionRow extends StatelessWidget {
                     Text(
                       title,
                       style: AppTextStyles.body.copyWith(
-                        color: AppColors.burgundy,
+                        color: AppColors.chocolate,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.31,
@@ -947,7 +949,7 @@ class _ActionRow extends StatelessWidget {
                     Text(
                       description,
                       style: AppTextStyles.caption.copyWith(
-                        color: AppColors.burgundy,
+                        color: AppColors.chocolate,
                         fontSize: 12,
                       ),
                     ),
@@ -985,7 +987,7 @@ class _SimpleRow extends StatelessWidget {
             Text(
               label,
               style: AppTextStyles.body.copyWith(
-                color: AppColors.burgundy,
+                color: AppColors.chocolate,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.31,
@@ -1011,7 +1013,7 @@ class _TogglePill extends StatelessWidget {
       height: 36,
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        color: isOn ? AppColors.burgundy : AppColors.burgundy.withOpacity(0.2),
+        color: isOn ? AppColors.chocolate : AppColors.chocolate.withOpacity(0.2),
         borderRadius: BorderRadius.circular(9999),
       ),
       child: Align(

@@ -266,6 +266,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get done => 'Done';
 
   @override
+  String get addToGraph => 'Add to Graph';
+
+  @override
+  String get measureAgain => 'Measure Again';
+
+  @override
   String get healthTrends => 'Health Trends';
 
   @override

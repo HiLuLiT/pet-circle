@@ -79,7 +79,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.verificationEmailSent),
-          backgroundColor: AppColors.successGreen,
+          backgroundColor: AppColors.lightBlue,
         ),
       );
       _startCooldown();
@@ -87,7 +87,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.error ?? l10n.failedToSendEmail),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.cherry,
         ),
       );
     }
@@ -161,28 +161,28 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 child: const Icon(
                   Icons.mark_email_unread_outlined,
                   size: 64,
-                  color: AppColors.burgundy,
+                  color: AppColors.chocolate,
                 ),
               ),
               const SizedBox(height: 32),
 
               Text(
                 l10n.verifyYourEmail,
-                style: AppTextStyles.heading1.copyWith(color: AppColors.burgundy),
+                style: AppTextStyles.heading1.copyWith(color: AppColors.chocolate),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
 
               Text(
                 l10n.verificationLinkSentTo,
-                style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 4),
               Text(
                 email,
                 style: AppTextStyles.body.copyWith(
-                  color: AppColors.burgundy,
+                  color: AppColors.chocolate,
                   fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
@@ -190,14 +190,14 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               const SizedBox(height: 8),
               Text(
                 l10n.clickLinkToVerify,
-                style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
 
               // Resend button
               if (_isLoading)
-                const CircularProgressIndicator(color: AppColors.burgundy)
+                const CircularProgressIndicator(color: AppColors.chocolate)
               else
                 PrimaryButton(
                   label: _canResend
@@ -205,7 +205,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                       : l10n.resendInSeconds(_resendCooldown),
                   onPressed: _canResend ? _resendEmail : null,
                   backgroundColor:
-                      _canResend ? AppColors.burgundy : AppColors.textMuted,
+                      _canResend ? AppColors.chocolate : AppColors.chocolate,
                 ),
 
               const SizedBox(height: 16),
@@ -215,7 +215,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 onPressed: _checkVerification,
                 icon: const Icon(Icons.refresh, size: 18),
                 label: Text(l10n.iveVerifiedMyEmail),
-                style: TextButton.styleFrom(foregroundColor: AppColors.burgundy),
+                style: TextButton.styleFrom(foregroundColor: AppColors.chocolate),
               ),
 
               const SizedBox(height: 32),
@@ -225,7 +225,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 onPressed: _signOut,
                 child: Text(
                   l10n.useDifferentAccount,
-                  style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
+                  style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
                 ),
               ),
             ],

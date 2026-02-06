@@ -35,7 +35,7 @@ class OwnerDashboard extends StatelessWidget {
               Text(
                 l10n.myPets,
                 style: AppTextStyles.heading2.copyWith(
-                  color: AppColors.burgundy,
+                  color: AppColors.chocolate,
                   letterSpacing: -0.96,
                 ),
               ),
@@ -120,7 +120,7 @@ class _PetCard extends StatelessWidget {
                   Text(
                     data.name,
                     style: AppTextStyles.heading2.copyWith(
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                       letterSpacing: -0.96,
                     ),
                   ),
@@ -128,7 +128,7 @@ class _PetCard extends StatelessWidget {
                   Text(
                     data.breedAndAge,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.burgundy,
+                      color: AppColors.chocolate,
                       fontSize: 14,
                       letterSpacing: -0.28,
                     ),
@@ -163,7 +163,7 @@ class _PetCard extends StatelessWidget {
                               Text(
                                 '${data.latestMeasurement.bpm}',
                                 style: AppTextStyles.heading2.copyWith(
-                                  color: AppColors.burgundy,
+                                  color: AppColors.chocolate,
                                   fontSize: 24,
                                   height: 1.2,
                                 ),
@@ -171,7 +171,7 @@ class _PetCard extends StatelessWidget {
                               Text(
                                 l10n.bpm,
                                 style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.burgundy,
+                                  color: AppColors.chocolate,
                                   fontSize: 12,
                                 ),
                               ),
@@ -182,7 +182,7 @@ class _PetCard extends StatelessWidget {
                       Text(
                         data.latestMeasurement.recordedAtLabel,
                         style: AppTextStyles.caption.copyWith(
-                          color: AppColors.burgundy,
+                          color: AppColors.chocolate,
                           fontSize: 12,
                         ),
                       ),
@@ -192,7 +192,7 @@ class _PetCard extends StatelessWidget {
                   // Care Circle divider
                   Container(
                     height: 1,
-                    color: AppColors.burgundy,
+                    color: AppColors.chocolate,
                   ),
                   const SizedBox(height: 17),
                   // Care Circle row
@@ -210,7 +210,7 @@ class _PetCard extends StatelessWidget {
                           Text(
                             l10n.careCircle,
                             style: AppTextStyles.caption.copyWith(
-                              color: AppColors.burgundy,
+                              color: AppColors.chocolate,
                               fontSize: 12,
                             ),
                           ),
@@ -223,7 +223,7 @@ class _PetCard extends StatelessWidget {
                   // Buttons divider
                   Container(
                     height: 1,
-                    color: AppColors.burgundy,
+                    color: AppColors.chocolate,
                   ),
                   const SizedBox(height: 17),
                   // Action buttons
@@ -293,7 +293,7 @@ class _ActionButton extends StatelessWidget {
             Text(
               label,
               style: AppTextStyles.body.copyWith(
-                color: AppColors.burgundy,
+                color: AppColors.chocolate,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 letterSpacing: -0.28,
