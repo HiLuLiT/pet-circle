@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
   static const white = Color(0xFFFFFFFF);
@@ -110,16 +111,16 @@ class AppShadows {
 }
 
 ThemeData buildAppTheme() {
+  final baseTextTheme = GoogleFonts.interTextTheme();
   return ThemeData(
     scaffoldBackgroundColor: AppColors.white,
-    fontFamily: 'Inter',
     colorScheme: ColorScheme.fromSeed(
       seedColor: AppColors.pink,
       primary: AppColors.burgundy,
       surface: AppColors.white,
       background: AppColors.white,
     ),
-    textTheme: const TextTheme(
+    textTheme: baseTextTheme.copyWith(
       headlineSmall: AppTextStyles.heading2,
       titleLarge: AppTextStyles.heading3,
       bodyMedium: AppTextStyles.body,
