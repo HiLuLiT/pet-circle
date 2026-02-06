@@ -3,6 +3,7 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/data/mock_data.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
+import 'package:pet_circle/widgets/toggle_pill.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class TrendsScreen extends StatefulWidget {
@@ -1285,38 +1286,35 @@ class _ReminderCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: c.pink,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(Icons.notifications_none, color: c.chocolate),
-              const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    l10n.medicationReminders,
-                    style:
-                        AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  Text(
-                    l10n.medicationRemindersDesc,
-                    style: AppTextStyles.caption,
-                  ),
-                ],
-              ),
-            ],
+          Icon(Icons.notifications_none, color: c.chocolate, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.medicationReminders,
+                  style: AppTextStyles.body
+                      .copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 1),
+                Text(
+                  l10n.medicationRemindersDesc,
+                  style: AppTextStyles.caption,
+                ),
+              ],
+            ),
           ),
-          Switch(
-            value: enabled,
-            onChanged: onChanged,
-            activeColor: c.chocolate,
+          GestureDetector(
+            onTap: () => onChanged(!enabled),
+            child: TogglePill(isOn: enabled),
           ),
         ],
       ),

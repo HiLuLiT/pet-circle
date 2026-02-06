@@ -6,6 +6,7 @@ import 'package:pet_circle/main.dart' show appLocale, appDarkMode;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
+import 'package:pet_circle/widgets/toggle_pill.dart';
 
 const _settingsShareAsset = 'assets/figma/settings_share.svg';
 const _settingsDownAsset = 'assets/figma/settings_down.svg';
@@ -590,7 +591,7 @@ class _SettingsToggleRow extends StatelessWidget {
           ),
           GestureDetector(
             onTap: onChanged,
-            child: _TogglePill(isOn: isOn),
+            child: TogglePill(isOn: isOn),
           ),
         ],
       ),
@@ -1017,33 +1018,3 @@ class _SimpleRow extends StatelessWidget {
   }
 }
 
-class _TogglePill extends StatelessWidget {
-  const _TogglePill({required this.isOn});
-
-  final bool isOn;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    return Container(
-      width: 75,
-      height: 36,
-      padding: const EdgeInsets.all(2),
-      decoration: BoxDecoration(
-        color: isOn ? c.chocolate : c.chocolate.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(9999),
-      ),
-      child: Align(
-        alignment: isOn ? Alignment.centerRight : Alignment.centerLeft,
-        child: Container(
-          width: 31,
-          height: 31,
-          decoration: BoxDecoration(
-            color: c.white,
-            shape: BoxShape.circle,
-          ),
-        ),
-      ),
-    );
-  }
-}
