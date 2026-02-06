@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 class MeasurementScreen extends StatefulWidget {
@@ -63,6 +65,7 @@ class _TabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -73,13 +76,13 @@ class _TabSelector extends StatelessWidget {
         children: [
           _TabButton(
             icon: Icons.touch_app,
-            label: 'Manual Mode',
+            label: l10n.manualMode,
             selected: selectedIndex == 0,
             onTap: () => onChanged(0),
           ),
           _TabButton(
             icon: Icons.videocam_outlined,
-            label: 'VisionRR Mode',
+            label: l10n.visionRRMode,
             selected: selectedIndex == 1,
             onTap: () => onChanged(1),
           ),
@@ -157,10 +160,23 @@ class _ManualModeState extends State<_ManualMode>
   Timer? _timer;
   static const _lightBlue = Color(0xFF75ACFF);
 
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
+
   @override
   void initState() {
     super.initState();
     _remainingSeconds = widget.selectedDuration;
+
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+      lowerBound: 0.0,
+      upperBound: 1.0,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -173,6 +189,7 @@ class _ManualModeState extends State<_ManualMode>
 
   @override
   void dispose() {
+    _scaleController.dispose();
     _timer?.cancel();
     super.dispose();
   }
@@ -200,6 +217,8 @@ class _ManualModeState extends State<_ManualMode>
     final bpm = (_tapCount / widget.selectedDuration * 60).round();
     
     setState(() => _isRunning = false);
+
+    final l10n = AppLocalizations.of(context)!;
     
     // Show result
     showDialog(
@@ -207,10 +226,10 @@ class _ManualModeState extends State<_ManualMode>
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
-          children: const [
-            Icon(Icons.favorite, color: AppColors.pink),
-            SizedBox(width: 8),
-            Text('Measurement Complete'),
+          children: [
+            const Icon(Icons.favorite, color: AppColors.pink),
+            const SizedBox(width: 8),
+            Text(l10n.measurementComplete),
           ],
         ),
         content: Column(
@@ -224,10 +243,10 @@ class _ManualModeState extends State<_ManualMode>
                 color: AppColors.burgundy,
               ),
             ),
-            const Text('breaths per minute', style: AppTextStyles.body),
+            Text(l10n.breathsPerMinute, style: AppTextStyles.body),
             const SizedBox(height: 16),
             Text(
-              'You counted $_tapCount breaths in ${widget.selectedDuration} seconds.',
+              l10n.breathCountMessage(_tapCount, widget.selectedDuration),
               style: AppTextStyles.caption,
               textAlign: TextAlign.center,
             ),
@@ -239,7 +258,7 @@ class _ManualModeState extends State<_ManualMode>
               Navigator.pop(context);
               setState(() => _remainingSeconds = widget.selectedDuration);
             },
-            child: const Text('Done'),
+            child: Text(l10n.done),
           ),
         ],
       ),
@@ -247,15 +266,22 @@ class _ManualModeState extends State<_ManualMode>
   }
 
   void _onTap() {
+    // Haptic feedback
+    HapticFeedback.mediumImpact();
+
+    // Scale animation: shrink then bounce back
+    _scaleController.forward().then((_) => _scaleController.reverse());
+
     if (!_isRunning) {
       _startTimer();
     }
-    
+
     setState(() => _tapCount++);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final progress = widget.selectedDuration == 0
         ? 0.0
         : (_remainingSeconds / widget.selectedDuration).clamp(0.0, 1.0);
@@ -273,26 +299,26 @@ class _ManualModeState extends State<_ManualMode>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Timer Duration',
+                l10n.timerDuration,
                 style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   _DurationChip(
-                    label: '15s',
+                    label: l10n.duration15s,
                     selected: widget.selectedDuration == 15,
                     onTap: _isRunning ? null : () => widget.onDurationChanged(15),
                   ),
                   const SizedBox(width: 16),
                   _DurationChip(
-                    label: '30s',
+                    label: l10n.duration30s,
                     selected: widget.selectedDuration == 30,
                     onTap: _isRunning ? null : () => widget.onDurationChanged(30),
                   ),
                   const SizedBox(width: 16),
                   _DurationChip(
-                    label: '60s',
+                    label: l10n.duration60s,
                     selected: widget.selectedDuration == 60,
                     onTap: _isRunning ? null : () => widget.onDurationChanged(60),
                   ),
@@ -349,40 +375,47 @@ class _ManualModeState extends State<_ManualMode>
               const SizedBox(height: 16),
               GestureDetector(
                 onTap: _onTap,
-                child: Container(
-                  width: 206,
-                  height: 206,
-                  decoration: BoxDecoration(
-                    color: AppColors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
+                child: AnimatedBuilder(
+                  animation: _scaleAnimation,
+                  builder: (context, child) => Transform.scale(
+                    scale: _scaleAnimation.value,
+                    child: child,
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '$_tapCount',
-                        style: const TextStyle(
-                          fontSize: 80,
-                          fontWeight: FontWeight.w500,
-                          color: AppColors.burgundy,
-                          height: 1.0,
+                  child: Container(
+                    width: 206,
+                    height: 206,
+                    decoration: BoxDecoration(
+                      color: AppColors.white,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.04),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _isRunning ? 'Tap to stop' : 'Tap to begin',
-                        style: AppTextStyles.body.copyWith(
-                          fontWeight: FontWeight.w500,
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '$_tapCount',
+                          style: const TextStyle(
+                            fontSize: 80,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.burgundy,
+                            height: 1.0,
+                          ),
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        Text(
+                          _isRunning ? l10n.tapToStop : l10n.tapToBegin,
+                          style: AppTextStyles.body.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -435,6 +468,7 @@ class _VisionMode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -443,16 +477,15 @@ class _VisionMode extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
-          Text('VisionRR Mode', style: AppTextStyles.heading3),
-          SizedBox(height: AppSpacing.sm),
+        children: [
+          Text(l10n.visionRRMode, style: AppTextStyles.heading3),
+          const SizedBox(height: AppSpacing.sm),
           Text(
-            'Use your camera to detect subtle chest motion while your pet sleeps. '
-            'This mode is hands-free and designed for accurate SRR tracking.',
+            l10n.visionRRModeDescription,
             style: AppTextStyles.body,
           ),
-          SizedBox(height: AppSpacing.lg),
-          Expanded(
+          const SizedBox(height: AppSpacing.lg),
+          const Expanded(
             child: Center(
               child: Icon(Icons.videocam, size: 64, color: AppColors.textMuted),
             ),

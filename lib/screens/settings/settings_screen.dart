@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
-import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/main.dart' show appLocale;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
@@ -9,13 +10,22 @@ import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 const _settingsRightAsset = 'assets/figma/settings_right.svg';
 const _settingsShareAsset = 'assets/figma/settings_share.svg';
 const _settingsDownAsset = 'assets/figma/settings_down.svg';
-const _settingsDownCircleAsset = 'assets/figma/settings_down_circle.svg';
 const _settingsMoonAsset = 'assets/figma/settings_moon.svg';
 const _settingsGlobeAsset = 'assets/figma/settings_globe.svg';
 const _settingsChevronAsset = 'assets/figma/settings_chevron.svg';
 const _settingsInviteAsset = 'assets/figma/settings_invite.svg';
 const _settingsTrashAsset = 'assets/figma/settings_trash.svg';
 const _settingsConfigureAsset = 'assets/figma/settings_configure.svg';
+
+/// Push notification categories
+/// - Medicine reminders: upcoming doses, missed doses
+/// - Measurement reminders: scheduled SRR measurements
+const kPushNotificationCategories = ['medicine_reminder', 'measurement_reminder'];
+
+/// Emergency alert categories
+/// - BPM exceeds alert threshold
+/// - Missed medication for 24h+
+const kEmergencyAlertCategories = ['bpm_threshold_exceeded', 'missed_medication_24h'];
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key, required this.role});
@@ -27,17 +37,15 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _showActivePreview = false;
+  bool _darkMode = false;
+  bool _pushNotifications = false;
+  bool _emergencyAlerts = false;
+  bool _visionRR = false;
+  bool _autoExport = false;
 
   @override
   Widget build(BuildContext context) {
-    final user = MockData.currentOwnerUser;
-
-    final darkModeOn = _showActivePreview;
-    final pushNotificationsOn = _showActivePreview;
-    final visionRrOn = _showActivePreview;
-    final autoExportOn = _showActivePreview;
-
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -46,17 +54,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: _ProfileSelector(
-                  avatarUrl: user.avatarUrl,
-                  onTap: () =>
-                      setState(() => _showActivePreview = !_showActivePreview),
-                ),
-              ),
-              const SizedBox(height: 24),
               Text(
-                'Settings',
+                l10n.settings,
                 style: AppTextStyles.heading2.copyWith(
                   color: AppColors.burgundy,
                   letterSpacing: -0.96,
@@ -64,7 +63,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Manage your PetBreath preferences',
+                l10n.managePreferences,
                 style: AppTextStyles.body.copyWith(
                   color: AppColors.burgundy,
                   fontSize: 14,
@@ -73,14 +72,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 24),
               _SettingsCard(
-                title: 'Appearance',
-                subtitle: 'Customize the look and feel',
+                title: l10n.appearance,
+                subtitle: l10n.customizeLookAndFeel,
                 child: Column(
                   children: [
                     _SettingsToggleRow(
                       iconAsset: _settingsMoonAsset,
-                      label: 'Dark mode',
-                      isOn: darkModeOn,
+                      label: l10n.darkMode,
+                      isOn: _darkMode,
+                      onChanged: () => setState(() => _darkMode = !_darkMode),
                     ),
                     const SizedBox(height: 12),
                     _LanguageRow(),
@@ -89,32 +89,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 16),
               _SettingsCard(
-                title: 'Care Circle',
-                subtitle: 'Manage caregivers, vets, and pet sitters',
+                title: l10n.careCircle,
+                subtitle: l10n.manageCaregivers,
                 trailing: _InviteButton(onTap: () {}),
                 child: Column(
-                  children: const [
+                  children: [
                     _CareCircleItem(
                       email: 'sarah@example.com',
-                      roleLabel: 'Owner',
-                      roleColor: Color(0xFFA15F3B),
-                      statusLabel: 'Active',
+                      roleLabel: l10n.owner,
+                      roleColor: const Color(0xFFA15F3B),
+                      statusLabel: l10n.active,
                       statusColor: AppColors.pink,
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     _CareCircleItem(
                       email: 'drsmith@vetclinic.com',
-                      roleLabel: 'Vet',
-                      roleColor: Color(0xFF146FD9),
-                      statusLabel: 'Active',
+                      roleLabel: l10n.veterinarian,
+                      roleColor: const Color(0xFF146FD9),
+                      statusLabel: l10n.active,
                       statusColor: AppColors.pink,
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     _CareCircleItem(
                       email: 'petsitter@example.com',
-                      roleLabel: 'Viewer',
-                      roleColor: Color(0xFFFFECB7),
-                      statusLabel: 'Pending',
+                      roleLabel: l10n.viewer,
+                      roleColor: const Color(0xFFFFECB7),
+                      statusLabel: l10n.pending,
                       statusColor: AppColors.offWhite,
                     ),
                   ],
@@ -122,64 +122,90 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 16),
               _SettingsCard(
-                title: 'Notifications',
-                subtitle: 'Manage alerts and reminders',
+                title: l10n.notifications,
+                subtitle: l10n.manageAlerts,
                 child: Column(
                   children: [
                     _SettingsToggleRow(
-                      label: 'Push notifications',
-                      description: 'Receive notifications for measurements',
-                      isOn: pushNotificationsOn,
+                      label: l10n.pushNotifications,
+                      description: l10n.pushNotificationsDesc,
+                      isOn: _pushNotifications,
+                      onChanged: () => setState(() => _pushNotifications = !_pushNotifications),
                     ),
                     const SizedBox(height: 12),
                     _SettingsToggleRow(
-                      label: 'Emergency alerts',
-                      description:
-                          'Critical alerts when SRR exceeds thresholds',
-                      isOn: false,
+                      label: l10n.emergencyAlerts,
+                      description: l10n.emergencyAlertsDesc,
+                      isOn: _emergencyAlerts,
+                      onChanged: () => setState(() => _emergencyAlerts = !_emergencyAlerts),
                     ),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
               _SettingsCard(
-                title: 'Measurement settings',
-                subtitle: 'Configure measurement modes and thresholds',
+                title: l10n.measurementSettings,
+                subtitle: l10n.configureModes,
                 child: Column(
                   children: [
-                    _SettingsToggleRow(
-                      label: 'VisionRR camera mode',
-                      description: 'AI-powered camera-based measurement',
-                      isOn: visionRrOn,
+                    Stack(
+                      children: [
+                        _SettingsToggleRow(
+                          label: l10n.visionRRCameraMode,
+                          description: l10n.visionRRDesc,
+                          isOn: _visionRR,
+                          onChanged: () => setState(() => _visionRR = !_visionRR),
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 80,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.warningAmber,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              l10n.comingSoon,
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
-                    _ConfigureRow(onTap: () {}),
+                    _ConfigureRow(onTap: () => _showThresholdDialog(context)),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
               _SettingsCard(
-                title: 'Data & Privacy',
-                subtitle: 'Export data and manage privacy settings',
+                title: l10n.dataAndPrivacy,
+                subtitle: l10n.exportAndManage,
                 child: Column(
                   children: [
                     _SettingsToggleRow(
-                      label: 'Auto-Export Data',
-                      description: 'Weekly CSV export to email',
-                      isOn: autoExportOn,
+                      label: l10n.autoExportData,
+                      description: l10n.autoExportDesc,
+                      isOn: _autoExport,
+                      onChanged: () => setState(() => _autoExport = !_autoExport),
                     ),
                     const SizedBox(height: 12),
                     _ActionRow(
                       iconAsset: _settingsDownAsset,
-                      title: 'Export All Data',
-                      description: 'Download complete health records',
+                      title: l10n.exportAllData,
+                      description: l10n.exportAllDataDesc,
                       onTap: () {},
                     ),
                     const SizedBox(height: 12),
                     _ActionRow(
                       iconAsset: _settingsShareAsset,
-                      title: 'Share with Veterinarian',
-                      description: 'Generate shareable report link',
+                      title: l10n.shareWithVet,
+                      description: l10n.shareWithVetDesc,
                       onTap: () {},
                     ),
                   ],
@@ -187,23 +213,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
               const SizedBox(height: 16),
               _SettingsCard(
-                title: 'About',
-                subtitle: 'App information and support',
+                title: l10n.about,
+                subtitle: l10n.appInfoAndSupport,
                 child: Column(
                   children: [
                     _SimpleRow(
-                      label: 'Terms of Service',
-                      onTap: () {},
+                      label: l10n.termsOfService,
+                      onTap: () => _showInfoDialog(
+                          context, l10n.termsOfService, l10n.termsOfServiceContent),
                     ),
                     const SizedBox(height: 12),
                     _SimpleRow(
-                      label: 'Privacy Policy',
-                      onTap: () {},
+                      label: l10n.privacyPolicy,
+                      onTap: () => _showInfoDialog(
+                          context, l10n.privacyPolicy, l10n.privacyPolicyContent),
                     ),
                     const SizedBox(height: 12),
                     _SimpleRow(
-                      label: 'Help & Support',
-                      onTap: () {},
+                      label: l10n.helpAndSupport,
+                      onTap: () => _showInfoDialog(
+                          context, l10n.helpAndSupport, l10n.helpAndSupportContent),
                     ),
                   ],
                 ),
@@ -227,54 +256,109 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
     );
   }
-}
 
-class _ProfileSelector extends StatelessWidget {
-  const _ProfileSelector({required this.avatarUrl, this.onTap});
+  void _showThresholdDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final normalController = TextEditingController(text: '30');
+    final alertController = TextEditingController(text: '40');
 
-  final String avatarUrl;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.white, width: 2),
-            ),
-            child: ClipOval(
-              child: Image.network(avatarUrl, fit: BoxFit.cover),
-            ),
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: const BoxDecoration(
+            color: AppColors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
           ),
-          Positioned(
-            right: -4,
-            top: -4,
-            child: Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: AppColors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.white, width: 2),
-              ),
-              child: Center(
-                child: Transform.rotate(
-                  angle: -1.57,
-                  child: SvgPicture.asset(
-                    _settingsDownCircleAsset,
-                    width: 20,
-                    height: 20,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.configureAlertThresholds, style: AppTextStyles.heading3),
+              const SizedBox(height: 8),
+              Text(l10n.configureAlertThresholdsDesc, style: AppTextStyles.body),
+              const SizedBox(height: 24),
+              Text(l10n.normalThresholdBpm, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: normalController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: 'e.g., 30',
+                  filled: true,
+                  fillColor: AppColors.offWhite,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
-            ),
+              const SizedBox(height: 16),
+              Text(l10n.alertThresholdBpm, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 8),
+              TextField(
+                controller: alertController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  hintText: 'e.g., 40',
+                  filled: true,
+                  fillColor: AppColors.offWhite,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.cancel, style: AppTextStyles.body.copyWith(color: AppColors.burgundy)),
+                  ),
+                  const SizedBox(width: 12),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.thresholdsUpdated)),
+                      );
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: const Color(0xFF75ACFF),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    ),
+                    child: Text(l10n.save, style: AppTextStyles.body.copyWith(color: AppColors.burgundy)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showInfoDialog(BuildContext context, String title, String content) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(title, style: AppTextStyles.heading3),
+        content: SingleChildScrollView(
+          child: Text(content, style: AppTextStyles.body),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: AppColors.burgundy)),
           ),
         ],
       ),
@@ -354,6 +438,7 @@ class _SettingsToggleRow extends StatelessWidget {
     this.description,
     this.iconAsset,
     this.radius = 12,
+    this.onChanged,
   });
 
   final String label;
@@ -361,6 +446,7 @@ class _SettingsToggleRow extends StatelessWidget {
   final bool isOn;
   final String? iconAsset;
   final double radius;
+  final VoidCallback? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -410,7 +496,10 @@ class _SettingsToggleRow extends StatelessWidget {
               ],
             ),
           ),
-          _TogglePill(isOn: isOn),
+          GestureDetector(
+            onTap: onChanged,
+            child: _TogglePill(isOn: isOn),
+          ),
         ],
       ),
     );
@@ -420,52 +509,93 @@ class _SettingsToggleRow extends StatelessWidget {
 class _LanguageRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              SvgPicture.asset(_settingsGlobeAsset, width: 16, height: 16),
-              const SizedBox(width: 8),
-              Text(
-                'Language',
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.burgundy,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.31,
-                ),
-              ),
-            ],
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: AppColors.pink,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Row(
+    final l10n = AppLocalizations.of(context)!;
+    final currentLocale = Localizations.localeOf(context);
+    final isHebrew = currentLocale.languageCode == 'he';
+    final currentLanguageName = isHebrew ? l10n.hebrew : l10n.english;
+
+    return GestureDetector(
+      onTap: () => _showLanguagePicker(context, l10n),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
               children: [
+                SvgPicture.asset(_settingsGlobeAsset, width: 16, height: 16),
+                const SizedBox(width: 8),
                 Text(
-                  'English',
+                  l10n.language,
                   style: AppTextStyles.body.copyWith(
                     color: AppColors.burgundy,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.31,
                   ),
                 ),
-                const SizedBox(width: 6),
-                SvgPicture.asset(_settingsChevronAsset, width: 16, height: 16),
               ],
             ),
-          ),
-        ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.pink,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    currentLanguageName,
+                    style: AppTextStyles.body.copyWith(
+                      color: AppColors.burgundy,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  SvgPicture.asset(_settingsChevronAsset, width: 16, height: 16),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLanguagePicker(BuildContext context, AppLocalizations l10n) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(l10n.english),
+              trailing: Localizations.localeOf(context).languageCode == 'en'
+                  ? const Icon(Icons.check, color: AppColors.burgundy)
+                  : null,
+              onTap: () {
+                appLocale.value = const Locale('en');
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: Text(l10n.hebrew),
+              trailing: Localizations.localeOf(context).languageCode == 'he'
+                  ? const Icon(Icons.check, color: AppColors.burgundy)
+                  : null,
+              onTap: () {
+                appLocale.value = const Locale('he');
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -478,6 +608,7 @@ class _InviteButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -491,7 +622,7 @@ class _InviteButton extends StatelessWidget {
             SvgPicture.asset(_settingsInviteAsset, width: 16, height: 16),
             const SizedBox(width: 6),
             Text(
-              'Invite',
+              l10n.invite,
               style: AppTextStyles.body.copyWith(
                 color: AppColors.burgundy,
                 fontSize: 14,
@@ -625,6 +756,7 @@ class _ConfigureRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -639,7 +771,7 @@ class _ConfigureRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Alert thresholds',
+                  l10n.alertThresholds,
                   style: AppTextStyles.body.copyWith(
                     color: AppColors.burgundy,
                     fontSize: 16,
@@ -649,7 +781,7 @@ class _ConfigureRow extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Customize BPM ranges for alerts',
+                  l10n.customizeBpmRanges,
                   style: AppTextStyles.caption.copyWith(
                     color: AppColors.burgundy,
                     fontSize: 12,
@@ -672,7 +804,7 @@ class _ConfigureRow extends StatelessWidget {
                       width: 16, height: 16),
                   const SizedBox(width: 6),
                   Text(
-                    'Configure',
+                    l10n.configure,
                     style: AppTextStyles.body.copyWith(
                       color: AppColors.burgundy,
                       fontSize: 14,
