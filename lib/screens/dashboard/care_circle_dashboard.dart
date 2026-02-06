@@ -19,12 +19,13 @@ class CareCircleDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final pets = MockData.pets;
     final user = MockData.currentOwnerUser;
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -68,19 +69,19 @@ class CareCircleDashboard extends StatelessWidget {
                   childAspectRatio: 3.3,
                   children: [
                     _SummaryCard(
-                      iconColor: AppColors.lightBlue.withValues(alpha: 0.15),
+                      iconColor: c.lightBlue.withValues(alpha: 0.15),
                       iconUrl: AppAssets.statusOkIcon,
                       value: '2',
                       label: l10n.normalStatus,
                     ),
                     _SummaryCard(
-                      iconColor: AppColors.cherry.withValues(alpha: 0.15),
+                      iconColor: c.cherry.withValues(alpha: 0.15),
                       iconUrl: AppAssets.attentionIcon,
                       value: '1',
                       label: l10n.needAttention,
                     ),
                     _SummaryCard(
-                      iconColor: AppColors.lightBlue.withValues(alpha: 0.1),
+                      iconColor: c.lightBlue.withValues(alpha: 0.1),
                       iconUrl: AppAssets.chartIcon,
                       value: '24',
                       label: l10n.measurementsThisWeek,
@@ -97,13 +98,14 @@ class CareCircleDashboard extends StatelessWidget {
 }
 
 class _PetCard extends StatelessWidget {
-  const _PetCard({required this.data, this.onTap});
+  _PetCard({required this.data, this.onTap});
 
   final Pet data;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onTap,
@@ -116,11 +118,11 @@ class _PetCard extends StatelessWidget {
               Container(
                 height: 192,
                 width: double.infinity,
-                decoration: BoxDecoration(
+                  decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [AppColors.lightBlue.withValues(alpha: 0.2), Colors.transparent],
+                    colors: [c.lightBlue.withValues(alpha: 0.2), Colors.transparent],
                   ),
                 ),
                 child: ClipRRect(
@@ -144,7 +146,7 @@ class _PetCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(data.name,
-                    style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate)),
+                    style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
                 const SizedBox(height: 4),
                 Text(data.breedAndAge, style: AppTextStyles.bodyMuted),
                 const SizedBox(height: 16),
@@ -155,10 +157,10 @@ class _PetCard extends StatelessWidget {
                       children: [
                         NeumorphicCard(
                           inner: true,
-                          color: AppColors.offWhite,
+                          color: c.offWhite,
                           padding: const EdgeInsets.all(12),
-                          child: const Icon(Icons.favorite_border,
-                              size: 20, color: AppColors.chocolate),
+                          child: Icon(Icons.favorite_border,
+                              size: 20, color: c.chocolate),
                         ),
                         const SizedBox(width: 12),
                         Column(
@@ -166,7 +168,7 @@ class _PetCard extends StatelessWidget {
                           children: [
                             Text('${data.latestMeasurement.bpm}',
                                 style: AppTextStyles.heading3
-                                    .copyWith(color: AppColors.chocolate)),
+                                    .copyWith(color: c.chocolate)),
                             Text(l10n.bpm, style: AppTextStyles.caption),
                           ],
                         ),
@@ -177,14 +179,14 @@ class _PetCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Divider(color: AppColors.lightBlue.withValues(alpha: 0.15), height: 1),
+                Divider(color: c.lightBlue.withValues(alpha: 0.15), height: 1),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.group, size: 12, color: AppColors.chocolate),
+                        Icon(Icons.group, size: 12, color: c.chocolate),
                         const SizedBox(width: 6),
                         Text(l10n.careCircle, style: AppTextStyles.caption),
                       ],
@@ -203,12 +205,13 @@ class _PetCard extends StatelessWidget {
 }
 
 class _AvatarStack extends StatelessWidget {
-  const _AvatarStack({required this.avatars});
+  _AvatarStack({required this.avatars});
 
   final List<CareCircleMember> avatars;
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return SizedBox(
       height: 32,
       width: 32 + (avatars.length - 1) * 24,
@@ -222,14 +225,14 @@ class _AvatarStack extends StatelessWidget {
                 height: 32,
                 padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: c.white,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: i == 0 ? AppColors.lightBlue : AppColors.offWhite,
+                    color: i == 0 ? c.lightBlue : c.offWhite,
                     width: 2,
                   ),
                   boxShadow: i == 0
-                      ? [BoxShadow(color: AppColors.lightBlue.withValues(alpha: 0.3), blurRadius: 0)]
+                      ? [BoxShadow(color: c.lightBlue.withValues(alpha: 0.3), blurRadius: 0)]
                       : null,
                 ),
                 child: ClipOval(
@@ -244,7 +247,7 @@ class _AvatarStack extends StatelessWidget {
 }
 
 class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({
+  _SummaryCard({
     required this.iconColor,
     required this.iconUrl,
     required this.value,
@@ -258,6 +261,7 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return NeumorphicCard(
       radius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(24),
@@ -274,7 +278,7 @@ class _SummaryCard extends StatelessWidget {
               child: Icon(
                 _summaryIcon(iconUrl),
                 size: 24,
-                color: AppColors.chocolate,
+                color: c.chocolate,
               ),
             ),
           ),
@@ -283,7 +287,7 @@ class _SummaryCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(value,
-                  style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate)),
+                  style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
               Text(label, style: AppTextStyles.bodyMuted),
             ],
           ),

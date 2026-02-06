@@ -72,6 +72,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     if (!mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
 
     setState(() => _isLoading = false);
 
@@ -79,7 +80,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.verificationEmailSent),
-          backgroundColor: AppColors.lightBlue,
+          backgroundColor: c.lightBlue,
         ),
       );
       _startCooldown();
@@ -87,7 +88,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.error ?? l10n.failedToSendEmail),
-          backgroundColor: AppColors.cherry,
+          backgroundColor: c.cherry,
         ),
       );
     }
@@ -119,10 +120,11 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     final email = AuthService.currentUser?.email ?? 'your email';
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -133,13 +135,13 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.pink.withOpacity(0.2),
+                  color: c.pink.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: const BoxDecoration(
-                    color: AppColors.pink,
+                  decoration: BoxDecoration(
+                    color: c.pink,
                     shape: BoxShape.circle,
                   ),
                   child: SvgPicture.asset(
@@ -155,34 +157,34 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: AppColors.offWhite,
+                  color: c.offWhite,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.mark_email_unread_outlined,
                   size: 64,
-                  color: AppColors.chocolate,
+                  color: c.chocolate,
                 ),
               ),
               const SizedBox(height: 32),
 
               Text(
                 l10n.verifyYourEmail,
-                style: AppTextStyles.heading1.copyWith(color: AppColors.chocolate),
+                style: AppTextStyles.heading1.copyWith(color: c.chocolate),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
 
               Text(
                 l10n.verificationLinkSentTo,
-                style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
+                style: AppTextStyles.body.copyWith(color: c.chocolate),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 4),
               Text(
                 email,
                 style: AppTextStyles.body.copyWith(
-                  color: AppColors.chocolate,
+                  color: c.chocolate,
                   fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
@@ -190,14 +192,14 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               const SizedBox(height: 8),
               Text(
                 l10n.clickLinkToVerify,
-                style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
+                style: AppTextStyles.body.copyWith(color: c.chocolate),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
 
               // Resend button
               if (_isLoading)
-                const CircularProgressIndicator(color: AppColors.chocolate)
+                CircularProgressIndicator(color: c.chocolate)
               else
                 PrimaryButton(
                   label: _canResend
@@ -205,7 +207,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                       : l10n.resendInSeconds(_resendCooldown),
                   onPressed: _canResend ? _resendEmail : null,
                   backgroundColor:
-                      _canResend ? AppColors.chocolate : AppColors.chocolate,
+                      _canResend ? c.chocolate : c.chocolate,
                 ),
 
               const SizedBox(height: 16),
@@ -215,7 +217,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 onPressed: _checkVerification,
                 icon: const Icon(Icons.refresh, size: 18),
                 label: Text(l10n.iveVerifiedMyEmail),
-                style: TextButton.styleFrom(foregroundColor: AppColors.chocolate),
+                style: TextButton.styleFrom(foregroundColor: c.chocolate),
               ),
 
               const SizedBox(height: 32),
@@ -225,7 +227,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 onPressed: _signOut,
                 child: Text(
                   l10n.useDifferentAccount,
-                  style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
+                  style: AppTextStyles.body.copyWith(color: c.chocolate),
                 ),
               ),
             ],

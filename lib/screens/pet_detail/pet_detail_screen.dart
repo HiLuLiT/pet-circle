@@ -59,18 +59,20 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     });
 
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.clinicalNoteAdded),
-        backgroundColor: AppColors.lightBlue,
+        backgroundColor: c.lightBlue,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: CustomScrollView(
         slivers: [
           _buildAppBar(),
@@ -95,12 +97,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   }
 
   Widget _buildAppBar() {
+    final c = AppColorsTheme.of(context);
     return SliverAppBar(
       expandedHeight: 280,
       pinned: true,
-      backgroundColor: AppColors.chocolate,
+      backgroundColor: c.chocolate,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back, color: AppColors.white),
+        icon: Icon(Icons.arrow_back, color: c.white),
         onPressed: () => Navigator.of(context).pop(),
       ),
       flexibleSpace: FlexibleSpaceBar(
@@ -115,7 +118,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    AppColors.chocolate.withOpacity(0.8),
+                    c.chocolate.withOpacity(0.8),
                   ],
                 ),
               ),
@@ -138,11 +141,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   const SizedBox(height: 8),
                   Text(
                     widget.pet.name,
-                    style: AppTextStyles.heading1.copyWith(color: AppColors.white),
+                    style: AppTextStyles.heading1.copyWith(color: c.white),
                   ),
                   Text(
                     widget.pet.breedAndAge,
-                    style: AppTextStyles.body.copyWith(color: AppColors.white.withOpacity(0.8)),
+                    style: AppTextStyles.body.copyWith(color: c.white.withOpacity(0.8)),
                   ),
                 ],
               ),
@@ -155,6 +158,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
 
   Widget _buildInfoSection() {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return NeumorphicCard(
       radius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(20),
@@ -163,7 +167,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         children: [
           Text(
             l10n.latestReading,
-            style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
+            style: AppTextStyles.heading3.copyWith(color: c.chocolate),
           ),
           const SizedBox(height: 16),
           Row(
@@ -171,7 +175,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               Expanded(
                 child: _InfoTile(
                   icon: Icons.favorite,
-                  iconColor: AppColors.pink,
+                  iconColor: c.pink,
                   value: '${widget.pet.latestMeasurement.bpm}',
                   label: l10n.bpm,
                 ),
@@ -180,7 +184,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               Expanded(
                 child: _InfoTile(
                   icon: Icons.access_time,
-                  iconColor: AppColors.lightBlue,
+                  iconColor: c.lightBlue,
                   value: widget.pet.latestMeasurement.recordedAtLabel,
                   label: l10n.lastMeasured,
                 ),
@@ -194,6 +198,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
 
   Widget _buildMeasurementHistory() {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     final measurements = widget.pet.name == 'Princess'
         ? MockData.princessMeasurements
         : [widget.pet.latestMeasurement];
@@ -209,13 +214,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             children: [
               Text(
                 l10n.measurementHistory,
-                style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
+                style: AppTextStyles.heading3.copyWith(color: c.chocolate),
               ),
               TextButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.show_chart, size: 18),
                 label: Text(l10n.viewGraph),
-                style: TextButton.styleFrom(foregroundColor: AppColors.lightBlue),
+                style: TextButton.styleFrom(foregroundColor: c.lightBlue),
               ),
             ],
           ),
@@ -238,7 +243,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                           '${m.bpm}',
                           style: AppTextStyles.caption.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: isElevated ? AppColors.cherry : AppColors.lightBlue,
+                            color: isElevated ? c.cherry : c.lightBlue,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -246,11 +251,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                           height: height.clamp(20, 60),
                           decoration: BoxDecoration(
                             color: isElevated
-                                ? AppColors.cherry.withOpacity(0.3)
-                                : AppColors.lightBlue.withOpacity(0.3),
+                                ? c.cherry.withOpacity(0.3)
+                                : c.lightBlue.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(4),
                             border: Border.all(
-                              color: isElevated ? AppColors.cherry : AppColors.lightBlue,
+                              color: isElevated ? c.cherry : c.lightBlue,
                               width: 2,
                             ),
                           ),
@@ -283,6 +288,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
 
   Widget _buildClinicalNotes() {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return NeumorphicCard(
       radius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(20),
@@ -291,11 +297,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.note_alt_outlined, color: AppColors.chocolate),
+              Icon(Icons.note_alt_outlined, color: c.chocolate),
               const SizedBox(width: 8),
               Text(
                 l10n.clinicalNotes,
-                style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
+                style: AppTextStyles.heading3.copyWith(color: c.chocolate),
               ),
             ],
           ),
@@ -304,7 +310,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.offWhite,
+              color: c.offWhite,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -314,7 +320,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   maxLines: 3,
                   decoration: InputDecoration(
                     hintText: l10n.addClinicalNoteHint,
-                    hintStyle: AppTextStyles.body.copyWith(color: AppColors.chocolate),
+                    hintStyle: AppTextStyles.body.copyWith(color: c.chocolate),
                     border: InputBorder.none,
                     isDense: true,
                   ),
@@ -328,8 +334,8 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                     icon: const Icon(Icons.add, size: 18),
                     label: Text(l10n.addNote),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.chocolate,
-                      foregroundColor: AppColors.white,
+                      backgroundColor: c.chocolate,
+                      foregroundColor: c.white,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
@@ -351,11 +357,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             Center(
               child: Column(
                 children: [
-                  Icon(Icons.notes, size: 40, color: AppColors.chocolate.withOpacity(0.5)),
+                  Icon(Icons.notes, size: 40, color: c.chocolate.withOpacity(0.5)),
                   const SizedBox(height: 8),
                   Text(
                     l10n.noClinicalNotesYet,
-                    style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
+                    style: AppTextStyles.body.copyWith(color: c.chocolate),
                   ),
                 ],
               ),
@@ -368,6 +374,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
 
   Widget _buildCareCircle() {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return NeumorphicCard(
       radius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(20),
@@ -376,11 +383,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.group, color: AppColors.chocolate),
+              Icon(Icons.group, color: c.chocolate),
               const SizedBox(width: 8),
               Text(
                 l10n.careCircle,
-                style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
+                style: AppTextStyles.heading3.copyWith(color: c.chocolate),
               ),
             ],
           ),
@@ -409,10 +416,11 @@ class _InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.offWhite,
+        color: c.offWhite,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -432,7 +440,7 @@ class _InfoTile extends StatelessWidget {
               children: [
                 Text(
                   value,
-                  style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
+                  style: AppTextStyles.heading3.copyWith(color: c.chocolate),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(label, style: AppTextStyles.caption),
@@ -452,6 +460,7 @@ class _NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -475,7 +484,7 @@ class _NoteCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       note.timeAgo,
-                      style: AppTextStyles.caption.copyWith(color: AppColors.chocolate),
+                      style: AppTextStyles.caption.copyWith(color: c.chocolate),
                     ),
                   ],
                 ),
@@ -497,6 +506,7 @@ class _MemberTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -516,7 +526,7 @@ class _MemberTile extends StatelessWidget {
                 ),
                 Text(
                   member.role,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.chocolate),
+                  style: AppTextStyles.caption.copyWith(color: c.chocolate),
                 ),
               ],
             ),
@@ -533,31 +543,33 @@ class _RoleBadge extends StatelessWidget {
 
   final String role;
 
-  Color get _color {
+  Color _color(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     switch (role.toLowerCase()) {
       case 'owner':
-        return AppColors.lightBlue;
+        return c.lightBlue;
       case 'veterinarian':
-        return AppColors.chocolate;
+        return c.chocolate;
       case 'caregiver':
-        return AppColors.lightBlue;
+        return c.lightBlue;
       default:
-        return AppColors.chocolate;
+        return c.chocolate;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final color = _color(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: _color.withOpacity(0.12),
+        color: color.withOpacity(0.12),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         role,
         style: AppTextStyles.caption.copyWith(
-          color: _color,
+          color: color,
           fontWeight: FontWeight.w500,
         ),
       ),

@@ -149,7 +149,7 @@ class _AuthScreenState extends State<AuthScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.passwordResetSent(email)),
-          backgroundColor: AppColors.lightBlue,
+          backgroundColor: AppColorsTheme.of(context).lightBlue,
         ),
       );
     } else {
@@ -160,11 +160,12 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     final isAppleAvailable = !kIsWeb && (Platform.isIOS || Platform.isMacOS);
     final roleLabel = widget.role == AppUserRole.vet ? l10n.veterinarian : l10n.petOwner;
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -176,8 +177,8 @@ class _AuthScreenState extends State<AuthScreen> {
               Center(
                 child: Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: const BoxDecoration(
-                    color: AppColors.pink,
+                  decoration: BoxDecoration(
+                    color: c.pink,
                     shape: BoxShape.circle,
                   ),
                   child: SvgPicture.asset(
@@ -190,14 +191,14 @@ class _AuthScreenState extends State<AuthScreen> {
               const SizedBox(height: 24),
               Text(
                 _isSignUp ? l10n.createAccount : 'Welcome Back',
-                style: AppTextStyles.heading1.copyWith(color: AppColors.chocolate),
+                style: AppTextStyles.heading1.copyWith(color: c.chocolate),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppColors.pink.withOpacity(0.3),
+                  color: c.pink.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -209,12 +210,12 @@ class _AuthScreenState extends State<AuthScreen> {
                           ? Icons.medical_services_outlined
                           : Icons.pets,
                       size: 18,
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       l10n.signingUpAs(roleLabel),
-                      style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
+                      style: AppTextStyles.body.copyWith(color: c.chocolate),
                     ),
                   ],
                 ),
@@ -227,18 +228,18 @@ class _AuthScreenState extends State<AuthScreen> {
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.cherry.withValues(alpha: 0.1),
+                    color: c.cherry.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.cherry.withValues(alpha: 0.3)),
+                    border: Border.all(color: c.cherry.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline, color: AppColors.cherry, size: 20),
+                      Icon(Icons.error_outline, color: c.cherry, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _error!,
-                          style: AppTextStyles.body.copyWith(color: AppColors.cherry),
+                          style: AppTextStyles.body.copyWith(color: c.cherry),
                         ),
                       ),
                     ],
@@ -290,7 +291,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                          color: AppColors.chocolate,
+                          color: c.chocolate,
                         ),
                         onPressed: () =>
                             setState(() => _obscurePassword = !_obscurePassword),
@@ -318,7 +319,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             _obscureConfirmPassword
                                 ? Icons.visibility_off
                                 : Icons.visibility,
-                            color: AppColors.chocolate,
+                            color: c.chocolate,
                           ),
                           onPressed: () => setState(
                               () => _obscureConfirmPassword = !_obscureConfirmPassword),
@@ -343,7 +344,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     onPressed: _isLoading ? null : _handleForgotPassword,
                     child: Text(
                       l10n.forgotPassword,
-                      style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
+                      style: AppTextStyles.body.copyWith(color: c.chocolate),
                     ),
                   ),
                 ),
@@ -355,7 +356,7 @@ class _AuthScreenState extends State<AuthScreen> {
               PrimaryButton(
                 label: _isSignUp ? l10n.createAccount : l10n.signIn,
                 onPressed: _isLoading ? null : _handleEmailAuth,
-                backgroundColor: AppColors.chocolate,
+                backgroundColor: c.chocolate,
               ),
 
               const SizedBox(height: 24),
@@ -363,15 +364,15 @@ class _AuthScreenState extends State<AuthScreen> {
               // Divider
               Row(
                 children: [
-                  Expanded(child: Divider(color: AppColors.chocolate.withOpacity(0.3))),
+                  Expanded(child: Divider(color: c.chocolate.withOpacity(0.3))),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       l10n.orContinueWith,
-                      style: AppTextStyles.caption.copyWith(color: AppColors.chocolate),
+                      style: AppTextStyles.caption.copyWith(color: c.chocolate),
                     ),
                   ),
-                  Expanded(child: Divider(color: AppColors.chocolate.withOpacity(0.3))),
+                  Expanded(child: Divider(color: c.chocolate.withOpacity(0.3))),
                 ],
               ),
 
@@ -408,7 +409,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 children: [
                   Text(
                     _isSignUp ? l10n.alreadyHaveAccount : l10n.dontHaveAccount,
-                    style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
+                    style: AppTextStyles.body.copyWith(color: c.chocolate),
                   ),
                   TextButton(
                     onPressed: _isLoading
@@ -420,7 +421,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     child: Text(
                       _isSignUp ? l10n.signIn : l10n.signUp,
                       style: AppTextStyles.body.copyWith(
-                        color: AppColors.chocolate,
+                        color: c.chocolate,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -432,8 +433,8 @@ class _AuthScreenState extends State<AuthScreen> {
               if (_isLoading)
                 Container(
                   margin: const EdgeInsets.only(top: 16),
-                  child: const Center(
-                    child: CircularProgressIndicator(color: AppColors.chocolate),
+                  child: Center(
+                    child: CircularProgressIndicator(color: c.chocolate),
                   ),
                 ),
             ],
@@ -453,6 +454,7 @@ class _AuthScreenState extends State<AuthScreen> {
     Widget? suffixIcon,
     String? Function(String?)? validator,
   }) {
+    final c = AppColorsTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -469,22 +471,22 @@ class _AuthScreenState extends State<AuthScreen> {
           style: AppTextStyles.body,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: AppTextStyles.body.copyWith(color: AppColors.chocolate),
-            prefixIcon: Icon(icon, color: AppColors.chocolate, size: 20),
+            hintStyle: AppTextStyles.body.copyWith(color: c.chocolate),
+            prefixIcon: Icon(icon, color: c.chocolate, size: 20),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: AppColors.offWhite,
+            fillColor: c.offWhite,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.chocolate, width: 2),
+              borderSide: BorderSide(color: c.chocolate, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: AppColors.cherry.withValues(alpha: 0.4), width: 1),
+              borderSide: BorderSide(color: c.cherry.withValues(alpha: 0.4), width: 1),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           ),
@@ -507,21 +509,22 @@ class _SocialButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 14),
-        side: BorderSide(color: AppColors.chocolate.withOpacity(0.3)),
+        side: BorderSide(color: c.chocolate.withOpacity(0.3)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: AppColors.chocolate, size: 24),
+          Icon(icon, color: c.chocolate, size: 24),
           const SizedBox(width: 8),
           Text(
             label,
-            style: AppTextStyles.body.copyWith(color: AppColors.chocolate),
+            style: AppTextStyles.body.copyWith(color: c.chocolate),
           ),
         ],
       ),

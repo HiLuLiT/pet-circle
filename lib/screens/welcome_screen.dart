@@ -11,9 +11,10 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.pink,
+      backgroundColor: c.pink,
       body: SafeArea(
         child: Column(
           children: [
@@ -35,8 +36,8 @@ class WelcomeScreen extends StatelessWidget {
                 children: [
                   _PrimaryPillButton(
                     label: l10n.signUp,
-                    textColor: AppColors.white,
-                    backgroundColor: AppColors.chocolate,
+                    textColor: c.white,
+                    backgroundColor: c.chocolate,
                     onTap: () =>
                         Navigator.of(context).pushNamed(AppRoutes.roleSelection),
                   ),
@@ -96,20 +97,21 @@ class _PrimaryPillButton extends StatelessWidget {
 }
 
 class _GoogleButton extends StatelessWidget {
-  const _GoogleButton({required this.onTap});
+  _GoogleButton({required this.onTap});
 
   final VoidCallback onTap;
   static const _googleLogoAsset = 'assets/figma/google_logo.png';
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return SizedBox(
       width: 247,
       height: 58,
       child: TextButton(
         onPressed: onTap,
         style: TextButton.styleFrom(
-          backgroundColor: AppColors.white,
+          backgroundColor: c.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(172),
           ),
@@ -122,7 +124,7 @@ class _GoogleButton extends StatelessWidget {
             Text(
               AppLocalizations.of(context)!.signInWithGoogle,
               style: AppTextStyles.body.copyWith(
-                color: AppColors.chocolate,
+                color: c.chocolate,
                 fontSize: 16,
                 letterSpacing: -0.32,
               ),

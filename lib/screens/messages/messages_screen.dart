@@ -11,6 +11,7 @@ class MessagesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     final user = MockData.currentOwnerUser;
     final notifications = _buildNotifications(l10n);
 
@@ -24,7 +25,7 @@ class MessagesScreen extends StatelessWidget {
             Text(
               l10n.notifications,
               style: AppTextStyles.heading2.copyWith(
-                color: AppColors.chocolate,
+                color: c.chocolate,
                 letterSpacing: -0.96,
               ),
             ),
@@ -32,7 +33,7 @@ class MessagesScreen extends StatelessWidget {
             Text(
               l10n.unreadNotifications(notifications.where((n) => !n.isRead).length),
               style: AppTextStyles.body.copyWith(
-                color: AppColors.chocolate,
+                color: c.chocolate,
               ),
             ),
             const SizedBox(height: 24),
@@ -46,11 +47,11 @@ class MessagesScreen extends StatelessWidget {
     );
 
     if (!showScaffold) {
-      return Container(color: AppColors.white, child: content);
+      return Container(color: c.white, child: content);
     }
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: content,
     );
   }
@@ -145,7 +146,7 @@ List<_Notification> _buildNotifications(AppLocalizations l10n) => [
 // ─── Notification Card ───────────────────────────────────────────
 
 class _NotificationCard extends StatelessWidget {
-  const _NotificationCard({required this.notification});
+  _NotificationCard({required this.notification});
 
   final _Notification notification;
 
@@ -162,30 +163,26 @@ class _NotificationCard extends StatelessWidget {
     }
   }
 
-  Color get _iconColor {
-    switch (notification.type) {
-      case NotificationType.medicationReminder:
-        return AppColors.blue;
-      case NotificationType.measurementAlert:
-        return AppColors.cherry;
-      case NotificationType.careCircleInvitation:
-        return AppColors.lightBlue;
-      case NotificationType.generalMessage:
-        return AppColors.cherry;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
+    
+    final iconColor = switch (notification.type) {
+      NotificationType.medicationReminder => c.blue,
+      NotificationType.measurementAlert => c.cherry,
+      NotificationType.careCircleInvitation => c.lightBlue,
+      NotificationType.generalMessage => c.cherry,
+    };
+    
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: notification.isRead ? AppColors.white : AppColors.offWhite,
+        color: notification.isRead ? c.white : c.offWhite,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: notification.isRead
-              ? AppColors.offWhite
-              : AppColors.pink.withAlpha(80),
+              ? c.offWhite
+              : c.pink.withAlpha(80),
         ),
       ),
       child: Row(
@@ -196,10 +193,10 @@ class _NotificationCard extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: _iconColor.withAlpha(26),
+              color: iconColor.withAlpha(26),
               shape: BoxShape.circle,
             ),
-            child: Icon(_icon, size: 20, color: _iconColor),
+            child: Icon(_icon, size: 20, color: iconColor),
           ),
           const SizedBox(width: 12),
           // Content
@@ -214,7 +211,7 @@ class _NotificationCard extends StatelessWidget {
                       child: Text(
                         notification.title,
                         style: AppTextStyles.body.copyWith(
-                          color: AppColors.chocolate,
+                          color: c.chocolate,
                           fontWeight: notification.isRead ? FontWeight.w400 : FontWeight.w600,
                           fontSize: 14,
                         ),
@@ -224,8 +221,8 @@ class _NotificationCard extends StatelessWidget {
                       Container(
                         width: 8,
                         height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.blue,
+                        decoration: BoxDecoration(
+                          color: c.blue,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -235,7 +232,7 @@ class _NotificationCard extends StatelessWidget {
                 Text(
                   notification.description,
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                     fontSize: 12,
                     height: 1.4,
                   ),
@@ -244,7 +241,7 @@ class _NotificationCard extends StatelessWidget {
                 Text(
                   notification.timeAgo,
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                     fontSize: 11,
                   ),
                 ),

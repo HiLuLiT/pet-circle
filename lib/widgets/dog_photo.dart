@@ -18,12 +18,13 @@ class DogPhoto extends StatefulWidget {
 class _DogPhotoState extends State<DogPhoto> {
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final source = widget.endpoint.trim();
     if (source.isEmpty) {
       return Container(
-        color: AppColors.offWhite,
+        color: c.offWhite,
         alignment: Alignment.center,
-        child: const Icon(Icons.pets, color: AppColors.chocolate),
+        child: Icon(Icons.pets, color: c.chocolate),
       );
     }
 

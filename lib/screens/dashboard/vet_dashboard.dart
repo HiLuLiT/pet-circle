@@ -19,6 +19,7 @@ class VetDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final pets = MockData.vetClinicPets;
     final user = MockData.currentVetUser;
     final l10n = AppLocalizations.of(context)!;
@@ -37,7 +38,7 @@ class VetDashboard extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
               Text(
                 l10n.clinicOverview,
-                style: AppTextStyles.heading2.copyWith(color: AppColors.chocolate),
+                style: AppTextStyles.heading2.copyWith(color: c.chocolate),
               ),
               Text(
                 l10n.patientsInYourCare(pets.length),
@@ -66,19 +67,19 @@ class VetDashboard extends StatelessWidget {
                 childAspectRatio: 3.3,
                 children: [
                   _SummaryCard(
-                    iconColor: AppColors.lightBlue.withValues(alpha: 0.15),
+                    iconColor: c.lightBlue.withValues(alpha: 0.15),
                     icon: Icons.check_circle_outline,
                     value: '$normalCount',
                     label: l10n.normalStatus,
                   ),
                   _SummaryCard(
-                    iconColor: AppColors.cherry.withValues(alpha: 0.15),
+                    iconColor: c.cherry.withValues(alpha: 0.15),
                     icon: Icons.warning_amber_outlined,
                     value: '$elevatedCount',
                     label: l10n.needAttention,
                   ),
                   _SummaryCard(
-                    iconColor: AppColors.lightBlue.withValues(alpha: 0.1),
+                    iconColor: c.lightBlue.withValues(alpha: 0.1),
                     icon: Icons.bar_chart,
                     value: '${pets.length * 6}',
                     label: l10n.measurementsThisWeek,
@@ -92,24 +93,25 @@ class VetDashboard extends StatelessWidget {
     );
 
     if (!showScaffold) {
-      return Container(color: AppColors.white, child: content);
+      return Container(color: c.white, child: content);
     }
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: content,
     );
   }
 }
 
 class _PetCard extends StatelessWidget {
-  const _PetCard({required this.data, this.onTap});
+  _PetCard({required this.data, this.onTap});
 
   final Pet data;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onTap,
@@ -126,7 +128,7 @@ class _PetCard extends StatelessWidget {
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [AppColors.lightBlue.withValues(alpha: 0.2), Colors.transparent],
+                      colors: [c.lightBlue.withValues(alpha: 0.2), Colors.transparent],
                     ),
                   ),
                   child: ClipRRect(
@@ -149,18 +151,18 @@ class _PetCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.chocolate.withOpacity(0.9),
+                      color: c.chocolate.withOpacity(0.9),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.visibility, size: 12, color: AppColors.white),
+                        Icon(Icons.visibility, size: 12, color: c.white),
                         const SizedBox(width: 4),
                         Text(
                           l10n.viewOnly,
                           style: AppTextStyles.caption.copyWith(
-                            color: AppColors.white,
+                            color: c.white,
                             fontSize: 10,
                           ),
                         ),
@@ -177,7 +179,7 @@ class _PetCard extends StatelessWidget {
                 children: [
                   Text(
                     data.name,
-                    style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
+                    style: AppTextStyles.heading3.copyWith(color: c.chocolate),
                   ),
                   const SizedBox(height: 4),
                   Text(data.breedAndAge, style: AppTextStyles.bodyMuted),
@@ -189,10 +191,10 @@ class _PetCard extends StatelessWidget {
                         children: [
                           NeumorphicCard(
                             inner: true,
-                            color: AppColors.offWhite,
+                            color: c.offWhite,
                             padding: const EdgeInsets.all(10),
-                            child: const Icon(Icons.favorite_border,
-                                size: 18, color: AppColors.chocolate),
+                            child: Icon(Icons.favorite_border,
+                                size: 18, color: c.chocolate),
                           ),
                           const SizedBox(width: 10),
                           Column(
@@ -201,7 +203,7 @@ class _PetCard extends StatelessWidget {
                               Text(
                                 '${data.latestMeasurement.bpm}',
                                 style: AppTextStyles.heading3
-                                    .copyWith(color: AppColors.chocolate),
+                                    .copyWith(color: c.chocolate),
                               ),
                               Text(l10n.bpm, style: AppTextStyles.caption),
                             ],
@@ -215,14 +217,14 @@ class _PetCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 14),
-                  Divider(color: AppColors.lightBlue.withValues(alpha: 0.15), height: 1),
+                  Divider(color: c.lightBlue.withValues(alpha: 0.15), height: 1),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.person_outline, size: 14, color: AppColors.chocolate),
+                          Icon(Icons.person_outline, size: 14, color: c.chocolate),
                           const SizedBox(width: 6),
                           Text(
                             l10n.ownerLabel(_getOwnerName(data.careCircle, l10n.unknown)),
@@ -230,7 +232,7 @@ class _PetCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const Icon(Icons.chevron_right, size: 18, color: AppColors.chocolate),
+                      Icon(Icons.chevron_right, size: 18, color: c.chocolate),
                     ],
                   ),
                 ],
@@ -249,7 +251,7 @@ class _PetCard extends StatelessWidget {
 }
 
 class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({
+  _SummaryCard({
     required this.iconColor,
     required this.icon,
     required this.value,
@@ -263,6 +265,7 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return NeumorphicCard(
       radius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(24),
@@ -276,7 +279,7 @@ class _SummaryCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Center(
-              child: Icon(icon, size: 24, color: AppColors.chocolate),
+              child: Icon(icon, size: 24, color: c.chocolate),
             ),
           ),
           const SizedBox(width: 16),
@@ -286,7 +289,7 @@ class _SummaryCard extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: AppTextStyles.heading3.copyWith(color: AppColors.chocolate),
+                style: AppTextStyles.heading3.copyWith(color: c.chocolate),
               ),
               Text(label, style: AppTextStyles.bodyMuted),
             ],

@@ -63,13 +63,14 @@ class _OnboardingStep4State extends State<OnboardingStep4>
         ? l10n.invitationSentTo(email, _selectedRole)
         : l10n.pleaseEnterEmailAddress;
 
+    final c = AppColorsTheme.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
             Icon(
               email.isNotEmpty ? Icons.check_circle : Icons.info_outline,
-              color: AppColors.white,
+              color: c.white,
               size: 20,
             ),
             const SizedBox(width: 12),
@@ -77,7 +78,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
           ],
         ),
         backgroundColor:
-            email.isNotEmpty ? AppColors.lightBlue : AppColors.cherry,
+            email.isNotEmpty ? c.lightBlue : c.cherry,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         margin: const EdgeInsets.all(16),
@@ -102,6 +103,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
       stepLabel: l10n.onboardingStep(4, 4),
@@ -140,7 +142,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: c.white,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Column(
@@ -166,7 +168,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
                       ),
                       decoration: BoxDecoration(
                         color:
-                            isSelected ? AppColors.lightYellow : Colors.transparent,
+                            isSelected ? c.lightYellow : Colors.transparent,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -187,7 +189,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
             width: double.infinity,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.blue,
+                backgroundColor: c.blue,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(56),
@@ -197,13 +199,13 @@ class _OnboardingStep4State extends State<OnboardingStep4>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.person_add_alt_1,
-                      size: 16, color: AppColors.white),
+                  Icon(Icons.person_add_alt_1,
+                      size: 16, color: c.white),
                   const SizedBox(width: 8),
                   Text(
                     l10n.addToCareCircle,
                     style:
-                        AppTextStyles.body.copyWith(color: AppColors.white),
+                        AppTextStyles.body.copyWith(color: c.white),
                   ),
                 ],
               ),
@@ -215,7 +217,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
             width: double.infinity,
             child: TextButton(
               style: TextButton.styleFrom(
-                backgroundColor: AppColors.white,
+                backgroundColor: c.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(100),
                 ),
@@ -224,12 +226,12 @@ class _OnboardingStep4State extends State<OnboardingStep4>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.person_add_alt_1,
-                      size: 16, color: AppColors.blue),
+                  Icon(Icons.person_add_alt_1,
+                      size: 16, color: c.blue),
                   const SizedBox(width: 8),
                   Text(
                     l10n.addAnotherPetCircle,
-                    style: AppTextStyles.body.copyWith(color: AppColors.blue),
+                    style: AppTextStyles.body.copyWith(color: c.blue),
                   ),
                 ],
               ),
@@ -249,16 +251,17 @@ class _InviteStatus {
 }
 
 class _InviteRow extends StatelessWidget {
-  const _InviteRow({required this.invite});
+  _InviteRow({required this.invite});
 
   final _InviteStatus invite;
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: c.white,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Row(
@@ -268,13 +271,13 @@ class _InviteRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.lightYellow,
+              color: c.lightYellow,
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
               invite.status,
               style: AppTextStyles.caption.copyWith(
-                color: AppColors.chocolate,
+                color: c.chocolate,
                 fontSize: 10,
               ),
             ),
@@ -286,7 +289,7 @@ class _InviteRow extends StatelessWidget {
 }
 
 class _InputRow extends StatelessWidget {
-  const _InputRow({
+  _InputRow({
     required this.label,
     required this.hint,
     required this.controller,
@@ -298,6 +301,7 @@ class _InputRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -311,10 +315,10 @@ class _InputRow extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               filled: true,
-              fillColor: AppColors.white,
+              fillColor: c.white,
               hintText: hint,
               hintStyle: AppTextStyles.body.copyWith(
-                color: AppColors.chocolate.withOpacity(0.4),
+                color: c.chocolate.withOpacity(0.4),
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
@@ -332,7 +336,7 @@ class _InputRow extends StatelessWidget {
 }
 
 class _SelectRow extends StatelessWidget {
-  const _SelectRow({
+  _SelectRow({
     required this.label,
     required this.value,
     required this.onTap,
@@ -348,6 +352,7 @@ class _SelectRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -359,7 +364,7 @@ class _SelectRow extends StatelessWidget {
           child: Container(
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: c.white,
               borderRadius: BorderRadius.circular(4),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -374,9 +379,9 @@ class _SelectRow extends StatelessWidget {
                       curve: Curves.easeInOut,
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.keyboard_arrow_down,
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                     size: 18,
                   ),
                 ),

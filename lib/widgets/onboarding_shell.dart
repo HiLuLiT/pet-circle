@@ -22,14 +22,15 @@ class OnboardingShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: Center(
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 24),
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
-            color: AppColors.offWhite,
+            color: c.offWhite,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -59,6 +60,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Column(
       children: [
         Row(
@@ -74,12 +76,12 @@ class _Header extends StatelessWidget {
           borderRadius: BorderRadius.circular(999),
           child: Container(
             height: 8,
-            color: AppColors.chocolate.withOpacity(0.08),
+            color: c.chocolate.withOpacity(0.08),
             child: Align(
               alignment: Alignment.centerLeft,
               child: FractionallySizedBox(
                 widthFactor: progress,
-                child: Container(color: AppColors.pink),
+                child: Container(color: c.pink),
               ),
             ),
           ),

@@ -15,6 +15,7 @@ class LabeledTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -29,10 +30,10 @@ class LabeledTextField extends StatelessWidget {
             keyboardType: keyboardType,
             decoration: InputDecoration(
               filled: true,
-              fillColor: AppColors.white,
+              fillColor: c.white,
               hintText: hintText,
               hintStyle: AppTextStyles.body.copyWith(
-                color: AppColors.chocolate.withOpacity(0.3),
+                color: c.chocolate.withOpacity(0.3),
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),

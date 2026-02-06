@@ -7,7 +7,6 @@ import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 
-const _settingsRightAsset = 'assets/figma/settings_right.svg';
 const _settingsShareAsset = 'assets/figma/settings_share.svg';
 const _settingsDownAsset = 'assets/figma/settings_down.svg';
 const _settingsMoonAsset = 'assets/figma/settings_moon.svg';
@@ -61,8 +60,9 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: SafeArea(
         child: _SettingsContent(role: role),
       ),
@@ -106,8 +106,9 @@ class _SettingsContentState extends State<_SettingsContent> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return Container(
-      color: AppColors.white,
+      color: c.white,
       child: SingleChildScrollView(
         controller: widget.scrollController,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -125,7 +126,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                       Text(
                         l10n.settings,
                         style: AppTextStyles.heading2.copyWith(
-                          color: AppColors.chocolate,
+                          color: c.chocolate,
                           letterSpacing: -0.96,
                         ),
                       ),
@@ -133,7 +134,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                       Text(
                         l10n.managePreferences,
                         style: AppTextStyles.body.copyWith(
-                          color: AppColors.chocolate,
+                          color: c.chocolate,
                           fontSize: 14,
                           letterSpacing: -0.15,
                         ),
@@ -149,13 +150,13 @@ class _SettingsContentState extends State<_SettingsContent> {
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: AppColors.offWhite,
+                        color: c.offWhite,
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.white, width: 2),
+                        border: Border.all(color: c.white, width: 2),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.keyboard_arrow_down,
-                        color: AppColors.chocolate,
+                        color: c.chocolate,
                         size: 24,
                       ),
                     ),
@@ -192,25 +193,25 @@ class _SettingsContentState extends State<_SettingsContent> {
                     _CareCircleItem(
                       email: 'sarah@example.com',
                       roleLabel: l10n.owner,
-                      roleColor: AppColors.chocolate,
+                      roleColor: c.chocolate,
                       statusLabel: l10n.active,
-                      statusColor: AppColors.pink,
+                      statusColor: c.pink,
                     ),
                     const SizedBox(height: 12),
                     _CareCircleItem(
                       email: 'drsmith@vetclinic.com',
                       roleLabel: l10n.veterinarian,
-                      roleColor: AppColors.blue,
+                      roleColor: c.blue,
                       statusLabel: l10n.active,
-                      statusColor: AppColors.pink,
+                      statusColor: c.pink,
                     ),
                     const SizedBox(height: 12),
                     _CareCircleItem(
                       email: 'petsitter@example.com',
                       roleLabel: l10n.viewer,
-                      roleColor: const Color(0xFFFFECB7),
+                      roleColor: c.lightYellow,
                       statusLabel: l10n.pending,
-                      statusColor: AppColors.offWhite,
+                      statusColor: c.offWhite,
                     ),
                   ],
                 ),
@@ -257,13 +258,13 @@ class _SettingsContentState extends State<_SettingsContent> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: AppColors.cherry,
+                              color: c.cherry,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               l10n.comingSoon,
                               style: AppTextStyles.caption.copyWith(
-                                color: AppColors.white,
+                                color: c.white,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -348,82 +349,85 @@ class _SettingsContentState extends State<_SettingsContent> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: const BoxDecoration(
-            color: AppColors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.configureAlertThresholds, style: AppTextStyles.heading3),
-              const SizedBox(height: 8),
-              Text(l10n.configureAlertThresholdsDesc, style: AppTextStyles.body),
-              const SizedBox(height: 24),
-              Text(l10n.normalThresholdBpm, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: normalController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: 'e.g., 30',
-                  filled: true,
-                  fillColor: AppColors.offWhite,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(l10n.alertThresholdBpm, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              TextField(
-                controller: alertController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  hintText: 'e.g., 40',
-                  filled: true,
-                  fillColor: AppColors.offWhite,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(l10n.cancel, style: AppTextStyles.body.copyWith(color: AppColors.chocolate)),
-                  ),
-                  const SizedBox(width: 12),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.thresholdsUpdated)),
-                      );
-                    },
-                    style: TextButton.styleFrom(
-                      backgroundColor: AppColors.lightBlue,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      builder: (context) {
+        final c = AppColorsTheme.of(context);
+        return Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: c.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.configureAlertThresholds, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+                const SizedBox(height: 8),
+                Text(l10n.configureAlertThresholdsDesc, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+                const SizedBox(height: 24),
+                Text(l10n.normalThresholdBpm, style: AppTextStyles.body.copyWith(color: c.chocolate, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: normalController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    hintText: 'e.g., 30',
+                    filled: true,
+                    fillColor: c.offWhite,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
-                    child: Text(l10n.save, style: AppTextStyles.body.copyWith(color: AppColors.chocolate)),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 16),
+                Text(l10n.alertThresholdBpm, style: AppTextStyles.body.copyWith(color: c.chocolate, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: alertController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    hintText: 'e.g., 40',
+                    filled: true,
+                    fillColor: c.offWhite,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(l10n.cancel, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+                    ),
+                    const SizedBox(width: 12),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.thresholdsUpdated)),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: c.lightBlue,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      ),
+                      child: Text(l10n.save, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -431,19 +435,23 @@ class _SettingsContentState extends State<_SettingsContent> {
     final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(title, style: AppTextStyles.heading3),
-        content: SingleChildScrollView(
-          child: Text(content, style: AppTextStyles.body),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: AppColors.chocolate)),
+      builder: (context) {
+        final c = AppColorsTheme.of(context);
+        return AlertDialog(
+          backgroundColor: c.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text(title, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+          content: SingleChildScrollView(
+            child: Text(content, style: AppTextStyles.body.copyWith(color: c.chocolate)),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -463,9 +471,10 @@ class _SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.offWhite,
+        color: c.offWhite,
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(24),
@@ -483,7 +492,7 @@ class _SettingsCard extends StatelessWidget {
                     Text(
                       title,
                       style: AppTextStyles.heading3.copyWith(
-                        color: AppColors.chocolate,
+                        color: c.chocolate,
                         letterSpacing: -0.54,
                       ),
                     ),
@@ -491,7 +500,7 @@ class _SettingsCard extends StatelessWidget {
                     Text(
                       subtitle,
                       style: AppTextStyles.body.copyWith(
-                        color: AppColors.chocolate,
+                        color: c.chocolate,
                         fontSize: 14,
                         letterSpacing: -0.15,
                       ),
@@ -532,10 +541,11 @@ class _SettingsToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: c.white,
         borderRadius: BorderRadius.circular(radius),
       ),
       child: Row(
@@ -555,7 +565,7 @@ class _SettingsToggleRow extends StatelessWidget {
                       Text(
                         label,
                         style: AppTextStyles.body.copyWith(
-                          color: AppColors.chocolate,
+                          color: c.chocolate,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.31,
@@ -566,7 +576,7 @@ class _SettingsToggleRow extends StatelessWidget {
                         Text(
                           description!,
                           style: AppTextStyles.caption.copyWith(
-                            color: AppColors.chocolate,
+                            color: c.chocolate,
                             fontSize: 12,
                             height: 1.3,
                           ),
@@ -592,6 +602,7 @@ class _LanguageRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     final currentLocale = Localizations.localeOf(context);
     final isHebrew = currentLocale.languageCode == 'he';
     final currentLanguageName = isHebrew ? l10n.hebrew : l10n.english;
@@ -601,7 +612,7 @@ class _LanguageRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: c.white,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -614,7 +625,7 @@ class _LanguageRow extends StatelessWidget {
                 Text(
                   l10n.language,
                   style: AppTextStyles.body.copyWith(
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.31,
@@ -625,7 +636,7 @@ class _LanguageRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.pink,
+                color: c.pink,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Row(
@@ -633,7 +644,7 @@ class _LanguageRow extends StatelessWidget {
                   Text(
                     currentLanguageName,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
@@ -652,33 +663,36 @@ class _LanguageRow extends StatelessWidget {
   void _showLanguagePicker(BuildContext context, AppLocalizations l10n) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: Text(l10n.english),
-              trailing: Localizations.localeOf(context).languageCode == 'en'
-                  ? const Icon(Icons.check, color: AppColors.chocolate)
-                  : null,
-              onTap: () {
-                appLocale.value = const Locale('en');
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text(l10n.hebrew),
-              trailing: Localizations.localeOf(context).languageCode == 'he'
-                  ? const Icon(Icons.check, color: AppColors.chocolate)
-                  : null,
-              onTap: () {
-                appLocale.value = const Locale('he');
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
+      builder: (context) {
+        final c = AppColorsTheme.of(context);
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text(l10n.english),
+                trailing: Localizations.localeOf(context).languageCode == 'en'
+                    ? Icon(Icons.check, color: c.chocolate)
+                    : null,
+                onTap: () {
+                  appLocale.value = const Locale('en');
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                title: Text(l10n.hebrew),
+                trailing: Localizations.localeOf(context).languageCode == 'he'
+                    ? Icon(Icons.check, color: c.chocolate)
+                    : null,
+                onTap: () {
+                  appLocale.value = const Locale('he');
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -691,12 +705,13 @@ class _InviteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: AppColors.lightBlue,
+          color: c.lightBlue,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(
@@ -706,7 +721,7 @@ class _InviteButton extends StatelessWidget {
             Text(
               l10n.invite,
               style: AppTextStyles.body.copyWith(
-                color: AppColors.chocolate,
+                color: c.chocolate,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 letterSpacing: -0.15,
@@ -736,10 +751,11 @@ class _CareCircleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: c.white,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -752,7 +768,7 @@ class _CareCircleItem extends StatelessWidget {
                 Text(
                   email,
                   style: AppTextStyles.body.copyWith(
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.31,
@@ -764,15 +780,15 @@ class _CareCircleItem extends StatelessWidget {
                     _Badge(
                       label: roleLabel,
                       backgroundColor: roleColor,
-                      textColor: roleColor == const Color(0xFFFFECB7)
-                          ? AppColors.chocolate
-                          : AppColors.white,
+                      textColor: roleColor == c.lightYellow
+                          ? c.chocolate
+                          : c.white,
                     ),
                     const SizedBox(width: 4),
                     _Badge(
                       label: statusLabel,
                       backgroundColor: statusColor,
-                      textColor: AppColors.chocolate,
+                      textColor: c.chocolate,
                     ),
                   ],
                 ),
@@ -783,7 +799,7 @@ class _CareCircleItem extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: c.white,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
@@ -839,10 +855,11 @@ class _ConfigureRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: c.white,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -855,7 +872,7 @@ class _ConfigureRow extends StatelessWidget {
                 Text(
                   l10n.alertThresholds,
                   style: AppTextStyles.body.copyWith(
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.31,
@@ -865,7 +882,7 @@ class _ConfigureRow extends StatelessWidget {
                 Text(
                   l10n.customizeBpmRanges,
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                     fontSize: 12,
                   ),
                 ),
@@ -877,7 +894,7 @@ class _ConfigureRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.lightBlue,
+                color: c.lightBlue,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Row(
@@ -888,7 +905,7 @@ class _ConfigureRow extends StatelessWidget {
                   Text(
                     l10n.configure,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
@@ -918,12 +935,13 @@ class _ActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: c.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -939,7 +957,7 @@ class _ActionRow extends StatelessWidget {
                     Text(
                       title,
                       style: AppTextStyles.body.copyWith(
-                        color: AppColors.chocolate,
+                        color: c.chocolate,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.31,
@@ -949,7 +967,7 @@ class _ActionRow extends StatelessWidget {
                     Text(
                       description,
                       style: AppTextStyles.caption.copyWith(
-                        color: AppColors.chocolate,
+                        color: c.chocolate,
                         fontSize: 12,
                       ),
                     ),
@@ -957,7 +975,6 @@ class _ActionRow extends StatelessWidget {
                 ),
               ],
             ),
-            SvgPicture.asset(_settingsRightAsset, width: 24, height: 24),
           ],
         ),
       ),
@@ -973,27 +990,26 @@ class _SimpleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: c.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               label,
               style: AppTextStyles.body.copyWith(
-                color: AppColors.chocolate,
+                color: c.chocolate,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.31,
               ),
             ),
-            SvgPicture.asset(_settingsRightAsset, width: 24, height: 24),
           ],
         ),
       ),
@@ -1008,12 +1024,13 @@ class _TogglePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Container(
       width: 75,
       height: 36,
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        color: isOn ? AppColors.chocolate : AppColors.chocolate.withOpacity(0.2),
+        color: isOn ? c.chocolate : c.chocolate.withOpacity(0.2),
         borderRadius: BorderRadius.circular(9999),
       ),
       child: Align(
@@ -1021,8 +1038,8 @@ class _TogglePill extends StatelessWidget {
         child: Container(
           width: 31,
           height: 31,
-          decoration: const BoxDecoration(
-            color: AppColors.white,
+          decoration: BoxDecoration(
+            color: c.white,
             shape: BoxShape.circle,
           ),
         ),

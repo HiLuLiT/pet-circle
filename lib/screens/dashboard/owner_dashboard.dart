@@ -21,6 +21,7 @@ class OwnerDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final pets = MockData.hilaPets;
     final l10n = AppLocalizations.of(context)!;
 
@@ -35,7 +36,7 @@ class OwnerDashboard extends StatelessWidget {
               Text(
                 l10n.myPets,
                 style: AppTextStyles.heading2.copyWith(
-                  color: AppColors.chocolate,
+                  color: c.chocolate,
                   letterSpacing: -0.96,
                 ),
               ),
@@ -70,18 +71,18 @@ class OwnerDashboard extends StatelessWidget {
     );
 
     if (!showScaffold) {
-      return Container(color: AppColors.white, child: content);
+      return Container(color: c.white, child: content);
     }
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: content,
     );
   }
 }
 
 class _PetCard extends StatelessWidget {
-  const _PetCard({
+  _PetCard({
     required this.data,
     required this.onMeasure,
     required this.onTrends,
@@ -93,11 +94,12 @@ class _PetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        color: AppColors.offWhite,
+        color: c.offWhite,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -120,7 +122,7 @@ class _PetCard extends StatelessWidget {
                   Text(
                     data.name,
                     style: AppTextStyles.heading2.copyWith(
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                       letterSpacing: -0.96,
                     ),
                   ),
@@ -128,7 +130,7 @@ class _PetCard extends StatelessWidget {
                   Text(
                     data.breedAndAge,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                       fontSize: 14,
                       letterSpacing: -0.28,
                     ),
@@ -144,8 +146,8 @@ class _PetCard extends StatelessWidget {
                           Container(
                             width: 44,
                             height: 44,
-                            decoration: const BoxDecoration(
-                              color: AppColors.white,
+                            decoration: BoxDecoration(
+                              color: c.white,
                               shape: BoxShape.circle,
                             ),
                             child: Center(
@@ -163,7 +165,7 @@ class _PetCard extends StatelessWidget {
                               Text(
                                 '${data.latestMeasurement.bpm}',
                                 style: AppTextStyles.heading2.copyWith(
-                                  color: AppColors.chocolate,
+                                  color: c.chocolate,
                                   fontSize: 24,
                                   height: 1.2,
                                 ),
@@ -171,7 +173,7 @@ class _PetCard extends StatelessWidget {
                               Text(
                                 l10n.bpm,
                                 style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.chocolate,
+                                  color: c.chocolate,
                                   fontSize: 12,
                                 ),
                               ),
@@ -182,7 +184,7 @@ class _PetCard extends StatelessWidget {
                       Text(
                         data.latestMeasurement.recordedAtLabel,
                         style: AppTextStyles.caption.copyWith(
-                          color: AppColors.chocolate,
+                          color: c.chocolate,
                           fontSize: 12,
                         ),
                       ),
@@ -192,7 +194,7 @@ class _PetCard extends StatelessWidget {
                   // Care Circle divider
                   Container(
                     height: 1,
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                   ),
                   const SizedBox(height: 17),
                   // Care Circle row
@@ -210,7 +212,7 @@ class _PetCard extends StatelessWidget {
                           Text(
                             l10n.careCircle,
                             style: AppTextStyles.caption.copyWith(
-                              color: AppColors.chocolate,
+                              color: c.chocolate,
                               fontSize: 12,
                             ),
                           ),
@@ -223,7 +225,7 @@ class _PetCard extends StatelessWidget {
                   // Buttons divider
                   Container(
                     height: 1,
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                   ),
                   const SizedBox(height: 17),
                   // Action buttons
@@ -259,7 +261,7 @@ class _PetCard extends StatelessWidget {
 }
 
 class _ActionButton extends StatelessWidget {
-  const _ActionButton({
+  _ActionButton({
     required this.label,
     required this.iconAsset,
     required this.isPrimary,
@@ -273,12 +275,13 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: 40,
         decoration: BoxDecoration(
-          color: isPrimary ? AppColors.pink : AppColors.white,
+          color: isPrimary ? c.pink : c.white,
           borderRadius: BorderRadius.circular(100),
         ),
         child: Row(
@@ -293,7 +296,7 @@ class _ActionButton extends StatelessWidget {
             Text(
               label,
               style: AppTextStyles.body.copyWith(
-                color: AppColors.chocolate,
+                color: c.chocolate,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 letterSpacing: -0.28,
@@ -313,6 +316,7 @@ class _AvatarStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     const double avatarSize = 31;
     const double overlap = 12;
 
@@ -329,7 +333,7 @@ class _AvatarStack extends StatelessWidget {
                 height: avatarSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.white, width: 2),
+                  border: Border.all(color: c.white, width: 2),
                 ),
                 child: ClipOval(
                   child: Image.network(avatars[i].avatarUrl, fit: BoxFit.cover),

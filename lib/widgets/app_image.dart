@@ -34,7 +34,7 @@ class AppImage extends StatelessWidget {
 }
 
 class _Fallback extends StatelessWidget {
-  const _Fallback({this.width, this.height, required this.icon});
+  _Fallback({this.width, this.height, required this.icon});
 
   final double? width;
   final double? height;
@@ -42,15 +42,16 @@ class _Fallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: AppColors.offWhite,
+        color: c.offWhite,
         borderRadius: BorderRadius.circular(12),
       ),
       alignment: Alignment.center,
-      child: Icon(icon, color: AppColors.chocolate, size: 20),
+      child: Icon(icon, color: c.chocolate, size: 20),
     );
   }
 }

@@ -27,6 +27,7 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -45,7 +46,7 @@ class AppHeader extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: AppColors.offWhite,
+                color: c.offWhite,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -67,13 +68,13 @@ class AppHeader extends StatelessWidget {
                   Text(
                     petName!,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Icon(Icons.keyboard_arrow_down, size: 16, color: AppColors.chocolate),
+                  Icon(Icons.keyboard_arrow_down, size: 16, color: c.chocolate),
                 ],
               ),
             ),
@@ -86,13 +87,13 @@ class AppHeader extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppColors.offWhite,
+              color: c.offWhite,
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.white, width: 2),
+              border: Border.all(color: c.white, width: 2),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.notifications_none,
-              color: AppColors.chocolate,
+              color: c.chocolate,
               size: 20,
             ),
           ),

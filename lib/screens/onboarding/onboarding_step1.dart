@@ -204,6 +204,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
       stepLabel: l10n.onboardingStep(1, 4),
@@ -228,7 +229,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
               height: 36,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: c.white,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Row(
@@ -239,8 +240,8 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                       _selectedBreed ?? 'e.g., Golden Retriever',
                       style: AppTextStyles.body.copyWith(
                         color: _selectedBreed == null
-                            ? AppColors.chocolate.withOpacity(0.3)
-                            : AppColors.chocolate,
+                            ? c.chocolate.withOpacity(0.3)
+                            : c.chocolate,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -253,9 +254,9 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                         curve: Curves.easeInOut,
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.keyboard_arrow_down,
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                       size: 18,
                     ),
                   ),
@@ -267,7 +268,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
             Container(
               margin: const EdgeInsets.only(top: 8),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: c.white,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: ConstrainedBox(
@@ -298,7 +299,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? AppColors.lightYellow
+                              ? c.lightYellow
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(4),
                         ),
@@ -318,7 +319,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                               Text(
                                 _capitalize(breed.breed),
                                 style: AppTextStyles.caption.copyWith(
-                                  color: AppColors.chocolate,
+                                  color: c.chocolate,
                                   fontSize: 10,
                                 ),
                               ),

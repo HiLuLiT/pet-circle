@@ -144,6 +144,107 @@ class AppColorsDark {
   static const black = Color(0xFFFFFFFF);        // inverted
 }
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// Theme-aware color extension — use AppColorsTheme.of(context) in widgets
+// instead of hardcoded AppColors / AppColorsDark constants.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+@immutable
+class AppColorsTheme extends ThemeExtension<AppColorsTheme> {
+  const AppColorsTheme({
+    required this.white,
+    required this.offWhite,
+    required this.lightYellow,
+    required this.chocolate,
+    required this.pink,
+    required this.cherry,
+    required this.lightBlue,
+    required this.blue,
+    required this.black,
+  });
+
+  final Color white;
+  final Color offWhite;
+  final Color lightYellow;
+  final Color chocolate;
+  final Color pink;
+  final Color cherry;
+  final Color lightBlue;
+  final Color blue;
+  final Color black;
+
+  /// Light palette (maps to [AppColors]).
+  static const light = AppColorsTheme(
+    white: AppColors.white,
+    offWhite: AppColors.offWhite,
+    lightYellow: AppColors.lightYellow,
+    chocolate: AppColors.chocolate,
+    pink: AppColors.pink,
+    cherry: AppColors.cherry,
+    lightBlue: AppColors.lightBlue,
+    blue: AppColors.blue,
+    black: AppColors.black,
+  );
+
+  /// Dark palette (maps to [AppColorsDark]).
+  static const dark = AppColorsTheme(
+    white: AppColorsDark.white,
+    offWhite: AppColorsDark.offWhite,
+    lightYellow: AppColorsDark.lightYellow,
+    chocolate: AppColorsDark.chocolate,
+    pink: AppColorsDark.pink,
+    cherry: AppColorsDark.cherry,
+    lightBlue: AppColorsDark.lightBlue,
+    blue: AppColorsDark.blue,
+    black: AppColorsDark.black,
+  );
+
+  /// Convenience accessor — `AppColorsTheme.of(context).white` etc.
+  static AppColorsTheme of(BuildContext context) =>
+      Theme.of(context).extension<AppColorsTheme>()!;
+
+  @override
+  AppColorsTheme copyWith({
+    Color? white,
+    Color? offWhite,
+    Color? lightYellow,
+    Color? chocolate,
+    Color? pink,
+    Color? cherry,
+    Color? lightBlue,
+    Color? blue,
+    Color? black,
+  }) {
+    return AppColorsTheme(
+      white: white ?? this.white,
+      offWhite: offWhite ?? this.offWhite,
+      lightYellow: lightYellow ?? this.lightYellow,
+      chocolate: chocolate ?? this.chocolate,
+      pink: pink ?? this.pink,
+      cherry: cherry ?? this.cherry,
+      lightBlue: lightBlue ?? this.lightBlue,
+      blue: blue ?? this.blue,
+      black: black ?? this.black,
+    );
+  }
+
+  @override
+  AppColorsTheme lerp(AppColorsTheme? other, double t) {
+    if (other is! AppColorsTheme) return this;
+    return AppColorsTheme(
+      white: Color.lerp(white, other.white, t)!,
+      offWhite: Color.lerp(offWhite, other.offWhite, t)!,
+      lightYellow: Color.lerp(lightYellow, other.lightYellow, t)!,
+      chocolate: Color.lerp(chocolate, other.chocolate, t)!,
+      pink: Color.lerp(pink, other.pink, t)!,
+      cherry: Color.lerp(cherry, other.cherry, t)!,
+      lightBlue: Color.lerp(lightBlue, other.lightBlue, t)!,
+      blue: Color.lerp(blue, other.blue, t)!,
+      black: Color.lerp(black, other.black, t)!,
+    );
+  }
+}
+
 ThemeData buildAppTheme() {
   final baseTextTheme = GoogleFonts.interTextTheme();
   return ThemeData(
@@ -173,6 +274,7 @@ ThemeData buildAppTheme() {
         borderSide: BorderSide.none,
       ),
     ),
+    extensions: const [AppColorsTheme.light],
   );
 }
 
@@ -206,5 +308,6 @@ ThemeData buildDarkTheme() {
         borderSide: BorderSide.none,
       ),
     ),
+    extensions: const [AppColorsTheme.dark],
   );
 }

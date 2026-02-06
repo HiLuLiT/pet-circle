@@ -5,20 +5,21 @@ class RoundIconButton extends StatelessWidget {
   const RoundIconButton({
     super.key,
     required this.icon,
-    this.backgroundColor = AppColors.offWhite,
+    this.backgroundColor,
     this.onTap,
     this.size = 36,
     this.iconSize = 16,
   });
 
   final Widget icon;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final VoidCallback? onTap;
   final double size;
   final double iconSize;
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -32,7 +33,7 @@ class RoundIconButton extends StatelessWidget {
           ),
           child: Container(
             decoration: BoxDecoration(
-              color: backgroundColor,
+              color: backgroundColor ?? c.offWhite,
               shape: BoxShape.circle,
             ),
             child: Center(

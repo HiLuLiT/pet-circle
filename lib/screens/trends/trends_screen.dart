@@ -30,6 +30,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     final content = SafeArea(
       child: SingleChildScrollView(
         child: Padding(
@@ -64,11 +65,11 @@ class _TrendsScreenState extends State<TrendsScreen> {
     );
 
     if (!widget.showScaffold) {
-      return Container(color: AppColors.white, child: content);
+      return Container(color: c.white, child: content);
     }
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: content,
     );
   }
@@ -86,11 +87,12 @@ class _TrendsTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Container(
       height: 36,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.offWhite,
+        color: c.offWhite,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -129,16 +131,17 @@ class _TrendsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
         child: Container(
           height: 29,
           decoration: BoxDecoration(
-            color: selected ? AppColors.white : Colors.transparent,
+            color: selected ? c.white : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Icon(icon, color: AppColors.chocolate, size: 18),
+          child: Icon(icon, color: c.chocolate, size: 18),
         ),
       ),
     );
@@ -153,6 +156,7 @@ class _TrendsOverview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return Column(
       children: [
         _SectionCard(
@@ -191,9 +195,9 @@ class _TrendsOverview extends StatelessWidget {
                 style: AppTextStyles.heading3,
               ),
               const SizedBox(height: 16),
-              const _BadgeRow(),
+              _BadgeRow(),
               const SizedBox(height: 8),
-              const _BadgeRowSecond(),
+              _BadgeRowSecond(),
             ],
           ),
         ),
@@ -212,7 +216,7 @@ class _TrendsOverview extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: c.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -220,11 +224,11 @@ class _TrendsOverview extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.medication, color: AppColors.chocolate),
+                        Icon(Icons.medication, color: c.chocolate),
                         const SizedBox(width: 8),
-                        Column(
+                        const Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
+                          children: [
                             Text('Furosemide',
                                 style: AppTextStyles.body),
                             Text('20mg', style: AppTextStyles.caption),
@@ -235,7 +239,7 @@ class _TrendsOverview extends StatelessWidget {
                     Text(
                       'Jan 6',
                       style: AppTextStyles.caption.copyWith(
-                        color: AppColors.chocolate,
+                        color: c.chocolate,
                       ),
                     ),
                   ],
@@ -247,7 +251,7 @@ class _TrendsOverview extends StatelessWidget {
                 child: TextButton(
                   onPressed: onOpenMedication,
                   style: TextButton.styleFrom(
-                    backgroundColor: AppColors.lightBlue,
+                    backgroundColor: c.lightBlue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
@@ -255,7 +259,7 @@ class _TrendsOverview extends StatelessWidget {
                   child: Text(
                     l10n.addMedication,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                     ),
                   ),
                 ),
@@ -283,6 +287,7 @@ class _MetricRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -302,11 +307,11 @@ class _MetricRow extends StatelessWidget {
         Container(
           width: 48,
           height: 48,
-          decoration: const BoxDecoration(
-            color: AppColors.white,
+          decoration: BoxDecoration(
+            color: c.white,
             shape: BoxShape.circle,
           ),
-          child: Icon(icon, color: AppColors.blue),
+          child: Icon(icon, color: c.blue),
         ),
       ],
     );
@@ -315,6 +320,7 @@ class _MetricRow extends StatelessWidget {
 
 void _exportMedicationLog(BuildContext context) {
   final l10n = AppLocalizations.of(context)!;
+  final c = AppColorsTheme.of(context);
   const csvData = 'Medication,Dosage,Frequency,Start Date,End Date,Prescribed By\n'
       'Pimobendan,5mg,Twice daily,2025-01-01,Ongoing,Dr. Smith DVM\n'
       'Furosemide,20mg,Once daily,2025-01-15,2025-03-15,Dr. Smith DVM\n'
@@ -335,7 +341,7 @@ void _exportMedicationLog(BuildContext context) {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.offWhite,
+                color: c.offWhite,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(csvData, style: AppTextStyles.caption.copyWith(fontFamily: 'monospace', fontSize: 10)),
@@ -346,7 +352,7 @@ void _exportMedicationLog(BuildContext context) {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: AppColors.chocolate)),
+          child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: c.chocolate)),
         ),
         TextButton(
           onPressed: () {
@@ -356,10 +362,10 @@ void _exportMedicationLog(BuildContext context) {
             );
           },
           style: TextButton.styleFrom(
-            backgroundColor: AppColors.lightBlue,
+            backgroundColor: c.lightBlue,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          child: Text(l10n.downloadCsv, style: AppTextStyles.body.copyWith(color: AppColors.chocolate)),
+          child: Text(l10n.downloadCsv, style: AppTextStyles.body.copyWith(color: c.chocolate)),
         ),
       ],
     ),
@@ -374,6 +380,7 @@ class _MedicationManagement extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -386,16 +393,16 @@ class _MedicationManagement extends StatelessWidget {
               child: TextButton.icon(
                 onPressed: onAddMedication,
                 style: TextButton.styleFrom(
-                  backgroundColor: AppColors.lightBlue,
+                  backgroundColor: c.lightBlue,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(100),
                   ),
                 ),
-                icon: const Icon(Icons.add, color: AppColors.chocolate, size: 16),
+                icon: Icon(Icons.add, color: c.chocolate, size: 16),
                 label: Text(
                   l10n.addMedication,
                   style: AppTextStyles.caption.copyWith(
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                   ),
                 ),
               ),
@@ -414,11 +421,11 @@ class _MedicationManagement extends StatelessWidget {
               Container(
                 width: 64,
                 height: 64,
-                decoration: const BoxDecoration(
-                  color: AppColors.white,
+                decoration: BoxDecoration(
+                  color: c.white,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.medication, color: AppColors.chocolate),
+                child: Icon(Icons.medication, color: c.chocolate),
               ),
               const SizedBox(height: 12),
               Text(
@@ -439,16 +446,16 @@ class _MedicationManagement extends StatelessWidget {
                 child: TextButton.icon(
                   onPressed: onAddMedication,
                   style: TextButton.styleFrom(
-                    backgroundColor: AppColors.lightBlue,
+                    backgroundColor: c.lightBlue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
-                  icon: const Icon(Icons.add, color: AppColors.chocolate, size: 16),
+                  icon: Icon(Icons.add, color: c.chocolate, size: 16),
                   label: Text(
                     l10n.addMedication,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                     ),
                   ),
                 ),
@@ -463,12 +470,12 @@ class _MedicationManagement extends StatelessWidget {
               Container(
                 width: 64,
                 height: 64,
-                decoration: const BoxDecoration(
-                  color: AppColors.white,
+                decoration: BoxDecoration(
+                  color: c.white,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.info_outline,
-                    color: AppColors.blue),
+                child: Icon(Icons.info_outline,
+                    color: c.blue),
               ),
               const SizedBox(height: 12),
               Text(
@@ -492,17 +499,17 @@ class _MedicationManagement extends StatelessWidget {
                     _exportMedicationLog(context);
                   },
                   style: TextButton.styleFrom(
-                    backgroundColor: AppColors.lightBlue,
+                    backgroundColor: c.lightBlue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
-                  icon: const Icon(Icons.file_download,
-                      color: AppColors.chocolate, size: 16),
+                  icon: Icon(Icons.file_download,
+                      color: c.chocolate, size: 16),
                   label: Text(
                     l10n.exportMedicationLog,
                     style: AppTextStyles.body.copyWith(
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                     ),
                   ),
                 ),
@@ -530,6 +537,7 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     final periodOptions = [
       l10n.last24Hours,
       l10n.last3Days,
@@ -554,7 +562,7 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
               height: 40,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: AppColors.offWhite,
+                color: c.offWhite,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: DropdownButtonHideUnderline(
@@ -600,7 +608,7 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
                 children: [
                   _StatCard(title: l10n.trend, value: '+2', footnote: l10n.bpmChange),
                   const SizedBox(width: 8),
-                  const _StatusCard(),
+                  _StatusCard(),
                 ],
               ),
             ],
@@ -616,11 +624,11 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
                 style: AppTextStyles.heading3,
               ),
               const SizedBox(height: 16),
-              const _BadgeRow(),
+              _BadgeRow(),
               const SizedBox(height: 8),
-              const _BadgeRowSecond(),
+              _BadgeRowSecond(),
               const SizedBox(height: 16),
-              const _SrrChart(),
+              _SrrChart(),
             ],
           ),
         ),
@@ -644,20 +652,21 @@ class _FilterChipButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         height: 40,
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
-          color: filled ? AppColors.lightBlue : AppColors.offWhite,
+          color: filled ? c.lightBlue : c.offWhite,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(icon, size: 16, color: AppColors.chocolate),
+              Icon(icon, size: 16, color: c.chocolate),
               const SizedBox(width: 8),
             ],
             Text(label, style: AppTextStyles.body),
@@ -679,10 +688,11 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.offWhite,
+        color: c.offWhite,
         borderRadius: BorderRadius.circular(16),
       ),
       child: child,
@@ -695,15 +705,16 @@ class _BadgeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Row(
-      children: const [
+      children: [
         _LegendBadge(
-          color: AppColors.lightBlue,
+          color: c.lightBlue,
           label: 'Normal (<30)',
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         _LegendBadge(
-          color: AppColors.lightYellow,
+          color: c.lightYellow,
           label: 'Elevated (30-40)',
         ),
       ],
@@ -716,8 +727,9 @@ class _BadgeRowSecond extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _LegendBadge(
-      color: AppColors.cherry,
+    final c = AppColorsTheme.of(context);
+    return _LegendBadge(
+      color: c.cherry,
       label: 'Alert (>40)',
     );
   }
@@ -734,10 +746,11 @@ class _LegendBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: c.white,
         borderRadius: BorderRadius.circular(100),
       ),
       child: Row(
@@ -749,7 +762,7 @@ class _LegendBadge extends StatelessWidget {
             decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           ),
           const SizedBox(width: 4),
-          Text(label, style: AppTextStyles.caption.copyWith(color: AppColors.chocolate)),
+          Text(label, style: AppTextStyles.caption.copyWith(color: c.chocolate)),
         ],
       ),
     );
@@ -769,12 +782,13 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Expanded(
       child: Container(
         height: 109,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: c.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Stack(
@@ -792,11 +806,11 @@ class _StatCard extends StatelessWidget {
                 Text(footnote, style: AppTextStyles.caption.copyWith(fontSize: 12)),
               ],
             ),
-            const Positioned(
+            Positioned(
               right: 8,
               top: 8,
               child: Icon(Icons.notifications_none,
-                  size: 18, color: AppColors.chocolate),
+                  size: 18, color: c.chocolate),
             ),
           ],
         ),
@@ -811,12 +825,13 @@ class _StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return Expanded(
       child: Container(
         height: 109,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: c.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -826,11 +841,11 @@ class _StatusCard extends StatelessWidget {
             const SizedBox(height: 16),
             Row(
               children: [
-                _StatusPill(value: '1', color: AppColors.lightBlue),
+                _StatusPill(value: '1', color: c.lightBlue),
                 const SizedBox(width: 8),
-                _StatusPill(value: '6', color: AppColors.lightYellow),
+                _StatusPill(value: '6', color: c.lightYellow),
                 const SizedBox(width: 8),
-                _StatusPill(value: '0', color: AppColors.cherry, muted: true),
+                _StatusPill(value: '0', color: c.cherry, muted: true),
               ],
             ),
           ],
@@ -881,6 +896,7 @@ class _SrrChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final data = [
       _SrrPoint('Jan 3', 28),
       _SrrPoint('Jan 4', 29),
@@ -896,22 +912,22 @@ class _SrrChart extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.white,
+        color: c.white,
         borderRadius: BorderRadius.circular(12),
       ),
       child: SfCartesianChart(
         plotAreaBorderWidth: 0,
         margin: EdgeInsets.zero,
         primaryXAxis: CategoryAxis(
-          axisLine: const AxisLine(width: 1, color: AppColors.chocolate),
-          majorGridLines: const MajorGridLines(
+          axisLine: AxisLine(width: 1, color: c.chocolate),
+          majorGridLines: MajorGridLines(
             width: 0.5,
-            color: AppColors.offWhite,
-            dashArray: [3, 3],
+            color: c.offWhite,
+            dashArray: const [3, 3],
           ),
           majorTickLines: const MajorTickLines(size: 6, width: 1),
           labelStyle: AppTextStyles.caption.copyWith(
-            color: AppColors.chocolate,
+            color: c.chocolate,
             fontSize: 10,
           ),
           labelRotation: 0,
@@ -920,39 +936,39 @@ class _SrrChart extends StatelessWidget {
           minimum: 0,
           maximum: 50,
           interval: 10,
-          axisLine: const AxisLine(width: 1, color: AppColors.chocolate),
+          axisLine: AxisLine(width: 1, color: c.chocolate),
           majorTickLines: const MajorTickLines(size: 6, width: 1),
-          majorGridLines: const MajorGridLines(
+          majorGridLines: MajorGridLines(
             width: 0.5,
-            color: AppColors.offWhite,
-            dashArray: [3, 3],
+            color: c.offWhite,
+            dashArray: const [3, 3],
           ),
           labelStyle: AppTextStyles.caption.copyWith(
-            color: AppColors.chocolate,
+            color: c.chocolate,
             fontSize: 10,
           ),
           plotBands: [
             PlotBand(
               start: 30,
               end: 30,
-              borderColor: AppColors.chocolate,
+              borderColor: c.chocolate,
               borderWidth: 1,
               dashArray: const [4, 4],
               text: 'Normal Threshold (30 BPM)',
               textStyle:
-                  AppTextStyles.caption.copyWith(color: AppColors.chocolate),
+                  AppTextStyles.caption.copyWith(color: c.chocolate),
               horizontalTextAlignment: TextAnchor.end,
               verticalTextAlignment: TextAnchor.middle,
             ),
             PlotBand(
               start: 40,
               end: 40,
-              borderColor: AppColors.chocolate,
+              borderColor: c.chocolate,
               borderWidth: 1,
               dashArray: const [4, 4],
               text: 'Alert Threshold (40 BPM)',
               textStyle:
-                  AppTextStyles.caption.copyWith(color: AppColors.chocolate),
+                  AppTextStyles.caption.copyWith(color: c.chocolate),
               horizontalTextAlignment: TextAnchor.end,
               verticalTextAlignment: TextAnchor.middle,
             ),
@@ -967,19 +983,19 @@ class _SrrChart extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                AppColors.blue.withValues(alpha: 0.25),
-                AppColors.blue.withValues(alpha: 0.0),
+                c.blue.withValues(alpha: 0.25),
+                c.blue.withValues(alpha: 0.0),
               ],
             ),
-            borderColor: AppColors.blue,
+            borderColor: c.blue,
             borderWidth: 2,
-            markerSettings: const MarkerSettings(
+            markerSettings: MarkerSettings(
               isVisible: true,
               width: 8,
               height: 8,
-              color: AppColors.blue,
+              color: c.blue,
               borderWidth: 2,
-              borderColor: AppColors.white,
+              borderColor: c.white,
             ),
           ),
         ],
@@ -1009,13 +1025,14 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        decoration: BoxDecoration(
+          color: c.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
         ),
         child: SafeArea(
           top: false,
@@ -1097,7 +1114,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(
-                        backgroundColor: AppColors.offWhite,
+                        backgroundColor: c.offWhite,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),
                         ),
@@ -1108,14 +1125,14 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(
-                        backgroundColor: AppColors.blue,
+                        backgroundColor: c.blue,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(100),
                         ),
                       ),
                       child: Text(
                         l10n.addMedication,
-                        style: const TextStyle(color: AppColors.white),
+                        style: TextStyle(color: c.white),
                       ),
                     ),
                   ],
@@ -1137,6 +1154,7 @@ class _FormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1150,10 +1168,10 @@ class _FormField extends StatelessWidget {
           child: TextField(
             decoration: InputDecoration(
               filled: true,
-              fillColor: AppColors.offWhite,
+              fillColor: c.offWhite,
               hintText: hint,
               hintStyle:
-                  AppTextStyles.body.copyWith(color: AppColors.chocolate.withOpacity(0.3)),
+                  AppTextStyles.body.copyWith(color: c.chocolate.withOpacity(0.3)),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(4),
                 borderSide: BorderSide.none,
@@ -1181,6 +1199,7 @@ class _DropdownField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1193,7 +1212,7 @@ class _DropdownField extends StatelessWidget {
           height: 36,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
-            color: AppColors.offWhite,
+            color: c.offWhite,
             borderRadius: BorderRadius.circular(4),
           ),
           child: DropdownButtonHideUnderline(
@@ -1223,6 +1242,7 @@ class _TextArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -1235,10 +1255,10 @@ class _TextArea extends StatelessWidget {
           maxLines: 3,
           decoration: InputDecoration(
             filled: true,
-            fillColor: AppColors.offWhite,
+            fillColor: c.offWhite,
             hintText: hint,
             hintStyle:
-                AppTextStyles.body.copyWith(color: AppColors.chocolate.withOpacity(0.3)),
+                AppTextStyles.body.copyWith(color: c.chocolate.withOpacity(0.3)),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(4),
               borderSide: BorderSide.none,
@@ -1263,10 +1283,11 @@ class _ReminderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.pink,
+        color: c.pink,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -1274,7 +1295,7 @@ class _ReminderCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.notifications_none, color: AppColors.chocolate),
+              Icon(Icons.notifications_none, color: c.chocolate),
               const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1295,7 +1316,7 @@ class _ReminderCard extends StatelessWidget {
           Switch(
             value: enabled,
             onChanged: onChanged,
-            activeColor: AppColors.chocolate,
+            activeColor: c.chocolate,
           ),
         ],
       ),

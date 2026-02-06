@@ -29,6 +29,7 @@ class UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
@@ -37,8 +38,8 @@ class UserAvatar extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: AppColors.white, width: 2),
-          color: _hasNetworkImage ? null : AppColors.pink,
+          border: Border.all(color: c.white, width: 2),
+          color: _hasNetworkImage ? null : c.pink,
         ),
         child: ClipOval(
           child: _hasNetworkImage
@@ -47,7 +48,7 @@ class UserAvatar extends StatelessWidget {
                   child: Text(
                     _initials,
                     style: TextStyle(
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                       fontWeight: FontWeight.w600,
                       fontSize: size * 0.38,
                       height: 1,

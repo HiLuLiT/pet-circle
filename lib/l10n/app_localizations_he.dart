@@ -685,4 +685,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get selectLanguage => 'בחר שפה';
+
+  @override
+  String get reset => 'איפוס';
 }

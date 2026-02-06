@@ -6,7 +6,7 @@ class PrimaryButton extends StatelessWidget {
     super.key,
     required this.label,
     this.onPressed,
-    this.backgroundColor = AppColors.chocolate,
+    this.backgroundColor,
     this.textStyle = AppTextStyles.button,
     this.minHeight = 58,
     this.borderRadius = 172,
@@ -15,7 +15,7 @@ class PrimaryButton extends StatelessWidget {
 
   final String label;
   final VoidCallback? onPressed;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final TextStyle textStyle;
   final double minHeight;
   final double borderRadius;
@@ -23,12 +23,14 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
+    final bg = backgroundColor ?? c.chocolate;
     return SizedBox(
       height: minHeight,
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
+          backgroundColor: bg,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),
@@ -39,7 +41,7 @@ class PrimaryButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (icon != null) ...[
-              Icon(icon, color: textStyle.color ?? AppColors.white, size: 22),
+              Icon(icon, color: textStyle.color ?? c.white, size: 22),
               const SizedBox(width: 10),
             ],
             Text(label, style: textStyle),

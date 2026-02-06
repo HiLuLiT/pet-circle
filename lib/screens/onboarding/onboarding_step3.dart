@@ -27,6 +27,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
       stepLabel: l10n.onboardingStep(3, 4),
@@ -70,7 +71,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
               child: Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.white,
+                  color: c.white,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -85,10 +86,10 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                         ],
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: AppColors.lightYellow,
+                          fillColor: c.lightYellow,
                           hintText: l10n.enterBpm,
                           hintStyle: AppTextStyles.body
-                              .copyWith(color: AppColors.chocolate),
+                              .copyWith(color: c.chocolate),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(4),
                             borderSide: BorderSide.none,
@@ -109,7 +110,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                       l10n.bpm,
                       style: AppTextStyles.body.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: AppColors.chocolate,
+                        color: c.chocolate,
                       ),
                     ),
                   ],
@@ -123,7 +124,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
 }
 
 class _TargetOption extends StatelessWidget {
-  const _TargetOption({
+  _TargetOption({
     required this.title,
     required this.subtitle,
     required this.selected,
@@ -139,13 +140,14 @@ class _TargetOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
-          color: AppColors.white,
+          color: c.white,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -156,10 +158,10 @@ class _TargetOption extends StatelessWidget {
               height: 16,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.white,
+                color: c.white,
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.black.withValues(alpha: 0.1),
+                    color: c.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: Offset(0, 1),
                   ),
@@ -170,8 +172,8 @@ class _TargetOption extends StatelessWidget {
                       child: Container(
                         width: 8,
                         height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.blue,
+                        decoration: BoxDecoration(
+                          color: c.blue,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -193,7 +195,7 @@ class _TargetOption extends StatelessWidget {
                     Text(
                       subtitle!,
                       style:
-                          AppTextStyles.caption.copyWith(color: AppColors.chocolate),
+                          AppTextStyles.caption.copyWith(color: c.chocolate),
                     ),
                   ],
                 ],
@@ -203,12 +205,12 @@ class _TargetOption extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppColors.lightYellow,
+                  color: c.lightYellow,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
                   trailingLabel!,
-                  style: AppTextStyles.caption.copyWith(color: AppColors.chocolate),
+                  style: AppTextStyles.caption.copyWith(color: c.chocolate),
                 ),
               ),
           ],

@@ -22,9 +22,10 @@ class RoleSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: SafeArea(
         child: Center(
           child: Padding(
@@ -35,7 +36,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 Text(
                   l10n.hiUser('Hila Ben Baruch'),
                   style: AppTextStyles.heading2.copyWith(
-                    color: AppColors.chocolate,
+                    color: c.chocolate,
                     letterSpacing: -0.96,
                   ),
                   textAlign: TextAlign.center,
@@ -43,17 +44,17 @@ class RoleSelectionScreen extends StatelessWidget {
                 const SizedBox(height: 93),
                 _RoleButton(
                   label: l10n.imAVeterinarian,
-                  backgroundColor: AppColors.chocolate,
-                  textColor: AppColors.white,
-                  iconColor: AppColors.white,
+                  backgroundColor: c.chocolate,
+                  textColor: c.white,
+                  iconColor: c.white,
                   onTap: () => _handleRoleSelect(context, AppUserRole.vet),
                 ),
                 const SizedBox(height: 12),
                 _RoleButton(
                   label: l10n.imAPetOwner,
-                  backgroundColor: AppColors.pink,
-                  textColor: AppColors.chocolate,
-                  iconColor: AppColors.chocolate,
+                  backgroundColor: c.pink,
+                  textColor: c.chocolate,
+                  iconColor: c.chocolate,
                   onTap: () => _handleRoleSelect(context, AppUserRole.owner),
                 ),
               ],

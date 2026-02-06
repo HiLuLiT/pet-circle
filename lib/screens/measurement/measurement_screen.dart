@@ -19,6 +19,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final content = SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -44,11 +45,11 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
     );
 
     if (!widget.showScaffold) {
-      return Container(color: AppColors.white, child: content);
+      return Container(color: c.white, child: content);
     }
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: content,
     );
   }
@@ -65,11 +66,12 @@ class _TabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.offWhite,
+        color: c.offWhite,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -107,6 +109,7 @@ class _TabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -114,7 +117,7 @@ class _TabButton extends StatelessWidget {
           height: 29,
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: selected ? AppColors.white : Colors.transparent,
+            color: selected ? c.white : Colors.transparent,
             borderRadius: BorderRadius.circular(20),
           ),
           child: Row(
@@ -122,13 +125,13 @@ class _TabButton extends StatelessWidget {
             children: [
               Icon(icon,
                   size: 16,
-                  color: AppColors.chocolate),
+                  color: c.chocolate),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: AppTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: AppColors.chocolate,
+                  color: c.chocolate,
                 ),
               ),
             ],
@@ -221,57 +224,112 @@ class _ManualModeState extends State<_ManualMode>
     // Show result
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(Icons.favorite, color: AppColors.pink),
-            const SizedBox(width: 8),
-            Text(l10n.measurementComplete),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              '$bpm',
-              style: const TextStyle(
-                fontSize: 64,
-                fontWeight: FontWeight.bold,
-                color: AppColors.chocolate,
-              ),
+      builder: (context) {
+        final c = AppColorsTheme.of(context);
+        return Dialog(
+          backgroundColor: c.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.favorite, color: c.pink),
+                    const SizedBox(width: 8),
+                    Text(
+                      l10n.measurementComplete,
+                      style: AppTextStyles.heading3.copyWith(color: c.chocolate),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  '$bpm',
+                  style: TextStyle(
+                    fontSize: 64,
+                    fontWeight: FontWeight.bold,
+                    color: c.chocolate,
+                  ),
+                ),
+                Text(
+                  l10n.breathsPerMinute,
+                  style: AppTextStyles.body.copyWith(color: c.chocolate),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.breathCountMessage(_tapCount, widget.selectedDuration),
+                  style: AppTextStyles.caption.copyWith(color: c.chocolate),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() {
+                          _remainingSeconds = widget.selectedDuration;
+                          _tapCount = 0;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: c.offWhite,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          l10n.measureAgain,
+                          style: AppTextStyles.body.copyWith(
+                            color: c.chocolate,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                        setState(() => _remainingSeconds = widget.selectedDuration);
+                        // TODO: Add the measurement to the graph
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: c.lightBlue,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Text(
+                          l10n.addToGraph,
+                          style: AppTextStyles.body.copyWith(
+                            color: c.chocolate,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-            Text(l10n.breathsPerMinute, style: AppTextStyles.body),
-            const SizedBox(height: 16),
-            Text(
-              l10n.breathCountMessage(_tapCount, widget.selectedDuration),
-              style: AppTextStyles.caption,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _remainingSeconds = widget.selectedDuration;
-                _tapCount = 0;
-              });
-            },
-            child: Text(l10n.measureAgain),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() => _remainingSeconds = widget.selectedDuration);
-              // TODO: Add the measurement to the graph
-            },
-            child: Text(l10n.addToGraph),
-          ),
-        ],
-      ),
+        );
+      },
     );
+  }
+
+  void _resetTimer() {
+    _timer?.cancel();
+    setState(() {
+      _isRunning = false;
+      _tapCount = 0;
+      _remainingSeconds = widget.selectedDuration;
+    });
   }
 
   void _onTap() {
@@ -290,6 +348,7 @@ class _ManualModeState extends State<_ManualMode>
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final progress = widget.selectedDuration == 0
         ? 0.0
@@ -301,7 +360,7 @@ class _ManualModeState extends State<_ManualMode>
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: AppColors.offWhite,
+            color: c.offWhite,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -340,17 +399,17 @@ class _ManualModeState extends State<_ManualMode>
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
           decoration: BoxDecoration(
-            color: AppColors.offWhite,
+            color: c.offWhite,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             children: [
               Text(
                 '${_remainingSeconds}s',
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 44,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.chocolate,
+                  color: c.chocolate,
                   height: 1.2,
                 ),
               ),
@@ -364,7 +423,7 @@ class _ManualModeState extends State<_ManualMode>
                       Container(
                         height: 8,
                         decoration: BoxDecoration(
-                          color: AppColors.chocolate.withOpacity(0.08),
+                          color: c.chocolate.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(999),
                         ),
                       ),
@@ -373,7 +432,7 @@ class _ManualModeState extends State<_ManualMode>
                         height: 8,
                         width: width * progress,
                         decoration: BoxDecoration(
-                          color: AppColors.lightBlue,
+                          color: c.lightBlue,
                           borderRadius: BorderRadius.circular(999),
                         ),
                       ),
@@ -394,7 +453,7 @@ class _ManualModeState extends State<_ManualMode>
                     width: 206,
                     height: 206,
                     decoration: BoxDecoration(
-                      color: AppColors.white,
+                      color: c.white,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
@@ -409,10 +468,10 @@ class _ManualModeState extends State<_ManualMode>
                       children: [
                         Text(
                           '$_tapCount',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 80,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.chocolate,
+                            color: c.chocolate,
                             height: 1.0,
                           ),
                         ),
@@ -428,6 +487,21 @@ class _ManualModeState extends State<_ManualMode>
                   ),
                 ),
               ),
+              if (_isRunning)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: TextButton.icon(
+                    onPressed: _resetTimer,
+                    icon: Icon(Icons.refresh, size: 18, color: c.cherry),
+                    label: Text(
+                      l10n.reset,
+                      style: AppTextStyles.body.copyWith(
+                        color: c.cherry,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -449,6 +523,7 @@ class _DurationChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -456,14 +531,14 @@ class _DurationChip extends StatelessWidget {
           height: 60,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? AppColors.lightBlue : AppColors.white,
+            color: selected ? c.lightBlue : c.white,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             label,
             style: AppTextStyles.body.copyWith(
               fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-              color: AppColors.chocolate,
+              color: c.chocolate,
             ),
           ),
         ),
@@ -477,11 +552,12 @@ class _VisionMode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.offWhite,
+        color: c.offWhite,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -494,9 +570,9 @@ class _VisionMode extends StatelessWidget {
             style: AppTextStyles.body,
           ),
           const SizedBox(height: AppSpacing.lg),
-          const Expanded(
+          Expanded(
             child: Center(
-              child: Icon(Icons.videocam, size: 64, color: AppColors.chocolate),
+              child: Icon(Icons.videocam, size: 64, color: c.chocolate),
             ),
           ),
         ],

@@ -36,6 +36,7 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
     final user = widget.role == AppUserRole.vet
         ? MockData.currentVetUser
         : MockData.currentOwnerUser;
@@ -47,7 +48,7 @@ class _MainShellState extends State<MainShell> {
         : const OwnerDashboard(showScaffold: false);
 
     return Scaffold(
-      backgroundColor: AppColors.white,
+      backgroundColor: c.white,
       body: SafeArea(
         child: Column(
           children: [

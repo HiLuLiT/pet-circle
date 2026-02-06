@@ -55,6 +55,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
       stepLabel: l10n.onboardingStep(2, 4),
@@ -82,7 +83,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
               height: 36,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: c.white,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Row(
@@ -93,8 +94,8 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                       _selectedDiagnosis ?? l10n.selectDiagnosis,
                       style: AppTextStyles.body.copyWith(
                         color: _selectedDiagnosis == null
-                            ? AppColors.chocolate.withOpacity(0.5)
-                            : AppColors.chocolate,
+                            ? c.chocolate.withOpacity(0.5)
+                            : c.chocolate,
                       ),
                     ),
                   ),
@@ -105,9 +106,9 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                         curve: Curves.easeInOut,
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.keyboard_arrow_down,
-                      color: AppColors.chocolate,
+                      color: c.chocolate,
                       size: 18,
                     ),
                   ),
@@ -120,7 +121,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
               margin: const EdgeInsets.only(top: 8),
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.white,
+                color: c.white,
                 borderRadius: BorderRadius.circular(4),
               ),
               child: Column(
@@ -146,7 +147,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                       ),
                       decoration: BoxDecoration(
                         color:
-                            isSelected ? AppColors.lightYellow : Colors.transparent,
+                            isSelected ? c.lightYellow : Colors.transparent,
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -165,7 +166,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppColors.white,
+              color: c.white,
               borderRadius: BorderRadius.circular(4),
             ),
             child: Column(
