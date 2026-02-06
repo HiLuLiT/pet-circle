@@ -5,9 +5,7 @@ import 'package:pet_circle/data/mock_data.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
-import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 
@@ -24,7 +22,6 @@ class OwnerDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pets = MockData.hilaPets;
-    final user = MockData.currentOwnerUser;
     final l10n = AppLocalizations.of(context)!;
 
     final content = SafeArea(
@@ -35,20 +32,6 @@ class OwnerDashboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 24),
-              AppHeader(
-                userName: user.name,
-                userImageUrl: user.avatarUrl,
-                petName: pets.isNotEmpty ? pets.first.name : null,
-                petImageUrl: pets.isNotEmpty ? pets.first.imageUrl : null,
-                onAvatarTap: () => Navigator.of(context).pushNamed(
-                  AppRoutes.settings,
-                  arguments: AppUserRole.owner,
-                ),
-                onNotificationTap: () {
-                  // TODO: Navigate to notifications
-                },
-              ),
-              const SizedBox(height: 40),
               Text(
                 l10n.myPets,
                 style: AppTextStyles.heading2.copyWith(

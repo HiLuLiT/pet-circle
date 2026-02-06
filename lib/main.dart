@@ -116,7 +116,10 @@ class PetCircleApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => const MessagesScreen());
 
           case AppRoutes.settings:
-            final role = settings.arguments as AppUserRole? ?? AppUserRole.owner;
+            AppUserRole role = AppUserRole.owner;
+            if (settings.arguments is AppUserRole) {
+              role = settings.arguments as AppUserRole;
+            }
             return MaterialPageRoute(builder: (_) => SettingsScreen(role: role));
 
           case AppRoutes.petDetail:

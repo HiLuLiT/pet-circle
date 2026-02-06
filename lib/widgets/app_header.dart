@@ -40,6 +40,7 @@ class AppHeader extends StatelessWidget {
         // Center: Pet selector (optional)
         if (petName != null)
           GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: onPetSelectorTap,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -79,6 +80,7 @@ class AppHeader extends StatelessWidget {
           ),
         // Right: Notification bell
         GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: onNotificationTap,
           child: Container(
             width: 36,

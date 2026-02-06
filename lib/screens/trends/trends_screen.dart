@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/data/mock_data.dart';
-import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -43,20 +41,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppHeader(
-                userName: MockData.currentOwnerUser.name,
-                userImageUrl: MockData.currentOwnerUser.avatarUrl,
-                petName: MockData.princess.name,
-                petImageUrl: MockData.princess.imageUrl,
-                onAvatarTap: () {
-                  // Navigate to settings
-                  Navigator.of(context).pushNamed('/settings', arguments: 'owner');
-                },
-                onNotificationTap: () {
-                  // TODO: Navigate to notifications
-                },
-              ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 16),
               Text(l10n.healthTrends, style: AppTextStyles.heading2),
               const SizedBox(height: 32),
               _TrendsTabs(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/data/mock_data.dart';
 
 class MessagesScreen extends StatelessWidget {
@@ -21,15 +20,7 @@ class MessagesScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            AppHeader(
-              userName: user.name,
-              userImageUrl: user.avatarUrl,
-              onAvatarTap: () {
-                Navigator.of(context).pushNamed('/settings', arguments: 'owner');
-              },
-              onNotificationTap: () {},
-            ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 16),
             Text(
               l10n.notifications,
               style: AppTextStyles.heading2.copyWith(

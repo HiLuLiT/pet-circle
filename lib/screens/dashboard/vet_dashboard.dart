@@ -5,9 +5,7 @@ import 'package:pet_circle/data/mock_data.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
-import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
@@ -36,17 +34,6 @@ class VetDashboard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppHeader(
-                userName: user.name,
-                userImageUrl: user.avatarUrl,
-                onAvatarTap: () => Navigator.of(context).pushNamed(
-                  AppRoutes.settings,
-                  arguments: AppUserRole.vet,
-                ),
-                onNotificationTap: () {
-                  // TODO: Navigate to notifications
-                },
-              ),
               const SizedBox(height: AppSpacing.md),
               Text(
                 l10n.clinicOverview,
