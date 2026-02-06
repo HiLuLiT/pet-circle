@@ -27,16 +27,77 @@ const kPushNotificationCategories = ['medicine_reminder', 'measurement_reminder'
 /// - Missed medication for 24h+
 const kEmergencyAlertCategories = ['bpm_threshold_exceeded', 'missed_medication_24h'];
 
-class SettingsScreen extends StatefulWidget {
+/// Opens the settings as a slide-up drawer (modal bottom sheet).
+class SettingsDrawer extends StatelessWidget {
+  const SettingsDrawer({super.key, required this.role});
+
+  final AppUserRole role;
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.92,
+      minChildSize: 0.4,
+      maxChildSize: 0.92,
+      builder: (context, scrollController) {
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          child: _SettingsContent(
+            role: role,
+            scrollController: scrollController,
+            onClose: () => Navigator.of(context).pop(),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Standalone settings screen (used when navigated to via route).
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key, required this.role});
 
   final AppUserRole role;
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.white,
+      body: SafeArea(
+        child: _SettingsContent(role: role),
+      ),
+      bottomNavigationBar: BottomNavBar(
+        selectedIndex: 0,
+        onTap: (index) {
+          Navigator.of(context).pushReplacementNamed(
+            AppRoutes.mainShell,
+            arguments: {
+              'role': role,
+              'initialIndex': index,
+            },
+          );
+        },
+      ),
+    );
+  }
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsContent extends StatefulWidget {
+  const _SettingsContent({
+    required this.role,
+    this.scrollController,
+    this.onClose,
+  });
+
+  final AppUserRole role;
+  final ScrollController? scrollController;
+  final VoidCallback? onClose;
+
+  @override
+  State<_SettingsContent> createState() => _SettingsContentState();
+}
+
+class _SettingsContentState extends State<_SettingsContent> {
   bool _darkMode = false;
   bool _pushNotifications = false;
   bool _emergencyAlerts = false;
@@ -46,31 +107,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: AppColors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.settings,
-                style: AppTextStyles.heading2.copyWith(
-                  color: AppColors.burgundy,
-                  letterSpacing: -0.96,
+    return Container(
+      color: AppColors.white,
+      child: SingleChildScrollView(
+        controller: widget.scrollController,
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top bar with title and optional close chevron
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.settings,
+                        style: AppTextStyles.heading2.copyWith(
+                          color: AppColors.burgundy,
+                          letterSpacing: -0.96,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.managePreferences,
+                        style: AppTextStyles.body.copyWith(
+                          color: AppColors.burgundy,
+                          fontSize: 14,
+                          letterSpacing: -0.15,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                l10n.managePreferences,
-                style: AppTextStyles.body.copyWith(
-                  color: AppColors.burgundy,
-                  fontSize: 14,
-                  letterSpacing: -0.15,
-                ),
-              ),
-              const SizedBox(height: 24),
+                if (widget.onClose != null)
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: widget.onClose,
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: AppColors.offWhite,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.white, width: 2),
+                      ),
+                      child: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: AppColors.burgundy,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 24),
               _SettingsCard(
                 title: l10n.appearance,
                 subtitle: l10n.customizeLookAndFeel,
@@ -241,20 +334,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavBar(
-        selectedIndex: 0,
-        onTap: (index) {
-          Navigator.of(context).pushReplacementNamed(
-            AppRoutes.mainShell,
-            arguments: {
-              'role': widget.role,
-              'initialIndex': index,
-            },
-          );
-        },
-      ),
-    );
+      );
   }
 
   void _showThresholdDialog(BuildContext context) {

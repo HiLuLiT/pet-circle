@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/data/mock_data.dart';
 import 'package:pet_circle/models/app_user.dart';
+import 'package:pet_circle/screens/settings/settings_screen.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
 import 'package:pet_circle/screens/measurement/measurement_screen.dart';
@@ -59,9 +59,11 @@ class _MainShellState extends State<MainShell> {
                 userImageUrl: user.avatarUrl,
                 petName: pet?.name,
                 petImageUrl: pet?.imageUrl,
-                onAvatarTap: () => Navigator.of(context).pushNamed(
-                  AppRoutes.settings,
-                  arguments: widget.role,
+                onAvatarTap: () => showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => SettingsDrawer(role: widget.role),
                 ),
                 onNotificationTap: () =>
                     setState(() => _selectedIndex = 3),
