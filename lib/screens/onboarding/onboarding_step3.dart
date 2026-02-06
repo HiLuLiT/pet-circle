@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
@@ -25,39 +26,39 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return OnboardingShell(
-      title: 'Setup pet profile',
-      stepLabel: 'Step 3 of 4',
+      title: l10n.setupPetProfile,
+      stepLabel: l10n.onboardingStep(3, 4),
       progress: 0.75,
       onBack: widget.onBack,
       onNext: widget.onNext,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Set Target Respiratory Rate', style: AppTextStyles.heading3),
+          Text(l10n.targetRespiratoryRate, style: AppTextStyles.heading3),
           const SizedBox(height: AppSpacing.sm),
-          const Text(
-            "We'll alert you when measurements exceed this threshold.",
+          Text(
+            l10n.targetRateDescription,
             style: AppTextStyles.body,
           ),
           const SizedBox(height: AppSpacing.md),
           _TargetOption(
-            title: '30 BPM (Standard)',
-            subtitle: 'Recommended for most dogs',
+            title: l10n.normalRangeLabel,
+            subtitle: l10n.standardRateDescription,
             selected: _selected == '30',
-            trailingLabel: 'Most popular',
             onTap: () => setState(() => _selected = '30'),
           ),
           const SizedBox(height: 12),
           _TargetOption(
-            title: '35 BPM',
-            subtitle: 'For pets with mild conditions',
+            title: l10n.elevatedRangeLabel,
+            subtitle: l10n.elevatedRateDescription,
             selected: _selected == '35',
             onTap: () => setState(() => _selected = '35'),
           ),
           const SizedBox(height: 12),
           _TargetOption(
-            title: 'Custom Rate',
+            title: l10n.customRate,
             subtitle: null,
             selected: _selected == 'custom',
             onTap: () => setState(() => _selected = 'custom'),
@@ -85,7 +86,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: AppColors.lightYellow,
-                          hintText: 'Enter BPM',
+                          hintText: l10n.enterBpm,
                           hintStyle: AppTextStyles.body
                               .copyWith(color: AppColors.textMuted),
                           border: OutlineInputBorder(
@@ -105,7 +106,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'BPM',
+                      l10n.bpm,
                       style: AppTextStyles.body.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppColors.burgundy,

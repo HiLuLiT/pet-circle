@@ -1,5 +1,7 @@
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/app_routes.dart';
 // import 'package:pet_circle/firebase_options.dart';
 import 'package:pet_circle/models/app_user.dart';
@@ -22,6 +24,9 @@ import 'package:pet_circle/theme/app_theme.dart';
 // Set to true when Firebase is fully configured
 const bool kEnableFirebase = false;
 
+/// Global locale notifier – updated from Settings language switcher.
+final ValueNotifier<Locale> appLocale = ValueNotifier(const Locale('en'));
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -40,10 +45,23 @@ class PetCircleApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return ValueListenableBuilder<Locale>(
+      valueListenable: appLocale,
+      builder: (context, locale, _) => MaterialApp(
       title: 'Pet Circle',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('he'),
+      ],
       initialRoute: AppRoutes.welcome,
       onGenerateRoute: (settings) {
         switch (settings.name) {
@@ -114,6 +132,7 @@ class PetCircleApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => const WelcomeScreen());
         }
       },
+    ),
     );
   }
 }

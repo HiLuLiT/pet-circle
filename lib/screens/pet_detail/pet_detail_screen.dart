@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/data/mock_data.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
@@ -57,9 +58,10 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
       _noteController.clear();
     });
 
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Clinical note added'),
+      SnackBar(
+        content: Text(l10n.clinicalNoteAdded),
         backgroundColor: AppColors.successGreen,
       ),
     );
@@ -152,6 +154,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   }
 
   Widget _buildInfoSection() {
+    final l10n = AppLocalizations.of(context)!;
     return NeumorphicCard(
       radius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(20),
@@ -159,7 +162,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Latest Reading',
+            l10n.latestReading,
             style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
           ),
           const SizedBox(height: 16),
@@ -170,7 +173,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   icon: Icons.favorite,
                   iconColor: AppColors.pink,
                   value: '${widget.pet.latestMeasurement.bpm}',
-                  label: 'BPM',
+                  label: l10n.bpm,
                 ),
               ),
               const SizedBox(width: 16),
@@ -179,7 +182,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   icon: Icons.access_time,
                   iconColor: AppColors.accentBlue,
                   value: widget.pet.latestMeasurement.recordedAtLabel,
-                  label: 'Last Measured',
+                  label: l10n.lastMeasured,
                 ),
               ),
             ],
@@ -190,6 +193,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   }
 
   Widget _buildMeasurementHistory() {
+    final l10n = AppLocalizations.of(context)!;
     final measurements = widget.pet.name == 'Princess'
         ? MockData.princessMeasurements
         : [widget.pet.latestMeasurement];
@@ -204,13 +208,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Measurement History',
+                l10n.measurementHistory,
                 style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
               ),
               TextButton.icon(
                 onPressed: () {},
                 icon: const Icon(Icons.show_chart, size: 18),
-                label: const Text('View Graph'),
+                label: Text(l10n.viewGraph),
                 style: TextButton.styleFrom(foregroundColor: AppColors.accentBlue),
               ),
             ],
@@ -278,6 +282,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   }
 
   Widget _buildClinicalNotes() {
+    final l10n = AppLocalizations.of(context)!;
     return NeumorphicCard(
       radius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(20),
@@ -289,7 +294,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               const Icon(Icons.note_alt_outlined, color: AppColors.burgundy),
               const SizedBox(width: 8),
               Text(
-                'Clinical Notes',
+                l10n.clinicalNotes,
                 style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
               ),
             ],
@@ -308,7 +313,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   controller: _noteController,
                   maxLines: 3,
                   decoration: InputDecoration(
-                    hintText: 'Add a clinical note...',
+                    hintText: l10n.addClinicalNoteHint,
                     hintStyle: AppTextStyles.body.copyWith(color: AppColors.textMuted),
                     border: InputBorder.none,
                     isDense: true,
@@ -321,7 +326,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   child: ElevatedButton.icon(
                     onPressed: _addNote,
                     icon: const Icon(Icons.add, size: 18),
-                    label: const Text('Add Note'),
+                    label: Text(l10n.addNote),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.burgundy,
                       foregroundColor: AppColors.white,
@@ -349,7 +354,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   Icon(Icons.notes, size: 40, color: AppColors.textMuted.withOpacity(0.5)),
                   const SizedBox(height: 8),
                   Text(
-                    'No clinical notes yet',
+                    l10n.noClinicalNotesYet,
                     style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
                   ),
                 ],
@@ -362,6 +367,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   }
 
   Widget _buildCareCircle() {
+    final l10n = AppLocalizations.of(context)!;
     return NeumorphicCard(
       radius: BorderRadius.circular(16),
       padding: const EdgeInsets.all(20),
@@ -373,7 +379,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               const Icon(Icons.group, color: AppColors.burgundy),
               const SizedBox(width: 8),
               Text(
-                'Care Circle',
+                l10n.careCircle,
                 style: AppTextStyles.heading3.copyWith(color: AppColors.burgundy),
               ),
             ],

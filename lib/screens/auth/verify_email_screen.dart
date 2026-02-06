@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/services/user_service.dart';
@@ -70,12 +71,14 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
     if (!mounted) return;
 
+    final l10n = AppLocalizations.of(context)!;
+
     setState(() => _isLoading = false);
 
     if (result.success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Verification email sent!'),
+        SnackBar(
+          content: Text(l10n.verificationEmailSent),
           backgroundColor: AppColors.successGreen,
         ),
       );
@@ -83,7 +86,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result.error ?? 'Failed to send email'),
+          content: Text(result.error ?? l10n.failedToSendEmail),
           backgroundColor: Colors.red,
         ),
       );
@@ -115,6 +118,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final email = AuthService.currentUser?.email ?? 'your email';
 
     return Scaffold(
@@ -163,14 +167,14 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               const SizedBox(height: 32),
 
               Text(
-                'Verify Your Email',
+                l10n.verifyYourEmail,
                 style: AppTextStyles.heading1.copyWith(color: AppColors.burgundy),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
 
               Text(
-                'We sent a verification link to',
+                l10n.verificationLinkSentTo,
                 style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
                 textAlign: TextAlign.center,
               ),
@@ -185,7 +189,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Click the link to verify your account.',
+                l10n.clickLinkToVerify,
                 style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
                 textAlign: TextAlign.center,
               ),
@@ -197,8 +201,8 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               else
                 PrimaryButton(
                   label: _canResend
-                      ? 'Resend Verification Email'
-                      : 'Resend in ${_resendCooldown}s',
+                      ? l10n.resendVerificationEmail
+                      : l10n.resendInSeconds(_resendCooldown),
                   onPressed: _canResend ? _resendEmail : null,
                   backgroundColor:
                       _canResend ? AppColors.burgundy : AppColors.textMuted,
@@ -210,7 +214,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               TextButton.icon(
                 onPressed: _checkVerification,
                 icon: const Icon(Icons.refresh, size: 18),
-                label: const Text("I've verified my email"),
+                label: Text(l10n.iveVerifiedMyEmail),
                 style: TextButton.styleFrom(foregroundColor: AppColors.burgundy),
               ),
 
@@ -220,7 +224,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               TextButton(
                 onPressed: _signOut,
                 child: Text(
-                  'Use a different account',
+                  l10n.useDifferentAccount,
                   style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
                 ),
               ),

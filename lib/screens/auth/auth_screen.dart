@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/theme/app_assets.dart';
@@ -126,9 +127,10 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _handleForgotPassword() async {
+    final l10n = AppLocalizations.of(context)!;
     final email = _emailController.text.trim();
     if (email.isEmpty) {
-      setState(() => _error = 'Please enter your email address first');
+      setState(() => _error = l10n.pleaseEnterEmailFirst);
       return;
     }
 
@@ -146,7 +148,7 @@ class _AuthScreenState extends State<AuthScreen> {
     if (result.success) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Password reset email sent to $email'),
+          content: Text(l10n.passwordResetSent(email)),
           backgroundColor: AppColors.successGreen,
         ),
       );
@@ -157,8 +159,9 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isAppleAvailable = !kIsWeb && (Platform.isIOS || Platform.isMacOS);
-    final roleLabel = widget.role == AppUserRole.vet ? 'Veterinarian' : 'Pet Owner';
+    final roleLabel = widget.role == AppUserRole.vet ? l10n.veterinarian : l10n.petOwner;
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -186,7 +189,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                _isSignUp ? 'Create Account' : 'Welcome Back',
+                _isSignUp ? l10n.createAccount : 'Welcome Back',
                 style: AppTextStyles.heading1.copyWith(color: AppColors.burgundy),
                 textAlign: TextAlign.center,
               ),
@@ -210,7 +213,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Signing up as $roleLabel',
+                      l10n.signingUpAs(roleLabel),
                       style: AppTextStyles.body.copyWith(color: AppColors.burgundy),
                     ),
                   ],
@@ -250,12 +253,12 @@ class _AuthScreenState extends State<AuthScreen> {
                     if (_isSignUp)
                       _buildTextField(
                         controller: _nameController,
-                        label: 'Full Name',
-                        hint: 'Enter your name',
+                        label: l10n.fullName,
+                        hint: l10n.enterYourName,
                         icon: Icons.person_outline,
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
-                            return 'Please enter your name';
+                            return l10n.pleaseEnterName;
                           }
                           return null;
                         },
@@ -263,16 +266,16 @@ class _AuthScreenState extends State<AuthScreen> {
                     if (_isSignUp) const SizedBox(height: 16),
                     _buildTextField(
                       controller: _emailController,
-                      label: 'Email',
-                      hint: 'Enter your email',
+                      label: l10n.email,
+                      hint: l10n.enterYourEmail,
                       icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Please enter your email';
+                          return l10n.pleaseEnterEmail;
                         }
                         if (!value.contains('@') || !value.contains('.')) {
-                          return 'Please enter a valid email';
+                          return l10n.pleaseEnterValidEmail;
                         }
                         return null;
                       },
@@ -280,8 +283,8 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(height: 16),
                     _buildTextField(
                       controller: _passwordController,
-                      label: 'Password',
-                      hint: 'Enter your password',
+                      label: l10n.password,
+                      hint: l10n.enterYourPassword,
                       icon: Icons.lock_outline,
                       obscureText: _obscurePassword,
                       suffixIcon: IconButton(
@@ -294,10 +297,10 @@ class _AuthScreenState extends State<AuthScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
+                          return l10n.pleaseEnterPassword;
                         }
                         if (_isSignUp && value.length < 6) {
-                          return 'Password must be at least 6 characters';
+                          return l10n.passwordMinLength;
                         }
                         return null;
                       },
@@ -306,8 +309,8 @@ class _AuthScreenState extends State<AuthScreen> {
                       const SizedBox(height: 16),
                       _buildTextField(
                         controller: _confirmPasswordController,
-                        label: 'Confirm Password',
-                        hint: 'Confirm your password',
+                        label: l10n.confirmPassword,
+                        hint: l10n.confirmYourPassword,
                         icon: Icons.lock_outline,
                         obscureText: _obscureConfirmPassword,
                         suffixIcon: IconButton(
@@ -322,7 +325,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                         validator: (value) {
                           if (value != _passwordController.text) {
-                            return 'Passwords do not match';
+                            return l10n.passwordsDoNotMatch;
                           }
                           return null;
                         },
@@ -339,7 +342,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: TextButton(
                     onPressed: _isLoading ? null : _handleForgotPassword,
                     child: Text(
-                      'Forgot Password?',
+                      l10n.forgotPassword,
                       style: AppTextStyles.body.copyWith(color: AppColors.burgundy),
                     ),
                   ),
@@ -350,7 +353,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
               // Submit button
               PrimaryButton(
-                label: _isSignUp ? 'Create Account' : 'Sign In',
+                label: _isSignUp ? l10n.createAccount : l10n.signIn,
                 onPressed: _isLoading ? null : _handleEmailAuth,
                 backgroundColor: AppColors.burgundy,
               ),
@@ -364,7 +367,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
-                      'or continue with',
+                      l10n.orContinueWith,
                       style: AppTextStyles.caption.copyWith(color: AppColors.textMuted),
                     ),
                   ),
@@ -379,7 +382,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 children: [
                   Expanded(
                     child: _SocialButton(
-                      label: 'Google',
+                      label: l10n.google,
                       icon: Icons.g_mobiledata,
                       onPressed: _isLoading ? null : _handleGoogleSignIn,
                     ),
@@ -388,7 +391,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: _SocialButton(
-                        label: 'Apple',
+                        label: l10n.apple,
                         icon: Icons.apple,
                         onPressed: _isLoading ? null : _handleAppleSignIn,
                       ),
@@ -404,7 +407,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    _isSignUp ? 'Already have an account?' : "Don't have an account?",
+                    _isSignUp ? l10n.alreadyHaveAccount : l10n.dontHaveAccount,
                     style: AppTextStyles.body.copyWith(color: AppColors.textMuted),
                   ),
                   TextButton(
@@ -415,7 +418,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               _error = null;
                             }),
                     child: Text(
-                      _isSignUp ? 'Sign In' : 'Sign Up',
+                      _isSignUp ? l10n.signIn : l10n.signUp,
                       style: AppTextStyles.body.copyWith(
                         color: AppColors.burgundy,
                         fontWeight: FontWeight.w600,

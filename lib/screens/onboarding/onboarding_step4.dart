@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
@@ -56,10 +57,11 @@ class _OnboardingStep4State extends State<OnboardingStep4>
   }
 
   void _addToCareCircle() {
+    final l10n = AppLocalizations.of(context)!;
     final email = _emailController.text.trim();
     final message = email.isNotEmpty
-        ? 'Invitation sent to $email as $_selectedRole'
-        : 'Please enter an email address';
+        ? l10n.invitationSentTo(email, _selectedRole)
+        : l10n.pleaseEnterEmailAddress;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -99,19 +101,20 @@ class _OnboardingStep4State extends State<OnboardingStep4>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return OnboardingShell(
-      title: 'Setup pet profile',
-      stepLabel: 'Step 4 of 4',
+      title: l10n.setupPetProfile,
+      stepLabel: l10n.onboardingStep(4, 4),
       progress: 1,
       onBack: widget.onBack,
       onNext: widget.onComplete,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Invite Your Care Circle', style: AppTextStyles.heading3),
+          Text(l10n.inviteYourCareCircle, style: AppTextStyles.heading3),
           const SizedBox(height: AppSpacing.sm),
-          const Text(
-            'Invite family members, pet sitters, and veterinarians to collaborate.',
+          Text(
+            l10n.inviteCareCircleDescription,
             style: AppTextStyles.body,
           ),
           const SizedBox(height: AppSpacing.md),
@@ -120,13 +123,13 @@ class _OnboardingStep4State extends State<OnboardingStep4>
             const SizedBox(height: AppSpacing.md),
           ],
           _InputRow(
-            label: 'Email Address',
+            label: l10n.emailAddress,
             hint: 'email@example.com',
             controller: _emailController,
           ),
           const SizedBox(height: AppSpacing.md),
           _SelectRow(
-            label: 'Role',
+            label: l10n.role,
             value: _selectedRole,
             isOpen: _roleOpen,
             chevronController: _chevronController,
@@ -198,7 +201,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
                       size: 16, color: AppColors.white),
                   const SizedBox(width: 8),
                   Text(
-                    'Add to pet circle',
+                    l10n.addToCareCircle,
                     style:
                         AppTextStyles.body.copyWith(color: AppColors.white),
                   ),
@@ -225,7 +228,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
                       size: 16, color: _primaryBlue),
                   const SizedBox(width: 8),
                   Text(
-                    'Add another pet circle',
+                    l10n.addAnotherPetCircle,
                     style: AppTextStyles.body.copyWith(color: _primaryBlue),
                   ),
                 ],

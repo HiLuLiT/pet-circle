@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
@@ -9,6 +10,8 @@ class WelcomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: const Color(0xFFFFC2B5),
       body: SafeArea(
@@ -31,7 +34,7 @@ class WelcomeScreen extends StatelessWidget {
               child: Column(
                 children: [
                   _PrimaryPillButton(
-                    label: 'Sign up',
+                    label: l10n.signUp,
                     textColor: AppColors.white,
                     backgroundColor: AppColors.burgundy,
                     onTap: () =>
@@ -117,7 +120,7 @@ class _GoogleButton extends StatelessWidget {
             Image.asset(_googleLogoAsset, width: 18, height: 18),
             const SizedBox(width: 8),
             Text(
-              'Sign in with Google',
+              AppLocalizations.of(context)!.signInWithGoogle,
               style: AppTextStyles.body.copyWith(
                 color: AppColors.burgundy,
                 fontSize: 16,

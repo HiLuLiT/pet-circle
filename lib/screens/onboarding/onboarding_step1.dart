@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/labeled_text_field.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
@@ -202,21 +203,22 @@ class _OnboardingStep1State extends State<OnboardingStep1>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return OnboardingShell(
-      title: 'Setup pet profile',
-      stepLabel: 'Step 1 of 4',
+      title: l10n.setupPetProfile,
+      stepLabel: l10n.onboardingStep(1, 4),
       progress: 0.25,
       onNext: widget.onNext,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Tell us about your pet', style: AppTextStyles.heading3),
+          Text(l10n.tellUsAboutYourPet, style: AppTextStyles.heading3),
           const SizedBox(height: AppSpacing.md),
-          const LabeledTextField(label: "Pet's Name", hintText: 'e.g., Max'),
+          LabeledTextField(label: l10n.petName, hintText: 'e.g., Max'),
           const SizedBox(height: AppSpacing.md),
           // Breed dropdown
           Text(
-            'Breed',
+            l10n.breed,
             style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -329,14 +331,14 @@ class _OnboardingStep1State extends State<OnboardingStep1>
               ),
             ),
           const SizedBox(height: AppSpacing.md),
-          const LabeledTextField(
-            label: 'Age (years)',
+          LabeledTextField(
+            label: l10n.ageYears,
             hintText: 'e.g., 8',
             keyboardType: TextInputType.number,
           ),
           const SizedBox(height: AppSpacing.md),
-          const LabeledTextField(
-            label: 'Photo URL (Optional)',
+          LabeledTextField(
+            label: l10n.photoUrl,
             hintText: 'https://...',
           ),
         ],

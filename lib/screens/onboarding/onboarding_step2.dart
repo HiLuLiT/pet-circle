@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
@@ -53,24 +54,25 @@ class _OnboardingStep2State extends State<OnboardingStep2>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return OnboardingShell(
-      title: 'Setup pet profile',
-      stepLabel: 'Step 2 of 4',
+      title: l10n.setupPetProfile,
+      stepLabel: l10n.onboardingStep(2, 4),
       progress: 0.5,
       onBack: widget.onBack,
       onNext: widget.onNext,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Medical Information', style: AppTextStyles.heading3),
+          Text(l10n.medicalInformation, style: AppTextStyles.heading3),
           const SizedBox(height: AppSpacing.sm),
-          const Text(
-            'This helps us provide more accurate monitoring recommendations.',
+          Text(
+            l10n.medicalInfoDescription,
             style: AppTextStyles.body,
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'Diagnosis (Optional)',
+            l10n.diagnosisOptional,
             style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -88,7 +90,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                 children: [
                   Expanded(
                     child: Text(
-                      _selectedDiagnosis ?? 'Select diagnosis',
+                      _selectedDiagnosis ?? l10n.selectDiagnosis,
                       style: AppTextStyles.body.copyWith(
                         color: _selectedDiagnosis == null
                             ? AppColors.burgundy.withOpacity(0.5)
@@ -170,12 +172,12 @@ class _OnboardingStep2State extends State<OnboardingStep2>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Note:',
+                  l10n.note,
                   style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'This information is used to set appropriate monitoring thresholds and is shared only with your care circle.',
+                Text(
+                  l10n.diagnosisNote,
                   style: AppTextStyles.body,
                 ),
               ],

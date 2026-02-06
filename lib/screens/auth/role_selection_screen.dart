@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/theme/app_theme.dart';
@@ -20,6 +21,8 @@ class RoleSelectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppColors.white,
       body: SafeArea(
@@ -30,7 +33,7 @@ class RoleSelectionScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Hi Hila Ben Baruch!',
+                  l10n.hiUser('Hila Ben Baruch'),
                   style: AppTextStyles.heading2.copyWith(
                     color: AppColors.burgundy,
                     letterSpacing: -0.96,
@@ -39,7 +42,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 93),
                 _RoleButton(
-                  label: "I'm a veterinarian",
+                  label: l10n.imAVeterinarian,
                   backgroundColor: AppColors.burgundy,
                   textColor: AppColors.white,
                   iconColor: AppColors.white,
@@ -47,7 +50,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 _RoleButton(
-                  label: "I'm a pet owner",
+                  label: l10n.imAPetOwner,
                   backgroundColor: const Color(0xFFFFC2B5),
                   textColor: AppColors.burgundy,
                   iconColor: AppColors.burgundy,
