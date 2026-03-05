@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/screens/settings/settings_screen.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
@@ -37,11 +38,8 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    final user = widget.role == AppUserRole.vet
-        ? MockData.currentVetUser
-        : MockData.currentOwnerUser;
-
-    final pet = MockData.hilaPets.isNotEmpty ? MockData.hilaPets.first : null;
+    final user = userStore.currentUser;
+    final pet = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first : null;
 
     final homeScreen = widget.role == AppUserRole.vet
         ? const VetDashboard(showScaffold: false)
@@ -56,8 +54,8 @@ class _MainShellState extends State<MainShell> {
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
               child: AppHeader(
-                userName: user.name,
-                userImageUrl: user.avatarUrl,
+                userName: user?.name ?? '',
+                userImageUrl: user?.avatarUrl ?? '',
                 petName: pet?.name,
                 petImageUrl: pet?.imageUrl,
                 onAvatarTap: () => showModalBottomSheet<void>(

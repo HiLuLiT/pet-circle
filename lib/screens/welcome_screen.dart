@@ -97,10 +97,9 @@ class _PrimaryPillButton extends StatelessWidget {
 }
 
 class _GoogleButton extends StatelessWidget {
-  _GoogleButton({required this.onTap});
+  const _GoogleButton({required this.onTap});
 
   final VoidCallback onTap;
-  static const _googleLogoAsset = 'assets/figma/google_logo.png';
 
   @override
   Widget build(BuildContext context) {
@@ -119,10 +118,10 @@ class _GoogleButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset(_googleLogoAsset, width: 18, height: 18),
+            Icon(Icons.login, size: 18, color: AppColorsTheme.of(context).chocolate),
             const SizedBox(width: 8),
             Text(
-              AppLocalizations.of(context)!.signInWithGoogle,
+              AppLocalizations.of(context)!.signIn,
               style: AppTextStyles.body.copyWith(
                 color: c.chocolate,
                 fontSize: 16,

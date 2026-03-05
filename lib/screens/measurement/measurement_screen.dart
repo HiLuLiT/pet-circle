@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/models/measurement.dart';
+import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 class MeasurementScreen extends StatefulWidget {
@@ -294,9 +297,24 @@ class _ManualModeState extends State<_ManualMode>
                     const SizedBox(width: 12),
                     GestureDetector(
                       onTap: () {
+                        final petName = petStore.ownerPets.isNotEmpty
+                            ? petStore.ownerPets.first.name
+                            : 'Pet';
+                        measurementStore.addMeasurement(
+                          petName,
+                          Measurement(
+                            bpm: bpm,
+                            recordedAt: DateTime.now(),
+                          ),
+                        );
                         Navigator.pop(context);
                         setState(() => _remainingSeconds = widget.selectedDuration);
-                        // TODO: Add the measurement to the graph
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Measurement saved: $bpm BPM'),
+                            backgroundColor: const Color(0xFF75ACFF),
+                          ),
+                        );
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),

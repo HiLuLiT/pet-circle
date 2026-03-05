@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/models/medication.dart';
+import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/stores/medication_store.dart';
+import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -25,6 +27,60 @@ class _TrendsScreenState extends State<TrendsScreen> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => const _AddMedicationSheet(),
+    );
+  }
+
+  void _showExportDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
+    final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+    final measurements = measurementStore.getMeasurements(petName);
+    final csvLines = measurements.map((m) => '${m.recordedAt.toIso8601String()},${m.bpm}').join('\n');
+    final csvData = 'Date,BPM\n$csvLines';
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
+        title: Text(l10n.exportLabel, style: AppTextStyles.heading3),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(l10n.csvPreview, style: AppTextStyles.body),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: c.offWhite,
+                  borderRadius: const BorderRadius.all(AppRadii.sm),
+                ),
+                child: Text(csvData, style: AppTextStyles.caption.copyWith(fontFamily: 'monospace', fontSize: 10)),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.medicationLogExported)),
+              );
+            },
+            style: TextButton.styleFrom(
+              backgroundColor: c.lightBlue,
+              shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.small)),
+            ),
+            child: Text(l10n.downloadCsv, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -53,7 +109,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                 )
               else if (_selectedTab == 1)
                 _MeasurementHistory(
-                  onExport: () {},
+                  onExport: () => _showExportDialog(context),
                 )
               else
                 _MedicationManagement(
@@ -553,7 +609,11 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
       children: [
         Text(l10n.measurementHistory, style: AppTextStyles.heading3),
         const SizedBox(height: 8),
-        const Text('Princess • 7 recordings', style: AppTextStyles.body),
+        Builder(builder: (context) {
+          final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+          final count = measurementStore.countForPet(petName);
+          return Text('$petName • $count recordings', style: AppTextStyles.body);
+        }),
         const SizedBox(height: 16),
         Wrap(
           spacing: 8,
@@ -898,15 +958,22 @@ class _SrrChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    final data = [
-      _SrrPoint('Jan 3', 28),
-      _SrrPoint('Jan 4', 29),
-      _SrrPoint('Jan 5', 31),
-      _SrrPoint('Jan 6', 35),
-      _SrrPoint('Jan 7', 33),
-      _SrrPoint('Jan 8', 30),
-      _SrrPoint('Jan 9', 32),
-    ];
+    final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : '';
+    final measurements = measurementStore.getMeasurements(petName);
+    final data = measurements.isNotEmpty
+        ? measurements.take(7).toList().reversed.map((m) {
+            final day = '${m.recordedAt.month}/${m.recordedAt.day}';
+            return _SrrPoint(day, m.bpm.toDouble());
+          }).toList()
+        : [
+            _SrrPoint('Jan 3', 28),
+            _SrrPoint('Jan 4', 29),
+            _SrrPoint('Jan 5', 31),
+            _SrrPoint('Jan 6', 35),
+            _SrrPoint('Jan 7', 33),
+            _SrrPoint('Jan 8', 30),
+            _SrrPoint('Jan 9', 32),
+          ];
 
     return Container(
       height: 280,
@@ -1022,6 +1089,15 @@ class _AddMedicationSheet extends StatefulWidget {
 class _AddMedicationSheetState extends State<_AddMedicationSheet> {
   bool _remindersEnabled = false;
   String _frequency = 'Once daily';
+  final _nameController = TextEditingController();
+  final _dosageController = TextEditingController();
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _dosageController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1064,9 +1140,9 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _FormField(label: l10n.medicationNameRequired, hint: 'e.g., Pimobendan'),
+                _FormField(label: l10n.medicationNameRequired, hint: 'e.g., Pimobendan', controller: _nameController),
                 const SizedBox(height: 16),
-                _FormField(label: l10n.dosageRequired, hint: 'e.g., 5mg'),
+                _FormField(label: l10n.dosageRequired, hint: 'e.g., 5mg', controller: _dosageController),
                 const SizedBox(height: 16),
                 _DropdownField(
                   label: l10n.frequencyRequired,
@@ -1124,7 +1200,23 @@ shape: RoundedRectangleBorder(
                     ),
                     const SizedBox(width: 8),
                     TextButton(
-                      onPressed: () => Navigator.of(context).pop(),
+                      onPressed: () {
+                        final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+                        medicationStore.addMedication(
+                          petName,
+                          Medication(
+                            id: 'med-${DateTime.now().millisecondsSinceEpoch}',
+                            name: _nameController.text.isNotEmpty ? _nameController.text : 'New Medication',
+                            dosage: _dosageController.text,
+                            frequency: _frequency,
+                            startDate: DateTime.now(),
+                          ),
+                        );
+                        Navigator.of(context).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Medication added')),
+                        );
+                      },
                       style: TextButton.styleFrom(
                         backgroundColor: c.blue,
 shape: RoundedRectangleBorder(
@@ -1148,10 +1240,11 @@ shape: RoundedRectangleBorder(
 }
 
 class _FormField extends StatelessWidget {
-  const _FormField({required this.label, required this.hint});
+  const _FormField({required this.label, required this.hint, this.controller});
 
   final String label;
   final String hint;
+  final TextEditingController? controller;
 
   @override
   Widget build(BuildContext context) {
@@ -1167,6 +1260,7 @@ class _FormField extends StatelessWidget {
         SizedBox(
           height: 36,
           child: TextField(
+            controller: controller,
             decoration: InputDecoration(
               filled: true,
               fillColor: c.offWhite,

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/stores/notification_store.dart';
+import 'package:pet_circle/models/app_notification.dart' as notif;
 
 /// Opens notifications as a slide-up drawer (modal bottom sheet),
 /// matching the SettingsDrawer interaction pattern.
@@ -17,7 +18,7 @@ class NotificationsDrawer extends StatelessWidget {
       builder: (context, scrollController) {
         final c = AppColorsTheme.of(context);
         final l10n = AppLocalizations.of(context)!;
-        final notifications = _buildNotifications(l10n);
+        final notifications = notificationStore.all;
 
         return ClipRRect(
           borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
@@ -46,7 +47,7 @@ class NotificationsDrawer extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               l10n.unreadNotifications(
-                                notifications.where((n) => !n.isRead).length,
+                                notificationStore.unreadCount,
                               ),
                               style: AppTextStyles.body.copyWith(color: c.chocolate),
                             ),
@@ -76,7 +77,7 @@ class NotificationsDrawer extends StatelessWidget {
                   const SizedBox(height: 24),
                   ...notifications.map((notification) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: _NotificationCard(notification: notification),
+                    child: _AppNotificationCard(notification: notification),
                   )),
                 ],
               ),
@@ -97,8 +98,7 @@ class MessagesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
-    final user = MockData.currentOwnerUser;
-    final notifications = _buildNotifications(l10n);
+    final notifications = notificationStore.all;
 
     final content = SafeArea(
       child: SingleChildScrollView(
@@ -116,7 +116,7 @@ class MessagesScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              l10n.unreadNotifications(notifications.where((n) => !n.isRead).length),
+              l10n.unreadNotifications(notificationStore.unreadCount),
               style: AppTextStyles.body.copyWith(
                 color: c.chocolate,
               ),
@@ -124,7 +124,7 @@ class MessagesScreen extends StatelessWidget {
             const SizedBox(height: 24),
             ...notifications.map((notification) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
-              child: _NotificationCard(notification: notification),
+              child: _AppNotificationCard(notification: notification),
             )),
           ],
         ),
@@ -142,108 +142,22 @@ class MessagesScreen extends StatelessWidget {
   }
 }
 
-// ─── Notification Model ──────────────────────────────────────────
-
-enum NotificationType {
-  medicationReminder,
-  measurementAlert,
-  careCircleInvitation,
-  generalMessage,
-}
-
-class _Notification {
-  const _Notification({
-    required this.type,
-    required this.title,
-    required this.description,
-    required this.timeAgo,
-    this.isRead = false,
-  });
-
-  final NotificationType type;
-  final String title;
-  final String description;
-  final String timeAgo;
-  final bool isRead;
-}
-
-// ─── Mock Data ───────────────────────────────────────────────────
-
-List<_Notification> _buildNotifications(AppLocalizations l10n) => [
-  _Notification(
-    type: NotificationType.measurementAlert,
-    title: l10n.elevatedRespiratoryRate,
-    description: 'Princess\'s latest measurement of 35 BPM exceeds the normal threshold of 30 BPM. Consider scheduling a vet check-up.',
-    timeAgo: '10 min ago',
-    isRead: false,
-  ),
-  _Notification(
-    type: NotificationType.medicationReminder,
-    title: l10n.medicationDue('Pimobendan'),
-    description: 'Princess\'s 5mg dose of Pimobendan is due. Tap to log administration.',
-    timeAgo: '1 hour ago',
-    isRead: false,
-  ),
-  _Notification(
-    type: NotificationType.careCircleInvitation,
-    title: l10n.careCircleInvitationAccepted,
-    description: 'Sarah accepted your invitation to join Princess\'s care circle as a Caregiver.',
-    timeAgo: '3 hours ago',
-    isRead: true,
-  ),
-  _Notification(
-    type: NotificationType.generalMessage,
-    title: l10n.weeklyHealthReportReady,
-    description: 'Princess\'s weekly respiratory rate report is ready for review. Average SRR: 24 BPM.',
-    timeAgo: 'Yesterday',
-    isRead: true,
-  ),
-  _Notification(
-    type: NotificationType.medicationReminder,
-    title: l10n.medicationDue('Furosemide'),
-    description: 'Princess\'s 20mg dose of Furosemide is due this morning.',
-    timeAgo: 'Yesterday',
-    isRead: true,
-  ),
-  _Notification(
-    type: NotificationType.measurementAlert,
-    title: l10n.measurementReminder,
-    description: 'It\'s been 24 hours since the last respiratory rate measurement for Princess.',
-    timeAgo: '2 days ago',
-    isRead: true,
-  ),
-  _Notification(
-    type: NotificationType.careCircleInvitation,
-    title: l10n.careCircleInvitationPending,
-    description: 'Your invitation to petsitter@example.com is still pending. Tap to resend.',
-    timeAgo: '3 days ago',
-    isRead: true,
-  ),
-  _Notification(
-    type: NotificationType.generalMessage,
-    title: l10n.autoExportComplete,
-    description: 'Weekly CSV report has been sent to hila@example.com successfully.',
-    timeAgo: '1 week ago',
-    isRead: true,
-  ),
-];
-
 // ─── Notification Card ───────────────────────────────────────────
 
-class _NotificationCard extends StatelessWidget {
-  _NotificationCard({required this.notification});
+class _AppNotificationCard extends StatelessWidget {
+  const _AppNotificationCard({required this.notification});
 
-  final _Notification notification;
+  final notif.AppNotification notification;
 
   IconData get _icon {
     switch (notification.type) {
-      case NotificationType.medicationReminder:
+      case notif.NotificationType.medication:
         return Icons.medication;
-      case NotificationType.measurementAlert:
+      case notif.NotificationType.measurement:
         return Icons.monitor_heart;
-      case NotificationType.careCircleInvitation:
+      case notif.NotificationType.careCircle:
         return Icons.group_add;
-      case NotificationType.generalMessage:
+      case notif.NotificationType.report:
         return Icons.mail_outline;
     }
   }
@@ -251,89 +165,107 @@ class _NotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    
+
     final iconColor = switch (notification.type) {
-      NotificationType.medicationReminder => c.blue,
-      NotificationType.measurementAlert => c.cherry,
-      NotificationType.careCircleInvitation => c.lightBlue,
-      NotificationType.generalMessage => c.cherry,
+      notif.NotificationType.medication => c.blue,
+      notif.NotificationType.measurement => c.cherry,
+      notif.NotificationType.careCircle => c.lightBlue,
+      notif.NotificationType.report => c.cherry,
     };
-    
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: notification.isRead ? c.white : c.offWhite,
-        borderRadius: const BorderRadius.all(AppRadii.small),
-        border: Border.all(
-          color: notification.isRead
-              ? c.offWhite
-              : c.pink.withAlpha(80),
+
+    return GestureDetector(
+      onTap: () {
+        notificationStore.markRead(notification.id);
+        final scaffold = ScaffoldMessenger.of(context);
+        switch (notification.type) {
+          case notif.NotificationType.medication:
+            scaffold.showSnackBar(
+              SnackBar(content: Text('Medication logged'), backgroundColor: c.lightBlue),
+            );
+          case notif.NotificationType.measurement:
+            Navigator.of(context).pop();
+          case notif.NotificationType.careCircle:
+            scaffold.showSnackBar(
+              SnackBar(content: Text('Care circle updated'), backgroundColor: c.lightBlue),
+            );
+          case notif.NotificationType.report:
+            scaffold.showSnackBar(
+              SnackBar(content: Text('Report opened'), backgroundColor: c.lightBlue),
+            );
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: notification.isRead ? c.white : c.offWhite,
+          borderRadius: const BorderRadius.all(AppRadii.small),
+          border: Border.all(
+            color: notification.isRead ? c.offWhite : c.pink.withAlpha(80),
+          ),
         ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Icon
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: iconColor.withAlpha(26),
-              shape: BoxShape.circle,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: iconColor.withAlpha(26),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(_icon, size: 20, color: iconColor),
             ),
-            child: Icon(_icon, size: 20, color: iconColor),
-          ),
-          const SizedBox(width: 12),
-          // Content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        notification.title,
-                        style: AppTextStyles.body.copyWith(
-                          color: c.chocolate,
-                          fontWeight: notification.isRead ? FontWeight.w400 : FontWeight.w600,
-                          fontSize: 14,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          notification.title,
+                          style: AppTextStyles.body.copyWith(
+                            color: c.chocolate,
+                            fontWeight: notification.isRead ? FontWeight.w400 : FontWeight.w600,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
+                      if (!notification.isRead)
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: c.blue,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    notification.body,
+                    style: AppTextStyles.caption.copyWith(
+                      color: c.chocolate,
+                      fontSize: 12,
+                      height: 1.4,
                     ),
-                    if (!notification.isRead)
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: c.blue,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  notification.description,
-                  style: AppTextStyles.caption.copyWith(
-                    color: c.chocolate,
-                    fontSize: 12,
-                    height: 1.4,
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  notification.timeAgo,
-                  style: AppTextStyles.caption.copyWith(
-                    color: c.chocolate,
-                    fontSize: 11,
+                  const SizedBox(height: 8),
+                  Text(
+                    notification.timeAgo,
+                    style: AppTextStyles.caption.copyWith(
+                      color: c.chocolate,
+                      fontSize: 11,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

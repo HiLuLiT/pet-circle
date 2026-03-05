@@ -5,9 +5,16 @@ import 'package:pet_circle/widgets/labeled_text_field.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep1 extends StatefulWidget {
-  const OnboardingStep1({super.key, this.onNext});
+  const OnboardingStep1({
+    super.key,
+    this.onNext,
+    this.onNameChanged,
+    this.onBreedChanged,
+  });
 
   final VoidCallback? onNext;
+  final ValueChanged<String>? onNameChanged;
+  final ValueChanged<String>? onBreedChanged;
 
   @override
   State<OnboardingStep1> createState() => _OnboardingStep1State();
@@ -215,7 +222,11 @@ class _OnboardingStep1State extends State<OnboardingStep1>
         children: [
           Text(l10n.tellUsAboutYourPet, style: AppTextStyles.heading3),
           const SizedBox(height: AppSpacing.md),
-          LabeledTextField(label: l10n.petName, hintText: 'e.g., Max'),
+          LabeledTextField(
+            label: l10n.petName,
+            hintText: 'e.g., Max',
+            onChanged: widget.onNameChanged,
+          ),
           const SizedBox(height: AppSpacing.md),
           // Breed dropdown
           Text(
@@ -287,6 +298,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                           _breedDropdownOpen = false;
                         });
                         _chevronController.reverse();
+                        widget.onBreedChanged?.call(breed.displayName);
                       },
                       child: Container(
                         margin: const EdgeInsets.symmetric(

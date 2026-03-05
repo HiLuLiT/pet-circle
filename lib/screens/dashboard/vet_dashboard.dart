@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
-import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
@@ -20,8 +22,8 @@ class VetDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    final pets = MockData.vetClinicPets;
-    final user = MockData.currentVetUser;
+    final pets = petStore.allClinicPets;
+    final user = userStore.currentUser;
     final l10n = AppLocalizations.of(context)!;
 
     // Count stats
@@ -81,7 +83,7 @@ class VetDashboard extends StatelessWidget {
                   _SummaryCard(
                     iconColor: c.lightBlue.withValues(alpha: 0.1),
                     icon: Icons.bar_chart,
-                    value: '${pets.length * 6}',
+                    value: '${measurementStore.thisWeekCount}',
                     label: l10n.measurementsThisWeek,
                   ),
                 ],

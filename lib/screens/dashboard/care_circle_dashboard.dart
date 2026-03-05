@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/app_routes.dart';
-import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
@@ -21,8 +23,8 @@ class CareCircleDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    final pets = MockData.pets;
-    final user = MockData.currentOwnerUser;
+    final pets = petStore.allClinicPets;
+    final user = userStore.currentUser;
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -34,8 +36,8 @@ class CareCircleDashboard extends StatelessWidget {
             child: Column(
               children: [
                 AppHeader(
-                  userName: user.name,
-                  userImageUrl: user.avatarUrl,
+                  userName: user?.name ?? '',
+                  userImageUrl: user?.avatarUrl ?? '',
                   onAvatarTap: () => Navigator.of(context).pushNamed(
                     AppRoutes.settings,
                     arguments: AppUserRole.owner,
@@ -58,7 +60,7 @@ class CareCircleDashboard extends StatelessWidget {
                           onTap: () => Navigator.of(context).pushNamed(
                             AppRoutes.mainShell,
                             arguments: {
-                              'role': AppUserRole.vet,
+                              'role': userStore.role,
                               'initialIndex': 2,
                             },
                           ),
@@ -75,19 +77,19 @@ class CareCircleDashboard extends StatelessWidget {
                     _SummaryCard(
                       iconColor: c.lightBlue.withValues(alpha: 0.15),
                       iconUrl: AppAssets.statusOkIcon,
-                      value: '2',
+                      value: '${pets.where((p) => p.statusLabel == 'Normal').length}',
                       label: l10n.normalStatus,
                     ),
                     _SummaryCard(
                       iconColor: c.cherry.withValues(alpha: 0.15),
                       iconUrl: AppAssets.attentionIcon,
-                      value: '1',
+                      value: '${pets.where((p) => p.statusLabel != 'Normal').length}',
                       label: l10n.needAttention,
                     ),
                     _SummaryCard(
                       iconColor: c.lightBlue.withValues(alpha: 0.1),
                       iconUrl: AppAssets.chartIcon,
-                      value: '24',
+                      value: '${measurementStore.thisWeekCount}',
                       label: l10n.measurementsThisWeek,
                     ),
                   ],

@@ -6,6 +6,7 @@ import 'package:pet_circle/main.dart' show appLocale, appDarkMode;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
+import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
 
 const _settingsShareAsset = 'assets/figma/settings_share.svg';
@@ -99,11 +100,6 @@ class _SettingsContent extends StatefulWidget {
 }
 
 class _SettingsContentState extends State<_SettingsContent> {
-  bool _pushNotifications = false;
-  bool _emergencyAlerts = false;
-  bool _visionRR = false;
-  bool _autoExport = false;
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -188,7 +184,7 @@ class _SettingsContentState extends State<_SettingsContent> {
               _SettingsCard(
                 title: l10n.careCircle,
                 subtitle: l10n.manageCaregivers,
-                trailing: _InviteButton(onTap: () {}),
+                trailing: _InviteButton(onTap: () => _showInviteDialog(context)),
                 child: Column(
                   children: [
                     _CareCircleItem(
@@ -226,15 +222,21 @@ class _SettingsContentState extends State<_SettingsContent> {
                     _SettingsToggleRow(
                       label: l10n.pushNotifications,
                       description: l10n.pushNotificationsDesc,
-                      isOn: _pushNotifications,
-                      onChanged: () => setState(() => _pushNotifications = !_pushNotifications),
+                      isOn: settingsStore.pushNotifications,
+                      onChanged: () {
+                        settingsStore.togglePushNotifications();
+                        setState(() {});
+                      },
                     ),
                     const SizedBox(height: 12),
                     _SettingsToggleRow(
                       label: l10n.emergencyAlerts,
                       description: l10n.emergencyAlertsDesc,
-                      isOn: _emergencyAlerts,
-                      onChanged: () => setState(() => _emergencyAlerts = !_emergencyAlerts),
+                      isOn: settingsStore.emergencyAlerts,
+                      onChanged: () {
+                        settingsStore.toggleEmergencyAlerts();
+                        setState(() {});
+                      },
                     ),
                   ],
                 ),
@@ -250,8 +252,11 @@ class _SettingsContentState extends State<_SettingsContent> {
                         _SettingsToggleRow(
                           label: l10n.visionRRCameraMode,
                           description: l10n.visionRRDesc,
-                          isOn: _visionRR,
-                          onChanged: () => setState(() => _visionRR = !_visionRR),
+                          isOn: settingsStore.visionRREnabled,
+                          onChanged: () {
+                            settingsStore.toggleVisionRR();
+                            setState(() {});
+                          },
                         ),
                         Positioned(
                           top: 8,
@@ -288,22 +293,25 @@ class _SettingsContentState extends State<_SettingsContent> {
                     _SettingsToggleRow(
                       label: l10n.autoExportData,
                       description: l10n.autoExportDesc,
-                      isOn: _autoExport,
-                      onChanged: () => setState(() => _autoExport = !_autoExport),
+                      isOn: settingsStore.autoExport,
+                      onChanged: () {
+                        settingsStore.toggleAutoExport();
+                        setState(() {});
+                      },
                     ),
                     const SizedBox(height: 12),
                     _ActionRow(
                       iconAsset: _settingsDownAsset,
                       title: l10n.exportAllData,
                       description: l10n.exportAllDataDesc,
-                      onTap: () {},
+                      onTap: () => _showExportDataDialog(context),
                     ),
                     const SizedBox(height: 12),
                     _ActionRow(
                       iconAsset: _settingsShareAsset,
                       title: l10n.shareWithVet,
                       description: l10n.shareWithVetDesc,
-                      onTap: () {},
+                      onTap: () => _showShareWithVetDialog(context),
                     ),
                   ],
                 ),
@@ -341,10 +349,170 @@ class _SettingsContentState extends State<_SettingsContent> {
       );
   }
 
+  void _showInviteDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
+    final emailController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: c.white,
+            borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.invite, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+              const SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  hintText: 'Enter email address',
+                  filled: true,
+                  fillColor: c.offWhite,
+                  border: OutlineInputBorder(
+                    borderRadius: const BorderRadius.all(AppRadii.small),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.cancel),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Invitation sent to ${emailController.text}')),
+                      );
+                    },
+                    style: TextButton.styleFrom(backgroundColor: c.lightBlue),
+                    child: Text('Send Invite', style: TextStyle(color: c.chocolate)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showExportDataDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
+        title: Text(l10n.exportAllData, style: AppTextStyles.heading3),
+        content: Text(
+          'This will export all pet data, measurements, and clinical notes as a CSV file.',
+          style: AppTextStyles.body.copyWith(color: c.chocolate),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Export started'), backgroundColor: c.lightBlue),
+              );
+            },
+            style: TextButton.styleFrom(backgroundColor: c.lightBlue),
+            child: Text(l10n.exportAllData, style: TextStyle(color: c.chocolate)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showShareWithVetDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
+    final emailController = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: c.white,
+            borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.shareWithVet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+              const SizedBox(height: 8),
+              Text('Enter your veterinarian\'s email to share pet data.', style: AppTextStyles.body),
+              const SizedBox(height: 16),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  hintText: 'vet@clinic.com',
+                  filled: true,
+                  fillColor: c.offWhite,
+                  border: OutlineInputBorder(
+                    borderRadius: const BorderRadius.all(AppRadii.small),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(l10n.cancel),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Data shared with ${emailController.text}')),
+                      );
+                    },
+                    style: TextButton.styleFrom(backgroundColor: c.lightBlue),
+                    child: Text(l10n.shareWithVet, style: TextStyle(color: c.chocolate)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _showThresholdDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final normalController = TextEditingController(text: '30');
-    final alertController = TextEditingController(text: '40');
+    final normalController = TextEditingController(text: '${settingsStore.elevatedThreshold}');
+    final alertController = TextEditingController(text: '${settingsStore.criticalThreshold}');
 
     showModalBottomSheet(
       context: context,
@@ -410,6 +578,9 @@ class _SettingsContentState extends State<_SettingsContent> {
                     const SizedBox(width: 12),
                     TextButton(
                       onPressed: () {
+                        final elevated = int.tryParse(normalController.text) ?? 30;
+                        final critical = int.tryParse(alertController.text) ?? 40;
+                        settingsStore.updateThresholds(elevated: elevated, critical: critical);
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(l10n.thresholdsUpdated)),

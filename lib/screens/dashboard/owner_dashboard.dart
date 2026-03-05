@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
-import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
@@ -22,7 +22,7 @@ class OwnerDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    final pets = MockData.hilaPets;
+    final pets = petStore.ownerPets;
     final l10n = AppLocalizations.of(context)!;
 
     final content = SafeArea(
@@ -46,6 +46,10 @@ class OwnerDashboard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 24),
                   child: _PetCard(
                     data: pet,
+                    onTap: () => Navigator.of(context).pushNamed(
+                      AppRoutes.petDetail,
+                      arguments: pet,
+                    ),
                     onMeasure: () => Navigator.of(context).pushNamed(
                       AppRoutes.mainShell,
                       arguments: {
@@ -86,17 +90,21 @@ class _PetCard extends StatelessWidget {
     required this.data,
     required this.onMeasure,
     required this.onTrends,
+    this.onTap,
   });
 
   final Pet data;
   final VoidCallback onMeasure;
   final VoidCallback onTrends;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    return ClipRRect(
+    return GestureDetector(
+      onTap: onTap,
+      child: ClipRRect(
       borderRadius: const BorderRadius.all(AppRadii.medium),
       child: Container(
         color: c.offWhite,
@@ -255,6 +263,7 @@ class _PetCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

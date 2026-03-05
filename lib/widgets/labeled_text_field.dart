@@ -7,11 +7,15 @@ class LabeledTextField extends StatelessWidget {
     required this.label,
     required this.hintText,
     this.keyboardType,
+    this.controller,
+    this.onChanged,
   });
 
   final String label;
   final String hintText;
   final TextInputType? keyboardType;
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +31,8 @@ class LabeledTextField extends StatelessWidget {
         SizedBox(
           height: 36,
           child: TextField(
+            controller: controller,
+            onChanged: onChanged,
             keyboardType: keyboardType,
             decoration: InputDecoration(
               filled: true,

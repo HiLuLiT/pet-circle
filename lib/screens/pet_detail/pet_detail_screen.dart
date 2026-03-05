@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/data/mock_data.dart';
+import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/stores/note_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
 import 'package:pet_circle/models/pet.dart';
@@ -20,20 +23,6 @@ class PetDetailScreen extends StatefulWidget {
 
 class _PetDetailScreenState extends State<PetDetailScreen> {
   final _noteController = TextEditingController();
-  List<ClinicalNote> _notes = [];
-
-  @override
-  void initState() {
-    super.initState();
-    // Load mock notes based on pet
-    if (widget.pet.name == 'Princess') {
-      _notes = List.from(MockData.princessNotes);
-    } else if (widget.pet.name == 'Max') {
-      _notes = List.from(MockData.maxNotes);
-    } else {
-      _notes = [];
-    }
-  }
 
   @override
   void dispose() {
@@ -44,19 +33,18 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   void _addNote() {
     if (_noteController.text.trim().isEmpty) return;
 
-    setState(() {
-      _notes.insert(
-        0,
-        ClinicalNote(
-          id: 'note-${DateTime.now().millisecondsSinceEpoch}',
-          authorName: MockData.currentVetUser.name,
-          authorAvatarUrl: MockData.currentVetUser.avatarUrl,
-          content: _noteController.text.trim(),
-          createdAt: DateTime.now(),
-        ),
-      );
-      _noteController.clear();
-    });
+    final user = userStore.currentUser;
+    noteStore.addNote(
+      widget.pet.name,
+      ClinicalNote(
+        id: 'note-${DateTime.now().millisecondsSinceEpoch}',
+        authorName: user?.name ?? 'Unknown',
+        authorAvatarUrl: user?.avatarUrl ?? '',
+        content: _noteController.text.trim(),
+        createdAt: DateTime.now(),
+      ),
+    );
+    _noteController.clear();
 
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
@@ -73,7 +61,9 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     final c = AppColorsTheme.of(context);
     return Scaffold(
       backgroundColor: c.white,
-      body: CustomScrollView(
+      body: ListenableBuilder(
+        listenable: Listenable.merge([noteStore, measurementStore]),
+        builder: (context, _) => CustomScrollView(
         slivers: [
           _buildAppBar(),
           SliverPadding(
@@ -92,6 +82,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -199,8 +190,9 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   Widget _buildMeasurementHistory() {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
-    final measurements = widget.pet.name == 'Princess'
-        ? MockData.princessMeasurements
+    final storeMeasurements = measurementStore.getMeasurements(widget.pet.name);
+    final measurements = storeMeasurements.isNotEmpty
+        ? storeMeasurements
         : [widget.pet.latestMeasurement];
 
     return NeumorphicCard(
@@ -217,7 +209,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 style: AppTextStyles.heading3.copyWith(color: c.chocolate),
               ),
               TextButton.icon(
-                onPressed: () {},
+                onPressed: () => Navigator.of(context).pushNamed(
+                  AppRoutes.mainShell,
+                  arguments: {
+                    'role': userStore.role,
+                    'initialIndex': 1,
+                  },
+                ),
                 icon: const Icon(Icons.show_chart, size: 18),
                 label: Text(l10n.viewGraph),
                 style: TextButton.styleFrom(foregroundColor: c.lightBlue),
@@ -289,6 +287,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   Widget _buildClinicalNotes() {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
+    final notes = noteStore.getNotes(widget.pet.name);
     return NeumorphicCard(
       radius: const BorderRadius.all(AppRadii.medium),
       padding: const EdgeInsets.all(20),
@@ -346,13 +345,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               ],
             ),
           ),
-          if (_notes.isNotEmpty) ...[
+          if (notes.isNotEmpty) ...[
             const SizedBox(height: 20),
             const Divider(height: 1),
             const SizedBox(height: 16),
-            ..._notes.map((note) => _NoteCard(note: note)),
+            ...notes.map((note) => _NoteCard(note: note)),
           ],
-          if (_notes.isEmpty) ...[
+          if (notes.isEmpty) ...[
             const SizedBox(height: 20),
             Center(
               child: Column(
