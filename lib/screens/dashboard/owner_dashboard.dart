@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
@@ -24,6 +25,56 @@ class OwnerDashboard extends StatelessWidget {
     final c = AppColorsTheme.of(context);
     final pets = petStore.ownerPets;
     final l10n = AppLocalizations.of(context)!;
+
+    if (pets.isEmpty) {
+      final emptyContent = SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.pets, size: 64, color: c.chocolate.withValues(alpha: 0.3)),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.noPetsYet,
+                  style: AppTextStyles.heading2.copyWith(color: c.chocolate),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.addYourFirstPet,
+                  style: AppTextStyles.body.copyWith(color: c.chocolate),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.onboarding),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: c.lightBlue,
+                      borderRadius: const BorderRadius.all(AppRadii.full),
+                    ),
+                    child: Text(
+                      l10n.getStarted,
+                      style: AppTextStyles.body.copyWith(
+                        color: c.chocolate,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      if (!showScaffold) {
+        return Container(color: c.white, child: emptyContent);
+      }
+      return Scaffold(backgroundColor: c.white, body: emptyContent);
+    }
 
     final content = SafeArea(
       child: SingleChildScrollView(
@@ -102,6 +153,8 @@ class _PetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final latestFromStore = measurementStore.latestForPet(data.name);
+    final latest = latestFromStore ?? data.latestMeasurement;
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -171,7 +224,7 @@ class _PetCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${data.latestMeasurement.bpm}',
+                                '${latest.bpm}',
                                 style: AppTextStyles.heading2.copyWith(
                                   color: c.chocolate,
                                   fontSize: 24,
@@ -190,7 +243,7 @@ class _PetCard extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        data.latestMeasurement.timeAgo,
+                        latest.timeAgo,
                         style: AppTextStyles.caption.copyWith(
                           color: c.chocolate,
                           fontSize: 12,

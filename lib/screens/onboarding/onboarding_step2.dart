@@ -4,10 +4,11 @@ import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep2 extends StatefulWidget {
-  const OnboardingStep2({super.key, this.onBack, this.onNext});
+  const OnboardingStep2({super.key, this.onBack, this.onNext, this.onDiagnosisChanged});
 
   final VoidCallback? onBack;
   final VoidCallback? onNext;
+  final ValueChanged<String>? onDiagnosisChanged;
 
   @override
   State<OnboardingStep2> createState() => _OnboardingStep2State();
@@ -134,6 +135,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                         _isOpen = false;
                       });
                       _chevronController.reverse();
+                      widget.onDiagnosisChanged?.call(diagnosis);
                     },
                     child: Container(
                       width: double.infinity,

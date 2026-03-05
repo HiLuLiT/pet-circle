@@ -1399,6 +1399,22 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reset'**
   String get reset;
+
+  String measurementSavedBpm(int bpm);
+  String get medicationLogged;
+  String get careCircleUpdated;
+  String get reportOpened;
+  String get sendInvite;
+  String get exportAllDataConfirmation;
+  String get exportStarted;
+  String get enterVetEmail;
+  String dataSharedWith(String email);
+  String get medicationAdded;
+  String get noCareCircleMembers;
+  String get enterEmailAddress;
+  String get getStarted;
+  String get noPetsYet;
+  String get addYourFirstPet;
 }
 
 class _AppLocalizationsDelegate

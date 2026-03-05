@@ -4,10 +4,11 @@ import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep4 extends StatefulWidget {
-  const OnboardingStep4({super.key, this.onBack, this.onComplete});
+  const OnboardingStep4({super.key, this.onBack, this.onComplete, this.onEmailAdded});
 
   final VoidCallback? onBack;
   final VoidCallback? onComplete;
+  final ValueChanged<String>? onEmailAdded;
 
   @override
   State<OnboardingStep4> createState() => _OnboardingStep4State();
@@ -87,6 +88,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
     );
 
     if (email.isNotEmpty) {
+      widget.onEmailAdded?.call(email);
       _emailController.clear();
       widget.onComplete?.call();
     }

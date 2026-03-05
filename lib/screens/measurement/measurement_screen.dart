@@ -308,10 +308,13 @@ class _ManualModeState extends State<_ManualMode>
                           ),
                         );
                         Navigator.pop(context);
-                        setState(() => _remainingSeconds = widget.selectedDuration);
+                        setState(() {
+                          _remainingSeconds = widget.selectedDuration;
+                          _tapCount = 0;
+                        });
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Measurement saved: $bpm BPM'),
+                            content: Text(l10n.measurementSavedBpm(bpm)),
                             backgroundColor: const Color(0xFF75ACFF),
                           ),
                         );

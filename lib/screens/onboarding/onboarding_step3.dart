@@ -5,10 +5,11 @@ import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep3 extends StatefulWidget {
-  const OnboardingStep3({super.key, this.onBack, this.onNext});
+  const OnboardingStep3({super.key, this.onBack, this.onNext, this.onTargetRateChanged});
 
   final VoidCallback? onBack;
   final VoidCallback? onNext;
+  final ValueChanged<int>? onTargetRateChanged;
 
   @override
   State<OnboardingStep3> createState() => _OnboardingStep3State();
@@ -48,14 +49,20 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
             title: l10n.normalRangeLabel,
             subtitle: l10n.standardRateDescription,
             selected: _selected == '30',
-            onTap: () => setState(() => _selected = '30'),
+            onTap: () {
+              setState(() => _selected = '30');
+              widget.onTargetRateChanged?.call(30);
+            },
           ),
           const SizedBox(height: 12),
           _TargetOption(
             title: l10n.elevatedRangeLabel,
             subtitle: l10n.elevatedRateDescription,
             selected: _selected == '35',
-            onTap: () => setState(() => _selected = '35'),
+            onTap: () {
+              setState(() => _selected = '35');
+              widget.onTargetRateChanged?.call(35);
+            },
           ),
           const SizedBox(height: 12),
           _TargetOption(
@@ -84,6 +91,10 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                           FilteringTextInputFormatter.digitsOnly,
                           LengthLimitingTextInputFormatter(3),
                         ],
+                        onChanged: (value) {
+                          final rate = int.tryParse(value);
+                          if (rate != null) widget.onTargetRateChanged?.call(rate);
+                        },
                         decoration: InputDecoration(
                           filled: true,
                           fillColor: c.lightYellow,

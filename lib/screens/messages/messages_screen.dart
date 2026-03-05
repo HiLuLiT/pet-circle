@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/stores/notification_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/app_notification.dart' as notif;
 
 /// Opens notifications as a slide-up drawer (modal bottom sheet),
@@ -165,6 +167,7 @@ class _AppNotificationCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     final iconColor = switch (notification.type) {
       notif.NotificationType.medication => c.blue,
@@ -180,17 +183,23 @@ class _AppNotificationCard extends StatelessWidget {
         switch (notification.type) {
           case notif.NotificationType.medication:
             scaffold.showSnackBar(
-              SnackBar(content: Text('Medication logged'), backgroundColor: c.lightBlue),
+              SnackBar(content: Text(l10n.medicationLogged), backgroundColor: c.lightBlue),
             );
           case notif.NotificationType.measurement:
-            Navigator.of(context).pop();
+            Navigator.of(context).pushReplacementNamed(
+              AppRoutes.mainShell,
+              arguments: {
+                'role': userStore.role,
+                'initialIndex': 1,
+              },
+            );
           case notif.NotificationType.careCircle:
             scaffold.showSnackBar(
-              SnackBar(content: Text('Care circle updated'), backgroundColor: c.lightBlue),
+              SnackBar(content: Text(l10n.careCircleUpdated), backgroundColor: c.lightBlue),
             );
           case notif.NotificationType.report:
             scaffold.showSnackBar(
-              SnackBar(content: Text('Report opened'), backgroundColor: c.lightBlue),
+              SnackBar(content: Text(l10n.reportOpened), backgroundColor: c.lightBlue),
             );
         }
       },

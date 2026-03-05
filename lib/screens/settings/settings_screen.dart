@@ -6,6 +6,7 @@ import 'package:pet_circle/main.dart' show appLocale, appDarkMode;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
+import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
 
@@ -185,33 +186,32 @@ class _SettingsContentState extends State<_SettingsContent> {
                 title: l10n.careCircle,
                 subtitle: l10n.manageCaregivers,
                 trailing: _InviteButton(onTap: () => _showInviteDialog(context)),
-                child: Column(
-                  children: [
-                    _CareCircleItem(
-                      email: 'sarah@example.com',
-                      roleLabel: l10n.owner,
-                      roleColor: c.chocolate,
-                      statusLabel: l10n.active,
-                      statusColor: c.pink,
-                    ),
-                    const SizedBox(height: 12),
-                    _CareCircleItem(
-                      email: 'drsmith@vetclinic.com',
-                      roleLabel: l10n.veterinarian,
-                      roleColor: c.blue,
-                      statusLabel: l10n.active,
-                      statusColor: c.pink,
-                    ),
-                    const SizedBox(height: 12),
-                    _CareCircleItem(
-                      email: 'petsitter@example.com',
-                      roleLabel: l10n.viewer,
-                      roleColor: c.lightYellow,
-                      statusLabel: l10n.pending,
-                      statusColor: c.offWhite,
-                    ),
-                  ],
-                ),
+                child: Builder(builder: (context) {
+                  final pets = petStore.ownerPets;
+                  if (pets.isEmpty) {
+                    return Text(l10n.noClinicalNotesYet, style: AppTextStyles.body);
+                  }
+                  final members = pets.first.careCircle;
+                  if (members.isEmpty) {
+                    return Text(l10n.noCareCircleMembers, style: AppTextStyles.body);
+                  }
+                  return Column(
+                    children: members.map((member) {
+                      final isOwner = member.role.toLowerCase() == 'owner';
+                      final isVet = member.role.toLowerCase() == 'veterinarian';
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _CareCircleItem(
+                          email: member.name,
+                          roleLabel: member.role,
+                          roleColor: isVet ? c.blue : isOwner ? c.chocolate : c.lightYellow,
+                          statusLabel: l10n.active,
+                          statusColor: c.pink,
+                        ),
+                      );
+                    }).toList(),
+                  );
+                }),
               ),
               const SizedBox(height: 16),
               _SettingsCard(
@@ -375,7 +375,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: 'Enter email address',
+                  hintText: l10n.enterEmailAddress,
                   filled: true,
                   fillColor: c.offWhite,
                   border: OutlineInputBorder(
@@ -396,12 +396,13 @@ class _SettingsContentState extends State<_SettingsContent> {
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
+                      final outerL10n = AppLocalizations.of(context)!;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Invitation sent to ${emailController.text}')),
+                        SnackBar(content: Text(outerL10n.dataSharedWith(emailController.text))),
                       );
                     },
                     style: TextButton.styleFrom(backgroundColor: c.lightBlue),
-                    child: Text('Send Invite', style: TextStyle(color: c.chocolate)),
+                    child: Text(l10n.sendInvite, style: TextStyle(color: c.chocolate)),
                   ),
                 ],
               ),
@@ -421,7 +422,7 @@ class _SettingsContentState extends State<_SettingsContent> {
         shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
         title: Text(l10n.exportAllData, style: AppTextStyles.heading3),
         content: Text(
-          'This will export all pet data, measurements, and clinical notes as a CSV file.',
+          l10n.exportAllDataConfirmation,
           style: AppTextStyles.body.copyWith(color: c.chocolate),
         ),
         actions: [
@@ -433,7 +434,7 @@ class _SettingsContentState extends State<_SettingsContent> {
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Export started'), backgroundColor: c.lightBlue),
+                SnackBar(content: Text(l10n.exportStarted), backgroundColor: c.lightBlue),
               );
             },
             style: TextButton.styleFrom(backgroundColor: c.lightBlue),
@@ -466,7 +467,7 @@ class _SettingsContentState extends State<_SettingsContent> {
             children: [
               Text(l10n.shareWithVet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
               const SizedBox(height: 8),
-              Text('Enter your veterinarian\'s email to share pet data.', style: AppTextStyles.body),
+              Text(l10n.enterVetEmail, style: AppTextStyles.body),
               const SizedBox(height: 16),
               TextField(
                 controller: emailController,
@@ -493,8 +494,9 @@ class _SettingsContentState extends State<_SettingsContent> {
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
+                      final vetL10n = AppLocalizations.of(context)!;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Data shared with ${emailController.text}')),
+                        SnackBar(content: Text(vetL10n.dataSharedWith(emailController.text))),
                       );
                     },
                     style: TextButton.styleFrom(backgroundColor: c.lightBlue),

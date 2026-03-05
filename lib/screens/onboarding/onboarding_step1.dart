@@ -10,11 +10,13 @@ class OnboardingStep1 extends StatefulWidget {
     this.onNext,
     this.onNameChanged,
     this.onBreedChanged,
+    this.onAgeChanged,
   });
 
   final VoidCallback? onNext;
   final ValueChanged<String>? onNameChanged;
   final ValueChanged<String>? onBreedChanged;
+  final ValueChanged<String>? onAgeChanged;
 
   @override
   State<OnboardingStep1> createState() => _OnboardingStep1State();
@@ -348,6 +350,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
             label: l10n.ageYears,
             hintText: 'e.g., 8',
             keyboardType: TextInputType.number,
+            onChanged: widget.onAgeChanged,
           ),
           const SizedBox(height: AppSpacing.md),
           LabeledTextField(

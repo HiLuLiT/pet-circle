@@ -688,4 +688,53 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get reset => 'איפוס';
+
+  @override
+  String measurementSavedBpm(int bpm) {
+    return 'מדידה נשמרה: $bpm BPM';
+  }
+
+  @override
+  String get medicationLogged => 'תרופה נרשמה';
+
+  @override
+  String get careCircleUpdated => 'מעגל הטיפול עודכן';
+
+  @override
+  String get reportOpened => 'דוח נפתח';
+
+  @override
+  String get sendInvite => 'שלח הזמנה';
+
+  @override
+  String get exportAllDataConfirmation => 'פעולה זו תייצא את כל נתוני חיות המחמד, המדידות וההערות הקליניות כקובץ CSV.';
+
+  @override
+  String get exportStarted => 'הייצוא החל';
+
+  @override
+  String get enterVetEmail => 'הכנס את כתובת האימייל של הוטרינר שלך לשיתוף נתונים.';
+
+  @override
+  String dataSharedWith(String email) {
+    return 'נתונים שותפו עם $email';
+  }
+
+  @override
+  String get medicationAdded => 'תרופה נוספה';
+
+  @override
+  String get noCareCircleMembers => 'אין עדיין חברי מעגל טיפול';
+
+  @override
+  String get enterEmailAddress => 'הכנס כתובת אימייל';
+
+  @override
+  String get getStarted => 'התחל';
+
+  @override
+  String get noPetsYet => 'אין עדיין חיות מחמד';
+
+  @override
+  String get addYourFirstPet => 'הוסף את חיית המחמד הראשונה שלך כדי להתחיל עם ניטור בריאות.';
 }

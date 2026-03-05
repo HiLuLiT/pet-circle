@@ -3,6 +3,7 @@ import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
@@ -34,7 +35,7 @@ class RoleSelectionScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  l10n.hiUser('Hila Ben Baruch'),
+                  l10n.hiUser(userStore.currentUser?.name ?? ''),
                   style: AppTextStyles.heading2.copyWith(
                     color: c.chocolate,
                     letterSpacing: -0.96,

@@ -235,5 +235,22 @@
   "privacyPolicyContent": "Pet Circle values your privacy. We collect minimal data necessary to provide our services.\n\n• Personal Information: Name, email, and pet health data are stored securely.\n• Data Sharing: Your data is only shared with care circle members you explicitly invite.\n• Data Storage: Health records are stored locally on your device and optionally synced to our secure cloud.\n• Third Parties: We do not sell or share your data with third parties.\n• Data Deletion: You can export and delete all your data at any time from Settings.\n\nLast updated: January 2026",
   "helpAndSupportContent": "Need help? Here are some resources:\n\n• FAQ: Visit our website at petcircle.app/faq\n• Email Support: support@petcircle.app\n• Response Time: We typically respond within 24 hours\n\nCommon Questions:\n• How to measure SRR: Use the Manual Mode tap counter or VisionRR camera mode.\n• Adding care circle members: Go to Settings > Care Circle > Invite.\n• Understanding alerts: Alerts trigger when BPM exceeds your configured thresholds.\n\nApp Version: 1.0.0",
   "selectLanguage": "Select Language",
-  "reset": "Reset"
+  "reset": "Reset",
+  "measurementSavedBpm": "Measurement saved: {bpm} BPM",
+  "@measurementSavedBpm": { "placeholders": { "bpm": { "type": "int" } } },
+  "medicationLogged": "Medication logged",
+  "careCircleUpdated": "Care circle updated",
+  "reportOpened": "Report opened",
+  "sendInvite": "Send Invite",
+  "exportAllDataConfirmation": "This will export all pet data, measurements, and clinical notes as a CSV file.",
+  "exportStarted": "Export started",
+  "enterVetEmail": "Enter your veterinarian's email to share pet data.",
+  "dataSharedWith": "Data shared with {email}",
+  "@dataSharedWith": { "placeholders": { "email": { "type": "String" } } },
+  "medicationAdded": "Medication added",
+  "noCareCircleMembers": "No care circle members yet",
+  "enterEmailAddress": "Enter email address",
+  "getStarted": "Get Started",
+  "noPetsYet": "No pets yet",
+  "addYourFirstPet": "Add your first pet to get started with health monitoring."
 }

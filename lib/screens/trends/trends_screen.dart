@@ -4,6 +4,7 @@ import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -216,32 +217,49 @@ class _TrendsOverview extends StatelessWidget {
     final c = AppColorsTheme.of(context);
     return Column(
       children: [
-        _SectionCard(
-          child: _MetricRow(
-            label: l10n.averageSrr,
-            value: '31',
-            subLabel: l10n.breathsPerMinute,
-            icon: Icons.show_chart,
-          ),
-        ),
-        const SizedBox(height: 24),
-        _SectionCard(
-          child: _MetricRow(
-            label: l10n.sevenDayTrend,
-            value: '+4',
-            subLabel: l10n.bpmChange,
-            icon: Icons.trending_up,
-          ),
-        ),
-        const SizedBox(height: 24),
-        _SectionCard(
-          child: _MetricRow(
-            label: l10n.sevenDayTrend,
-            value: '1',
-            subLabel: l10n.activeTreatments,
-            icon: Icons.medication,
-          ),
-        ),
+        Builder(builder: (context) {
+          final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+          final measurements = measurementStore.getMeasurements(petName);
+          final avg = measurements.isEmpty ? 0 : (measurements.map((m) => m.bpm).reduce((a, b) => a + b) / measurements.length).round();
+          final weekAgo = DateTime.now().subtract(const Duration(days: 7));
+          final recent = measurements.where((m) => m.recordedAt.isAfter(weekAgo)).toList();
+          final older = measurements.where((m) => !m.recordedAt.isAfter(weekAgo)).toList();
+          final recentAvg = recent.isEmpty ? avg : (recent.map((m) => m.bpm).reduce((a, b) => a + b) / recent.length).round();
+          final olderAvg = older.isEmpty ? recentAvg : (older.map((m) => m.bpm).reduce((a, b) => a + b) / older.length).round();
+          final trend = recentAvg - olderAvg;
+          final trendStr = trend >= 0 ? '+$trend' : '$trend';
+          final activeMeds = medicationStore.getActiveMedications(petName).length;
+          return Column(
+            children: [
+              _SectionCard(
+                child: _MetricRow(
+                  label: l10n.averageSrr,
+                  value: '$avg',
+                  subLabel: l10n.breathsPerMinute,
+                  icon: Icons.show_chart,
+                ),
+              ),
+              const SizedBox(height: 24),
+              _SectionCard(
+                child: _MetricRow(
+                  label: l10n.sevenDayTrend,
+                  value: trendStr,
+                  subLabel: l10n.bpmChange,
+                  icon: trend >= 0 ? Icons.trending_up : Icons.trending_down,
+                ),
+              ),
+              const SizedBox(height: 24),
+              _SectionCard(
+                child: _MetricRow(
+                  label: l10n.sevenDayTrend,
+                  value: '$activeMeds',
+                  subLabel: l10n.activeTreatments,
+                  icon: Icons.medication,
+                ),
+              ),
+            ],
+          );
+        }),
         const SizedBox(height: 24),
         _SectionCard(
           child: Column(
@@ -266,42 +284,57 @@ class _TrendsOverview extends StatelessWidget {
               Text(l10n.medicationTimeline, style: AppTextStyles.heading3),
               const SizedBox(height: 4),
               Text(
-                'Customize the look and feel',
+                l10n.activeTreatments,
                 style: AppTextStyles.body.copyWith(fontSize: 14),
               ),
               const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: c.white,
-                  borderRadius: const BorderRadius.all(AppRadii.small),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.medication, color: c.chocolate),
-                        const SizedBox(width: 8),
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('Furosemide',
-                                style: AppTextStyles.body),
-                            Text('20mg', style: AppTextStyles.caption),
-                          ],
-                        ),
-                      ],
+              Builder(builder: (context) {
+                final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+                final meds = medicationStore.getActiveMedications(petName);
+                if (meds.isEmpty) {
+                  return Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: c.white,
+                      borderRadius: const BorderRadius.all(AppRadii.small),
                     ),
-                    Text(
-                      'Jan 6',
-                      style: AppTextStyles.caption.copyWith(
-                        color: c.chocolate,
+                    child: Center(
+                      child: Text(l10n.noMedicationsRecorded, style: AppTextStyles.body),
+                    ),
+                  );
+                }
+                final med = meds.first;
+                final dateStr = '${med.startDate.month}/${med.startDate.day}';
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: c.white,
+                    borderRadius: const BorderRadius.all(AppRadii.small),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.medication, color: c.chocolate),
+                          const SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(med.name, style: AppTextStyles.body),
+                              Text(med.dosage, style: AppTextStyles.caption),
+                            ],
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                      Text(
+                        dateStr,
+                        style: AppTextStyles.caption.copyWith(color: c.chocolate),
+                      ),
+                    ],
+                  ),
+                );
+              }),
               const SizedBox(height: 16),
               SizedBox(
                 height: 36,
@@ -378,10 +411,14 @@ class _MetricRow extends StatelessWidget {
 void _exportMedicationLog(BuildContext context) {
   final l10n = AppLocalizations.of(context)!;
   final c = AppColorsTheme.of(context);
-  const csvData = 'Medication,Dosage,Frequency,Start Date,End Date,Prescribed By\n'
-      'Pimobendan,5mg,Twice daily,2025-01-01,Ongoing,Dr. Smith DVM\n'
-      'Furosemide,20mg,Once daily,2025-01-15,2025-03-15,Dr. Smith DVM\n'
-      'Enalapril,2.5mg,Once daily,2025-02-01,Ongoing,Dr. Johnson DVM\n';
+  final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+  final meds = medicationStore.getMedications(petName);
+  final csvLines = meds.map((m) {
+    final start = '${m.startDate.year}-${m.startDate.month.toString().padLeft(2, '0')}-${m.startDate.day.toString().padLeft(2, '0')}';
+    final status = m.isActive ? 'Ongoing' : 'Completed';
+    return '${m.name},${m.dosage},${m.frequency},$start,$status';
+  }).join('\n');
+  final csvData = 'Medication,Dosage,Frequency,Start Date,Status\n$csvLines';
 
   showDialog(
     context: context,
@@ -436,145 +473,157 @@ class _MedicationManagement extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return ListenableBuilder(
+      listenable: medicationStore,
+      builder: (context, _) {
+        final l10n = AppLocalizations.of(context)!;
+        final c = AppColorsTheme.of(context);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.medicationManagement, style: AppTextStyles.heading3),
-            SizedBox(
-              height: 32,
-              child: TextButton.icon(
-                onPressed: onAddMedication,
-                style: TextButton.styleFrom(
-                  backgroundColor: c.lightBlue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: const BorderRadius.all(AppRadii.full),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(l10n.medicationManagement, style: AppTextStyles.heading3),
+                SizedBox(
+                  height: 32,
+                  child: TextButton.icon(
+                    onPressed: onAddMedication,
+                    style: TextButton.styleFrom(
+                      backgroundColor: c.lightBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: const BorderRadius.all(AppRadii.full),
+                      ),
+                    ),
+                    icon: Icon(Icons.add, color: c.chocolate, size: 16),
+                    label: Text(
+                      l10n.addMedication,
+                      style: AppTextStyles.caption.copyWith(
+                        color: c.chocolate,
+                      ),
+                    ),
                   ),
                 ),
-                icon: Icon(Icons.add, color: c.chocolate, size: 16),
-                label: Text(
-                  l10n.addMedication,
-                  style: AppTextStyles.caption.copyWith(
-                    color: c.chocolate,
+              ],
+            ),
+            const SizedBox(height: 16),
+            Builder(builder: (context) {
+              final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+              final count = medicationStore.getActiveMedications(petName).length;
+              return Text(
+                '$petName • $count active treatments',
+                style: AppTextStyles.body,
+              );
+            }),
+            const SizedBox(height: 24),
+            _SectionCard(
+              child: Column(
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: c.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.medication, color: c.chocolate),
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.noMedicationsRecorded,
+                    style: AppTextStyles.heading3,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  Builder(builder: (context) {
+                    final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'your pet';
+                    return Text(
+                      "Keep track of $petName's medications, dosages, and treatment schedules. "
+                      'Add medication records to monitor health trends alongside respiratory data.',
+                      style: AppTextStyles.body,
+                      textAlign: TextAlign.center,
+                    );
+                  }),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    height: 40,
+                    child: TextButton.icon(
+                      onPressed: onAddMedication,
+                      style: TextButton.styleFrom(
+                        backgroundColor: c.lightBlue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: const BorderRadius.all(AppRadii.full),
+                        ),
+                      ),
+                      icon: Icon(Icons.add, color: c.chocolate, size: 16),
+                      label: Text(
+                        l10n.addMedication,
+                        style: AppTextStyles.body.copyWith(
+                          color: c.chocolate,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            _SectionCard(
+              child: Column(
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: c.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.info_outline,
+                        color: c.blue),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.clinicalRecordInformation,
+                    style: AppTextStyles.heading3,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Medication data is stored locally and included in exported clinical reports. '
+                    'Always consult with your veterinarian before starting, stopping, or modifying any medication regimen. '
+                    'This tool is for tracking purposes only and does not replace professional veterinary advice.',
+                    style: AppTextStyles.body,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    height: 40,
+                    child: TextButton.icon(
+                      onPressed: () {
+                        _exportMedicationLog(context);
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: c.lightBlue,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: const BorderRadius.all(AppRadii.full),
+                        ),
+                      ),
+                      icon: Icon(Icons.file_download,
+                          color: c.chocolate, size: 16),
+                      label: Text(
+                        l10n.exportMedicationLog,
+                        style: AppTextStyles.body.copyWith(
+                          color: c.chocolate,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
-        ),
-        const SizedBox(height: 16),
-        const Text(
-          'Princess • 0 active treatments',
-          style: AppTextStyles.body,
-        ),
-        const SizedBox(height: 24),
-        _SectionCard(
-          child: Column(
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: c.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.medication, color: c.chocolate),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                l10n.noMedicationsRecorded,
-                style: AppTextStyles.heading3,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                "Keep track of Luna's medications, dosages, and treatment schedules. "
-                'Add medication records to monitor health trends alongside respiratory data.',
-                style: AppTextStyles.body,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                height: 40,
-                child: TextButton.icon(
-                  onPressed: onAddMedication,
-                  style: TextButton.styleFrom(
-                    backgroundColor: c.lightBlue,
-shape: RoundedRectangleBorder(
-                        borderRadius: const BorderRadius.all(AppRadii.full),
-                      ),
-                  ),
-                  icon: Icon(Icons.add, color: c.chocolate, size: 16),
-                  label: Text(
-                    l10n.addMedication,
-                    style: AppTextStyles.body.copyWith(
-                      color: c.chocolate,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-        _SectionCard(
-          child: Column(
-            children: [
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: c.white,
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.info_outline,
-                    color: c.blue),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                l10n.clinicalRecordInformation,
-                style: AppTextStyles.heading3,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Medication data is stored locally and included in exported clinical reports. '
-                'Always consult with your veterinarian before starting, stopping, or modifying any medication regimen. '
-                'This tool is for tracking purposes only and does not replace professional veterinary advice.',
-                style: AppTextStyles.body,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 24),
-              SizedBox(
-                height: 40,
-                child: TextButton.icon(
-                  onPressed: () {
-                    _exportMedicationLog(context);
-                  },
-                  style: TextButton.styleFrom(
-                    backgroundColor: c.lightBlue,
-shape: RoundedRectangleBorder(
-                        borderRadius: const BorderRadius.all(AppRadii.full),
-                      ),
-                  ),
-                  icon: Icon(Icons.file_download,
-                      color: c.chocolate, size: 16),
-                  label: Text(
-                    l10n.exportMedicationLog,
-                    style: AppTextStyles.body.copyWith(
-                      color: c.chocolate,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
@@ -657,21 +706,53 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
         _SectionCard(
           child: Column(
             children: [
-              Row(
-                children: [
-                  _StatCard(title: l10n.averageSrr, value: '31', footnote: l10n.bpm),
-                  const SizedBox(width: 8),
-                  _StatCard(title: l10n.range, value: '29-33', footnote: l10n.minMax),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _StatCard(title: l10n.trend, value: '+2', footnote: l10n.bpmChange),
-                  const SizedBox(width: 8),
-                  _StatusCard(),
-                ],
-              ),
+              Builder(builder: (context) {
+                final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+                final measurements = measurementStore.getMeasurements(petName);
+                if (measurements.isEmpty) {
+                  return Column(
+                    children: [
+                      Row(children: [
+                        _StatCard(title: l10n.averageSrr, value: '--', footnote: l10n.bpm),
+                        const SizedBox(width: 8),
+                        _StatCard(title: l10n.range, value: '--', footnote: l10n.minMax),
+                      ]),
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        _StatCard(title: l10n.trend, value: '--', footnote: l10n.bpmChange),
+                        const SizedBox(width: 8),
+                        const _StatusCard(),
+                      ]),
+                    ],
+                  );
+                }
+                final bpms = measurements.map((m) => m.bpm).toList();
+                final avg = (bpms.reduce((a, b) => a + b) / bpms.length).round();
+                final minBpm = bpms.reduce((a, b) => a < b ? a : b);
+                final maxBpm = bpms.reduce((a, b) => a > b ? a : b);
+                final weekAgo = DateTime.now().subtract(const Duration(days: 7));
+                final recent = measurements.where((m) => m.recordedAt.isAfter(weekAgo)).toList();
+                final older = measurements.where((m) => !m.recordedAt.isAfter(weekAgo)).toList();
+                final recentAvg = recent.isEmpty ? avg : (recent.map((m) => m.bpm).reduce((a, b) => a + b) / recent.length).round();
+                final olderAvg = older.isEmpty ? recentAvg : (older.map((m) => m.bpm).reduce((a, b) => a + b) / older.length).round();
+                final trend = recentAvg - olderAvg;
+                final trendStr = trend >= 0 ? '+$trend' : '$trend';
+                return Column(
+                  children: [
+                    Row(children: [
+                      _StatCard(title: l10n.averageSrr, value: '$avg', footnote: l10n.bpm),
+                      const SizedBox(width: 8),
+                      _StatCard(title: l10n.range, value: '$minBpm-$maxBpm', footnote: l10n.minMax),
+                    ]),
+                    const SizedBox(height: 8),
+                    Row(children: [
+                      _StatCard(title: l10n.trend, value: trendStr, footnote: l10n.bpmChange),
+                      const SizedBox(width: 8),
+                      const _StatusCard(),
+                    ]),
+                  ],
+                );
+              }),
             ],
           ),
         ),
@@ -900,15 +981,22 @@ class _StatusCard extends StatelessWidget {
           children: [
             Text(l10n.status, style: AppTextStyles.caption.copyWith(fontSize: 12)),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                _StatusPill(value: '1', color: c.lightBlue),
-                const SizedBox(width: 8),
-                _StatusPill(value: '6', color: c.lightYellow),
-                const SizedBox(width: 8),
-                _StatusPill(value: '0', color: c.cherry, muted: true),
-              ],
-            ),
+            Builder(builder: (context) {
+              final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+              final measurements = measurementStore.getMeasurements(petName);
+              final normal = measurements.where((m) => m.bpm < settingsStore.elevatedThreshold).length;
+              final elevated = measurements.where((m) => m.bpm >= settingsStore.elevatedThreshold && m.bpm < settingsStore.criticalThreshold).length;
+              final critical = measurements.where((m) => m.bpm >= settingsStore.criticalThreshold).length;
+              return Row(
+                children: [
+                  _StatusPill(value: '$normal', color: c.lightBlue),
+                  const SizedBox(width: 8),
+                  _StatusPill(value: '$elevated', color: c.lightYellow),
+                  const SizedBox(width: 8),
+                  _StatusPill(value: '$critical', color: c.cherry, muted: critical == 0),
+                ],
+              );
+            }),
           ],
         ),
       ),
@@ -1132,7 +1220,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                       Text(l10n.addNewMedication, style: AppTextStyles.heading2),
                       const SizedBox(height: 8),
                       Text(
-                        'Record a new medication or treatment for Princess’ care plan',
+                        'Record a new medication or treatment for ${petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : "your pet"}\'s care plan',
                         style: AppTextStyles.body,
                         textAlign: TextAlign.center,
                       ),
@@ -1213,8 +1301,9 @@ shape: RoundedRectangleBorder(
                           ),
                         );
                         Navigator.of(context).pop();
+                        final medL10n = AppLocalizations.of(context)!;
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Medication added')),
+                          SnackBar(content: Text(medL10n.medicationAdded)),
                         );
                       },
                       style: TextButton.styleFrom(

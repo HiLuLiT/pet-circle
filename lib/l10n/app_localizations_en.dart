@@ -690,4 +690,53 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reset => 'Reset';
+
+  @override
+  String measurementSavedBpm(int bpm) {
+    return 'Measurement saved: $bpm BPM';
+  }
+
+  @override
+  String get medicationLogged => 'Medication logged';
+
+  @override
+  String get careCircleUpdated => 'Care circle updated';
+
+  @override
+  String get reportOpened => 'Report opened';
+
+  @override
+  String get sendInvite => 'Send Invite';
+
+  @override
+  String get exportAllDataConfirmation => 'This will export all pet data, measurements, and clinical notes as a CSV file.';
+
+  @override
+  String get exportStarted => 'Export started';
+
+  @override
+  String get enterVetEmail => 'Enter your veterinarian\'s email to share pet data.';
+
+  @override
+  String dataSharedWith(String email) {
+    return 'Data shared with $email';
+  }
+
+  @override
+  String get medicationAdded => 'Medication added';
+
+  @override
+  String get noCareCircleMembers => 'No care circle members yet';
+
+  @override
+  String get enterEmailAddress => 'Enter email address';
+
+  @override
+  String get getStarted => 'Get Started';
+
+  @override
+  String get noPetsYet => 'No pets yet';
+
+  @override
+  String get addYourFirstPet => 'Add your first pet to get started with health monitoring.';
 }
