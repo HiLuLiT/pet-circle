@@ -182,7 +182,7 @@ class _PetCard extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        data.latestMeasurement.recordedAtLabel,
+                        data.latestMeasurement.timeAgo,
                         style: AppTextStyles.caption.copyWith(
                           color: c.chocolate,
                           fontSize: 12,

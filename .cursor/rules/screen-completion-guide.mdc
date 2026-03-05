@@ -1,0 +1,218 @@
+---
+description: Screen-by-screen completion guide for Pet Circle. Lists what works, what is broken or placeholder, and what needs to be done for each screen. Use this as a checklist when implementing remaining features.
+globs: "lib/screens/**/*.dart"
+alwaysApply: false
+---
+
+# Pet Circle — Screen Completion Guide
+
+## How to Use This File
+
+This is a checklist of every gap in the app UI. When working on a screen, consult the relevant section below to see exactly what needs fixing. Each item lists the file, the problem, and the required fix.
+
+Stores are documented in the `state-management.mdc` rule file.
+
+---
+
+## Priority 1 — Core Data Flow
+
+### Measurement Screen (`lib/screens/measurement/measurement_screen.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| WORKS | Tap counter with haptics | Scale animation, count increments |
+| WORKS | Timer (15/30/60s) and BPM calculation | Result dialog shown correctly |
+| WORKS | "Measure Again" button | Resets timer and closes dialog |
+| BROKEN | "Add to Graph" button | Line ~299: `// TODO: Add the measurement to the graph` — no save logic |
+| PLACEHOLDER | VisionRR mode tab | Just an icon and description text — no camera/processing |
+
+**Required fixes:**
+- Wire "Add to Graph" to `measurementStore.addMeasurement(petName, measurement)`
+- After saving, show success feedback and optionally navigate to trends
+- VisionRR: leave as placeholder for now (Phase 3 feature)
+
+### Trends Screen (`lib/screens/trends/trends_screen.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| WORKS | Tab switching (Overview, History, Medication) | Local state |
+| WORKS | Period dropdown (24h, 3d, 7d, etc.) | Changes local state |
+| HARDCODED | SRR chart data | Uses static `_SrrPoint` list (Jan 3–9) — not from measurement store |
+| BROKEN | Measurement History "Export" | `onExport: () {}` — empty callback |
+| PARTIAL | Medication export | Shows CSV dialog + snackbar, but does not write a file |
+| BROKEN | Add medication "Save" | Closes sheet; form data not captured or persisted |
+| HARDCODED | `'Princess • 7 recordings'` | Line ~555: hardcoded pet name and count |
+
+**Required fixes:**
+- Replace `_SrrPoint` data with `measurementStore.getMeasurements(petName)`
+- Wire Export button to show export dialog (CSV preview like medication does)
+- Wire Add Medication Save to `medicationStore.addMedication(...)`
+- Derive pet name and recording count from stores
+
+### Onboarding (`lib/screens/onboarding/onboarding_step1.dart` – `step4.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| WORKS | Page navigation and step order | Flow controller works |
+| NOT PERSISTED | Step 1: name, breed, age, photo | Input stored in local state only; lost on completion |
+| NOT PERSISTED | Step 2: diagnosis dropdown | Selection not saved |
+| NOT PERSISTED | Step 3: target respiratory rate | Local state only |
+| BROKEN | Step 4: "Add to Care Circle" | Shows snackbar + clears email; no invite logic |
+| WORKS | Step 4: "Complete" navigates to dashboard | Navigation works |
+
+**Required fixes:**
+- Collect all step data into a pet creation model
+- On completion, call `petStore.addPet(newPet)` to persist the new pet
+- Care circle invite: add member to the pet's care circle (mock — just show success)
+
+---
+
+## Priority 2 — Dead Buttons (5 total)
+
+| File | Button | Current | Fix |
+|------|--------|---------|-----|
+| `lib/screens/settings/settings_screen.dart` ~191 | Invite (care circle) | `onTap: () {}` | Open email input dialog, show confirmation snackbar |
+| `lib/screens/settings/settings_screen.dart` ~299 | Export all data | `onTap: () {}` | Show CSV/JSON preview dialog with download snackbar |
+| `lib/screens/settings/settings_screen.dart` ~306 | Share with vet | `onTap: () {}` | Open vet selection dialog, show share confirmation |
+| `lib/screens/pet_detail/pet_detail_screen.dart` ~220 | View graph | `onPressed: () {}` | Navigate to Trends screen for this pet |
+| `lib/screens/trends/trends_screen.dart` ~56 | Export (history) | `onExport: () {}` | Show export dialog (same pattern as medication export) |
+
+---
+
+## Priority 3 — Navigation and Interaction Gaps
+
+### Owner Dashboard (`lib/screens/dashboard/owner_dashboard.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| WORKS | "Measure" button per pet | Navigates to MainShell tab 2 |
+| WORKS | "Trends" button per pet | Navigates to MainShell tab 1 |
+| BROKEN | Pet card body tap | No `onTap`/`GestureDetector` on card — should navigate to PetDetailScreen |
+| MOCK | Pet list | Uses `MockData.hilaPets` — should use `petStore.ownerPets` |
+
+### Welcome Screen (`lib/screens/welcome_screen.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| WORKS | Sign up button | Navigates to role selection |
+| MISLEADING | Google button | Also navigates to role selection (same as sign up); never calls Google auth |
+
+**Fix:** Since Firebase is off, rename/restyle the Google button to indicate it's a secondary entry, or differentiate sign-up vs sign-in paths.
+
+### Notification Cards (`lib/screens/messages/messages_screen.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| HARDCODED | Notification list | Built from `_buildNotifications()` static list |
+| BROKEN | Card tap handlers | No `onTap` — cards like "Log medication" and "Resend invite" do nothing |
+
+**Fix:** Read from `notificationStore`, add tap handlers that navigate to relevant screens or show action dialogs.
+
+### Care Circle Dashboard (`lib/screens/dashboard/care_circle_dashboard.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| WORKS | Pet card tap → MainShell | Navigation works |
+| HARDCODED | Summary stats | `'2'`, `'1'`, `'24'` are static strings |
+| BUG | Pet card role | Uses `AppUserRole.vet` regardless of actual user role |
+
+---
+
+## Priority 4 — Data Persistence (in-memory via stores)
+
+### Pet Detail (`lib/screens/pet_detail/pet_detail_screen.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| WORKS | "Add Note" | Adds to local `_notes` list; shows snackbar |
+| NOT PERSISTED | Notes lost on navigation | `_notes` is local state in the widget |
+| MOCK | Measurement history | From `MockData.princessMeasurements` |
+| MOCK | Clinical notes | From `MockData.princessNotes` / `maxNotes` |
+| MISSING | Edit pet info | Screen is read-only |
+
+**Fix:** Replace local `_notes` with `noteStore.getNotes(pet.name)` and `noteStore.addNote(...)`. Replace measurement history with `measurementStore.getMeasurements(pet.name)`.
+
+### Settings (`lib/screens/settings/settings_screen.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| WORKS | Dark mode toggle | Uses `appDarkMode.value` |
+| WORKS | Language switcher | Uses `appLocale.value` |
+| WORKS | Terms, Privacy, Help dialogs | Show content |
+| UI-ONLY | Push notifications toggle | Local state; no FCM |
+| UI-ONLY | Emergency alerts toggle | Local state only |
+| UI-ONLY | VisionRR toggle | "Coming Soon" badge |
+| UI-ONLY | Auto export toggle | Local state only |
+| PARTIAL | Configure thresholds | Dialog opens; values not saved |
+| BROKEN | Invite button | Empty callback |
+| BROKEN | Export all data | Empty callback |
+| BROKEN | Share with vet | Empty callback |
+
+**Fix:** Wire toggles and thresholds to `settingsStore`. Fix broken buttons (see Priority 2).
+
+### Vet Dashboard (`lib/screens/dashboard/vet_dashboard.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| WORKS | Patient cards → PetDetailScreen | Navigation works |
+| MOCK | Patient list | From `MockData.vetClinicPets` |
+| FAKE | "Measurements this week" | Calculated as `pets.length * 6` |
+
+**Fix:** Read from `petStore.allClinicPets` and `measurementStore.thisWeekCount`.
+
+---
+
+## Priority 5 — Polish
+
+### Hardcoded Strings
+
+| File | Line | Current | Fix |
+|------|------|---------|-----|
+| `lib/screens/trends/trends_screen.dart` | ~555 | `'Princess • 7 recordings'` | Derive from pet name + `measurementStore` count |
+| `lib/screens/settings/settings_screen.dart` | ~195-211 | `sarah@example.com`, etc. | Read care circle from `petStore` |
+| `lib/screens/dashboard/care_circle_dashboard.dart` | stats | `'2'`, `'1'`, `'24'` | Derive from store data |
+
+### Main Shell (`lib/screens/main_shell.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| WORKS | Tab navigation | IndexedStack + BottomNavBar |
+| WORKS | Avatar → Settings drawer | Opens correctly |
+| WORKS | Bell → Notifications drawer | Opens correctly |
+| MOCK | User/pet context in header | From `MockData.hilaPets.first` / `MockData.currentVetUser` |
+
+**Fix:** Read from `userStore` and `petStore`.
+
+---
+
+## MockData Import Locations (need migration to stores)
+
+These files import `mock_data.dart` and need to be updated to use stores:
+
+| File | What it reads |
+|------|---------------|
+| `lib/screens/main_shell.dart` | `currentVetUser`, `currentOwnerUser`, `hilaPets` |
+| `lib/screens/dashboard/owner_dashboard.dart` | `hilaPets` |
+| `lib/screens/dashboard/vet_dashboard.dart` | `vetClinicPets`, `currentVetUser` |
+| `lib/screens/dashboard/care_circle_dashboard.dart` | `pets`, `currentOwnerUser` |
+| `lib/screens/pet_detail/pet_detail_screen.dart` | `princessNotes`, `maxNotes`, `currentVetUser`, `princessMeasurements` |
+| `lib/screens/messages/messages_screen.dart` | `currentOwnerUser` |
+| `lib/screens/trends/trends_screen.dart` | imported but usage is in hardcoded chart data |
+
+---
+
+## Completion Checklist Summary
+
+- [ ] Measurement save flow (store + "Add to Graph" button)
+- [ ] Trends chart reads from measurement store
+- [ ] Onboarding persists pet to store
+- [ ] 5 dead buttons wired to actions
+- [ ] Owner dashboard pet cards tappable
+- [ ] Notification cards have tap handlers
+- [ ] Clinical notes persist via store
+- [ ] Medication save persists via store
+- [ ] Settings thresholds persist via store
+- [ ] All MockData imports replaced with store reads
+- [ ] Hardcoded strings derived from data
+- [ ] Care circle stats derived from data
+- [ ] Vet dashboard stats derived from data

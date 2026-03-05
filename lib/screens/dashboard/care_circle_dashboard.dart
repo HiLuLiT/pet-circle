@@ -178,7 +178,7 @@ class _PetCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Text(data.latestMeasurement.recordedAtLabel,
+                    Text(data.latestMeasurement.timeAgo,
                         style: AppTextStyles.caption),
                   ],
                 ),

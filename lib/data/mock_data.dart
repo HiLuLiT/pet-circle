@@ -91,11 +91,11 @@ class MockData {
 
   // ── Measurement History ────────────────────────────────────────────────────
   static final princessMeasurements = [
-    Measurement(bpm: 22, recordedAtLabel: '2 hours ago'),
-    Measurement(bpm: 24, recordedAtLabel: 'Yesterday'),
-    Measurement(bpm: 21, recordedAtLabel: '2 days ago'),
-    Measurement(bpm: 23, recordedAtLabel: '3 days ago'),
-    Measurement(bpm: 25, recordedAtLabel: '4 days ago'),
+    Measurement(bpm: 22, recordedAt: DateTime.now().subtract(const Duration(hours: 2)), recordedAtLabel: '2 hours ago'),
+    Measurement(bpm: 24, recordedAt: DateTime.now().subtract(const Duration(days: 1)), recordedAtLabel: 'Yesterday'),
+    Measurement(bpm: 21, recordedAt: DateTime.now().subtract(const Duration(days: 2)), recordedAtLabel: '2 days ago'),
+    Measurement(bpm: 23, recordedAt: DateTime.now().subtract(const Duration(days: 3)), recordedAtLabel: '3 days ago'),
+    Measurement(bpm: 25, recordedAt: DateTime.now().subtract(const Duration(days: 4)), recordedAtLabel: '4 days ago'),
   ];
 
   // ── Pets ───────────────────────────────────────────────────────────────────
@@ -107,7 +107,7 @@ class MockData {
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
     statusColorHex: AppColors.lightBlue.value,
-    latestMeasurement: Measurement(bpm: 22, recordedAtLabel: '2 hours ago'),
+    latestMeasurement: Measurement(bpm: 22, recordedAt: DateTime.now().subtract(const Duration(hours: 2)), recordedAtLabel: '2 hours ago'),
     careCircle: [hilaOwner, drSmithVet, sarahCaregiver],
   );
 
@@ -118,7 +118,7 @@ class MockData {
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Elevated',
     statusColorHex: AppColors.cherry.value,
-    latestMeasurement: Measurement(bpm: 32, recordedAtLabel: '30 min ago'),
+    latestMeasurement: Measurement(bpm: 32, recordedAt: DateTime.now().subtract(const Duration(minutes: 30)), recordedAtLabel: '30 min ago'),
     careCircle: [maxOwner, drSmithVet],
   );
 
@@ -129,7 +129,7 @@ class MockData {
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
     statusColorHex: AppColors.lightBlue.value,
-    latestMeasurement: Measurement(bpm: 24, recordedAtLabel: '1 hour ago'),
+    latestMeasurement: Measurement(bpm: 24, recordedAt: DateTime.now().subtract(const Duration(hours: 1)), recordedAtLabel: '1 hour ago'),
     careCircle: [lunaOwner, drSmithVet],
   );
 
@@ -140,7 +140,7 @@ class MockData {
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
     statusColorHex: AppColors.lightBlue.value,
-    latestMeasurement: Measurement(bpm: 18, recordedAtLabel: '1 day ago'),
+    latestMeasurement: Measurement(bpm: 18, recordedAt: DateTime.now().subtract(const Duration(days: 1)), recordedAtLabel: '1 day ago'),
     careCircle: [rockyOwner, drSmithVet],
   );
 

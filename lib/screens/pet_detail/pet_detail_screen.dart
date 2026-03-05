@@ -185,7 +185,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 child: _InfoTile(
                   icon: Icons.access_time,
                   iconColor: c.lightBlue,
-                  value: widget.pet.latestMeasurement.recordedAtLabel,
+                  value: widget.pet.latestMeasurement.timeAgo,
                   label: l10n.lastMeasured,
                 ),
               ),
@@ -273,7 +273,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             children: measurements.take(5).map((m) {
               return Expanded(
                 child: Text(
-                  m.recordedAtLabel.replaceAll(' ago', ''),
+                  m.timeAgo.replaceAll(' ago', ''),
                   style: AppTextStyles.caption.copyWith(fontSize: 9),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
