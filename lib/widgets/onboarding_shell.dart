@@ -31,7 +31,7 @@ class OnboardingShell extends StatelessWidget {
           padding: const EdgeInsets.all(32),
           decoration: BoxDecoration(
             color: c.offWhite,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: const BorderRadius.all(AppRadii.medium),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -73,7 +73,7 @@ class _Header extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         ClipRRect(
-          borderRadius: BorderRadius.circular(999),
+          borderRadius: const BorderRadius.all(AppRadii.pill),
           child: Container(
             height: 8,
             color: c.chocolate.withOpacity(0.08),

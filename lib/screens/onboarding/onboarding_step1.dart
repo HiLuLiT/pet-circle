@@ -230,7 +230,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: c.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -269,7 +269,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
               margin: const EdgeInsets.only(top: 8),
               decoration: BoxDecoration(
                 color: c.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
               ),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 180),
@@ -301,7 +301,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                           color: isSelected
                               ? c.lightYellow
                               : Colors.transparent,
-                          borderRadius: BorderRadius.circular(4),
+                          borderRadius: const BorderRadius.all(AppRadii.xs),
                         ),
                         child: Row(
                           children: [

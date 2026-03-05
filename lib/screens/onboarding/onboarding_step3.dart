@@ -72,7 +72,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: c.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: const BorderRadius.all(AppRadii.small),
                 ),
                 child: Row(
                   children: [
@@ -91,7 +91,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
                           hintStyle: AppTextStyles.body
                               .copyWith(color: c.chocolate),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: const BorderRadius.all(AppRadii.xs),
                             borderSide: BorderSide.none,
                           ),
                           contentPadding: const EdgeInsets.symmetric(
@@ -143,12 +143,12 @@ class _TargetOption extends StatelessWidget {
     final c = AppColorsTheme.of(context);
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: const BorderRadius.all(AppRadii.small),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
         decoration: BoxDecoration(
           color: c.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: const BorderRadius.all(AppRadii.small),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -206,7 +206,7 @@ class _TargetOption extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
                   color: c.lightYellow,
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: const BorderRadius.all(AppRadii.xs),
                 ),
                 child: Text(
                   trailingLabel!,

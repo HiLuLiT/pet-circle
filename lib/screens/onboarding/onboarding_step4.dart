@@ -80,7 +80,8 @@ class _OnboardingStep4State extends State<OnboardingStep4>
         backgroundColor:
             email.isNotEmpty ? c.lightBlue : c.cherry,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.all(AppRadii.small)),
         margin: const EdgeInsets.all(16),
       ),
     );
@@ -143,7 +144,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                 color: c.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
               ),
               child: Column(
                 children: _roles.map((role) {
@@ -169,7 +170,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
                       decoration: BoxDecoration(
                         color:
                             isSelected ? c.lightYellow : Colors.transparent,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: const BorderRadius.all(AppRadii.xs),
                       ),
                       child: Text(
                         role,
@@ -219,7 +220,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
               style: TextButton.styleFrom(
                 backgroundColor: c.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(100),
+                  borderRadius: const BorderRadius.all(AppRadii.full),
                 ),
               ),
               onPressed: _resetInvite,
@@ -262,7 +263,7 @@ class _InviteRow extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: c.white,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: const BorderRadius.all(AppRadii.xs),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -272,7 +273,7 @@ class _InviteRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: c.lightYellow,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: const BorderRadius.all(AppRadii.xs),
             ),
             child: Text(
               invite.status,
@@ -321,7 +322,7 @@ class _InputRow extends StatelessWidget {
                 color: c.chocolate.withOpacity(0.4),
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
                 borderSide: BorderSide.none,
               ),
               contentPadding:
@@ -365,7 +366,7 @@ class _SelectRow extends StatelessWidget {
             height: 36,
             decoration: BoxDecoration(
               color: c.white,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: const BorderRadius.all(AppRadii.xs),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(

@@ -36,7 +36,7 @@ class LabeledTextField extends StatelessWidget {
                 color: c.chocolate.withOpacity(0.3),
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
                 borderSide: BorderSide.none,
               ),
               contentPadding:

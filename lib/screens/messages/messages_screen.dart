@@ -3,6 +3,91 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/data/mock_data.dart';
 
+/// Opens notifications as a slide-up drawer (modal bottom sheet),
+/// matching the SettingsDrawer interaction pattern.
+class NotificationsDrawer extends StatelessWidget {
+  const NotificationsDrawer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 1.0,
+      minChildSize: 0.4,
+      maxChildSize: 1.0,
+      builder: (context, scrollController) {
+        final c = AppColorsTheme.of(context);
+        final l10n = AppLocalizations.of(context)!;
+        final notifications = _buildNotifications(l10n);
+
+        return ClipRRect(
+          borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+          child: Container(
+            color: c.white,
+            child: SingleChildScrollView(
+              controller: scrollController,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.notifications,
+                              style: AppTextStyles.heading2.copyWith(
+                                color: c.chocolate,
+                                letterSpacing: -0.96,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              l10n.unreadNotifications(
+                                notifications.where((n) => !n.isRead).length,
+                              ),
+                              style: AppTextStyles.body.copyWith(color: c.chocolate),
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: c.offWhite,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: c.white, width: 2),
+                          ),
+                          child: Icon(
+                            Icons.keyboard_arrow_down,
+                            color: c.chocolate,
+                            size: 24,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  ...notifications.map((notification) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _NotificationCard(notification: notification),
+                  )),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
 class MessagesScreen extends StatelessWidget {
   const MessagesScreen({super.key, this.showScaffold = true});
 
@@ -178,7 +263,7 @@ class _NotificationCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: notification.isRead ? c.white : c.offWhite,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.all(AppRadii.small),
         border: Border.all(
           color: notification.isRead
               ? c.offWhite

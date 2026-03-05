@@ -91,7 +91,7 @@ class _RoleButton extends StatelessWidget {
         style: TextButton.styleFrom(
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(172),
+            borderRadius: const BorderRadius.all(AppRadii.pill),
           ),
         ),
         child: Row(

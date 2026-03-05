@@ -47,7 +47,7 @@ class AppHeader extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 color: c.offWhite,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: const BorderRadius.all(AppRadii.large),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,

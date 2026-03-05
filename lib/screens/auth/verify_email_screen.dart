@@ -158,7 +158,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: c.offWhite,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: const BorderRadius.all(AppRadii.large),
                 ),
                 child: Icon(
                   Icons.mark_email_unread_outlined,

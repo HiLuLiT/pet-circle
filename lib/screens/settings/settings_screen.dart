@@ -41,7 +41,7 @@ class SettingsDrawer extends StatelessWidget {
       maxChildSize: 1.0,
       builder: (context, scrollController) {
         return ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
           child: _SettingsContent(
             role: role,
             scrollController: scrollController,
@@ -260,7 +260,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
                               color: c.cherry,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: const BorderRadius.all(AppRadii.sm),
                             ),
                             child: Text(
                               l10n.comingSoon,
@@ -358,7 +358,7 @@ class _SettingsContentState extends State<_SettingsContent> {
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: c.white,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -378,7 +378,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                     filled: true,
                     fillColor: c.offWhite,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: const BorderRadius.all(AppRadii.small),
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -394,7 +394,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                     filled: true,
                     fillColor: c.offWhite,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: const BorderRadius.all(AppRadii.small),
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -417,7 +417,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: c.lightBlue,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.small)),
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       ),
                       child: Text(l10n.save, style: AppTextStyles.body.copyWith(color: c.chocolate)),
@@ -440,7 +440,7 @@ class _SettingsContentState extends State<_SettingsContent> {
         final c = AppColorsTheme.of(context);
         return AlertDialog(
           backgroundColor: c.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
           title: Text(title, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
           content: SingleChildScrollView(
             child: Text(content, style: AppTextStyles.body.copyWith(color: c.chocolate)),
@@ -476,7 +476,7 @@ class _SettingsCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: c.offWhite,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.all(AppRadii.medium),
       ),
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -529,7 +529,6 @@ class _SettingsToggleRow extends StatelessWidget {
     required this.isOn,
     this.description,
     this.iconAsset,
-    this.radius = 12,
     this.onChanged,
   });
 
@@ -537,7 +536,6 @@ class _SettingsToggleRow extends StatelessWidget {
   final String? description;
   final bool isOn;
   final String? iconAsset;
-  final double radius;
   final VoidCallback? onChanged;
 
   @override
@@ -547,7 +545,7 @@ class _SettingsToggleRow extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: c.white,
-        borderRadius: BorderRadius.circular(radius),
+        borderRadius: const BorderRadius.all(AppRadii.small),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -614,7 +612,7 @@ class _LanguageRow extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: c.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: const BorderRadius.all(AppRadii.medium),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -638,7 +636,7 @@ class _LanguageRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: c.pink,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
               ),
               child: Row(
                 children: [
@@ -713,7 +711,7 @@ class _InviteButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: c.lightBlue,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: const BorderRadius.all(AppRadii.xs),
         ),
         child: Row(
           children: [
@@ -757,7 +755,7 @@ class _CareCircleItem extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: c.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.all(AppRadii.small),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -801,7 +799,7 @@ class _CareCircleItem extends StatelessWidget {
             height: 36,
             decoration: BoxDecoration(
               color: c.white,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: const BorderRadius.all(AppRadii.small),
             ),
             child: Center(
               child: SvgPicture.asset(
@@ -834,7 +832,7 @@ class _Badge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: const BorderRadius.all(AppRadii.small),
       ),
       child: Text(
         label,
@@ -861,7 +859,7 @@ class _ConfigureRow extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: c.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.all(AppRadii.small),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -896,7 +894,7 @@ class _ConfigureRow extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
                 color: c.lightBlue,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
               ),
               child: Row(
                 children: [
@@ -943,7 +941,7 @@ class _ActionRow extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: c.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: const BorderRadius.all(AppRadii.small),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -998,7 +996,7 @@ class _SimpleRow extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: c.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: const BorderRadius.all(AppRadii.small),
         ),
         child: Row(
           children: [

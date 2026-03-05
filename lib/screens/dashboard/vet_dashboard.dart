@@ -116,7 +116,7 @@ class _PetCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: NeumorphicCard(
-        radius: BorderRadius.circular(16),
+        radius: const BorderRadius.all(AppRadii.medium),
         child: Column(
           children: [
             Stack(
@@ -132,7 +132,7 @@ class _PetCard extends StatelessWidget {
                     ),
                   ),
                   child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                    borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
                     child: DogPhoto(endpoint: data.imageUrl),
                   ),
                 ),
@@ -152,7 +152,7 @@ class _PetCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: c.chocolate.withOpacity(0.9),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: const BorderRadius.all(AppRadii.sm),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -267,7 +267,7 @@ class _SummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     return NeumorphicCard(
-      radius: BorderRadius.circular(16),
+      radius: const BorderRadius.all(AppRadii.medium),
       padding: const EdgeInsets.all(24),
       child: Row(
         children: [
@@ -276,7 +276,7 @@ class _SummaryCard extends StatelessWidget {
             width: 48,
             decoration: BoxDecoration(
               color: iconColor,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: const BorderRadius.all(AppRadii.large),
             ),
             child: Center(
               child: Icon(icon, size: 24, color: c.chocolate),

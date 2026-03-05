@@ -5,7 +5,7 @@ import 'package:pet_circle/screens/settings/settings_screen.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
 import 'package:pet_circle/screens/measurement/measurement_screen.dart';
-import 'package:pet_circle/screens/messages/messages_screen.dart';
+import 'package:pet_circle/screens/messages/messages_screen.dart' show MessagesScreen, NotificationsDrawer;
 import 'package:pet_circle/screens/trends/trends_screen.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/app_header.dart';
@@ -66,8 +66,12 @@ class _MainShellState extends State<MainShell> {
                   backgroundColor: Colors.transparent,
                   builder: (_) => SettingsDrawer(role: widget.role),
                 ),
-                onNotificationTap: () =>
-                    setState(() => _selectedIndex = 3),
+                onNotificationTap: () => showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => const NotificationsDrawer(),
+                ),
               ),
             ),
             // ── Tab content ──

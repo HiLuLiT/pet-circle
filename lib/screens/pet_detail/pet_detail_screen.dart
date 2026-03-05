@@ -160,7 +160,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     return NeumorphicCard(
-      radius: BorderRadius.circular(16),
+      radius: const BorderRadius.all(AppRadii.medium),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,7 +204,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         : [widget.pet.latestMeasurement];
 
     return NeumorphicCard(
-      radius: BorderRadius.circular(16),
+      radius: const BorderRadius.all(AppRadii.medium),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -253,7 +253,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                             color: isElevated
                                 ? c.cherry.withOpacity(0.3)
                                 : c.lightBlue.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(4),
+                            borderRadius: const BorderRadius.all(AppRadii.xs),
                             border: Border.all(
                               color: isElevated ? c.cherry : c.lightBlue,
                               width: 2,
@@ -290,7 +290,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     return NeumorphicCard(
-      radius: BorderRadius.circular(16),
+      radius: const BorderRadius.all(AppRadii.medium),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -311,7 +311,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: c.offWhite,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: const BorderRadius.all(AppRadii.small),
             ),
             child: Column(
               children: [
@@ -338,7 +338,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                       foregroundColor: c.white,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: const BorderRadius.all(AppRadii.large),
                       ),
                     ),
                   ),
@@ -376,7 +376,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     return NeumorphicCard(
-      radius: BorderRadius.circular(16),
+      radius: const BorderRadius.all(AppRadii.medium),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -421,7 +421,7 @@ class _InfoTile extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: c.offWhite,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.all(AppRadii.small),
       ),
       child: Row(
         children: [
@@ -429,7 +429,7 @@ class _InfoTile extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: iconColor.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: const BorderRadius.all(AppRadii.small),
             ),
             child: Icon(icon, color: iconColor, size: 22),
           ),
@@ -564,7 +564,7 @@ class _RoleBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.all(AppRadii.small),
       ),
       child: Text(
         role,

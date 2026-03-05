@@ -106,7 +106,7 @@ class MockData {
     breedAndAge: 'Cavalier King Charles • 5 years old',
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
-    statusColorHex: AppColors.successGreen.value,
+    statusColorHex: AppColors.lightBlue.value,
     latestMeasurement: Measurement(bpm: 22, recordedAtLabel: '2 hours ago'),
     careCircle: [hilaOwner, drSmithVet, sarahCaregiver],
   );
@@ -117,7 +117,7 @@ class MockData {
     breedAndAge: 'Golden Retriever • 8 years old',
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Elevated',
-    statusColorHex: AppColors.warningAmber.value,
+    statusColorHex: AppColors.cherry.value,
     latestMeasurement: Measurement(bpm: 32, recordedAtLabel: '30 min ago'),
     careCircle: [maxOwner, drSmithVet],
   );
@@ -128,7 +128,7 @@ class MockData {
     breedAndAge: 'Labrador • 6 years old',
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
-    statusColorHex: AppColors.successGreen.value,
+    statusColorHex: AppColors.lightBlue.value,
     latestMeasurement: Measurement(bpm: 24, recordedAtLabel: '1 hour ago'),
     careCircle: [lunaOwner, drSmithVet],
   );
@@ -139,7 +139,7 @@ class MockData {
     breedAndAge: 'German Shepherd • 10 years old',
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
-    statusColorHex: AppColors.successGreen.value,
+    statusColorHex: AppColors.lightBlue.value,
     latestMeasurement: Measurement(bpm: 18, recordedAtLabel: '1 day ago'),
     careCircle: [rockyOwner, drSmithVet],
   );

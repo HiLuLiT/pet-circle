@@ -84,7 +84,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: c.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -122,7 +122,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
               padding: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                 color: c.white,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
               ),
               child: Column(
                 children: _diagnoses.map((diagnosis) {
@@ -148,7 +148,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                       decoration: BoxDecoration(
                         color:
                             isSelected ? c.lightYellow : Colors.transparent,
-                        borderRadius: BorderRadius.circular(4),
+                        borderRadius: const BorderRadius.all(AppRadii.xs),
                       ),
                       child: Text(
                         diagnosis,
@@ -167,7 +167,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: c.white,
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: const BorderRadius.all(AppRadii.xs),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

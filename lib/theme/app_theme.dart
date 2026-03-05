@@ -33,9 +33,12 @@ class AppColors {
 }
 
 class AppRadii {
+  static const xs = Radius.circular(4);
+  static const sm = Radius.circular(8);
   static const small = Radius.circular(12);
   static const medium = Radius.circular(16);
   static const large = Radius.circular(20);
+  static const full = Radius.circular(100);
   static const pill = Radius.circular(999);
 }
 

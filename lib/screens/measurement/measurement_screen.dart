@@ -72,7 +72,7 @@ class _TabSelector extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: c.offWhite,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: const BorderRadius.all(AppRadii.large),
       ),
       child: Row(
         children: [
@@ -118,7 +118,7 @@ class _TabButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
             color: selected ? c.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: const BorderRadius.all(AppRadii.large),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -228,7 +228,7 @@ class _ManualModeState extends State<_ManualMode>
         final c = AppColorsTheme.of(context);
         return Dialog(
           backgroundColor: c.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.large)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
             child: Column(
@@ -280,7 +280,7 @@ class _ManualModeState extends State<_ManualMode>
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         decoration: BoxDecoration(
                           color: c.offWhite,
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: const BorderRadius.all(AppRadii.full),
                         ),
                         child: Text(
                           l10n.measureAgain,
@@ -302,7 +302,7 @@ class _ManualModeState extends State<_ManualMode>
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         decoration: BoxDecoration(
                           color: c.lightBlue,
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: const BorderRadius.all(AppRadii.full),
                         ),
                         child: Text(
                           l10n.addToGraph,
@@ -361,7 +361,7 @@ class _ManualModeState extends State<_ManualMode>
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: c.offWhite,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: const BorderRadius.all(AppRadii.medium),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -400,7 +400,7 @@ class _ManualModeState extends State<_ManualMode>
           padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
           decoration: BoxDecoration(
             color: c.offWhite,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: const BorderRadius.all(AppRadii.medium),
           ),
           child: Column(
             children: [
@@ -424,7 +424,7 @@ class _ManualModeState extends State<_ManualMode>
                         height: 8,
                         decoration: BoxDecoration(
                           color: c.chocolate.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(999),
+                          borderRadius: const BorderRadius.all(AppRadii.pill),
                         ),
                       ),
                       AnimatedContainer(
@@ -433,7 +433,7 @@ class _ManualModeState extends State<_ManualMode>
                         width: width * progress,
                         decoration: BoxDecoration(
                           color: c.lightBlue,
-                          borderRadius: BorderRadius.circular(999),
+                          borderRadius: const BorderRadius.all(AppRadii.pill),
                         ),
                       ),
                     ],
@@ -532,7 +532,7 @@ class _DurationChip extends StatelessWidget {
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: selected ? c.lightBlue : c.white,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: const BorderRadius.all(AppRadii.small),
           ),
           child: Text(
             label,
@@ -558,7 +558,7 @@ class _VisionMode extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: c.offWhite,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.all(AppRadii.medium),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

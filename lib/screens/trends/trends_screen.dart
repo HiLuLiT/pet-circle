@@ -94,7 +94,7 @@ class _TrendsTabs extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
         color: c.offWhite,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: const BorderRadius.all(AppRadii.large),
       ),
       child: Row(
         children: [
@@ -140,7 +140,7 @@ class _TrendsTab extends StatelessWidget {
           height: 29,
           decoration: BoxDecoration(
             color: selected ? c.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: const BorderRadius.all(AppRadii.large),
           ),
           child: Icon(icon, color: c.chocolate, size: 18),
         ),
@@ -218,7 +218,7 @@ class _TrendsOverview extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: c.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: const BorderRadius.all(AppRadii.small),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -253,9 +253,9 @@ class _TrendsOverview extends StatelessWidget {
                   onPressed: onOpenMedication,
                   style: TextButton.styleFrom(
                     backgroundColor: c.lightBlue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
+shape: RoundedRectangleBorder(
+                        borderRadius: const BorderRadius.all(AppRadii.full),
+                      ),
                   ),
                   child: Text(
                     l10n.addMedication,
@@ -330,7 +330,7 @@ void _exportMedicationLog(BuildContext context) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
       title: Text(l10n.exportMedicationLog, style: AppTextStyles.heading3),
       content: SingleChildScrollView(
         child: Column(
@@ -343,7 +343,7 @@ void _exportMedicationLog(BuildContext context) {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: c.offWhite,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: const BorderRadius.all(AppRadii.sm),
               ),
               child: Text(csvData, style: AppTextStyles.caption.copyWith(fontFamily: 'monospace', fontSize: 10)),
             ),
@@ -364,7 +364,7 @@ void _exportMedicationLog(BuildContext context) {
           },
           style: TextButton.styleFrom(
             backgroundColor: c.lightBlue,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.small)),
           ),
           child: Text(l10n.downloadCsv, style: AppTextStyles.body.copyWith(color: c.chocolate)),
         ),
@@ -396,7 +396,7 @@ class _MedicationManagement extends StatelessWidget {
                 style: TextButton.styleFrom(
                   backgroundColor: c.lightBlue,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(100),
+                    borderRadius: const BorderRadius.all(AppRadii.full),
                   ),
                 ),
                 icon: Icon(Icons.add, color: c.chocolate, size: 16),
@@ -448,9 +448,9 @@ class _MedicationManagement extends StatelessWidget {
                   onPressed: onAddMedication,
                   style: TextButton.styleFrom(
                     backgroundColor: c.lightBlue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
+shape: RoundedRectangleBorder(
+                        borderRadius: const BorderRadius.all(AppRadii.full),
+                      ),
                   ),
                   icon: Icon(Icons.add, color: c.chocolate, size: 16),
                   label: Text(
@@ -501,9 +501,9 @@ class _MedicationManagement extends StatelessWidget {
                   },
                   style: TextButton.styleFrom(
                     backgroundColor: c.lightBlue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
+shape: RoundedRectangleBorder(
+                        borderRadius: const BorderRadius.all(AppRadii.full),
+                      ),
                   ),
                   icon: Icon(Icons.file_download,
                       color: c.chocolate, size: 16),
@@ -564,7 +564,7 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
                 color: c.offWhite,
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
               ),
               child: DropdownButtonHideUnderline(
                 child: DropdownButton<String>(
@@ -661,7 +661,7 @@ class _FilterChipButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: filled ? c.lightBlue : c.offWhite,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: const BorderRadius.all(AppRadii.xs),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -694,7 +694,7 @@ class _SectionCard extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: c.offWhite,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: const BorderRadius.all(AppRadii.medium),
       ),
       child: child,
     );
@@ -752,7 +752,7 @@ class _LegendBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: c.white,
-        borderRadius: BorderRadius.circular(100),
+        borderRadius: const BorderRadius.all(AppRadii.full),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -790,7 +790,7 @@ class _StatCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: c.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: const BorderRadius.all(AppRadii.small),
         ),
         child: Stack(
           children: [
@@ -833,7 +833,7 @@ class _StatusCard extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: c.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: const BorderRadius.all(AppRadii.small),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -884,7 +884,7 @@ class _StatusPill extends StatelessWidget {
           height: 2,
           decoration: BoxDecoration(
             color: muted ? color.withOpacity(0.4) : color,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: const BorderRadius.all(AppRadii.xs),
           ),
         ),
       ],
@@ -914,7 +914,7 @@ class _SrrChart extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: c.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.all(AppRadii.small),
       ),
       child: SfCartesianChart(
         plotAreaBorderWidth: 0,
@@ -1033,7 +1033,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
       child: Container(
         decoration: BoxDecoration(
           color: c.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
         ),
         child: SafeArea(
           top: false,
@@ -1116,9 +1116,9 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(
                         backgroundColor: c.offWhite,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100),
-                        ),
+shape: RoundedRectangleBorder(
+                        borderRadius: const BorderRadius.all(AppRadii.full),
+                      ),
                       ),
                       child: Text(l10n.cancel),
                     ),
@@ -1127,9 +1127,9 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(
                         backgroundColor: c.blue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(100),
-                        ),
+shape: RoundedRectangleBorder(
+                        borderRadius: const BorderRadius.all(AppRadii.full),
+                      ),
                       ),
                       child: Text(
                         l10n.addMedication,
@@ -1174,7 +1174,7 @@ class _FormField extends StatelessWidget {
               hintStyle:
                   AppTextStyles.body.copyWith(color: c.chocolate.withOpacity(0.3)),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: const BorderRadius.all(AppRadii.xs),
                 borderSide: BorderSide.none,
               ),
               contentPadding:
@@ -1214,7 +1214,7 @@ class _DropdownField extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           decoration: BoxDecoration(
             color: c.offWhite,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: const BorderRadius.all(AppRadii.xs),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
@@ -1261,7 +1261,7 @@ class _TextArea extends StatelessWidget {
             hintStyle:
                 AppTextStyles.body.copyWith(color: c.chocolate.withOpacity(0.3)),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(4),
+              borderRadius: const BorderRadius.all(AppRadii.xs),
               borderSide: BorderSide.none,
             ),
             contentPadding: const EdgeInsets.all(12),
@@ -1289,7 +1289,7 @@ class _ReminderCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: c.pink,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.all(AppRadii.small),
       ),
       child: Row(
         children: [

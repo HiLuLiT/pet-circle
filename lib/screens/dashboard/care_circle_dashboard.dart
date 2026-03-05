@@ -7,6 +7,7 @@ import 'package:pet_circle/models/pet.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/screens/messages/messages_screen.dart' show NotificationsDrawer;
 import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
@@ -39,9 +40,12 @@ class CareCircleDashboard extends StatelessWidget {
                     AppRoutes.settings,
                     arguments: AppUserRole.owner,
                   ),
-                  onNotificationTap: () {
-                    // TODO: Navigate to notifications
-                  },
+                  onNotificationTap: () => showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (_) => const NotificationsDrawer(),
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 _ResponsiveGrid(
@@ -110,7 +114,7 @@ class _PetCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: NeumorphicCard(
-        radius: BorderRadius.circular(16),
+        radius: const BorderRadius.all(AppRadii.medium),
         child: Column(
         children: [
           Stack(
@@ -126,7 +130,7 @@ class _PetCard extends StatelessWidget {
                   ),
                 ),
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
                   child: DogPhoto(endpoint: data.imageUrl),
                 ),
               ),
@@ -263,7 +267,7 @@ class _SummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     return NeumorphicCard(
-      radius: BorderRadius.circular(16),
+      radius: const BorderRadius.all(AppRadii.medium),
       padding: const EdgeInsets.all(24),
       child: Row(
         children: [
@@ -272,7 +276,7 @@ class _SummaryCard extends StatelessWidget {
             width: 48,
             decoration: BoxDecoration(
               color: iconColor,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: const BorderRadius.all(AppRadii.large),
             ),
             child: Center(
               child: Icon(

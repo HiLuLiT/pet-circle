@@ -48,7 +48,7 @@ class _Fallback extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: c.offWhite,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: const BorderRadius.all(AppRadii.small),
       ),
       alignment: Alignment.center,
       child: Icon(icon, color: c.chocolate, size: 20),

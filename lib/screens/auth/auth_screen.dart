@@ -199,7 +199,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: c.pink.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: const BorderRadius.all(AppRadii.large),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -229,7 +229,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: c.cherry.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: const BorderRadius.all(AppRadii.small),
                     border: Border.all(color: c.cherry.withValues(alpha: 0.3)),
                   ),
                   child: Row(
@@ -477,15 +477,15 @@ class _AuthScreenState extends State<AuthScreen> {
             filled: true,
             fillColor: c.offWhite,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: const BorderRadius.all(AppRadii.small),
               borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: const BorderRadius.all(AppRadii.small),
               borderSide: BorderSide(color: c.chocolate, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: const BorderRadius.all(AppRadii.small),
               borderSide: BorderSide(color: c.cherry.withValues(alpha: 0.4), width: 1),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -515,7 +515,7 @@ class _SocialButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 14),
         side: BorderSide(color: c.chocolate.withOpacity(0.3)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.small)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

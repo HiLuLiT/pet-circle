@@ -79,7 +79,7 @@ class _PrimaryPillButton extends StatelessWidget {
         style: TextButton.styleFrom(
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(172),
+            borderRadius: const BorderRadius.all(AppRadii.pill),
           ),
         ),
         child: Text(
@@ -113,7 +113,7 @@ class _GoogleButton extends StatelessWidget {
         style: TextButton.styleFrom(
           backgroundColor: c.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(172),
+            borderRadius: const BorderRadius.all(AppRadii.pill),
           ),
         ),
         child: Row(

@@ -97,7 +97,7 @@ class _PetCard extends StatelessWidget {
     final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: const BorderRadius.all(AppRadii.medium),
       child: Container(
         color: c.offWhite,
         child: Column(
@@ -105,7 +105,7 @@ class _PetCard extends StatelessWidget {
           children: [
             // Pet image
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
               child: SizedBox(
                 height: 216,
                 width: double.infinity,
@@ -282,7 +282,7 @@ class _ActionButton extends StatelessWidget {
         height: 40,
         decoration: BoxDecoration(
           color: isPrimary ? c.pink : c.white,
-          borderRadius: BorderRadius.circular(100),
+          borderRadius: const BorderRadius.all(AppRadii.full),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
