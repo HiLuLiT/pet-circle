@@ -342,11 +342,65 @@ class _SettingsContentState extends State<_SettingsContent> {
                   ],
                 ),
               ),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () => _showSignOutDialog(context),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: c.cherry.withValues(alpha: 0.08),
+                    borderRadius: const BorderRadius.all(AppRadii.medium),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.logout, size: 18, color: c.cherry),
+                      const SizedBox(width: 8),
+                      Text(
+                        l10n.signOut,
+                        style: AppTextStyles.body.copyWith(
+                          color: c.cherry,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
             ],
           ),
         ),
       );
+  }
+
+  void _showSignOutDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
+        title: Text(l10n.signOut, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+        content: Text(l10n.signOutConfirmation, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              if (widget.onClose != null) widget.onClose!();
+              Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.welcome, (_) => false);
+            },
+            style: TextButton.styleFrom(backgroundColor: c.cherry),
+            child: Text(l10n.signOut, style: TextStyle(color: c.white)),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showInviteDialog(BuildContext context) {

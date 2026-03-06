@@ -252,5 +252,17 @@
   "enterEmailAddress": "Enter email address",
   "getStarted": "Get Started",
   "noPetsYet": "No pets yet",
-  "addYourFirstPet": "Add your first pet to get started with health monitoring."
+  "addYourFirstPet": "Add your first pet to get started with health monitoring.",
+  "signOut": "Sign Out",
+  "signOutConfirmation": "Are you sure you want to sign out?",
+  "addPet": "Add Pet",
+  "selectPet": "Select Pet",
+  "measuringFor": "Measuring for {name}",
+  "@measuringFor": { "placeholders": { "name": { "type": "String" } } },
+  "noMeasurementsYet": "No measurements yet",
+  "noMeasurementsDescription": "Start measuring your pet's respiratory rate to see trends here.",
+  "deleteMeasurement": "Delete measurement",
+  "measurementDeleted": "Measurement deleted",
+  "deleteMeasurementConfirmation": "Delete this {bpm} BPM reading from {date}?",
+  "@deleteMeasurementConfirmation": { "placeholders": { "bpm": { "type": "int" }, "date": { "type": "String" } } }
 }

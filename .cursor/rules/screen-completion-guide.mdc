@@ -15,70 +15,31 @@ User story status is tracked in the `user-story-map.mdc` rule file.
 
 ---
 
-## Priority 1 — Remaining Data Flow Gaps
-
-### Trends Screen (`lib/screens/trends/trends_screen.dart`)
-
-| Status | Item | Details |
-|--------|------|---------|
-| DONE | Tab switching (Overview, History, Medication) | Local state |
-| DONE | Period dropdown (24h, 3d, 7d, etc.) | Changes local state |
-| PARTIAL | SRR chart data | Reads from `measurementStore` but falls back to hardcoded Jan 3–9 data when empty |
-| PARTIAL | Period filtering | Dropdown changes state but chart does not filter by time range |
-| DONE | Measurement History "Export" | CSV preview dialog with data from `measurementStore` |
-| DONE | Add medication "Save" | Wired to `medicationStore.addMedication()` |
-| DONE | Pet name and recording count | Derived from stores |
-| PLACEHOLDER | VisionRR mode tab | Just an icon and description text — Phase 3 feature |
-
-**Required fixes:**
-- Remove hardcoded `_SrrPoint` fallback — show empty state when no measurements exist
-- Implement time-range filtering logic in chart based on selected period dropdown
-
-### Onboarding (`lib/screens/onboarding/onboarding_step1.dart` – `step4.dart`)
-
-| Status | Item | Details |
-|--------|------|---------|
-| DONE | Page navigation and step order | Flow controller works |
-| DONE | Step 1: name, breed, age | Persisted via `petStore.addPet()` on completion |
-| PARTIAL | Step 2: diagnosis dropdown | Selection collected but `Pet` model has no `diagnosis` field — data lost |
-| DONE | Step 3: target respiratory rate | Saved to `settingsStore.updateThresholds()` |
-| PARTIAL | Step 4: care circle invites | Emails collected but not converted to `CareCircleMember` objects |
-| DONE | Step 4: "Complete" navigates to dashboard | Navigation works |
-
-**Required fixes:**
-- Add `diagnosis` field to `Pet` model (`lib/models/pet.dart`)
-- Pass diagnosis value through `onboarding_flow.dart` to `petStore.addPet()`
-- Convert collected care circle emails to `CareCircleMember` objects and include in pet creation
-
----
-
-## Priority 2 — Missing Features (no implementation)
+## Priority 1 — Missing Features (no implementation)
 
 These features have zero UI and need to be built from scratch.
 
 | Feature | Impact | Suggested Location |
 |---------|--------|--------------------|
-| Add pet after onboarding | Multi-pet owners can't add pets | "Add Pet" button on `owner_dashboard.dart` → reuse onboarding or simplified form |
 | Edit pet profile | Can't update name, breed, photo | Edit mode on `pet_detail_screen.dart` or edit sheet |
 | Delete / archive pet | Can't remove a pet | Swipe-to-delete or menu on `owner_dashboard.dart`; `petStore.removePet()` exists |
-| Select pet to measure | `measurement_screen.dart` hardcodes `ownerPets.first` | Pet selector dropdown/chip at top of measurement screen |
-| Switch active pet context | Header pet chip is not tappable | Wire `onPetSelectorTap` in `main_shell.dart` → `AppHeader` |
 | User profile management | No way to edit name or photo | Profile section in settings or dedicated screen |
-| Sign out from main app | Only on verify-email screen | Add sign-out row to settings drawer |
 | Caregiver route | `CareCircleDashboard` unreachable | Add route to `app_routes.dart` and `main.dart`; add caregiver role option |
-| Measurement deletion | No store method or UI | Add `removeMeasurement()` to `MeasurementStore`; swipe or long-press in history |
 
 ---
 
-## Priority 3 — Remaining Polish
+## Priority 2 — Remaining Polish
+
+### Trends Screen (`lib/screens/trends/trends_screen.dart`)
+
+| Status | Item | Details |
+|--------|------|---------|
+| PLACEHOLDER | VisionRR mode tab | Just an icon and description text — Phase 3 feature |
 
 ### Care Circle Dashboard (`lib/screens/dashboard/care_circle_dashboard.dart`)
 
 | Status | Item | Details |
 |--------|------|---------|
-| DONE | Pet card tap → MainShell | Navigation works |
-| DONE | Summary stats from stores | Uses `petStore` and `measurementStore` |
-| DONE | Pet card role fix | Role bug fixed (was hardcoded to vet) |
 | MISSING | No route in app | Screen exists but is unreachable |
 
 ### Care Circle Management
@@ -95,10 +56,12 @@ These features have zero UI and need to be built from scratch.
 ## Completion Checklist Summary
 
 - [x] Measurement save flow (store + "Add to Graph" button)
-- [ ] Trends chart: remove hardcoded fallback, add time-range filtering
+- [x] Trends chart: data-driven with empty state, no hardcoded fallback
+- [x] Trends time-range filtering: period dropdown filters chart + stats
+- [x] Measurement deletion: swipe-to-delete with confirmation dialog
 - [x] Onboarding persists pet to store
-- [ ] Onboarding: add diagnosis field to Pet model
-- [ ] Onboarding: convert care circle emails to members
+- [x] Onboarding: diagnosis field added to Pet model and persisted
+- [x] Onboarding: care circle emails converted to CareCircleMember objects
 - [x] 5 dead buttons wired to actions
 - [x] Owner dashboard pet cards tappable
 - [x] Notification cards have tap handlers and read from store
@@ -109,13 +72,13 @@ These features have zero UI and need to be built from scratch.
 - [x] Hardcoded strings derived from data
 - [x] Care circle stats derived from data
 - [x] Vet dashboard stats derived from data
-- [ ] Add pet after onboarding (M1)
+- [x] Add pet after onboarding (M1) — button on owner dashboard
+- [x] Pet selector in measurement screen (M4) — chip list for multi-pet
+- [x] Wire pet switcher in header (M5) — bottom sheet selector
+- [x] Sign out from main app (M7) — settings drawer with confirmation
+- [x] Measurement deletion (M10) — swipe + store method
 - [ ] Edit pet profile (M2)
 - [ ] Delete pet UI (M3)
-- [ ] Pet selector in measurement screen (M4)
-- [ ] Wire pet switcher in header (M5)
 - [ ] User profile management (M6)
-- [ ] Sign out from main app (M7)
 - [ ] Caregiver route and role (M8)
 - [ ] Care circle remove / roles (M9)
-- [ ] Measurement deletion (M10)

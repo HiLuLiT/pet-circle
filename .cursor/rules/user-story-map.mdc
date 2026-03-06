@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Pet Circle — User Story Map
 
-Last updated: 2026-03-05 (after commits `61a0965`, `58653b0`)
+Last updated: 2026-03-06 (Sprint 2 complete: trends & data integrity)
 
 ## Update Protocol
 
@@ -18,17 +18,19 @@ After completing work on any user story listed below:
 
 ---
 
-## Status: DONE (36 stories)
+## Status: DONE (46 stories)
 
 These stories are fully functional in the current mock-data mode.
 
 ### Authentication & Onboarding
 - A1: Welcome screen with sign-up and sign-in buttons
 - A2: Role selection (Vet / Pet Owner)
-- A3–A7: Email auth, Google, Apple, password reset (behind Firebase flag)
-- A8–A10: Email verification with resend and account switch (behind Firebase flag)
+- A3-A7: Email auth, Google, Apple, password reset (behind Firebase flag)
+- A8-A10: Email verification with resend and account switch (behind Firebase flag)
 - B1: Onboarding Step 1 — name, breed, age persisted to `petStore`
+- B2: Onboarding Step 2 — diagnosis saved to `Pet.diagnosis` field
 - B3: Onboarding Step 3 — target rate saved to `settingsStore`
+- B4: Onboarding Step 4 — care circle emails converted to `CareCircleMember` objects
 
 ### Owner Experience
 - B5: Owner dashboard with pet cards from `petStore` + empty state CTA
@@ -37,6 +39,8 @@ These stories are fully functional in the current mock-data mode.
 - B8: Manual tap-to-count with haptics and BPM calculation
 - B9: Configurable timer durations (15s / 30s / 60s)
 - B10: "Add to Graph" saves measurement via `measurementStore`
+- B11: Trends SRR chart reads from `measurementStore` with empty state (no hardcoded fallback)
+- B12: Trends time-range filtering — period dropdown filters chart data and stats
 - B13: Medication save wired to `medicationStore`
 - B14: Export measurement data — CSV preview dialog (no file download)
 - B15: Pet detail reads from `noteStore` and `measurementStore`
@@ -49,16 +53,22 @@ These stories are fully functional in the current mock-data mode.
 - B22: Export all data dialog from settings
 - B23: Share with vet dialog from settings
 - B24: Push / emergency notification toggles wired to `settingsStore`
+- M1: "Add Pet" button on owner dashboard navigates to onboarding
+- M4: Pet selector on measurement screen — chip list when multiple pets exist
+- M5: Pet switcher in header — bottom sheet to switch active pet context
+- M7: Sign out from settings drawer with confirmation dialog
+- M10: Measurement deletion — swipe-to-delete in history with confirmation dialog
 
 ### Vet Experience
 - C1: Clinic overview dashboard from stores with real stats
 - C2: Summary stats (normal / elevated / measurements) from stores
 - C3: Patient card tap navigates to pet detail
 - C4: Clinical notes persisted via `noteStore`
+- C5: Vet SRR trends — same data-driven chart as B11
 - C6: Notifications from `notificationStore`
 
 ### Caregiver
-- D2: Take measurements (same as B8–B10)
+- D2: Take measurements (same as B8-B10)
 - D3: View pet details (same as B15)
 
 ### Cross-Cutting
@@ -70,41 +80,28 @@ These stories are fully functional in the current mock-data mode.
 
 ---
 
-## Status: PARTIAL (7 stories)
-
-These have UI but are incomplete or missing data wiring.
+## Status: PARTIAL (1 story)
 
 | ID | Story | Gap | File |
 |----|-------|-----|------|
-| B2 | Onboarding diagnosis | Collected in Step 2 but `Pet` model has no `diagnosis` field — data is lost | `onboarding_step2.dart`, `pet.dart` |
-| B4 | Onboarding care circle invites | Emails collected but never converted to `CareCircleMember` objects | `onboarding_flow.dart` |
-| B11 | Trends SRR chart | Reads from `measurementStore` but falls back to hardcoded Jan 3–9 data when empty | `trends_screen.dart` |
-| B12 | Trends time filter | Period dropdown changes state but no filtering logic applies to chart data | `trends_screen.dart` |
-| C5 | Vet SRR trends | Same as B11 | `trends_screen.dart` |
 | D1 | Caregiver dashboard | Screen exists with store data but has NO ROUTE — unreachable | `care_circle_dashboard.dart` |
-| M9 | Care circle management | Invite works but no remove, role change, or pending invite UI | `settings_screen.dart` |
 
 ---
 
-## Status: MISSING (9 stories — Phase 1 gaps)
+## Status: MISSING (4 stories — Phase 1 gaps)
 
 No implementation exists. These should be built before Phase 2.
 
 | ID | Story | Notes |
 |----|-------|-------|
-| M1 | Add pet after onboarding | No "Add Pet" button post-onboarding; `petStore.addPet` exists |
 | M2 | Edit pet profile | Pet detail is read-only; `petStore.updatePet` exists |
 | M3 | Delete / archive pet | `petStore.removePet` exists but no UI |
-| M4 | Select pet to measure | `measurement_screen.dart` hardcodes `ownerPets.first` |
-| M5 | Switch active pet context | `AppHeader` has `onPetSelectorTap` but `MainShell` doesn't wire it |
 | M6 | User profile management | No way to edit name or photo; `userService.updateUser` exists |
-| M7 | Sign out from main app | Only available on verify-email screen |
 | M8 | Caregiver route / role | `CareCircleDashboard` exists but no route, no role option |
-| M10 | Measurement deletion | No store method or UI to remove a reading |
 
 ---
 
-## Status: FUTURE (16 stories — Phase 2–5)
+## Status: FUTURE (16 stories — Phase 2-5)
 
 | Phase | Stories |
 |-------|---------|
@@ -117,14 +114,11 @@ No implementation exists. These should be built before Phase 2.
 
 ## Recommended Next Priorities
 
-1. Fix onboarding gaps (B2, B4) — add `diagnosis` to Pet model, convert emails to members
-2. Complete trends (B11, B12) — remove hardcoded fallback, add time-range filtering
-3. Add pet switcher (M5) — wire `onPetSelectorTap` in MainShell
-4. Add "Add Pet" flow (M1) — button on owner dashboard
-5. Add sign out (M7) — add to settings drawer
-6. Add caregiver route (M8) — register route, enable caregiver role
-7. Pet measurement selector (M4) — pick which pet before measuring
-8. Edit pet profile (M2) — edit mode on pet detail screen
+1. Add caregiver route (M8 + D1) — register route, enable caregiver role
+2. Edit pet profile (M2) — edit mode on pet detail screen
+3. Delete pet UI (M3) — swipe or menu action on dashboard
+4. User profile management (M6) — edit name/photo in settings
+5. Care circle management (M9 partial) — remove member, change roles
 
 ---
 

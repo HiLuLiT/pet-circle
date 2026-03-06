@@ -709,13 +709,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sendInvite => 'Send Invite';
 
   @override
-  String get exportAllDataConfirmation => 'This will export all pet data, measurements, and clinical notes as a CSV file.';
+  String get exportAllDataConfirmation =>
+      'This will export all pet data, measurements, and clinical notes as a CSV file.';
 
   @override
   String get exportStarted => 'Export started';
 
   @override
-  String get enterVetEmail => 'Enter your veterinarian\'s email to share pet data.';
+  String get enterVetEmail =>
+      'Enter your veterinarian\'s email to share pet data.';
 
   @override
   String dataSharedWith(String email) {
@@ -738,5 +740,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noPetsYet => 'No pets yet';
 
   @override
-  String get addYourFirstPet => 'Add your first pet to get started with health monitoring.';
+  String get addYourFirstPet =>
+      'Add your first pet to get started with health monitoring.';
+
+  @override
+  String get signOut => 'Sign Out';
+
+  @override
+  String get signOutConfirmation => 'Are you sure you want to sign out?';
+
+  @override
+  String get addPet => 'Add Pet';
+
+  @override
+  String get selectPet => 'Select Pet';
+
+  @override
+  String measuringFor(String name) {
+    return 'Measuring for $name';
+  }
+
+  @override
+  String get noMeasurementsYet => 'No measurements yet';
+
+  @override
+  String get noMeasurementsDescription =>
+      'Start measuring your pet\'s respiratory rate to see trends here.';
+
+  @override
+  String get deleteMeasurement => 'Delete measurement';
+
+  @override
+  String get measurementDeleted => 'Measurement deleted';
+
+  @override
+  String deleteMeasurementConfirmation(int bpm, String date) {
+    return 'Delete this $bpm BPM reading from $date?';
+  }
 }

@@ -10,6 +10,7 @@ class Pet {
     required this.statusColorHex,
     required this.latestMeasurement,
     required this.careCircle,
+    this.diagnosis,
   });
 
   final String name;
@@ -19,4 +20,5 @@ class Pet {
   final int statusColorHex;
   final Measurement latestMeasurement;
   final List<CareCircleMember> careCircle;
+  final String? diagnosis;
 }

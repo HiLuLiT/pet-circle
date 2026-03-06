@@ -1400,21 +1400,155 @@ abstract class AppLocalizations {
   /// **'Reset'**
   String get reset;
 
+  /// No description provided for @measurementSavedBpm.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement saved: {bpm} BPM'**
   String measurementSavedBpm(int bpm);
+
+  /// No description provided for @medicationLogged.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication logged'**
   String get medicationLogged;
+
+  /// No description provided for @careCircleUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Care circle updated'**
   String get careCircleUpdated;
+
+  /// No description provided for @reportOpened.
+  ///
+  /// In en, this message translates to:
+  /// **'Report opened'**
   String get reportOpened;
+
+  /// No description provided for @sendInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Invite'**
   String get sendInvite;
+
+  /// No description provided for @exportAllDataConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'This will export all pet data, measurements, and clinical notes as a CSV file.'**
   String get exportAllDataConfirmation;
+
+  /// No description provided for @exportStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Export started'**
   String get exportStarted;
+
+  /// No description provided for @enterVetEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your veterinarian\'s email to share pet data.'**
   String get enterVetEmail;
+
+  /// No description provided for @dataSharedWith.
+  ///
+  /// In en, this message translates to:
+  /// **'Data shared with {email}'**
   String dataSharedWith(String email);
+
+  /// No description provided for @medicationAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication added'**
   String get medicationAdded;
+
+  /// No description provided for @noCareCircleMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'No care circle members yet'**
   String get noCareCircleMembers;
+
+  /// No description provided for @enterEmailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter email address'**
   String get enterEmailAddress;
+
+  /// No description provided for @getStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
   String get getStarted;
+
+  /// No description provided for @noPetsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No pets yet'**
   String get noPetsYet;
+
+  /// No description provided for @addYourFirstPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first pet to get started with health monitoring.'**
   String get addYourFirstPet;
+
+  /// No description provided for @signOut.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Out'**
+  String get signOut;
+
+  /// No description provided for @signOutConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to sign out?'**
+  String get signOutConfirmation;
+
+  /// No description provided for @addPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Pet'**
+  String get addPet;
+
+  /// No description provided for @selectPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Pet'**
+  String get selectPet;
+
+  /// No description provided for @measuringFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Measuring for {name}'**
+  String measuringFor(String name);
+
+  /// No description provided for @noMeasurementsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No measurements yet'**
+  String get noMeasurementsYet;
+
+  /// No description provided for @noMeasurementsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Start measuring your pet\'s respiratory rate to see trends here.'**
+  String get noMeasurementsDescription;
+
+  /// No description provided for @deleteMeasurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete measurement'**
+  String get deleteMeasurement;
+
+  /// No description provided for @measurementDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement deleted'**
+  String get measurementDeleted;
+
+  /// No description provided for @deleteMeasurementConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this {bpm} BPM reading from {date}?'**
+  String deleteMeasurementConfirmation(int bpm, String date);
 }
 
 class _AppLocalizationsDelegate

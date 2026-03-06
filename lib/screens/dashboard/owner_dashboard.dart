@@ -118,6 +118,36 @@ class OwnerDashboard extends StatelessWidget {
                   ),
                 ),
               ),
+              GestureDetector(
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.onboarding),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: c.offWhite,
+                    borderRadius: const BorderRadius.all(AppRadii.medium),
+                    border: Border.all(
+                      color: c.chocolate.withValues(alpha: 0.15),
+                      width: 1.5,
+                      strokeAlign: BorderSide.strokeAlignInside,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.add, size: 20, color: c.chocolate),
+                      const SizedBox(width: 8),
+                      Text(
+                        l10n.addPet,
+                        style: AppTextStyles.body.copyWith(
+                          color: c.chocolate,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               const SizedBox(height: 24),
             ],
           ),

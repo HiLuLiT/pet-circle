@@ -252,5 +252,17 @@
   "enterEmailAddress": "הכנס כתובת אימייל",
   "getStarted": "התחל",
   "noPetsYet": "אין עדיין חיות מחמד",
-  "addYourFirstPet": "הוסף את חיית המחמד הראשונה שלך כדי להתחיל עם ניטור בריאות."
+  "addYourFirstPet": "הוסף את חיית המחמד הראשונה שלך כדי להתחיל עם ניטור בריאות.",
+  "signOut": "התנתקות",
+  "signOutConfirmation": "האם אתה בטוח שברצונך להתנתק?",
+  "addPet": "הוספת חיית מחמד",
+  "selectPet": "בחר חיית מחמד",
+  "measuringFor": "מדידה עבור {name}",
+  "@measuringFor": { "placeholders": { "name": { "type": "String" } } },
+  "noMeasurementsYet": "אין עדיין מדידות",
+  "noMeasurementsDescription": "התחל למדוד את קצב הנשימה של חיית המחמד שלך כדי לראות מגמות כאן.",
+  "deleteMeasurement": "מחיקת מדידה",
+  "measurementDeleted": "מדידה נמחקה",
+  "deleteMeasurementConfirmation": "למחוק את הקריאה של {bpm} BPM מ-{date}?",
+  "@deleteMeasurementConfirmation": { "placeholders": { "bpm": { "type": "int" }, "date": { "type": "String" } } }
 }

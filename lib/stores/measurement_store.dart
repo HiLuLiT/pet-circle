@@ -29,6 +29,15 @@ class MeasurementStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeMeasurement(String petName, Measurement measurement) {
+    final list = _measurements[petName];
+    if (list == null) return;
+    list.removeWhere((m) =>
+        m.bpm == measurement.bpm &&
+        m.recordedAt.isAtSameMomentAs(measurement.recordedAt));
+    notifyListeners();
+  }
+
   int get totalCount =>
       _measurements.values.fold(0, (sum, list) => sum + list.length);
 

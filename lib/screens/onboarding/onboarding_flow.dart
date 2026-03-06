@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/stores/pet_store.dart';
@@ -36,6 +37,14 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   void _onComplete() {
     final breedAge = _breedAndAge.isNotEmpty ? _breedAndAge : 'Unknown breed';
+    final careCircleMembers = _careCircleEmails
+        .where((e) => e.isNotEmpty)
+        .map((email) => CareCircleMember(
+              name: email,
+              avatarUrl: 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(email)}&background=E8B4B8&color=5B2C3F',
+              role: 'Caregiver',
+            ))
+        .toList();
     petStore.addPet(Pet(
       name: _petName.isNotEmpty ? _petName : 'New Pet',
       breedAndAge: '$breedAge${_age.isNotEmpty ? " • $_age" : ""}',
@@ -43,7 +52,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       statusLabel: 'Normal',
       statusColorHex: AppColors.lightBlue.value,
       latestMeasurement: Measurement(bpm: 0, recordedAt: DateTime.now(), recordedAtLabel: 'No measurements yet'),
-      careCircle: [],
+      careCircle: careCircleMembers,
+      diagnosis: _diagnosis.isNotEmpty ? _diagnosis : null,
     ));
     settingsStore.updateThresholds(elevated: _targetRate);
     Navigator.of(context).pushReplacementNamed(AppRoutes.ownerDashboard);

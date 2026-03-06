@@ -707,13 +707,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get sendInvite => 'שלח הזמנה';
 
   @override
-  String get exportAllDataConfirmation => 'פעולה זו תייצא את כל נתוני חיות המחמד, המדידות וההערות הקליניות כקובץ CSV.';
+  String get exportAllDataConfirmation =>
+      'פעולה זו תייצא את כל נתוני חיות המחמד, המדידות וההערות הקליניות כקובץ CSV.';
 
   @override
   String get exportStarted => 'הייצוא החל';
 
   @override
-  String get enterVetEmail => 'הכנס את כתובת האימייל של הוטרינר שלך לשיתוף נתונים.';
+  String get enterVetEmail =>
+      'הכנס את כתובת האימייל של הוטרינר שלך לשיתוף נתונים.';
 
   @override
   String dataSharedWith(String email) {
@@ -736,5 +738,41 @@ class AppLocalizationsHe extends AppLocalizations {
   String get noPetsYet => 'אין עדיין חיות מחמד';
 
   @override
-  String get addYourFirstPet => 'הוסף את חיית המחמד הראשונה שלך כדי להתחיל עם ניטור בריאות.';
+  String get addYourFirstPet =>
+      'הוסף את חיית המחמד הראשונה שלך כדי להתחיל עם ניטור בריאות.';
+
+  @override
+  String get signOut => 'התנתקות';
+
+  @override
+  String get signOutConfirmation => 'האם אתה בטוח שברצונך להתנתק?';
+
+  @override
+  String get addPet => 'הוספת חיית מחמד';
+
+  @override
+  String get selectPet => 'בחר חיית מחמד';
+
+  @override
+  String measuringFor(String name) {
+    return 'מדידה עבור $name';
+  }
+
+  @override
+  String get noMeasurementsYet => 'אין עדיין מדידות';
+
+  @override
+  String get noMeasurementsDescription =>
+      'התחל למדוד את קצב הנשימה של חיית המחמד שלך כדי לראות מגמות כאן.';
+
+  @override
+  String get deleteMeasurement => 'מחיקת מדידה';
+
+  @override
+  String get measurementDeleted => 'מדידה נמחקה';
+
+  @override
+  String deleteMeasurementConfirmation(int bpm, String date) {
+    return 'למחוק את הקריאה של $bpm BPM מ-$date?';
+  }
 }

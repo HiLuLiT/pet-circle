@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/medication_store.dart';
@@ -640,6 +641,50 @@ class _MeasurementHistory extends StatefulWidget {
 class _MeasurementHistoryState extends State<_MeasurementHistory> {
   String? _selectedPeriod;
 
+  Duration? _periodToDuration(String period, AppLocalizations l10n) {
+    if (period == l10n.last24Hours) return const Duration(hours: 24);
+    if (period == l10n.last3Days) return const Duration(days: 3);
+    if (period == l10n.last7Days) return const Duration(days: 7);
+    if (period == l10n.last30Days) return const Duration(days: 30);
+    if (period == l10n.last90Days) return const Duration(days: 90);
+    return null;
+  }
+
+  List<Measurement> _filterByPeriod(List<Measurement> all, AppLocalizations l10n) {
+    final duration = _periodToDuration(_selectedPeriod ?? l10n.last7Days, l10n);
+    if (duration == null) return all;
+    final cutoff = DateTime.now().subtract(duration);
+    return all.where((m) => m.recordedAt.isAfter(cutoff)).toList();
+  }
+
+  void _confirmDelete(BuildContext context, String petName, Measurement m) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
+    final dateStr = '${m.recordedAt.month}/${m.recordedAt.day}';
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
+        title: Text(l10n.deleteMeasurement, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+        content: Text(l10n.deleteMeasurementConfirmation(m.bpm, dateStr), style: AppTextStyles.body),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+          TextButton(
+            onPressed: () {
+              measurementStore.removeMeasurement(petName, m);
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.measurementDeleted)),
+              );
+            },
+            style: TextButton.styleFrom(backgroundColor: c.cherry),
+            child: Text(l10n.deleteMeasurement, style: TextStyle(color: c.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -653,16 +698,17 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
       l10n.customRange,
     ];
     _selectedPeriod ??= l10n.last7Days;
+
+    final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+    final allMeasurements = measurementStore.getMeasurements(petName);
+    final filtered = _filterByPeriod(allMeasurements, l10n);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(l10n.measurementHistory, style: AppTextStyles.heading3),
         const SizedBox(height: 8),
-        Builder(builder: (context) {
-          final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
-          final count = measurementStore.countForPet(petName);
-          return Text('$petName • $count recordings', style: AppTextStyles.body);
-        }),
+        Text('$petName • ${allMeasurements.length} recordings', style: AppTextStyles.body),
         const SizedBox(height: 16),
         Wrap(
           spacing: 8,
@@ -706,53 +752,51 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
         _SectionCard(
           child: Column(
             children: [
-              Builder(builder: (context) {
-                final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
-                final measurements = measurementStore.getMeasurements(petName);
-                if (measurements.isEmpty) {
+              if (filtered.isEmpty)
+                Column(
+                  children: [
+                    Row(children: [
+                      _StatCard(title: l10n.averageSrr, value: '--', footnote: l10n.bpm),
+                      const SizedBox(width: 8),
+                      _StatCard(title: l10n.range, value: '--', footnote: l10n.minMax),
+                    ]),
+                    const SizedBox(height: 8),
+                    Row(children: [
+                      _StatCard(title: l10n.trend, value: '--', footnote: l10n.bpmChange),
+                      const SizedBox(width: 8),
+                      const _StatusCard(),
+                    ]),
+                  ],
+                )
+              else
+                Builder(builder: (context) {
+                  final bpms = filtered.map((m) => m.bpm).toList();
+                  final avg = (bpms.reduce((a, b) => a + b) / bpms.length).round();
+                  final minBpm = bpms.reduce((a, b) => a < b ? a : b);
+                  final maxBpm = bpms.reduce((a, b) => a > b ? a : b);
+                  final weekAgo = DateTime.now().subtract(const Duration(days: 7));
+                  final recent = filtered.where((m) => m.recordedAt.isAfter(weekAgo)).toList();
+                  final older = filtered.where((m) => !m.recordedAt.isAfter(weekAgo)).toList();
+                  final recentAvg = recent.isEmpty ? avg : (recent.map((m) => m.bpm).reduce((a, b) => a + b) / recent.length).round();
+                  final olderAvg = older.isEmpty ? recentAvg : (older.map((m) => m.bpm).reduce((a, b) => a + b) / older.length).round();
+                  final trend = recentAvg - olderAvg;
+                  final trendStr = trend >= 0 ? '+$trend' : '$trend';
                   return Column(
                     children: [
                       Row(children: [
-                        _StatCard(title: l10n.averageSrr, value: '--', footnote: l10n.bpm),
+                        _StatCard(title: l10n.averageSrr, value: '$avg', footnote: l10n.bpm),
                         const SizedBox(width: 8),
-                        _StatCard(title: l10n.range, value: '--', footnote: l10n.minMax),
+                        _StatCard(title: l10n.range, value: '$minBpm-$maxBpm', footnote: l10n.minMax),
                       ]),
                       const SizedBox(height: 8),
                       Row(children: [
-                        _StatCard(title: l10n.trend, value: '--', footnote: l10n.bpmChange),
+                        _StatCard(title: l10n.trend, value: trendStr, footnote: l10n.bpmChange),
                         const SizedBox(width: 8),
                         const _StatusCard(),
                       ]),
                     ],
                   );
-                }
-                final bpms = measurements.map((m) => m.bpm).toList();
-                final avg = (bpms.reduce((a, b) => a + b) / bpms.length).round();
-                final minBpm = bpms.reduce((a, b) => a < b ? a : b);
-                final maxBpm = bpms.reduce((a, b) => a > b ? a : b);
-                final weekAgo = DateTime.now().subtract(const Duration(days: 7));
-                final recent = measurements.where((m) => m.recordedAt.isAfter(weekAgo)).toList();
-                final older = measurements.where((m) => !m.recordedAt.isAfter(weekAgo)).toList();
-                final recentAvg = recent.isEmpty ? avg : (recent.map((m) => m.bpm).reduce((a, b) => a + b) / recent.length).round();
-                final olderAvg = older.isEmpty ? recentAvg : (older.map((m) => m.bpm).reduce((a, b) => a + b) / older.length).round();
-                final trend = recentAvg - olderAvg;
-                final trendStr = trend >= 0 ? '+$trend' : '$trend';
-                return Column(
-                  children: [
-                    Row(children: [
-                      _StatCard(title: l10n.averageSrr, value: '$avg', footnote: l10n.bpm),
-                      const SizedBox(width: 8),
-                      _StatCard(title: l10n.range, value: '$minBpm-$maxBpm', footnote: l10n.minMax),
-                    ]),
-                    const SizedBox(height: 8),
-                    Row(children: [
-                      _StatCard(title: l10n.trend, value: trendStr, footnote: l10n.bpmChange),
-                      const SizedBox(width: 8),
-                      const _StatusCard(),
-                    ]),
-                  ],
-                );
-              }),
+                }),
             ],
           ),
         ),
@@ -761,19 +805,77 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                l10n.srrOverTime,
-                style: AppTextStyles.heading3,
-              ),
+              Text(l10n.srrOverTime, style: AppTextStyles.heading3),
               const SizedBox(height: 16),
               _BadgeRow(),
               const SizedBox(height: 8),
               _BadgeRowSecond(),
               const SizedBox(height: 16),
-              _SrrChart(),
+              _SrrChart(measurements: filtered),
             ],
           ),
         ),
+        if (filtered.isNotEmpty) ...[
+          const SizedBox(height: 24),
+          ...filtered.map((m) {
+            final dateStr = '${m.recordedAt.month}/${m.recordedAt.day} ${m.recordedAt.hour}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
+            final status = settingsStore.classifyStatus(m.bpm);
+            final statusColor = status == 'Normal' ? c.lightBlue : status == 'Elevated' ? c.lightYellow : c.cherry;
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Dismissible(
+                key: ValueKey('${m.recordedAt.millisecondsSinceEpoch}-${m.bpm}'),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  decoration: BoxDecoration(
+                    color: c.cherry,
+                    borderRadius: const BorderRadius.all(AppRadii.small),
+                  ),
+                  child: Icon(Icons.delete, color: c.white),
+                ),
+                confirmDismiss: (_) async {
+                  _confirmDelete(context, petName, m);
+                  return false;
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: c.offWhite,
+                    borderRadius: const BorderRadius.all(AppRadii.small),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 8, height: 8,
+                        decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('${m.bpm} BPM', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: c.chocolate)),
+                            Text(dateStr, style: AppTextStyles.caption.copyWith(color: c.chocolate)),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.2),
+                          borderRadius: const BorderRadius.all(AppRadii.full),
+                        ),
+                        child: Text(status, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: c.chocolate)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }),
+        ],
       ],
     );
   }
@@ -1041,27 +1143,45 @@ class _StatusPill extends StatelessWidget {
 }
 
 class _SrrChart extends StatelessWidget {
-  const _SrrChart();
+  const _SrrChart({this.measurements = const []});
+
+  final List<Measurement> measurements;
 
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : '';
-    final measurements = measurementStore.getMeasurements(petName);
-    final data = measurements.isNotEmpty
-        ? measurements.take(7).toList().reversed.map((m) {
-            final day = '${m.recordedAt.month}/${m.recordedAt.day}';
-            return _SrrPoint(day, m.bpm.toDouble());
-          }).toList()
-        : [
-            _SrrPoint('Jan 3', 28),
-            _SrrPoint('Jan 4', 29),
-            _SrrPoint('Jan 5', 31),
-            _SrrPoint('Jan 6', 35),
-            _SrrPoint('Jan 7', 33),
-            _SrrPoint('Jan 8', 30),
-            _SrrPoint('Jan 9', 32),
-          ];
+    final l10n = AppLocalizations.of(context)!;
+
+    if (measurements.isEmpty) {
+      return Container(
+        height: 280,
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: c.white,
+          borderRadius: const BorderRadius.all(AppRadii.small),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.show_chart, size: 48, color: c.chocolate.withValues(alpha: 0.2)),
+            const SizedBox(height: 12),
+            Text(l10n.noMeasurementsYet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+            const SizedBox(height: 8),
+            Text(
+              l10n.noMeasurementsDescription,
+              style: AppTextStyles.body.copyWith(color: c.chocolate),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+
+    final data = measurements.reversed.map((m) {
+      final day = '${m.recordedAt.month}/${m.recordedAt.day}';
+      return _SrrPoint(day, m.bpm.toDouble());
+    }).toList();
 
     return Container(
       height: 280,

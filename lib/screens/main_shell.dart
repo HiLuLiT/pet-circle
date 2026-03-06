@@ -10,6 +10,7 @@ import 'package:pet_circle/screens/messages/messages_screen.dart' show MessagesS
 import 'package:pet_circle/screens/trends/trends_screen.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/app_header.dart';
+import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 
 class MainShell extends StatefulWidget {
@@ -28,6 +29,7 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   late int _selectedIndex;
+  int _activePetIndex = 0;
 
   @override
   void initState() {
@@ -35,11 +37,60 @@ class _MainShellState extends State<MainShell> {
     _selectedIndex = widget.initialIndex;
   }
 
+  void _showPetSwitcher() {
+    final c = AppColorsTheme.of(context);
+    final pets = petStore.ownerPets;
+    if (pets.length <= 1) return;
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: c.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: c.offWhite, borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 16),
+            ...List.generate(pets.length, (i) {
+              final pet = pets[i];
+              final isSelected = i == _activePetIndex;
+              return ListTile(
+                leading: ClipOval(
+                  child: SizedBox(
+                    width: 36, height: 36,
+                    child: DogPhoto(endpoint: pet.imageUrl, fit: BoxFit.cover),
+                  ),
+                ),
+                title: Text(pet.name, style: AppTextStyles.body.copyWith(
+                  color: c.chocolate,
+                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                )),
+                subtitle: Text(pet.breedAndAge, style: AppTextStyles.caption.copyWith(color: c.chocolate)),
+                trailing: isSelected ? Icon(Icons.check_circle, color: c.lightBlue) : null,
+                onTap: () {
+                  setState(() => _activePetIndex = i);
+                  Navigator.pop(context);
+                },
+              );
+            }),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final user = userStore.currentUser;
-    final pet = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first : null;
+    final pets = petStore.ownerPets;
+    final petIndex = _activePetIndex.clamp(0, pets.isEmpty ? 0 : pets.length - 1);
+    final pet = pets.isNotEmpty ? pets[petIndex] : null;
 
     final homeScreen = widget.role == AppUserRole.vet
         ? const VetDashboard(showScaffold: false)
@@ -58,6 +109,7 @@ class _MainShellState extends State<MainShell> {
                 userImageUrl: user?.avatarUrl ?? '',
                 petName: pet?.name,
                 petImageUrl: pet?.imageUrl,
+                onPetSelectorTap: pets.length > 1 ? _showPetSwitcher : null,
                 onAvatarTap: () => showModalBottomSheet<void>(
                   context: context,
                   isScrollControlled: true,
