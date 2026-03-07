@@ -20,6 +20,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
   bool get wantKeepAlive => true;
 
   final _roles = const [
+    'Admin',
     'Member',
     'Viewer',
   ];

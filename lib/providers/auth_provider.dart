@@ -5,18 +5,23 @@ import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/services/user_service.dart';
 
-class AuthProvider extends ChangeNotifier {
-  AuthProvider() {
-    _init();
-  }
+enum AuthRouteState {
+  loading,
+  unauthenticated,
+  needsEmailVerification,
+  needsRole,
+  authenticated,
+}
 
+final authProvider = AuthProvider();
+
+class AuthProvider extends ChangeNotifier {
   User? _firebaseUser;
   AppUser? _appUser;
   bool _isLoading = true;
   StreamSubscription<User?>? _authSubscription;
   StreamSubscription<AppUser?>? _userSubscription;
 
-  // Getters
   User? get firebaseUser => _firebaseUser;
   AppUser? get appUser => _appUser;
   bool get isLoading => _isLoading;
@@ -24,14 +29,22 @@ class AuthProvider extends ChangeNotifier {
   bool get isEmailVerified => _firebaseUser?.emailVerified ?? false;
   bool get hasUserProfile => _appUser != null;
 
-  void _init() {
+  AuthRouteState get routeState {
+    if (_isLoading) return AuthRouteState.loading;
+    if (_firebaseUser == null) return AuthRouteState.unauthenticated;
+    if (!isEmailVerified) return AuthRouteState.needsEmailVerification;
+    if (_appUser == null) return AuthRouteState.needsRole;
+    return AuthRouteState.authenticated;
+  }
+
+  void init() {
+    if (_authSubscription != null) return;
     _authSubscription = AuthService.authStateChanges.listen(_onAuthStateChanged);
   }
 
   Future<void> _onAuthStateChanged(User? user) async {
     _firebaseUser = user;
 
-    // Cancel previous user subscription
     await _userSubscription?.cancel();
     _userSubscription = null;
 
@@ -42,7 +55,6 @@ class AuthProvider extends ChangeNotifier {
       return;
     }
 
-    // Listen to user profile changes
     _userSubscription = UserService.streamUser(user.uid).listen((appUser) {
       _appUser = appUser;
       _isLoading = false;
@@ -50,7 +62,6 @@ class AuthProvider extends ChangeNotifier {
     });
   }
 
-  /// Refresh user data
   Future<void> refresh() async {
     await AuthService.reloadUser();
     if (_firebaseUser != null) {
@@ -59,7 +70,6 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Sign out
   Future<void> signOut() async {
     await AuthService.signOut();
   }

@@ -63,11 +63,14 @@ class PetStore extends ChangeNotifier {
   }
 
   CareCircleRole? currentUserRoleFor(String petName) {
-    final user = userStore.currentUser;
-    if (user == null) return null;
+    final uid = userStore.currentUserUid;
+    final name = userStore.currentUser?.name;
+    if (uid == null && name == null) return null;
     final pet = getPetByName(petName);
     if (pet == null) return null;
-    final match = pet.careCircle.where((m) => m.name == user.name).firstOrNull;
+    final match = pet.careCircle
+        .where((m) => (m.uid != null && m.uid == uid) || m.name == name)
+        .firstOrNull;
     return match?.role;
   }
 

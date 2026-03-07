@@ -320,6 +320,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get viewer => 'Viewer';
 
   @override
+  String get roleAdmin => 'Admin';
+
+  @override
+  String get roleMember => 'Member';
+
+  @override
+  String get roleViewer => 'Viewer';
+
+  @override
+  String get selectRole => 'Select Role';
+
+  @override
+  String get viewerMeasurementRestriction =>
+      'As a Viewer, you can view data and add notes but cannot take measurements. Ask an Admin to upgrade your role.';
+
+  @override
   String get normalThresholdBpm => 'Normal Threshold (BPM)';
 
   @override

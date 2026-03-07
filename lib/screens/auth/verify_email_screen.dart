@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/auth_service.dart';
-import 'package:pet_circle/services/user_service.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
@@ -49,17 +47,8 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   }
 
   Future<void> _navigateAfterVerification() async {
-    final user = AuthService.currentUser;
-    if (user == null) return;
-
-    final appUser = await UserService.getUser(user.uid);
     if (!mounted) return;
-
-    if (appUser?.role == AppUserRole.vet) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.vetDashboard);
-    } else {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
-    }
+    Navigator.of(context).pushReplacementNamed(AppRoutes.authGate);
   }
 
   Future<void> _resendEmail() async {

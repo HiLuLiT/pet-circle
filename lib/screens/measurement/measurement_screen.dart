@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
@@ -23,6 +24,42 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final activePet = petStore.activePet;
+    final role = activePet != null
+        ? (petStore.currentUserRoleFor(activePet.name) ?? CareCircleRole.viewer)
+        : CareCircleRole.viewer;
+
+    if (!role.canMeasure) {
+      final noPermissionContent = Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.lock_outline, size: 48, color: c.chocolate.withValues(alpha: 0.3)),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                l10n.viewer,
+                style: AppTextStyles.heading3.copyWith(color: c.chocolate),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                l10n.viewerMeasurementRestriction,
+                style: AppTextStyles.body.copyWith(color: c.chocolate),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      );
+
+      if (!widget.showScaffold) {
+        return Container(color: c.white, child: noPermissionContent);
+      }
+      return Scaffold(backgroundColor: c.white, body: noPermissionContent);
+    }
+
     final content = SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(24),

@@ -318,6 +318,22 @@ class AppLocalizationsHe extends AppLocalizations {
   String get viewer => 'צופה';
 
   @override
+  String get roleAdmin => 'מנהל';
+
+  @override
+  String get roleMember => 'חבר';
+
+  @override
+  String get roleViewer => 'צופה';
+
+  @override
+  String get selectRole => 'בחירת תפקיד';
+
+  @override
+  String get viewerMeasurementRestriction =>
+      'כצופה, ניתן לצפות בנתונים ולהוסיף הערות אך לא לבצע מדידות. בקש ממנהל לשדרג את התפקיד שלך.';
+
+  @override
   String get normalThresholdBpm => 'סף תקין (BPM)';
 
   @override

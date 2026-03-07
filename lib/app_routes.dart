@@ -1,5 +1,6 @@
 class AppRoutes {
   static const welcome = '/';
+  static const authGate = '/auth-gate';
   static const roleSelection = '/role-selection';
   static const auth = '/auth';
   static const verifyEmail = '/verify-email';

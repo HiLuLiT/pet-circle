@@ -191,38 +191,50 @@ class _SettingsContentState extends State<_SettingsContent> {
                 ),
               ),
               const SizedBox(height: 16),
-              _SettingsCard(
-                title: l10n.careCircle,
-                subtitle: l10n.manageCaregivers,
-                trailing: _InviteButton(onTap: () => _showInviteDialog(context)),
-                child: Builder(builder: (context) {
-                  final pets = petStore.ownerPets;
-                  if (pets.isEmpty) {
-                    return Text(l10n.noClinicalNotesYet, style: AppTextStyles.body);
-                  }
-                  final members = pets.first.careCircle;
-                  if (members.isEmpty) {
-                    return Text(l10n.noCareCircleMembers, style: AppTextStyles.body);
-                  }
-                  return Column(
-                    children: members.map((member) {
-                      final isAdmin = member.role == CareCircleRole.admin;
-                      final isViewer = member.role == CareCircleRole.viewer;
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _CareCircleItem(
-                          email: member.name,
-                          roleLabel: member.roleLabel,
-                          roleColor: isViewer ? c.blue : isAdmin ? c.chocolate : c.lightYellow,
-                          statusLabel: l10n.active,
-                          statusColor: c.pink,
-                          onRemove: () => _confirmRemoveMember(context, pets.first.name, member.name),
-                        ),
-                      );
-                    }).toList(),
-                  );
-                }),
-              ),
+              Builder(builder: (context) {
+                final pets = petStore.ownerPets;
+                final activePet = pets.isNotEmpty ? pets.first : null;
+                final currentRole = activePet != null
+                    ? (petStore.currentUserRoleFor(activePet.name) ?? CareCircleRole.viewer)
+                    : CareCircleRole.viewer;
+                final canManage = currentRole.canManageCircle;
+
+                return _SettingsCard(
+                  title: l10n.careCircle,
+                  subtitle: l10n.manageCaregivers,
+                  trailing: canManage
+                      ? _InviteButton(onTap: () => _showInviteDialog(context))
+                      : null,
+                  child: Builder(builder: (context) {
+                    if (activePet == null) {
+                      return Text(l10n.noClinicalNotesYet, style: AppTextStyles.body);
+                    }
+                    final members = activePet.careCircle;
+                    if (members.isEmpty) {
+                      return Text(l10n.noCareCircleMembers, style: AppTextStyles.body);
+                    }
+                    return Column(
+                      children: members.map((member) {
+                        final isAdmin = member.role == CareCircleRole.admin;
+                        final isViewer = member.role == CareCircleRole.viewer;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _CareCircleItem(
+                            email: member.name,
+                            roleLabel: member.roleLabel,
+                            roleColor: isViewer ? c.blue : isAdmin ? c.chocolate : c.lightYellow,
+                            statusLabel: l10n.active,
+                            statusColor: c.pink,
+                            onRemove: canManage
+                                ? () => _confirmRemoveMember(context, activePet.name, member.name)
+                                : null,
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  }),
+                );
+              }),
               const SizedBox(height: 16),
               _SettingsCard(
                 title: l10n.notifications,
@@ -522,60 +534,87 @@ class _SettingsContentState extends State<_SettingsContent> {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     final emailController = TextEditingController();
+    String selectedRole = 'Member';
+    final roles = ['Admin', 'Member', 'Viewer'];
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: c.white,
-            borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.invite, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
-              const SizedBox(height: 16),
-              TextField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: l10n.enterEmailAddress,
-                  filled: true,
-                  fillColor: c.offWhite,
-                  border: OutlineInputBorder(
-                    borderRadius: const BorderRadius.all(AppRadii.small),
-                    borderSide: BorderSide.none,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: c.white,
+              borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.invite, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: emailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: InputDecoration(
+                    hintText: l10n.enterEmailAddress,
+                    filled: true,
+                    fillColor: c.offWhite,
+                    border: OutlineInputBorder(
+                      borderRadius: const BorderRadius.all(AppRadii.small),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(l10n.cancel),
+                const SizedBox(height: 16),
+                Text(l10n.role, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: AppSpacing.sm),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: c.offWhite,
+                    borderRadius: const BorderRadius.all(AppRadii.small),
                   ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      final outerL10n = AppLocalizations.of(context)!;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(outerL10n.dataSharedWith(emailController.text))),
-                      );
-                    },
-                    style: TextButton.styleFrom(backgroundColor: c.lightBlue),
-                    child: Text(l10n.sendInvite, style: TextStyle(color: c.chocolate)),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedRole,
+                      isExpanded: true,
+                      dropdownColor: c.white,
+                      style: AppTextStyles.body.copyWith(color: c.chocolate),
+                      items: roles
+                          .map((r) => DropdownMenuItem(value: r, child: Text(r)))
+                          .toList(),
+                      onChanged: (v) {
+                        if (v != null) setSheetState(() => selectedRole = v);
+                      },
+                    ),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: Text(l10n.cancel),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.invitationSentTo(emailController.text, selectedRole))),
+                        );
+                      },
+                      style: TextButton.styleFrom(backgroundColor: c.lightBlue),
+                      child: Text(l10n.sendInvite, style: TextStyle(color: c.chocolate)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

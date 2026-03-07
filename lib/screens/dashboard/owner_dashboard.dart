@@ -122,29 +122,37 @@ class OwnerDashboard extends StatelessWidget {
               ...pets.map(
                 (pet) => Padding(
                   padding: const EdgeInsets.only(bottom: 24),
-                  child: _PetCard(
-                    data: pet,
-                    onTap: () => Navigator.of(context).pushNamed(
-                      AppRoutes.petDetail,
-                      arguments: pet,
-                    ),
-                    onLongPress: (petStore.currentUserRoleFor(pet.name) ?? CareCircleRole.admin).canDeletePet
-                        ? () => _confirmDeletePet(context, pet)
-                        : null,
-                    onMeasure: () => Navigator.of(context).pushNamed(
-                      AppRoutes.mainShell,
-                      arguments: {
-                        'role': AppUserRole.owner,
-                        'initialIndex': 2,
-                      },
-                    ),
-                    onTrends: () => Navigator.of(context).pushNamed(
-                      AppRoutes.mainShell,
-                      arguments: {
-                        'role': AppUserRole.owner,
-                        'initialIndex': 1,
-                      },
-                    ),
+                  child: Builder(
+                    builder: (context) {
+                      final role = petStore.currentUserRoleFor(pet.name) ?? CareCircleRole.viewer;
+                      return _PetCard(
+                        data: pet,
+                        userRole: role,
+                        onTap: () => Navigator.of(context).pushNamed(
+                          AppRoutes.petDetail,
+                          arguments: pet,
+                        ),
+                        onLongPress: role.canDeletePet
+                            ? () => _confirmDeletePet(context, pet)
+                            : null,
+                        onMeasure: role.canMeasure
+                            ? () => Navigator.of(context).pushNamed(
+                                  AppRoutes.mainShell,
+                                  arguments: {
+                                    'role': AppUserRole.owner,
+                                    'initialIndex': 2,
+                                  },
+                                )
+                            : null,
+                        onTrends: () => Navigator.of(context).pushNamed(
+                          AppRoutes.mainShell,
+                          arguments: {
+                            'role': AppUserRole.owner,
+                            'initialIndex': 1,
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ),
               ),
@@ -201,13 +209,15 @@ class _PetCard extends StatelessWidget {
     required this.data,
     required this.onMeasure,
     required this.onTrends,
+    required this.userRole,
     this.onTap,
     this.onLongPress,
   });
 
   final Pet data;
-  final VoidCallback onMeasure;
+  final VoidCallback? onMeasure;
   final VoidCallback onTrends;
+  final CareCircleRole userRole;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -355,20 +365,22 @@ class _PetCard extends StatelessWidget {
                   // Action buttons
                   Row(
                     children: [
-                      Expanded(
-                        child: _ActionButton(
-                          label: l10n.measure,
-                          iconAsset: _measureIconAsset,
-                          isPrimary: true,
-                          onTap: onMeasure,
+                      if (onMeasure != null)
+                        Expanded(
+                          child: _ActionButton(
+                            label: l10n.measure,
+                            iconAsset: _measureIconAsset,
+                            isPrimary: true,
+                            onTap: onMeasure!,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
+                      if (onMeasure != null)
+                        const SizedBox(width: 12),
                       Expanded(
                         child: _ActionButton(
                           label: l10n.trends,
                           iconAsset: _trendsIconAsset,
-                          isPrimary: false,
+                          isPrimary: onMeasure == null,
                           onTap: onTrends,
                         ),
                       ),

@@ -1,15 +1,17 @@
-// import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/app_routes.dart';
-// import 'package:pet_circle/firebase_options.dart';
+import 'package:pet_circle/firebase_options.dart';
 import 'package:pet_circle/data/mock_data.dart';
 import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/models/pet.dart';
+import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/screens/auth/auth_screen.dart';
+import 'package:pet_circle/screens/auth/auth_gate.dart';
 import 'package:pet_circle/screens/auth/role_selection_screen.dart';
 import 'package:pet_circle/screens/auth/verify_email_screen.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
@@ -28,6 +30,7 @@ import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
+import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 // Set to true when Firebase is fully configured
@@ -41,19 +44,23 @@ final ValueNotifier<bool> appDarkMode = ValueNotifier(false);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Uncomment when Firebase is configured:
-  // if (kEnableFirebase) {
-  //   await Firebase.initializeApp(
-  //     options: DefaultFirebaseOptions.currentPlatform,
-  //   );
-  // }
 
-  _seedStores();
+  if (kEnableFirebase) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    authProvider.init();
+    await deepLinkService.init();
+  }
+
+  if (!kEnableFirebase) {
+    _seedMockStores();
+  }
+
   runApp(const PetCircleApp());
 }
 
-void _seedStores() {
+void _seedMockStores() {
   userStore.seed(MockData.currentOwnerUser);
 
   petStore.seed(
@@ -149,9 +156,12 @@ class PetCircleApp extends StatelessWidget {
         Locale('en'),
         Locale('he'),
       ],
-      initialRoute: AppRoutes.welcome,
+      initialRoute: kEnableFirebase ? AppRoutes.authGate : AppRoutes.welcome,
       onGenerateRoute: (settings) {
         switch (settings.name) {
+          case AppRoutes.authGate:
+            return MaterialPageRoute(builder: (_) => const AuthGate());
+
           case AppRoutes.welcome:
             return MaterialPageRoute(builder: (_) => const WelcomeScreen());
 

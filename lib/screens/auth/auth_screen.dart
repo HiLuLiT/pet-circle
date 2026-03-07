@@ -119,11 +119,7 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void _navigateAfterAuth() {
-    if (widget.role == AppUserRole.vet) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.vetDashboard);
-    } else {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
-    }
+    Navigator.of(context).pushReplacementNamed(AppRoutes.authGate);
   }
 
   Future<void> _handleForgotPassword() async {

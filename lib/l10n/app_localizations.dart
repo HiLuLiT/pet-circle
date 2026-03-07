@@ -704,6 +704,36 @@ abstract class AppLocalizations {
   /// **'Viewer'**
   String get viewer;
 
+  /// No description provided for @roleAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin'**
+  String get roleAdmin;
+
+  /// No description provided for @roleMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Member'**
+  String get roleMember;
+
+  /// No description provided for @roleViewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewer'**
+  String get roleViewer;
+
+  /// No description provided for @selectRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Role'**
+  String get selectRole;
+
+  /// No description provided for @viewerMeasurementRestriction.
+  ///
+  /// In en, this message translates to:
+  /// **'As a Viewer, you can view data and add notes but cannot take measurements. Ask an Admin to upgrade your role.'**
+  String get viewerMeasurementRestriction;
+
   /// No description provided for @normalThresholdBpm.
   ///
   /// In en, this message translates to:

@@ -200,7 +200,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         onPressed: () => Navigator.of(context).pop(),
       ),
       actions: [
-        if ((petStore.currentUserRoleFor(_pet.name) ?? CareCircleRole.admin).canEditPet)
+        if ((petStore.currentUserRoleFor(_pet.name) ?? CareCircleRole.viewer).canEditPet)
           IconButton(
             icon: Icon(Icons.edit, color: c.white),
             onPressed: _showEditSheet,

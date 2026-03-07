@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Medication {
   const Medication({
     required this.id,
@@ -14,6 +16,28 @@ class Medication {
   final String frequency;
   final DateTime startDate;
   final bool isActive;
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'name': name,
+      'dosage': dosage,
+      'frequency': frequency,
+      'startDate': Timestamp.fromDate(startDate),
+      'isActive': isActive,
+    };
+  }
+
+  factory Medication.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return Medication(
+      id: doc.id,
+      name: data['name'] ?? '',
+      dosage: data['dosage'] ?? '',
+      frequency: data['frequency'] ?? '',
+      startDate: (data['startDate'] as Timestamp).toDate(),
+      isActive: data['isActive'] ?? true,
+    );
+  }
 
   Medication copyWith({
     String? id,
