@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/measurement.dart';
-import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/widgets/dog_photo.dart';
 
 class MeasurementScreen extends StatefulWidget {
   const MeasurementScreen({super.key, this.showScaffold = true});
@@ -21,42 +19,15 @@ class MeasurementScreen extends StatefulWidget {
 class _MeasurementScreenState extends State<MeasurementScreen> {
   int _selectedTab = 0;
   int _selectedDuration = 60;
-  int _selectedPetIndex = 0;
-
-  String get _activePetName {
-    final pets = petStore.ownerPets;
-    if (pets.isEmpty) return 'Pet';
-    final idx = _selectedPetIndex.clamp(0, pets.length - 1);
-    return pets[idx].name;
-  }
 
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    final pets = petStore.ownerPets;
     final content = SafeArea(
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            if (pets.length > 1)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: _PetSelector(
-                  pets: pets,
-                  selectedIndex: _selectedPetIndex,
-                  onChanged: (i) => setState(() => _selectedPetIndex = i),
-                ),
-              ),
-            if (pets.length == 1)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: Text(
-                  l10n.measuringFor(pets.first.name),
-                  style: AppTextStyles.body.copyWith(color: c.chocolate, fontWeight: FontWeight.w500),
-                ),
-              ),
             _TabSelector(
               selectedIndex: _selectedTab,
               onChanged: (index) => setState(() => _selectedTab = index),
@@ -326,8 +297,7 @@ class _ManualModeState extends State<_ManualMode>
                     const SizedBox(width: 12),
                     GestureDetector(
                       onTap: () {
-                        final screen = context.findAncestorStateOfType<_MeasurementScreenState>();
-                        final petName = screen?._activePetName ?? 'Pet';
+                        final petName = petStore.activePet?.name ?? 'Pet';
                         measurementStore.addMeasurement(
                           petName,
                           Measurement(
@@ -630,62 +600,3 @@ class _VisionMode extends StatelessWidget {
   }
 }
 
-class _PetSelector extends StatelessWidget {
-  const _PetSelector({
-    required this.pets,
-    required this.selectedIndex,
-    required this.onChanged,
-  });
-
-  final List<Pet> pets;
-  final int selectedIndex;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    return SizedBox(
-      height: 44,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: pets.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 8),
-        itemBuilder: (context, i) {
-          final pet = pets[i];
-          final isSelected = i == selectedIndex;
-          return GestureDetector(
-            onTap: () => onChanged(i),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: isSelected ? c.lightBlue : c.offWhite,
-                borderRadius: const BorderRadius.all(AppRadii.full),
-                border: isSelected ? Border.all(color: c.chocolate.withValues(alpha: 0.2)) : null,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ClipOval(
-                    child: SizedBox(
-                      width: 28, height: 28,
-                      child: DogPhoto(endpoint: pet.imageUrl, fit: BoxFit.cover),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    pet.name,
-                    style: AppTextStyles.body.copyWith(
-                      color: c.chocolate,
-                      fontSize: 14,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}

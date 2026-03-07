@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
-import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
@@ -18,13 +17,28 @@ class TrendsScreen extends StatefulWidget {
 }
 
 class _TrendsScreenState extends State<TrendsScreen> {
+  String? _selectedPeriod;
 
-  int _selectedTab = 0;
+  Duration? _periodToDuration(String period, AppLocalizations l10n) {
+    if (period == l10n.last24Hours) return const Duration(hours: 24);
+    if (period == l10n.last3Days) return const Duration(days: 3);
+    if (period == l10n.last7Days) return const Duration(days: 7);
+    if (period == l10n.last30Days) return const Duration(days: 30);
+    if (period == l10n.last90Days) return const Duration(days: 90);
+    return null;
+  }
+
+  List<Measurement> _filterByPeriod(List<Measurement> all, AppLocalizations l10n) {
+    final duration = _periodToDuration(_selectedPeriod ?? l10n.last7Days, l10n);
+    if (duration == null) return all;
+    final cutoff = DateTime.now().subtract(duration);
+    return all.where((m) => m.recordedAt.isAfter(cutoff)).toList();
+  }
 
   void _showExportDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
-    final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+    final petName = petStore.activePet?.name ?? 'Pet';
     final measurements = measurementStore.getMeasurements(petName);
     final csvLines = measurements.map((m) => '${m.recordedAt.toIso8601String()},${m.bpm}').join('\n');
     final csvData = 'Date,BPM\n$csvLines';
@@ -75,263 +89,6 @@ class _TrendsScreenState extends State<TrendsScreen> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
-    final content = SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              Text(l10n.healthTrends, style: AppTextStyles.heading2),
-              const SizedBox(height: 32),
-              _TrendsTabs(
-                selectedIndex: _selectedTab,
-                onChanged: (index) => setState(() => _selectedTab = index),
-              ),
-              const SizedBox(height: 24),
-              if (_selectedTab == 0)
-                const _TrendsOverview()
-              else
-                _MeasurementHistory(
-                  onExport: () => _showExportDialog(context),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-
-    if (!widget.showScaffold) {
-      return Container(color: c.white, child: content);
-    }
-
-    return Scaffold(
-      backgroundColor: c.white,
-      body: content,
-    );
-  }
-}
-
-
-class _TrendsTabs extends StatelessWidget {
-  const _TrendsTabs({
-    required this.selectedIndex,
-    required this.onChanged,
-  });
-
-  final int selectedIndex;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    return Container(
-      height: 36,
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: c.offWhite,
-        borderRadius: const BorderRadius.all(AppRadii.large),
-      ),
-      child: Row(
-        children: [
-          _TrendsTab(
-            selected: selectedIndex == 0,
-            icon: Icons.monitor_heart,
-            onTap: () => onChanged(0),
-          ),
-          _TrendsTab(
-            selected: selectedIndex == 1,
-            icon: Icons.bar_chart,
-            onTap: () => onChanged(1),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TrendsTab extends StatelessWidget {
-  const _TrendsTab({
-    required this.selected,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final bool selected;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 29,
-          decoration: BoxDecoration(
-            color: selected ? c.white : Colors.transparent,
-            borderRadius: const BorderRadius.all(AppRadii.large),
-          ),
-          child: Icon(icon, color: c.chocolate, size: 18),
-        ),
-      ),
-    );
-  }
-}
-
-class _TrendsOverview extends StatelessWidget {
-  const _TrendsOverview();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
-    return Column(
-      children: [
-        Builder(builder: (context) {
-          final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
-          final measurements = measurementStore.getMeasurements(petName);
-          final avg = measurements.isEmpty ? 0 : (measurements.map((m) => m.bpm).reduce((a, b) => a + b) / measurements.length).round();
-          final weekAgo = DateTime.now().subtract(const Duration(days: 7));
-          final recent = measurements.where((m) => m.recordedAt.isAfter(weekAgo)).toList();
-          final older = measurements.where((m) => !m.recordedAt.isAfter(weekAgo)).toList();
-          final recentAvg = recent.isEmpty ? avg : (recent.map((m) => m.bpm).reduce((a, b) => a + b) / recent.length).round();
-          final olderAvg = older.isEmpty ? recentAvg : (older.map((m) => m.bpm).reduce((a, b) => a + b) / older.length).round();
-          final trend = recentAvg - olderAvg;
-          final trendStr = trend >= 0 ? '+$trend' : '$trend';
-          final activeMeds = medicationStore.getActiveMedications(petName).length;
-          return Column(
-            children: [
-              _SectionCard(
-                child: _MetricRow(
-                  label: l10n.averageSrr,
-                  value: '$avg',
-                  subLabel: l10n.breathsPerMinute,
-                  icon: Icons.show_chart,
-                ),
-              ),
-              const SizedBox(height: 24),
-              _SectionCard(
-                child: _MetricRow(
-                  label: l10n.sevenDayTrend,
-                  value: trendStr,
-                  subLabel: l10n.bpmChange,
-                  icon: trend >= 0 ? Icons.trending_up : Icons.trending_down,
-                ),
-              ),
-              const SizedBox(height: 24),
-              _SectionCard(
-                child: _MetricRow(
-                  label: l10n.sevenDayTrend,
-                  value: '$activeMeds',
-                  subLabel: l10n.activeTreatments,
-                  icon: Icons.medication,
-                ),
-              ),
-            ],
-          );
-        }),
-        const SizedBox(height: 24),
-        _SectionCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.srrOverTime,
-                style: AppTextStyles.heading3,
-              ),
-              const SizedBox(height: 16),
-              _BadgeRow(),
-              const SizedBox(height: 8),
-              _BadgeRowSecond(),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _MetricRow extends StatelessWidget {
-  const _MetricRow({
-    required this.label,
-    required this.value,
-    required this.subLabel,
-    required this.icon,
-  });
-
-  final String label;
-  final String value;
-  final String subLabel;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: AppTextStyles.caption.copyWith(fontSize: 12)),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: AppTextStyles.heading1.copyWith(fontSize: 32),
-            ),
-            const SizedBox(height: 4),
-            Text(subLabel, style: AppTextStyles.caption.copyWith(fontSize: 12)),
-          ],
-        ),
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: c.white,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: c.blue),
-        ),
-      ],
-    );
-  }
-}
-
-class _MeasurementHistory extends StatefulWidget {
-  const _MeasurementHistory({required this.onExport});
-
-  final VoidCallback onExport;
-
-  @override
-  State<_MeasurementHistory> createState() => _MeasurementHistoryState();
-}
-
-class _MeasurementHistoryState extends State<_MeasurementHistory> {
-  String? _selectedPeriod;
-
-  Duration? _periodToDuration(String period, AppLocalizations l10n) {
-    if (period == l10n.last24Hours) return const Duration(hours: 24);
-    if (period == l10n.last3Days) return const Duration(days: 3);
-    if (period == l10n.last7Days) return const Duration(days: 7);
-    if (period == l10n.last30Days) return const Duration(days: 30);
-    if (period == l10n.last90Days) return const Duration(days: 90);
-    return null;
-  }
-
-  List<Measurement> _filterByPeriod(List<Measurement> all, AppLocalizations l10n) {
-    final duration = _periodToDuration(_selectedPeriod ?? l10n.last7Days, l10n);
-    if (duration == null) return all;
-    final cutoff = DateTime.now().subtract(duration);
-    return all.where((m) => m.recordedAt.isAfter(cutoff)).toList();
-  }
-
   void _confirmDelete(BuildContext context, String petName, Measurement m) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
@@ -374,228 +131,211 @@ class _MeasurementHistoryState extends State<_MeasurementHistory> {
     ];
     _selectedPeriod ??= l10n.last7Days;
 
-    final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+    final petName = petStore.activePet?.name ?? 'Pet';
     final allMeasurements = measurementStore.getMeasurements(petName);
     final filtered = _filterByPeriod(allMeasurements, l10n);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(l10n.measurementHistory, style: AppTextStyles.heading3),
-        const SizedBox(height: 8),
-        Text('$petName • ${allMeasurements.length} recordings', style: AppTextStyles.body),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 8,
-          runSpacing: 12,
-          children: [
-            Container(
-              height: 40,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: c.offWhite,
-                borderRadius: const BorderRadius.all(AppRadii.xs),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _selectedPeriod,
-                  icon: const Icon(Icons.keyboard_arrow_down, size: 16),
-                  style: AppTextStyles.body,
-                  items: periodOptions
-                      .map((option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() => _selectedPeriod = value);
-                    }
-                  },
-                ),
-              ),
-            ),
-            _FilterChipButton(
-              label: l10n.exportLabel,
-              onTap: widget.onExport,
-              icon: Icons.file_download,
-              filled: true,
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        _SectionCard(
-          child: Column(
-            children: [
-              if (filtered.isEmpty)
-                Column(
-                  children: [
-                    Row(children: [
-                      _StatCard(title: l10n.averageSrr, value: '--', footnote: l10n.bpm),
-                      const SizedBox(width: 8),
-                      _StatCard(title: l10n.range, value: '--', footnote: l10n.minMax),
-                    ]),
-                    const SizedBox(height: 8),
-                    Row(children: [
-                      _StatCard(title: l10n.trend, value: '--', footnote: l10n.bpmChange),
-                      const SizedBox(width: 8),
-                      const _StatusCard(),
-                    ]),
-                  ],
-                )
-              else
-                Builder(builder: (context) {
-                  final bpms = filtered.map((m) => m.bpm).toList();
-                  final avg = (bpms.reduce((a, b) => a + b) / bpms.length).round();
-                  final minBpm = bpms.reduce((a, b) => a < b ? a : b);
-                  final maxBpm = bpms.reduce((a, b) => a > b ? a : b);
-                  final weekAgo = DateTime.now().subtract(const Duration(days: 7));
-                  final recent = filtered.where((m) => m.recordedAt.isAfter(weekAgo)).toList();
-                  final older = filtered.where((m) => !m.recordedAt.isAfter(weekAgo)).toList();
-                  final recentAvg = recent.isEmpty ? avg : (recent.map((m) => m.bpm).reduce((a, b) => a + b) / recent.length).round();
-                  final olderAvg = older.isEmpty ? recentAvg : (older.map((m) => m.bpm).reduce((a, b) => a + b) / older.length).round();
-                  final trend = recentAvg - olderAvg;
-                  final trendStr = trend >= 0 ? '+$trend' : '$trend';
-                  return Column(
-                    children: [
-                      Row(children: [
-                        _StatCard(title: l10n.averageSrr, value: '$avg', footnote: l10n.bpm),
-                        const SizedBox(width: 8),
-                        _StatCard(title: l10n.range, value: '$minBpm-$maxBpm', footnote: l10n.minMax),
-                      ]),
-                      const SizedBox(height: 8),
-                      Row(children: [
-                        _StatCard(title: l10n.trend, value: trendStr, footnote: l10n.bpmChange),
-                        const SizedBox(width: 8),
-                        const _StatusCard(),
-                      ]),
-                    ],
-                  );
-                }),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-        _SectionCard(
+    final content = SafeArea(
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.srrOverTime, style: AppTextStyles.heading3),
-              const SizedBox(height: 16),
-              _BadgeRow(),
-              const SizedBox(height: 8),
-              _BadgeRowSecond(),
-              const SizedBox(height: 16),
-              _SrrChart(measurements: filtered),
-            ],
-          ),
-        ),
-        if (filtered.isNotEmpty) ...[
-          const SizedBox(height: 24),
-          ...filtered.map((m) {
-            final dateStr = '${m.recordedAt.month}/${m.recordedAt.day} ${m.recordedAt.hour}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
-            final status = settingsStore.classifyStatus(m.bpm);
-            final statusColor = status == 'Normal' ? c.lightBlue : status == 'Elevated' ? c.lightYellow : c.cherry;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Dismissible(
-                key: ValueKey('${m.recordedAt.millisecondsSinceEpoch}-${m.bpm}'),
-                direction: DismissDirection.endToStart,
-                background: Container(
-                  alignment: Alignment.centerRight,
-                  padding: const EdgeInsets.only(right: 20),
-                  decoration: BoxDecoration(
-                    color: c.cherry,
-                    borderRadius: const BorderRadius.all(AppRadii.small),
-                  ),
-                  child: Icon(Icons.delete, color: c.white),
-                ),
-                confirmDismiss: (_) async {
-                  _confirmDelete(context, petName, m);
-                  return false;
-                },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: c.offWhite,
-                    borderRadius: const BorderRadius.all(AppRadii.small),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 8, height: 8,
-                        decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+              const SizedBox(height: AppSpacing.md),
+              Text(l10n.healthTrends, style: AppTextStyles.heading2),
+              const SizedBox(height: AppSpacing.sm),
+              Text('$petName • ${allMeasurements.length} recordings', style: AppTextStyles.body),
+              const SizedBox(height: AppSpacing.md),
+              Wrap(
+                spacing: 8,
+                runSpacing: 12,
+                children: [
+                  Container(
+                    height: 40,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: c.offWhite,
+                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedPeriod,
+                        icon: const Icon(Icons.keyboard_arrow_down, size: 16),
+                        style: AppTextStyles.body,
+                        items: periodOptions
+                            .map((option) => DropdownMenuItem(value: option, child: Text(option)))
+                            .toList(),
+                        onChanged: (value) {
+                          if (value != null) setState(() => _selectedPeriod = value);
+                        },
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => _showExportDialog(context),
+                    child: Container(
+                      height: 40,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: c.lightBlue,
+                        borderRadius: const BorderRadius.all(AppRadii.xs),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.file_download, size: 16, color: c.chocolate),
+                          const SizedBox(width: 8),
+                          Text(l10n.exportLabel, style: AppTextStyles.body),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              _StatGrid(filtered: filtered),
+              const SizedBox(height: AppSpacing.lg),
+              _SectionCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.srrOverTime, style: AppTextStyles.heading3),
+                    const SizedBox(height: AppSpacing.md),
+                    _BadgeRow(),
+                    const SizedBox(height: AppSpacing.sm),
+                    _BadgeRowSecond(),
+                    const SizedBox(height: AppSpacing.md),
+                    _SrrChart(measurements: filtered),
+                  ],
+                ),
+              ),
+              if (filtered.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.lg),
+                Text(l10n.measurementHistory, style: AppTextStyles.heading3),
+                const SizedBox(height: AppSpacing.sm + 4),
+                ...filtered.map((m) {
+                  final dateStr = '${m.recordedAt.month}/${m.recordedAt.day} ${m.recordedAt.hour}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
+                  final status = settingsStore.classifyStatus(m.bpm);
+                  final statusColor = status == 'Normal' ? c.lightBlue : status == 'Elevated' ? c.lightYellow : c.cherry;
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Dismissible(
+                      key: ValueKey('${m.recordedAt.millisecondsSinceEpoch}-${m.bpm}'),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        decoration: BoxDecoration(
+                          color: c.cherry,
+                          borderRadius: const BorderRadius.all(AppRadii.small),
+                        ),
+                        child: Icon(Icons.delete, color: c.white),
+                      ),
+                      confirmDismiss: (_) async {
+                        _confirmDelete(context, petName, m);
+                        return false;
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: c.offWhite,
+                          borderRadius: const BorderRadius.all(AppRadii.small),
+                        ),
+                        child: Row(
                           children: [
-                            Text('${m.bpm} BPM', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: c.chocolate)),
-                            Text(dateStr, style: AppTextStyles.caption.copyWith(color: c.chocolate)),
+                            Container(
+                              width: 8, height: 8,
+                              decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('${m.bpm} BPM', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: c.chocolate)),
+                                  Text(dateStr, style: AppTextStyles.caption.copyWith(color: c.chocolate)),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: statusColor.withValues(alpha: 0.2),
+                                borderRadius: const BorderRadius.all(AppRadii.full),
+                              ),
+                              child: Text(status, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: c.chocolate)),
+                            ),
                           ],
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: statusColor.withValues(alpha: 0.2),
-                          borderRadius: const BorderRadius.all(AppRadii.full),
-                        ),
-                        child: Text(status, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: c.chocolate)),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }),
-        ],
-      ],
+                    ),
+                  );
+                }),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
+
+    if (!widget.showScaffold) return Container(color: c.white, child: content);
+    return Scaffold(backgroundColor: c.white, body: content);
   }
 }
 
-class _FilterChipButton extends StatelessWidget {
-  const _FilterChipButton({
-    required this.label,
-    required this.onTap,
-    this.icon,
-    this.filled = false,
-  });
+class _StatGrid extends StatelessWidget {
+  const _StatGrid({required this.filtered});
 
-  final String label;
-  final VoidCallback onTap;
-  final IconData? icon;
-  final bool filled;
+  final List<Measurement> filtered;
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: 40,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        decoration: BoxDecoration(
-          color: filled ? c.lightBlue : c.offWhite,
-          borderRadius: const BorderRadius.all(AppRadii.xs),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, size: 16, color: c.chocolate),
-              const SizedBox(width: 8),
-            ],
-            Text(label, style: AppTextStyles.body),
-            if (!filled) ...[
-              const SizedBox(width: 8),
-              const Icon(Icons.keyboard_arrow_down, size: 16),
-            ],
-          ],
-        ),
-      ),
+    final l10n = AppLocalizations.of(context)!;
+    if (filtered.isEmpty) {
+      return _SectionCard(
+        child: Column(children: [
+          Row(children: [
+            _StatCard(title: l10n.averageSrr, value: '--', footnote: l10n.bpm),
+            const SizedBox(width: 8),
+            _StatCard(title: l10n.range, value: '--', footnote: l10n.minMax),
+          ]),
+          const SizedBox(height: 8),
+          Row(children: [
+            _StatCard(title: l10n.trend, value: '--', footnote: l10n.bpmChange),
+            const SizedBox(width: 8),
+            const _StatusCard(),
+          ]),
+        ]),
+      );
+    }
+
+    final bpms = filtered.map((m) => m.bpm).toList();
+    final avg = (bpms.reduce((a, b) => a + b) / bpms.length).round();
+    final minBpm = bpms.reduce((a, b) => a < b ? a : b);
+    final maxBpm = bpms.reduce((a, b) => a > b ? a : b);
+    final weekAgo = DateTime.now().subtract(const Duration(days: 7));
+    final recent = filtered.where((m) => m.recordedAt.isAfter(weekAgo)).toList();
+    final older = filtered.where((m) => !m.recordedAt.isAfter(weekAgo)).toList();
+    final recentAvg = recent.isEmpty ? avg : (recent.map((m) => m.bpm).reduce((a, b) => a + b) / recent.length).round();
+    final olderAvg = older.isEmpty ? recentAvg : (older.map((m) => m.bpm).reduce((a, b) => a + b) / older.length).round();
+    final trend = recentAvg - olderAvg;
+    final trendStr = trend >= 0 ? '+$trend' : '$trend';
+
+    return _SectionCard(
+      child: Column(children: [
+        Row(children: [
+          _StatCard(title: l10n.averageSrr, value: '$avg', footnote: l10n.bpm),
+          const SizedBox(width: 8),
+          _StatCard(title: l10n.range, value: '$minBpm-$maxBpm', footnote: l10n.minMax),
+        ]),
+        const SizedBox(height: 8),
+        Row(children: [
+          _StatCard(title: l10n.trend, value: trendStr, footnote: l10n.bpmChange),
+          const SizedBox(width: 8),
+          const _StatusCard(),
+        ]),
+      ]),
     );
   }
 }
@@ -609,7 +349,7 @@ class _SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: c.offWhite,
         borderRadius: const BorderRadius.all(AppRadii.medium),
@@ -625,19 +365,11 @@ class _BadgeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    return Row(
-      children: [
-        _LegendBadge(
-          color: c.lightBlue,
-          label: 'Normal (<30)',
-        ),
-        const SizedBox(width: 8),
-        _LegendBadge(
-          color: c.lightYellow,
-          label: 'Elevated (30-40)',
-        ),
-      ],
-    );
+    return Row(children: [
+      _LegendBadge(color: c.lightBlue, label: 'Normal (<30)'),
+      const SizedBox(width: 8),
+      _LegendBadge(color: c.lightYellow, label: 'Elevated (30-40)'),
+    ]);
   }
 }
 
@@ -647,18 +379,12 @@ class _BadgeRowSecond extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    return _LegendBadge(
-      color: c.cherry,
-      label: 'Alert (>40)',
-    );
+    return _LegendBadge(color: c.cherry, label: 'Alert (>40)');
   }
 }
 
 class _LegendBadge extends StatelessWidget {
-  const _LegendBadge({
-    required this.color,
-    required this.label,
-  });
+  const _LegendBadge({required this.color, required this.label});
 
   final Color color;
   final String label;
@@ -675,11 +401,7 @@ class _LegendBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
+          Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
           const SizedBox(width: 4),
           Text(label, style: AppTextStyles.caption.copyWith(color: c.chocolate)),
         ],
@@ -689,11 +411,7 @@ class _LegendBadge extends StatelessWidget {
 }
 
 class _StatCard extends StatelessWidget {
-  const _StatCard({
-    required this.title,
-    required this.value,
-    required this.footnote,
-  });
+  const _StatCard({required this.title, required this.value, required this.footnote});
 
   final String title;
   final String value;
@@ -705,32 +423,19 @@ class _StatCard extends StatelessWidget {
     return Expanded(
       child: Container(
         height: 109,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.sm + 4),
         decoration: BoxDecoration(
           color: c.white,
           borderRadius: const BorderRadius.all(AppRadii.small),
         ),
-        child: Stack(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: AppTextStyles.caption.copyWith(fontSize: 12)),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: AppTextStyles.heading2.copyWith(fontSize: 24),
-                ),
-                const Spacer(),
-                Text(footnote, style: AppTextStyles.caption.copyWith(fontSize: 12)),
-              ],
-            ),
-            Positioned(
-              right: 8,
-              top: 8,
-              child: Icon(Icons.notifications_none,
-                  size: 18, color: c.chocolate),
-            ),
+            Text(title, style: AppTextStyles.caption),
+            const SizedBox(height: AppSpacing.xs),
+            Text(value, style: AppTextStyles.heading2.copyWith(fontSize: 24)),
+            const Spacer(),
+            Text(footnote, style: AppTextStyles.caption),
           ],
         ),
       ),
@@ -759,20 +464,18 @@ class _StatusCard extends StatelessWidget {
             Text(l10n.status, style: AppTextStyles.caption.copyWith(fontSize: 12)),
             const SizedBox(height: 16),
             Builder(builder: (context) {
-              final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+              final petName = petStore.activePet?.name ?? 'Pet';
               final measurements = measurementStore.getMeasurements(petName);
               final normal = measurements.where((m) => m.bpm < settingsStore.elevatedThreshold).length;
               final elevated = measurements.where((m) => m.bpm >= settingsStore.elevatedThreshold && m.bpm < settingsStore.criticalThreshold).length;
               final critical = measurements.where((m) => m.bpm >= settingsStore.criticalThreshold).length;
-              return Row(
-                children: [
-                  _StatusPill(value: '$normal', color: c.lightBlue),
-                  const SizedBox(width: 8),
-                  _StatusPill(value: '$elevated', color: c.lightYellow),
-                  const SizedBox(width: 8),
-                  _StatusPill(value: '$critical', color: c.cherry, muted: critical == 0),
-                ],
-              );
+              return Row(children: [
+                _StatusPill(value: '$normal', color: c.lightBlue),
+                const SizedBox(width: 8),
+                _StatusPill(value: '$elevated', color: c.lightYellow),
+                const SizedBox(width: 8),
+                _StatusPill(value: '$critical', color: c.cherry, muted: critical == 0),
+              ]);
             }),
           ],
         ),
@@ -782,11 +485,7 @@ class _StatusCard extends StatelessWidget {
 }
 
 class _StatusPill extends StatelessWidget {
-  const _StatusPill({
-    required this.value,
-    required this.color,
-    this.muted = false,
-  });
+  const _StatusPill({required this.value, required this.color, this.muted = false});
 
   final String value;
   final Color color;
@@ -794,26 +493,17 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: AppTextStyles.body.copyWith(
-            fontWeight: FontWeight.w600,
-            color: color,
-          ),
+    return Column(children: [
+      Text(value, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: color)),
+      const SizedBox(height: 4),
+      Container(
+        width: 27, height: 2,
+        decoration: BoxDecoration(
+          color: muted ? color.withValues(alpha: 0.4) : color,
+          borderRadius: const BorderRadius.all(AppRadii.xs),
         ),
-        const SizedBox(height: 4),
-        Container(
-          width: 27,
-          height: 2,
-          decoration: BoxDecoration(
-            color: muted ? color.withOpacity(0.4) : color,
-            borderRadius: const BorderRadius.all(AppRadii.xs),
-          ),
-        ),
-      ],
-    );
+      ),
+    ]);
   }
 }
 
@@ -843,11 +533,7 @@ class _SrrChart extends StatelessWidget {
             const SizedBox(height: 12),
             Text(l10n.noMeasurementsYet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
             const SizedBox(height: 8),
-            Text(
-              l10n.noMeasurementsDescription,
-              style: AppTextStyles.body.copyWith(color: c.chocolate),
-              textAlign: TextAlign.center,
-            ),
+            Text(l10n.noMeasurementsDescription, style: AppTextStyles.body.copyWith(color: c.chocolate), textAlign: TextAlign.center),
           ],
         ),
       );
@@ -871,16 +557,9 @@ class _SrrChart extends StatelessWidget {
         margin: EdgeInsets.zero,
         primaryXAxis: CategoryAxis(
           axisLine: AxisLine(width: 1, color: c.chocolate),
-          majorGridLines: MajorGridLines(
-            width: 0.5,
-            color: c.offWhite,
-            dashArray: const [3, 3],
-          ),
+          majorGridLines: MajorGridLines(width: 0.5, color: c.offWhite, dashArray: const [3, 3]),
           majorTickLines: const MajorTickLines(size: 6, width: 1),
-          labelStyle: AppTextStyles.caption.copyWith(
-            color: c.chocolate,
-            fontSize: 10,
-          ),
+          labelStyle: AppTextStyles.caption.copyWith(color: c.chocolate, fontSize: 10),
           labelRotation: 0,
         ),
         primaryYAxis: NumericAxis(
@@ -889,37 +568,22 @@ class _SrrChart extends StatelessWidget {
           interval: 10,
           axisLine: AxisLine(width: 1, color: c.chocolate),
           majorTickLines: const MajorTickLines(size: 6, width: 1),
-          majorGridLines: MajorGridLines(
-            width: 0.5,
-            color: c.offWhite,
-            dashArray: const [3, 3],
-          ),
-          labelStyle: AppTextStyles.caption.copyWith(
-            color: c.chocolate,
-            fontSize: 10,
-          ),
+          majorGridLines: MajorGridLines(width: 0.5, color: c.offWhite, dashArray: const [3, 3]),
+          labelStyle: AppTextStyles.caption.copyWith(color: c.chocolate, fontSize: 10),
           plotBands: [
             PlotBand(
-              start: 30,
-              end: 30,
-              borderColor: c.chocolate,
-              borderWidth: 1,
+              start: 30, end: 30, borderColor: c.chocolate, borderWidth: 1,
               dashArray: const [4, 4],
               text: 'Normal Threshold (30 BPM)',
-              textStyle:
-                  AppTextStyles.caption.copyWith(color: c.chocolate),
+              textStyle: AppTextStyles.caption.copyWith(color: c.chocolate),
               horizontalTextAlignment: TextAnchor.end,
               verticalTextAlignment: TextAnchor.middle,
             ),
             PlotBand(
-              start: 40,
-              end: 40,
-              borderColor: c.chocolate,
-              borderWidth: 1,
+              start: 40, end: 40, borderColor: c.chocolate, borderWidth: 1,
               dashArray: const [4, 4],
               text: 'Alert Threshold (40 BPM)',
-              textStyle:
-                  AppTextStyles.caption.copyWith(color: c.chocolate),
+              textStyle: AppTextStyles.caption.copyWith(color: c.chocolate),
               horizontalTextAlignment: TextAnchor.end,
               verticalTextAlignment: TextAnchor.middle,
             ),
@@ -933,20 +597,13 @@ class _SrrChart extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [
-                c.blue.withValues(alpha: 0.25),
-                c.blue.withValues(alpha: 0.0),
-              ],
+              colors: [c.blue.withValues(alpha: 0.25), c.blue.withValues(alpha: 0.0)],
             ),
             borderColor: c.blue,
             borderWidth: 2,
             markerSettings: MarkerSettings(
-              isVisible: true,
-              width: 8,
-              height: 8,
-              color: c.blue,
-              borderWidth: 2,
-              borderColor: c.white,
+              isVisible: true, width: 8, height: 8,
+              color: c.blue, borderWidth: 2, borderColor: c.white,
             ),
           ),
         ],
@@ -961,4 +618,3 @@ class _SrrPoint {
   final String label;
   final double value;
 }
-

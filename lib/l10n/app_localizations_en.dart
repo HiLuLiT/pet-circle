@@ -826,4 +826,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get complete => 'Complete';
+
+  @override
+  String get editMedication => 'Edit Medication';
+
+  @override
+  String get medicationUpdated => 'Medication updated';
+
+  @override
+  String updateMedicationDescription(String name) {
+    return 'Update medication details for $name\'s care plan';
+  }
+
+  @override
+  String addMedicationDescription(String name) {
+    return 'Record a new medication or treatment for $name\'s care plan';
+  }
+
+  @override
+  String keepTrackOfMedications(String name) {
+    return 'Keep track of $name\'s medications, dosages, and treatment schedules. Add medication records to monitor health trends alongside respiratory data.';
+  }
+
+  @override
+  String get newMedication => 'New Medication';
+
+  @override
+  String get onceDaily => 'Once daily';
+
+  @override
+  String get twiceDaily => 'Twice daily';
+
+  @override
+  String get asNeeded => 'As needed';
+
+  @override
+  String get searchBreeds => 'Search breeds...';
+
+  @override
+  String get noBreedsFound => 'No breeds found';
+
+  @override
+  String get ongoing => 'Ongoing';
+
+  @override
+  String get completed => 'Completed';
 }

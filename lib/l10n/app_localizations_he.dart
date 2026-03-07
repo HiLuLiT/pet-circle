@@ -824,4 +824,49 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get complete => 'סיום';
+
+  @override
+  String get editMedication => 'עריכת תרופה';
+
+  @override
+  String get medicationUpdated => 'תרופה עודכנה';
+
+  @override
+  String updateMedicationDescription(String name) {
+    return 'עדכון פרטי תרופה עבור תוכנית הטיפול של $name';
+  }
+
+  @override
+  String addMedicationDescription(String name) {
+    return 'רישום תרופה או טיפול חדש עבור תוכנית הטיפול של $name';
+  }
+
+  @override
+  String keepTrackOfMedications(String name) {
+    return 'עקוב אחר התרופות, המינונים ולוחות הזמנים של $name. הוסף רשומות תרופות כדי לעקוב אחר מגמות בריאות לצד נתוני נשימה.';
+  }
+
+  @override
+  String get newMedication => 'תרופה חדשה';
+
+  @override
+  String get onceDaily => 'פעם ביום';
+
+  @override
+  String get twiceDaily => 'פעמיים ביום';
+
+  @override
+  String get asNeeded => 'לפי הצורך';
+
+  @override
+  String get searchBreeds => 'חיפוש גזעים...';
+
+  @override
+  String get noBreedsFound => 'לא נמצאו גזעים';
+
+  @override
+  String get ongoing => 'פעיל';
+
+  @override
+  String get completed => 'הושלם';
 }

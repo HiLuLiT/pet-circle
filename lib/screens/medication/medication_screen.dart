@@ -16,12 +16,12 @@ class MedicationScreen extends StatefulWidget {
 }
 
 class _MedicationScreenState extends State<MedicationScreen> {
-  void _openAddMedicationSheet() {
+  void _openMedicationSheet([Medication? medication]) {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const _AddMedicationSheet(),
+      builder: (context) => _AddMedicationSheet(medication: medication),
     );
   }
 
@@ -32,7 +32,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
     final meds = medicationStore.getMedications(petName);
     final csvLines = meds.map((m) {
       final start = '${m.startDate.year}-${m.startDate.month.toString().padLeft(2, '0')}-${m.startDate.day.toString().padLeft(2, '0')}';
-      final status = m.isActive ? 'Ongoing' : 'Completed';
+      final status = m.isActive ? l10n.ongoing : l10n.completed;
       return '${m.name},${m.dosage},${m.frequency},$start,$status';
     }).join('\n');
     final csvData = 'Medication,Dosage,Frequency,Start Date,Status\n$csvLines';
@@ -105,7 +105,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                       SizedBox(
                         height: 32,
                         child: TextButton.icon(
-                          onPressed: _openAddMedicationSheet,
+                          onPressed: _openMedicationSheet,
                           style: TextButton.styleFrom(
                             backgroundColor: c.lightBlue,
                             shape: RoundedRectangleBorder(
@@ -131,7 +131,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                     );
                   }),
                   const SizedBox(height: 24),
-                  _ActiveMedicationsList(),
+                  _ActiveMedicationsList(onEdit: _openMedicationSheet),
                   const SizedBox(height: 24),
                   _SectionCard(
                     child: Column(
@@ -193,6 +193,10 @@ class _MedicationScreenState extends State<MedicationScreen> {
 }
 
 class _ActiveMedicationsList extends StatelessWidget {
+  const _ActiveMedicationsList({this.onEdit});
+
+  final void Function(Medication)? onEdit;
+
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
@@ -214,8 +218,7 @@ class _ActiveMedicationsList extends StatelessWidget {
             Text(l10n.noMedicationsRecorded, style: AppTextStyles.heading3, textAlign: TextAlign.center),
             const SizedBox(height: 4),
             Text(
-              "Keep track of $petName's medications, dosages, and treatment schedules. "
-              'Add medication records to monitor health trends alongside respiratory data.',
+              l10n.keepTrackOfMedications(petName),
               style: AppTextStyles.body,
               textAlign: TextAlign.center,
             ),
@@ -229,7 +232,9 @@ class _ActiveMedicationsList extends StatelessWidget {
         final dateStr = '${med.startDate.month}/${med.startDate.day}';
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
-          child: Container(
+          child: GestureDetector(
+            onTap: () => onEdit?.call(med),
+            child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: c.offWhite,
@@ -277,6 +282,7 @@ class _ActiveMedicationsList extends StatelessWidget {
               ],
             ),
           ),
+          ),
         );
       }).toList(),
     );
@@ -304,7 +310,9 @@ class _SectionCard extends StatelessWidget {
 }
 
 class _AddMedicationSheet extends StatefulWidget {
-  const _AddMedicationSheet();
+  const _AddMedicationSheet({this.medication});
+
+  final Medication? medication;
 
   @override
   State<_AddMedicationSheet> createState() => _AddMedicationSheetState();
@@ -312,9 +320,19 @@ class _AddMedicationSheet extends StatefulWidget {
 
 class _AddMedicationSheetState extends State<_AddMedicationSheet> {
   bool _remindersEnabled = false;
-  String _frequency = 'Once daily';
-  final _nameController = TextEditingController();
-  final _dosageController = TextEditingController();
+  late String _frequency;
+  late final TextEditingController _nameController;
+  late final TextEditingController _dosageController;
+
+  bool get _isEditing => widget.medication != null;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.medication?.name ?? '');
+    _dosageController = TextEditingController(text: widget.medication?.dosage ?? '');
+    _frequency = widget.medication?.frequency ?? 'Once daily';
+  }
 
   @override
   void dispose() {
@@ -353,10 +371,15 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                 Center(
                   child: Column(
                     children: [
-                      Text(l10n.addNewMedication, style: AppTextStyles.heading2),
-                      const SizedBox(height: 8),
                       Text(
-                        'Record a new medication or treatment for ${petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : "your pet"}\'s care plan',
+                        _isEditing ? l10n.editMedication : l10n.addNewMedication,
+                        style: AppTextStyles.heading2,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        _isEditing
+                            ? l10n.updateMedicationDescription(petStore.activePet?.name ?? l10n.petName)
+                            : l10n.addMedicationDescription(petStore.activePet?.name ?? l10n.petName),
                         style: AppTextStyles.body,
                         textAlign: TextAlign.center,
                       ),
@@ -404,27 +427,45 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                     const SizedBox(width: 8),
                     TextButton(
                       onPressed: () {
-                        final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
-                        medicationStore.addMedication(
-                          petName,
-                          Medication(
-                            id: 'med-${DateTime.now().millisecondsSinceEpoch}',
-                            name: _nameController.text.isNotEmpty ? _nameController.text : 'New Medication',
-                            dosage: _dosageController.text,
-                            frequency: _frequency,
-                            startDate: DateTime.now(),
-                          ),
-                        );
+                        final petName = petStore.activePet?.name ?? 'Pet';
+                        final name = _nameController.text.isNotEmpty ? _nameController.text : l10n.newMedication;
+                        final dosage = _dosageController.text;
+
+                        if (_isEditing) {
+                          medicationStore.updateMedication(
+                            petName,
+                            widget.medication!.id,
+                            widget.medication!.copyWith(
+                              name: name,
+                              dosage: dosage,
+                              frequency: _frequency,
+                            ),
+                          );
+                        } else {
+                          medicationStore.addMedication(
+                            petName,
+                            Medication(
+                              id: 'med-${DateTime.now().millisecondsSinceEpoch}',
+                              name: name,
+                              dosage: dosage,
+                              frequency: _frequency,
+                              startDate: DateTime.now(),
+                            ),
+                          );
+                        }
                         Navigator.of(context).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.medicationAdded)),
+                          SnackBar(content: Text(_isEditing ? l10n.medicationUpdated : l10n.medicationAdded)),
                         );
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: c.blue,
                         shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.full)),
                       ),
-                      child: Text(l10n.addMedication, style: TextStyle(color: c.white)),
+                      child: Text(
+                        _isEditing ? l10n.save : l10n.addMedication,
+                        style: TextStyle(color: c.white),
+                      ),
                     ),
                   ],
                 ),
@@ -481,11 +522,12 @@ class _DropdownField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.sm),
         Container(
           height: 36,
           padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -495,10 +537,10 @@ class _DropdownField extends StatelessWidget {
               value: value,
               isExpanded: true,
               icon: const Icon(Icons.keyboard_arrow_down),
-              items: const [
-                DropdownMenuItem(value: 'Once daily', child: Text('Once daily')),
-                DropdownMenuItem(value: 'Twice daily', child: Text('Twice daily')),
-                DropdownMenuItem(value: 'As needed', child: Text('As needed')),
+              items: [
+                DropdownMenuItem(value: 'Once daily', child: Text(l10n.onceDaily)),
+                DropdownMenuItem(value: 'Twice daily', child: Text(l10n.twiceDaily)),
+                DropdownMenuItem(value: 'As needed', child: Text(l10n.asNeeded)),
               ],
               onChanged: onChanged,
             ),

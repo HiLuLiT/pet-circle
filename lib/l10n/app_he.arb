@@ -281,5 +281,21 @@
   "@removeMemberConfirmation": { "placeholders": { "name": { "type": "String" } } },
   "back": "חזרה",
   "next": "הבא",
-  "complete": "סיום"
+  "complete": "סיום",
+  "editMedication": "עריכת תרופה",
+  "medicationUpdated": "תרופה עודכנה",
+  "updateMedicationDescription": "עדכון פרטי תרופה עבור תוכנית הטיפול של {name}",
+  "@updateMedicationDescription": { "placeholders": { "name": { "type": "String" } } },
+  "addMedicationDescription": "רישום תרופה או טיפול חדש עבור תוכנית הטיפול של {name}",
+  "@addMedicationDescription": { "placeholders": { "name": { "type": "String" } } },
+  "keepTrackOfMedications": "עקוב אחר התרופות, המינונים ולוחות הזמנים של {name}. הוסף רשומות תרופות כדי לעקוב אחר מגמות בריאות לצד נתוני נשימה.",
+  "@keepTrackOfMedications": { "placeholders": { "name": { "type": "String" } } },
+  "newMedication": "תרופה חדשה",
+  "onceDaily": "פעם ביום",
+  "twiceDaily": "פעמיים ביום",
+  "asNeeded": "לפי הצורך",
+  "searchBreeds": "חיפוש גזעים...",
+  "noBreedsFound": "לא נמצאו גזעים",
+  "ongoing": "פעיל",
+  "completed": "הושלם"
 }

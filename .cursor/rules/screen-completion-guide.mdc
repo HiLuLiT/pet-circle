@@ -1,5 +1,5 @@
 ---
-description: Screen-by-screen completion guide for Pet Circle. Phase 1 is complete with care circle role system. This file tracks remaining polish and Phase 2+ items.
+description: Screen-by-screen guide for Pet Circle. Phase 1 is complete. Tracks navigation structure, role system, remaining polish, and Phase 2+ items.
 globs: "lib/screens/**/*.dart"
 alwaysApply: false
 ---
@@ -8,26 +8,35 @@ alwaysApply: false
 
 ## Phase 1 Status: COMPLETE
 
-All Phase 1 user stories are implemented including the care circle role system (Admin/Member/Viewer).
-
-## Role System
-
-- Two app-level roles: Owner and Vet (selected at sign-in via role_selection_screen)
-- Three care circle roles per pet: Admin, Member, Viewer (defined in `care_circle_member.dart`)
-- `CareCirclePermissions` extension provides `canMeasure`, `canEditPet`, `canManageCircle`, `canAddNotes`, `canDeletePet`
-- `PetStore.currentUserRoleFor(petName)` returns the current user's role for a given pet
-- Pet detail edit button: admin-only
-- Dashboard delete (long-press): admin-only
-- Invite flow: offers Member or Viewer (Admin is auto-assigned to pet creator)
+All Phase 1 user stories are implemented.
 
 ## Navigation Structure
 
 ```
 Bottom Nav: Home(0) | Trends(1) | Measure(2) | Medication(3)
-Trends tabs: Overview | Measurement History
+Trends: single unified view (stats + chart + history, no tabs)
 Notifications: bell icon drawer only (no dedicated tab)
 Medication: standalone screen at lib/screens/medication/medication_screen.dart
+Active pet: global via petStore.activePetIndex, switched from header pet chip
 ```
+
+## Role System
+
+- Two app-level roles: Owner and Vet (selected at sign-in)
+- Three care circle roles per pet: Admin, Member, Viewer (enum in `care_circle_member.dart`)
+- `CareCirclePermissions` extension: `canMeasure`, `canEditPet`, `canManageCircle`, `canAddNotes`, `canDeletePet`
+- `PetStore.currentUserRoleFor(petName)` returns current user's role for a pet
+- Pet detail edit button: admin-only
+- Dashboard delete (long-press): admin-only
+- Invite flow: offers Member or Viewer (Admin auto-assigned to pet creator)
+
+## Shared Widgets
+
+| Widget | File | Used In |
+|--------|------|---------|
+| `BreedSearchField` | `lib/widgets/breed_search_field.dart` | Onboarding Step 1, Pet Detail edit sheet |
+| `OnboardingShell` | `lib/widgets/onboarding_shell.dart` | All 4 onboarding steps (Back/Next buttons) |
+| `BottomNavBar` | `lib/widgets/bottom_nav_bar.dart` | MainShell (Home, Trends, Measure, Medication) |
 
 ## Remaining Polish (Optional)
 
@@ -45,11 +54,14 @@ Medication: standalone screen at lib/screens/medication/medication_screen.dart
 - [x] All buttons functional
 - [x] Care circle role system (Admin/Member/Viewer)
 - [x] Role-aware UI (edit/delete/measure permissions)
-- [x] Multi-pet support (add, edit, delete, switch, select)
+- [x] Multi-pet support (add, edit, delete, global switcher)
 - [x] User profile management
 - [x] Sign out
-- [x] Measurement lifecycle (add, view, filter, delete)
+- [x] Measurement lifecycle (add, view, filter by period, delete)
 - [x] Clinical notes persistence
-- [x] Medication management
-- [x] Dark mode + i18n (EN/HE)
-- [x] Caregiver app-level role removed (sharing via care circle instead)
+- [x] Medication management (add, edit, list, export)
+- [x] Unified health trends (single view, no tabs)
+- [x] Searchable breed dropdown (shared widget)
+- [x] Onboarding Back/Next with persistent state
+- [x] Dark mode + i18n (EN/HE, enforced)
+- [x] Design system tokens enforced via cursor rule

@@ -34,6 +34,15 @@ class MedicationStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateMedication(String petName, String medicationId, Medication updated) {
+    final list = _medications[petName];
+    if (list == null) return;
+    final idx = list.indexWhere((m) => m.id == medicationId);
+    if (idx == -1) return;
+    list[idx] = updated;
+    notifyListeners();
+  }
+
   void toggleMedication(String petName, String medicationId) {
     final list = _medications[petName];
     if (list == null) return;

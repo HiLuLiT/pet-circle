@@ -4,15 +4,15 @@ globs: "lib/**/*.dart"
 alwaysApply: false
 ---
 
-# Pet Circle — State Management Rules
+# Pet Circle -- State Management Rules
 
 ## Architecture Overview
 
-Pet Circle uses **global `ChangeNotifier` stores** for all shared app state. This extends the existing `ValueNotifier` pattern already used for locale and dark mode. No third-party state management packages are required.
+Pet Circle uses **global `ChangeNotifier` stores** for all shared app state. Global preferences (locale, dark mode) use `ValueNotifier`. No third-party state management packages are required.
 
 ```
 lib/stores/
-├── pet_store.dart            # Pet profiles
+├── pet_store.dart            # Pet profiles, active pet, care circle ops
 ├── measurement_store.dart    # SRR measurements per pet
 ├── note_store.dart           # Clinical notes per pet
 ├── medication_store.dart     # Medications per pet
@@ -29,19 +29,15 @@ Every store follows the same structure:
 import 'package:flutter/foundation.dart';
 
 class ExampleStore extends ChangeNotifier {
-  // Private mutable state
   List<Item> _items = [];
 
-  // Public read-only getters
   List<Item> get items => List.unmodifiable(_items);
 
-  // Mutation methods — always call notifyListeners()
   void addItem(Item item) {
     _items.add(item);
     notifyListeners();
   }
 
-  // Seeding from mock data
   void seed(List<Item> initial) {
     _items = List.of(initial);
     notifyListeners();
@@ -60,44 +56,17 @@ class ExampleStore extends ChangeNotifier {
 
 ## Global Store Instances
 
-All stores are instantiated as top-level globals in `lib/main.dart`, matching the existing `appLocale` / `appDarkMode` pattern:
+Each store file exports its own global singleton instance:
 
 ```dart
-// Global store instances — seeded in main() before runApp()
+// In lib/stores/pet_store.dart:
 final petStore = PetStore();
+
+// In lib/stores/measurement_store.dart:
 final measurementStore = MeasurementStore();
-final noteStore = NoteStore();
-final medicationStore = MedicationStore();
-final notificationStore = NotificationStore();
-final userStore = UserStore();
-final settingsStore = SettingsStore();
 ```
 
-Stores are seeded in `main()` before `runApp()`:
-
-```dart
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  _seedStores();
-  runApp(const PetCircleApp());
-}
-
-void _seedStores() {
-  userStore.seed(MockData.currentOwnerUser);
-  petStore.seed(
-    ownerPets: MockData.hilaPets,
-    clinicPets: MockData.vetClinicPets,
-  );
-  measurementStore.seed({
-    'Princess': MockData.princessMeasurements,
-  });
-  noteStore.seed({
-    'Princess': MockData.princessNotes,
-    'Max': MockData.maxNotes,
-  });
-  // ... etc
-}
-```
+Stores are seeded in `main()` before `runApp()` via `_seedStores()`.
 
 ## Accessing Stores in Widgets
 
@@ -133,14 +102,13 @@ ListenableBuilder(
 
 ### Writing (mutations)
 
-Call store methods directly — no context needed:
+Call store methods directly -- no context needed:
 
 ```dart
 onPressed: () {
   measurementStore.addMeasurement('Princess', Measurement(
     bpm: calculatedBpm,
     recordedAt: DateTime.now(),
-    recordedAtLabel: 'Just now',
   ));
 }
 ```
@@ -151,13 +119,12 @@ Access store getters directly when you don't need reactive rebuilds:
 
 ```dart
 final currentUser = userStore.currentUser;
-final notes = noteStore.getNotes('Princess');
+final activePet = petStore.activePet;
 ```
 
 ## Import Convention
 
 ```dart
-// Import the store file — the global instance is the top-level variable
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 ```
@@ -166,55 +133,37 @@ The global instance (e.g. `petStore`) is exported from the store file itself, NO
 
 ## Store Registry
 
-| Store | Global | State | Key Methods |
-|-------|--------|-------|-------------|
-| `PetStore` | `petStore` | Owner pets, clinic pets | `addPet`, `updatePet`, `removePet`, `getPetByName` |
-| `MeasurementStore` | `measurementStore` | Measurements per pet | `addMeasurement`, `getMeasurements`, `latestForPet` |
-| `NoteStore` | `noteStore` | Clinical notes per pet | `addNote`, `getNotes` |
-| `MedicationStore` | `medicationStore` | Medications per pet | `addMedication`, `removeMedication`, `getMedications` |
-| `NotificationStore` | `notificationStore` | App notifications | `addNotification`, `markRead`, `markAllRead` |
-| `UserStore` | `userStore` | Current user + role | `setUser`, `setRole` |
-| `SettingsStore` | `settingsStore` | Thresholds, prefs | `updateThresholds`, toggle methods |
+| Store | Global | Key Methods |
+|-------|--------|-------------|
+| `PetStore` | `petStore` | `addPet`, `updatePet`, `removePet`, `getPetByName`, `activePet`, `activePetIndex`, `setActivePetIndex`, `currentUserRoleFor`, `removeCareCircleMember` |
+| `MeasurementStore` | `measurementStore` | `addMeasurement`, `removeMeasurement`, `getMeasurements`, `latestForPet`, `countForPet`, `thisWeekCount` |
+| `NoteStore` | `noteStore` | `addNote`, `getNotes` |
+| `MedicationStore` | `medicationStore` | `addMedication`, `updateMedication`, `removeMedication`, `toggleMedication`, `getMedications`, `getActiveMedications` |
+| `NotificationStore` | `notificationStore` | `addNotification`, `markRead`, `markAllRead`, `unreadCount` |
+| `UserStore` | `userStore` | `setUser`, `setRole`, `currentUser`, `role`, `isVet`, `isOwner` |
+| `SettingsStore` | `settingsStore` | `updateThresholds`, `classifyStatus`, `togglePushNotifications`, `toggleEmergencyAlerts`, `toggleVisionRR`, `toggleAutoExport` |
 
-## Migration Path (from MockData to Stores)
-
-When updating a screen to use stores:
-
-1. Replace `MockData.xxx` imports with the appropriate store import
-2. Wrap data-dependent UI in `ListenableBuilder(listenable: xxxStore, ...)`
-3. Replace direct `MockData` references with store getters
-4. Replace local `setState` mutations with store method calls
-5. Remove any local state that duplicates store state
-
-Example — before:
-```dart
-import 'package:pet_circle/data/mock_data.dart';
-// ...
-final pets = MockData.hilaPets;
-```
-
-After:
-```dart
-import 'package:pet_circle/stores/pet_store.dart';
-// ...
-ListenableBuilder(
-  listenable: petStore,
-  builder: (context, _) {
-    final pets = petStore.ownerPets;
-    // ...
-  },
-)
-```
-
-## Data Flow Diagram
+## Data Flow
 
 ```
-MockData (seed) ──► Stores (ChangeNotifier) ──► Screens (ListenableBuilder)
-                         ▲                            │
-                         │                            │
-                         └──── User Actions ──────────┘
+MockData (seed) --> Stores (ChangeNotifier) --> Screens (ListenableBuilder)
+                         ^                            |
+                         |                            |
+                         +---- User Actions ----------+
                               (store.method())
 ```
+
+## Active Pet Pattern
+
+The active pet is tracked globally in `PetStore`:
+
+```dart
+final pet = petStore.activePet;          // Current active pet (or null)
+final idx = petStore.activePetIndex;      // Current index
+petStore.setActivePetIndex(newIndex);     // Switch pet (from header)
+```
+
+All data-driven screens (trends, measurement, medication) should read from `petStore.activePet` to stay in sync with the header pet switcher.
 
 ## Future: Firebase Migration
 
@@ -223,4 +172,4 @@ When `kEnableFirebase` is set to `true`, stores will be updated to:
 2. Write mutations to Firestore, then update local state
 3. Listen to Firestore streams for real-time sync
 
-The screen-facing API (getters, methods) will NOT change — only the store internals.
+The screen-facing API (getters, methods) will NOT change -- only the store internals.

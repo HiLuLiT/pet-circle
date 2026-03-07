@@ -8,9 +8,18 @@ final petStore = PetStore();
 class PetStore extends ChangeNotifier {
   List<Pet> _ownerPets = [];
   List<Pet> _clinicPets = [];
+  int _activePetIndex = 0;
 
   List<Pet> get ownerPets => List.unmodifiable(_ownerPets);
   List<Pet> get allClinicPets => List.unmodifiable(_clinicPets);
+  int get activePetIndex => _activePetIndex.clamp(0, _ownerPets.isEmpty ? 0 : _ownerPets.length - 1);
+
+  Pet? get activePet => _ownerPets.isEmpty ? null : _ownerPets[activePetIndex];
+
+  void setActivePetIndex(int index) {
+    _activePetIndex = index;
+    notifyListeners();
+  }
 
   void seed({
     required List<Pet> ownerPets,

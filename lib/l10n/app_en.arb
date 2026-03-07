@@ -281,5 +281,21 @@
   "@removeMemberConfirmation": { "placeholders": { "name": { "type": "String" } } },
   "back": "Back",
   "next": "Next",
-  "complete": "Complete"
+  "complete": "Complete",
+  "editMedication": "Edit Medication",
+  "medicationUpdated": "Medication updated",
+  "updateMedicationDescription": "Update medication details for {name}'s care plan",
+  "@updateMedicationDescription": { "placeholders": { "name": { "type": "String" } } },
+  "addMedicationDescription": "Record a new medication or treatment for {name}'s care plan",
+  "@addMedicationDescription": { "placeholders": { "name": { "type": "String" } } },
+  "keepTrackOfMedications": "Keep track of {name}'s medications, dosages, and treatment schedules. Add medication records to monitor health trends alongside respiratory data.",
+  "@keepTrackOfMedications": { "placeholders": { "name": { "type": "String" } } },
+  "newMedication": "New Medication",
+  "onceDaily": "Once daily",
+  "twiceDaily": "Twice daily",
+  "asNeeded": "As needed",
+  "searchBreeds": "Search breeds...",
+  "noBreedsFound": "No breeds found",
+  "ongoing": "Ongoing",
+  "completed": "Completed"
 }

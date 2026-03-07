@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Pet Circle -- User Story Map
 
-Last updated: 2026-03-06 (Medication moved to bottom nav, Messages tab removed)
+Last updated: 2026-03-06 (Phase 1 complete, all rules + PRD synced)
 
 ## Update Protocol
 
@@ -26,21 +26,24 @@ Per-pet sharing via care circle with three roles:
 - **Member**: Invited family/sitter. Can measure, view, add notes. Cannot edit pet or manage circle.
 - **Viewer**: Typically the vet. Can view everything, add clinical notes. Cannot measure or edit.
 
-Permissions are enforced via `CareCircleRole` enum with `CareCirclePermissions` extension in `lib/models/care_circle_member.dart`.
+Permissions enforced via `CareCircleRole` enum with `CareCirclePermissions` extension in `lib/models/care_circle_member.dart`.
+
+Global active pet tracked in `petStore.activePetIndex` -- shared across all screens via header pet switcher.
 
 ---
 
-## Status: DONE (50 stories) -- Phase 1 Complete
+## Status: DONE (53 stories) -- Phase 1 Complete
 
 ### Authentication & Onboarding
 - A1: Welcome screen with sign-up and sign-in buttons
 - A2: Role selection (Vet / Pet Owner)
 - A3-A7: Email auth, Google, Apple, password reset (behind Firebase flag)
 - A8-A10: Email verification with resend and account switch (behind Firebase flag)
-- B1: Onboarding Step 1 -- name, breed, age persisted to `petStore`
+- B1: Onboarding Step 1 -- name, searchable breed dropdown (BreedSearchField), age
 - B2: Onboarding Step 2 -- diagnosis saved to `Pet.diagnosis` field
 - B3: Onboarding Step 3 -- target rate saved to `settingsStore`
 - B4: Onboarding Step 4 -- care circle emails converted to `CareCircleMember` with role
+- B25: Onboarding Back/Next buttons with persistent state (AutomaticKeepAliveClientMixin)
 
 ### Owner Experience
 - B5: Owner dashboard with pet cards from `petStore` + empty state CTA
@@ -48,10 +51,10 @@ Permissions are enforced via `CareCircleRole` enum with `CareCirclePermissions` 
 - B7: Quick-action Measure / Trends buttons per pet
 - B8: Manual tap-to-count with haptics and BPM calculation
 - B9: Configurable timer durations (15s / 30s / 60s)
-- B10: "Add to Graph" saves measurement via `measurementStore`
-- B11: Trends SRR chart -- data-driven with empty state
+- B10: "Add to Graph" saves measurement for active pet via `measurementStore`
+- B11: Unified health trends -- single scrollable view with stats, chart, history
 - B12: Trends time-range filtering -- period dropdown filters chart + stats
-- B13: Medication save wired to `medicationStore`
+- B13: Medication add/edit wired to `medicationStore`
 - B14: Export measurement data -- CSV preview dialog
 - B15: Pet detail reads from `noteStore` and `measurementStore`
 - B16: "View Graph" navigates to trends tab
@@ -63,15 +66,18 @@ Permissions are enforced via `CareCircleRole` enum with `CareCirclePermissions` 
 - B22: Export all data dialog from settings
 - B23: Share with vet dialog from settings
 - B24: Push / emergency notification toggles wired to `settingsStore`
-- M1: "Add Pet" button on owner dashboard
-- M2: Edit pet profile -- admin-only, bottom sheet on pet detail
-- M3: Delete pet -- admin-only, long-press on pet card
-- M4: Pet selector on measurement screen
-- M5: Pet switcher in header
+- M1: "Add Pet" button on owner dashboard navigates to onboarding
+- M2: Edit pet profile -- admin-only, bottom sheet with searchable breed dropdown
+- M3: Delete pet -- admin-only, long-press on pet card with confirmation
+- M5: Global pet switcher in header -- `petStore.activePetIndex` shared across all screens
 - M6: User profile management -- edit name/photo from settings
-- M7: Sign out from settings drawer
+- M7: Sign out from settings drawer with confirmation
 - M9: Care circle management -- remove members with confirmation
-- M10: Measurement deletion -- swipe-to-delete in history
+- M10: Measurement deletion -- swipe-to-delete in history with confirmation
+
+### Medication
+- E6: Standalone Medication screen at bottom nav index 3
+- E7: Medication list with add, edit (tap to open pre-filled sheet), status, export
 
 ### Care Circle Sharing
 - S1: CareCircleRole enum (admin/member/viewer) with permissions extension
@@ -87,12 +93,14 @@ Permissions are enforced via `CareCircleRole` enum with `CareCirclePermissions` 
 - C6: Notifications from `notificationStore`
 
 ### Cross-Cutting
-- E1: Bottom nav: Home, Trends, Measure, Medication (Messages removed, notifications via bell drawer)
+- E1: Bottom nav: Home, Trends, Measure, Medication
 - E2: Settings drawer from avatar tap
-- E3: Notifications drawer from bell icon
+- E3: Notifications drawer from bell icon (no dedicated tab)
 - E4: RTL layout for Hebrew
 - E5: Full dark mode support
-- E6: Standalone Medication screen extracted from Trends into `lib/screens/medication/medication_screen.dart`
+- E8: Searchable breed dropdown as shared widget (`lib/widgets/breed_search_field.dart`)
+- E9: All user-facing strings internationalized (enforced by cursor rule)
+- E10: Design system tokens enforced (enforced by cursor rule)
 
 ---
 
@@ -120,6 +128,7 @@ Permissions are enforced via `CareCircleRole` enum with `CareCirclePermissions` 
 
 ## Related Rules
 
-- `screen-completion-guide.mdc` -- screen-level checklist
-- `state-management.mdc` -- store patterns, access conventions
-- `figma-design-system.mdc` -- design tokens, colors, typography, spacing
+- `screen-completion-guide.mdc` -- screen-level checklist and remaining polish
+- `state-management.mdc` -- store patterns, access conventions, store registry
+- `figma-design-system.mdc` -- design tokens, colors, typography, spacing, Figma workflow
+- `design-system-enforcement.mdc` -- always-apply enforcement: tokens, components, i18n

@@ -1639,6 +1639,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Complete'**
   String get complete;
+
+  /// No description provided for @editMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Medication'**
+  String get editMedication;
+
+  /// No description provided for @medicationUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication updated'**
+  String get medicationUpdated;
+
+  /// No description provided for @updateMedicationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Update medication details for {name}\'s care plan'**
+  String updateMedicationDescription(String name);
+
+  /// No description provided for @addMedicationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a new medication or treatment for {name}\'s care plan'**
+  String addMedicationDescription(String name);
+
+  /// No description provided for @keepTrackOfMedications.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep track of {name}\'s medications, dosages, and treatment schedules. Add medication records to monitor health trends alongside respiratory data.'**
+  String keepTrackOfMedications(String name);
+
+  /// No description provided for @newMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'New Medication'**
+  String get newMedication;
+
+  /// No description provided for @onceDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Once daily'**
+  String get onceDaily;
+
+  /// No description provided for @twiceDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Twice daily'**
+  String get twiceDaily;
+
+  /// No description provided for @asNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'As needed'**
+  String get asNeeded;
+
+  /// No description provided for @searchBreeds.
+  ///
+  /// In en, this message translates to:
+  /// **'Search breeds...'**
+  String get searchBreeds;
+
+  /// No description provided for @noBreedsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No breeds found'**
+  String get noBreedsFound;
+
+  /// No description provided for @ongoing.
+  ///
+  /// In en, this message translates to:
+  /// **'Ongoing'**
+  String get ongoing;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
 }
 
 class _AppLocalizationsDelegate

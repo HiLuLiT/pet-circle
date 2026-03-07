@@ -47,12 +47,14 @@ lib/
 │   ├── auth/
 │   ├── dashboard/
 │   ├── measurement/
+│   ├── medication/
 │   ├── messages/
 │   ├── onboarding/
 │   ├── pet_detail/
 │   ├── settings/
 │   └── trends/
-├── models/           # Data models (Pet, User, Measurement, etc.)
+├── models/           # Data models (Pet, User, Measurement, Medication, etc.)
+├── stores/           # ChangeNotifier stores (pet, measurement, note, medication, etc.)
 ├── services/         # Business logic (auth_service, user_service)
 ├── providers/        # State providers
 ├── theme/            # Design tokens and theme configuration
@@ -78,16 +80,17 @@ lib/
 | `RoundIconButton` | `lib/widgets/round_icon_button.dart` | Circular icon button |
 | `NeumorphicCard` | `lib/widgets/neumorphic_card.dart` | Card with neumorphic shadows |
 | `LabeledTextField` | `lib/widgets/labeled_text_field.dart` | Text field with label |
+| `BreedSearchField` | `lib/widgets/breed_search_field.dart` | Searchable breed dropdown (148 breeds, live filter) |
 | `AppDropdown` | `lib/widgets/app_dropdown.dart` | Label + dropdown selector with chevron |
 | `SettingsRow` | `lib/widgets/settings_row.dart` | Settings row (icon + title + trailing) |
-| `AppHeader` | `lib/widgets/app_header.dart` | App header with avatar and nav |
-| `BottomNavBar` | `lib/widgets/bottom_nav_bar.dart` | Bottom navigation bar |
+| `AppHeader` | `lib/widgets/app_header.dart` | Header with avatar, pet switcher chip, notification bell |
+| `BottomNavBar` | `lib/widgets/bottom_nav_bar.dart` | Tab bar: Home, Trends, Measure, Medication |
 | `StatusBadge` | `lib/widgets/status_badge.dart` | Colored status badge |
 | `TogglePill` | `lib/widgets/toggle_pill.dart` | Pill-shaped toggle |
 | `UserAvatar` | `lib/widgets/user_avatar.dart` | User avatar with fallback |
 | `DogPhoto` | `lib/widgets/dog_photo.dart` | Pet photo with fallback |
 | `AppImage` | `lib/widgets/app_image.dart` | Image with error handling |
-| `OnboardingShell` | `lib/widgets/onboarding_shell.dart` | Onboarding layout wrapper |
+| `OnboardingShell` | `lib/widgets/onboarding_shell.dart` | Onboarding layout with Back/Next buttons |
 
 ---
 
@@ -364,9 +367,10 @@ Two icon systems are in use:
 
 ### State Management
 
-- `StatefulWidget` with `setState()` for local state
-- `ValueNotifier` for global state (locale, dark mode toggle)
-- No third-party state management library
+- Global `ChangeNotifier` stores for shared state (7 stores in `lib/stores/`)
+- `ValueNotifier` for global preferences (locale, dark mode)
+- `ListenableBuilder` for reactive UI rebuilds
+- See `state-management.mdc` for full patterns and store registry
 
 ### Authentication
 

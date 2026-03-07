@@ -30,7 +30,6 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   late int _selectedIndex;
-  int _activePetIndex = 0;
 
   @override
   void initState() {
@@ -58,7 +57,7 @@ class _MainShellState extends State<MainShell> {
             const SizedBox(height: 16),
             ...List.generate(pets.length, (i) {
               final pet = pets[i];
-              final isSelected = i == _activePetIndex;
+              final isSelected = i == petStore.activePetIndex;
               return ListTile(
                 leading: ClipOval(
                   child: SizedBox(
@@ -73,7 +72,7 @@ class _MainShellState extends State<MainShell> {
                 subtitle: Text(pet.breedAndAge, style: AppTextStyles.caption.copyWith(color: c.chocolate)),
                 trailing: isSelected ? Icon(Icons.check_circle, color: c.lightBlue) : null,
                 onTap: () {
-                  setState(() => _activePetIndex = i);
+                  petStore.setActivePetIndex(i);
                   Navigator.pop(context);
                 },
               );
@@ -89,9 +88,7 @@ class _MainShellState extends State<MainShell> {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final user = userStore.currentUser;
-    final pets = petStore.ownerPets;
-    final petIndex = _activePetIndex.clamp(0, pets.isEmpty ? 0 : pets.length - 1);
-    final pet = pets.isNotEmpty ? pets[petIndex] : null;
+    final pet = petStore.activePet;
 
     final homeScreen = widget.role == AppUserRole.vet
         ? const VetDashboard(showScaffold: false)
@@ -110,7 +107,7 @@ class _MainShellState extends State<MainShell> {
                 userImageUrl: user?.avatarUrl ?? '',
                 petName: pet?.name,
                 petImageUrl: pet?.imageUrl,
-                onPetSelectorTap: pets.length > 1 ? _showPetSwitcher : null,
+                onPetSelectorTap: petStore.ownerPets.length > 1 ? _showPetSwitcher : null,
                 onAvatarTap: () => showModalBottomSheet<void>(
                   context: context,
                   isScrollControlled: true,

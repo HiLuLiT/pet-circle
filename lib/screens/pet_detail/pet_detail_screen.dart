@@ -10,6 +10,7 @@ import 'package:pet_circle/models/clinical_note.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/widgets/breed_search_field.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
@@ -43,8 +44,8 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     final nameCtrl = TextEditingController(text: _pet.name);
-    final breedCtrl = TextEditingController(text: _pet.breedAndAge);
     final imageCtrl = TextEditingController(text: _pet.imageUrl);
+    String selectedBreed = _pet.breedAndAge;
 
     showModalBottomSheet<void>(
       context: context,
@@ -53,77 +54,78 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: c.white,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.editPet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
-              const SizedBox(height: 16),
-              TextField(
-                controller: nameCtrl,
-                decoration: InputDecoration(
-                  labelText: l10n.petName,
-                  filled: true, fillColor: c.offWhite,
-                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: breedCtrl,
-                decoration: InputDecoration(
-                  labelText: l10n.breed,
-                  filled: true, fillColor: c.offWhite,
-                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: imageCtrl,
-                decoration: InputDecoration(
-                  labelText: l10n.photoUrl,
-                  filled: true, fillColor: c.offWhite,
-                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    child: Text(l10n.cancel),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.editPet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: InputDecoration(
+                    labelText: l10n.petName,
+                    filled: true, fillColor: c.offWhite,
+                    border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
                   ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () {
-                      final updated = Pet(
-                        name: nameCtrl.text.isNotEmpty ? nameCtrl.text : _pet.name,
-                        breedAndAge: breedCtrl.text.isNotEmpty ? breedCtrl.text : _pet.breedAndAge,
-                        imageUrl: imageCtrl.text.isNotEmpty ? imageCtrl.text : _pet.imageUrl,
-                        statusLabel: _pet.statusLabel,
-                        statusColorHex: _pet.statusColorHex,
-                        latestMeasurement: _pet.latestMeasurement,
-                        careCircle: _pet.careCircle,
-                        diagnosis: _pet.diagnosis,
-                      );
-                      petStore.updatePet(_pet.name, updated);
-                      setState(() => _pet = updated);
-                      Navigator.pop(ctx);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(l10n.petUpdated)),
-                      );
-                    },
-                    style: TextButton.styleFrom(backgroundColor: c.lightBlue),
-                    child: Text(l10n.save, style: TextStyle(color: c.chocolate)),
+                ),
+                const SizedBox(height: 12),
+                BreedSearchField(
+                  label: l10n.breed,
+                  initialValue: _pet.breedAndAge,
+                  onChanged: (breed) => selectedBreed = breed,
+                  maxHeight: 150,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: imageCtrl,
+                  decoration: InputDecoration(
+                    labelText: l10n.photoUrl,
+                    filled: true, fillColor: c.offWhite,
+                    border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: Text(l10n.cancel),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: () {
+                        final updated = Pet(
+                          name: nameCtrl.text.isNotEmpty ? nameCtrl.text : _pet.name,
+                          breedAndAge: selectedBreed.isNotEmpty ? selectedBreed : _pet.breedAndAge,
+                          imageUrl: imageCtrl.text.isNotEmpty ? imageCtrl.text : _pet.imageUrl,
+                          statusLabel: _pet.statusLabel,
+                          statusColorHex: _pet.statusColorHex,
+                          latestMeasurement: _pet.latestMeasurement,
+                          careCircle: _pet.careCircle,
+                          diagnosis: _pet.diagnosis,
+                        );
+                        petStore.updatePet(_pet.name, updated);
+                        setState(() => _pet = updated);
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(l10n.petUpdated)),
+                        );
+                      },
+                      style: TextButton.styleFrom(backgroundColor: c.lightBlue),
+                      child: Text(l10n.save, style: TextStyle(color: c.chocolate)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
