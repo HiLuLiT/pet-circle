@@ -775,4 +775,53 @@ class AppLocalizationsHe extends AppLocalizations {
   String deleteMeasurementConfirmation(int bpm, String date) {
     return 'למחוק את הקריאה של $bpm BPM מ-$date?';
   }
+
+  @override
+  String get editPet => 'עריכת חיית מחמד';
+
+  @override
+  String get deletePet => 'מחיקת חיית מחמד';
+
+  @override
+  String get petDeleted => 'חיית מחמד נמחקה';
+
+  @override
+  String deletePetConfirmation(String name) {
+    return 'למחוק את $name? פעולה זו תסיר את כל הנתונים הקשורים.';
+  }
+
+  @override
+  String get petUpdated => 'חיית מחמד עודכנה';
+
+  @override
+  String get editProfile => 'עריכת פרופיל';
+
+  @override
+  String get profileUpdated => 'פרופיל עודכן';
+
+  @override
+  String get displayName => 'שם תצוגה';
+
+  @override
+  String get profilePhoto => 'כתובת תמונת פרופיל';
+
+  @override
+  String get removeMember => 'הסרה';
+
+  @override
+  String get memberRemoved => 'חבר הוסר';
+
+  @override
+  String removeMemberConfirmation(String name) {
+    return 'להסיר את $name ממעגל הטיפול?';
+  }
+
+  @override
+  String get back => 'חזרה';
+
+  @override
+  String get next => 'הבא';
+
+  @override
+  String get complete => 'סיום';
 }

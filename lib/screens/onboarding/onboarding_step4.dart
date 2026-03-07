@@ -15,18 +15,19 @@ class OnboardingStep4 extends StatefulWidget {
 }
 
 class _OnboardingStep4State extends State<OnboardingStep4>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
   final _roles = const [
-    'Viewer (View Only)',
-    'Caregiver',
-    'Owner',
+    'Member',
+    'Viewer',
   ];
   final _invites = const [
     _InviteStatus(name: 'Guest 01', status: 'Status: invited'),
   ];
   bool _roleOpen = false;
-  String _selectedRole = 'Viewer (View Only)';
+  String _selectedRole = 'Member';
   final _emailController = TextEditingController();
   late AnimationController _chevronController;
 
@@ -107,12 +108,14 @@ class _OnboardingStep4State extends State<OnboardingStep4>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
+    super.build(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
       stepLabel: l10n.onboardingStep(4, 4),
       progress: 1,
       onBack: widget.onBack,
       onNext: widget.onComplete,
+      nextLabel: l10n.complete,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

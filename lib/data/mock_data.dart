@@ -28,37 +28,37 @@ class MockData {
   static final hilaOwner = CareCircleMember(
     name: 'Hila',
     avatarUrl: 'https://ui-avatars.com/api/?name=Hila&size=128&rounded=true&background=E8B4B8&color=5B2C3F',
-    role: 'Owner',
+    role: CareCircleRole.admin,
   );
 
   static final drSmithVet = CareCircleMember(
     name: 'Dr. Smith',
     avatarUrl: 'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
-    role: 'Veterinarian',
+    role: CareCircleRole.viewer,
   );
 
-  static final sarahCaregiver = CareCircleMember(
+  static final sarahMember = CareCircleMember(
     name: 'Sarah',
     avatarUrl: 'https://ui-avatars.com/api/?name=Sarah&size=128&rounded=true&background=7FBA7A&color=fff',
-    role: 'Caregiver',
+    role: CareCircleRole.member,
   );
 
   static final maxOwner = CareCircleMember(
     name: 'John',
     avatarUrl: 'https://ui-avatars.com/api/?name=John&size=128&rounded=true&background=5B9BD5&color=fff',
-    role: 'Owner',
+    role: CareCircleRole.admin,
   );
 
   static final lunaOwner = CareCircleMember(
     name: 'Emily',
     avatarUrl: 'https://ui-avatars.com/api/?name=Emily&size=128&rounded=true&background=F39C12&color=fff',
-    role: 'Owner',
+    role: CareCircleRole.admin,
   );
 
   static final rockyOwner = CareCircleMember(
     name: 'Mike',
     avatarUrl: 'https://ui-avatars.com/api/?name=Mike&size=128&rounded=true&background=9B59B6&color=fff',
-    role: 'Owner',
+    role: CareCircleRole.admin,
   );
 
   // ── Clinical Notes ─────────────────────────────────────────────────────────
@@ -108,7 +108,7 @@ class MockData {
     statusLabel: 'Normal',
     statusColorHex: AppColors.lightBlue.value,
     latestMeasurement: Measurement(bpm: 22, recordedAt: DateTime.now().subtract(const Duration(hours: 2)), recordedAtLabel: '2 hours ago'),
-    careCircle: [hilaOwner, drSmithVet, sarahCaregiver],
+    careCircle: [hilaOwner, drSmithVet, sarahMember],
   );
 
   // Max - owned by John

@@ -5,19 +5,38 @@ import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep3 extends StatefulWidget {
-  const OnboardingStep3({super.key, this.onBack, this.onNext, this.onTargetRateChanged});
+  const OnboardingStep3({super.key, this.onBack, this.onNext, this.nextLabel, this.onTargetRateChanged, this.initialTargetRate});
 
   final VoidCallback? onBack;
   final VoidCallback? onNext;
+  final String? nextLabel;
   final ValueChanged<int>? onTargetRateChanged;
+  final int? initialTargetRate;
 
   @override
   State<OnboardingStep3> createState() => _OnboardingStep3State();
 }
 
-class _OnboardingStep3State extends State<OnboardingStep3> {
-  String _selected = '30';
+class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  late String _selected;
   final _customController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final rate = widget.initialTargetRate ?? 30;
+    if (rate == 30) {
+      _selected = '30';
+    } else if (rate == 35) {
+      _selected = '35';
+    } else {
+      _selected = 'custom';
+      _customController.text = '$rate';
+    }
+  }
 
   @override
   void dispose() {
@@ -27,6 +46,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     return OnboardingShell(
@@ -35,6 +55,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> {
       progress: 0.75,
       onBack: widget.onBack,
       onNext: widget.onNext,
+      nextLabel: widget.nextLabel,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

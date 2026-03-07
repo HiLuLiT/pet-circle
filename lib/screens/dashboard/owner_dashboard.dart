@@ -20,6 +20,33 @@ class OwnerDashboard extends StatelessWidget {
 
   final bool showScaffold;
 
+  void _confirmDeletePet(BuildContext context, Pet pet) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
+        title: Text(l10n.deletePet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+        content: Text(l10n.deletePetConfirmation(pet.name), style: AppTextStyles.body),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+          TextButton(
+            onPressed: () {
+              petStore.removePet(pet.name);
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.petDeleted)),
+              );
+            },
+            style: TextButton.styleFrom(backgroundColor: c.cherry),
+            child: Text(l10n.deletePet, style: TextStyle(color: c.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
@@ -101,6 +128,9 @@ class OwnerDashboard extends StatelessWidget {
                       AppRoutes.petDetail,
                       arguments: pet,
                     ),
+                    onLongPress: (petStore.currentUserRoleFor(pet.name) ?? CareCircleRole.admin).canDeletePet
+                        ? () => _confirmDeletePet(context, pet)
+                        : null,
                     onMeasure: () => Navigator.of(context).pushNamed(
                       AppRoutes.mainShell,
                       arguments: {
@@ -172,12 +202,14 @@ class _PetCard extends StatelessWidget {
     required this.onMeasure,
     required this.onTrends,
     this.onTap,
+    this.onLongPress,
   });
 
   final Pet data;
   final VoidCallback onMeasure;
   final VoidCallback onTrends;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -187,6 +219,7 @@ class _PetCard extends StatelessWidget {
     final latest = latestFromStore ?? data.latestMeasurement;
     return GestureDetector(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: ClipRRect(
       borderRadius: const BorderRadius.all(AppRadii.medium),
       child: Container(

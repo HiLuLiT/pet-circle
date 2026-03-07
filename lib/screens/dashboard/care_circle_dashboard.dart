@@ -24,32 +24,16 @@ class CareCircleDashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final pets = petStore.allClinicPets;
-    final user = userStore.currentUser;
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      backgroundColor: c.white,
-      body: SafeArea(
+    return Container(
+      color: c.white,
+      child: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: SingleChildScrollView(
             child: Column(
               children: [
-                AppHeader(
-                  userName: user?.name ?? '',
-                  userImageUrl: user?.avatarUrl ?? '',
-                  onAvatarTap: () => Navigator.of(context).pushNamed(
-                    AppRoutes.settings,
-                    arguments: AppUserRole.owner,
-                  ),
-                  onNotificationTap: () => showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (_) => const NotificationsDrawer(),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
                 _ResponsiveGrid(
                   maxCrossAxisCount: 3,
                   minItemWidth: 280,

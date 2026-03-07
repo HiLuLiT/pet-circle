@@ -4,10 +4,12 @@ import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show appLocale, appDarkMode;
 import 'package:pet_circle/models/app_user.dart';
+import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
 
 const _settingsShareAsset = 'assets/figma/settings_share.svg';
@@ -162,6 +164,13 @@ class _SettingsContentState extends State<_SettingsContent> {
               ],
             ),
             const SizedBox(height: 24),
+              _ActionRow(
+                iconAsset: _settingsConfigureAsset,
+                title: l10n.editProfile,
+                description: userStore.currentUser?.name ?? '',
+                onTap: () => _showEditProfileDialog(context),
+              ),
+              const SizedBox(height: 16),
               _SettingsCard(
                 title: l10n.appearance,
                 subtitle: l10n.customizeLookAndFeel,
@@ -197,16 +206,17 @@ class _SettingsContentState extends State<_SettingsContent> {
                   }
                   return Column(
                     children: members.map((member) {
-                      final isOwner = member.role.toLowerCase() == 'owner';
-                      final isVet = member.role.toLowerCase() == 'veterinarian';
+                      final isAdmin = member.role == CareCircleRole.admin;
+                      final isViewer = member.role == CareCircleRole.viewer;
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: _CareCircleItem(
                           email: member.name,
-                          roleLabel: member.role,
-                          roleColor: isVet ? c.blue : isOwner ? c.chocolate : c.lightYellow,
+                          roleLabel: member.roleLabel,
+                          roleColor: isViewer ? c.blue : isAdmin ? c.chocolate : c.lightYellow,
                           statusLabel: l10n.active,
                           statusColor: c.pink,
+                          onRemove: () => _confirmRemoveMember(context, pets.first.name, member.name),
                         ),
                       );
                     }).toList(),
@@ -397,6 +407,111 @@ class _SettingsContentState extends State<_SettingsContent> {
             },
             style: TextButton.styleFrom(backgroundColor: c.cherry),
             child: Text(l10n.signOut, style: TextStyle(color: c.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditProfileDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
+    final user = userStore.currentUser;
+    final nameCtrl = TextEditingController(text: user?.name ?? '');
+    final photoCtrl = TextEditingController(text: user?.avatarUrl ?? '');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: c.white,
+            borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.editProfile, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+              const SizedBox(height: 16),
+              TextField(
+                controller: nameCtrl,
+                decoration: InputDecoration(
+                  labelText: l10n.displayName,
+                  filled: true, fillColor: c.offWhite,
+                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: photoCtrl,
+                decoration: InputDecoration(
+                  labelText: l10n.profilePhoto,
+                  filled: true, fillColor: c.offWhite,
+                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(l10n.cancel),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () {
+                      if (user != null) {
+                        userStore.setUser(user.copyWith(
+                          name: nameCtrl.text.isNotEmpty ? nameCtrl.text : user.name,
+                          avatarUrl: photoCtrl.text.isNotEmpty ? photoCtrl.text : user.avatarUrl,
+                        ));
+                      }
+                      Navigator.pop(ctx);
+                      setState(() {});
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.profileUpdated)),
+                      );
+                    },
+                    style: TextButton.styleFrom(backgroundColor: c.lightBlue),
+                    child: Text(l10n.save, style: TextStyle(color: c.chocolate)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _confirmRemoveMember(BuildContext context, String petName, String memberName) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
+        title: Text(l10n.removeMember, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+        content: Text(l10n.removeMemberConfirmation(memberName), style: AppTextStyles.body),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+          TextButton(
+            onPressed: () {
+              petStore.removeCareCircleMember(petName, memberName);
+              Navigator.pop(ctx);
+              setState(() {});
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.memberRemoved)),
+              );
+            },
+            style: TextButton.styleFrom(backgroundColor: c.cherry),
+            child: Text(l10n.removeMember, style: TextStyle(color: c.white)),
           ),
         ],
       ),
@@ -967,6 +1082,7 @@ class _CareCircleItem extends StatelessWidget {
     required this.roleColor,
     required this.statusLabel,
     required this.statusColor,
+    this.onRemove,
   });
 
   final String email;
@@ -974,6 +1090,7 @@ class _CareCircleItem extends StatelessWidget {
   final Color roleColor;
   final String statusLabel;
   final Color statusColor;
+  final VoidCallback? onRemove;
 
   @override
   Widget build(BuildContext context) {
@@ -1021,18 +1138,21 @@ class _CareCircleItem extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: c.white,
-              borderRadius: const BorderRadius.all(AppRadii.small),
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                _settingsTrashAsset,
-                width: 16,
-                height: 16,
+          GestureDetector(
+            onTap: onRemove,
+            child: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: c.white,
+                borderRadius: const BorderRadius.all(AppRadii.small),
+              ),
+              child: Center(
+                child: SvgPicture.asset(
+                  _settingsTrashAsset,
+                  width: 16,
+                  height: 16,
+                ),
               ),
             ),
           ),

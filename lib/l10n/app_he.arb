@@ -264,5 +264,22 @@
   "deleteMeasurement": "מחיקת מדידה",
   "measurementDeleted": "מדידה נמחקה",
   "deleteMeasurementConfirmation": "למחוק את הקריאה של {bpm} BPM מ-{date}?",
-  "@deleteMeasurementConfirmation": { "placeholders": { "bpm": { "type": "int" }, "date": { "type": "String" } } }
+  "@deleteMeasurementConfirmation": { "placeholders": { "bpm": { "type": "int" }, "date": { "type": "String" } } },
+  "editPet": "עריכת חיית מחמד",
+  "deletePet": "מחיקת חיית מחמד",
+  "petDeleted": "חיית מחמד נמחקה",
+  "deletePetConfirmation": "למחוק את {name}? פעולה זו תסיר את כל הנתונים הקשורים.",
+  "@deletePetConfirmation": { "placeholders": { "name": { "type": "String" } } },
+  "petUpdated": "חיית מחמד עודכנה",
+  "editProfile": "עריכת פרופיל",
+  "profileUpdated": "פרופיל עודכן",
+  "displayName": "שם תצוגה",
+  "profilePhoto": "כתובת תמונת פרופיל",
+  "removeMember": "הסרה",
+  "memberRemoved": "חבר הוסר",
+  "removeMemberConfirmation": "להסיר את {name} ממעגל הטיפול?",
+  "@removeMemberConfirmation": { "placeholders": { "name": { "type": "String" } } },
+  "back": "חזרה",
+  "next": "הבא",
+  "complete": "סיום"
 }

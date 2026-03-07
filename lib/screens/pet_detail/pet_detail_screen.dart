@@ -3,9 +3,11 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/note_store.dart';
+import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
+import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
@@ -23,6 +25,13 @@ class PetDetailScreen extends StatefulWidget {
 
 class _PetDetailScreenState extends State<PetDetailScreen> {
   final _noteController = TextEditingController();
+  late Pet _pet;
+
+  @override
+  void initState() {
+    super.initState();
+    _pet = widget.pet;
+  }
 
   @override
   void dispose() {
@@ -30,12 +39,103 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     super.dispose();
   }
 
+  void _showEditSheet() {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppColorsTheme.of(context);
+    final nameCtrl = TextEditingController(text: _pet.name);
+    final breedCtrl = TextEditingController(text: _pet.breedAndAge);
+    final imageCtrl = TextEditingController(text: _pet.imageUrl);
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: c.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.editPet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+              const SizedBox(height: 16),
+              TextField(
+                controller: nameCtrl,
+                decoration: InputDecoration(
+                  labelText: l10n.petName,
+                  filled: true, fillColor: c.offWhite,
+                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: breedCtrl,
+                decoration: InputDecoration(
+                  labelText: l10n.breed,
+                  filled: true, fillColor: c.offWhite,
+                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: imageCtrl,
+                decoration: InputDecoration(
+                  labelText: l10n.photoUrl,
+                  filled: true, fillColor: c.offWhite,
+                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(l10n.cancel),
+                  ),
+                  const SizedBox(width: 8),
+                  TextButton(
+                    onPressed: () {
+                      final updated = Pet(
+                        name: nameCtrl.text.isNotEmpty ? nameCtrl.text : _pet.name,
+                        breedAndAge: breedCtrl.text.isNotEmpty ? breedCtrl.text : _pet.breedAndAge,
+                        imageUrl: imageCtrl.text.isNotEmpty ? imageCtrl.text : _pet.imageUrl,
+                        statusLabel: _pet.statusLabel,
+                        statusColorHex: _pet.statusColorHex,
+                        latestMeasurement: _pet.latestMeasurement,
+                        careCircle: _pet.careCircle,
+                        diagnosis: _pet.diagnosis,
+                      );
+                      petStore.updatePet(_pet.name, updated);
+                      setState(() => _pet = updated);
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(l10n.petUpdated)),
+                      );
+                    },
+                    style: TextButton.styleFrom(backgroundColor: c.lightBlue),
+                    child: Text(l10n.save, style: TextStyle(color: c.chocolate)),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _addNote() {
     if (_noteController.text.trim().isEmpty) return;
 
     final user = userStore.currentUser;
     noteStore.addNote(
-      widget.pet.name,
+      _pet.name,
       ClinicalNote(
         id: 'note-${DateTime.now().millisecondsSinceEpoch}',
         authorName: user?.name ?? 'Unknown',
@@ -97,11 +197,18 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         icon: Icon(Icons.arrow_back, color: c.white),
         onPressed: () => Navigator.of(context).pop(),
       ),
+      actions: [
+        if ((petStore.currentUserRoleFor(_pet.name) ?? CareCircleRole.admin).canEditPet)
+          IconButton(
+            icon: Icon(Icons.edit, color: c.white),
+            onPressed: _showEditSheet,
+          ),
+      ],
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(
           fit: StackFit.expand,
           children: [
-            DogPhoto(endpoint: widget.pet.imageUrl),
+            DogPhoto(endpoint: _pet.imageUrl),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -124,18 +231,18 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   Row(
                     children: [
                       StatusBadge(
-                        label: widget.pet.statusLabel,
-                        color: Color(widget.pet.statusColorHex),
+                        label: _pet.statusLabel,
+                        color: Color(_pet.statusColorHex),
                       ),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    widget.pet.name,
+                    _pet.name,
                     style: AppTextStyles.heading1.copyWith(color: c.white),
                   ),
                   Text(
-                    widget.pet.breedAndAge,
+                    _pet.breedAndAge,
                     style: AppTextStyles.body.copyWith(color: c.white.withOpacity(0.8)),
                   ),
                 ],
@@ -167,7 +274,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 child: _InfoTile(
                   icon: Icons.favorite,
                   iconColor: c.pink,
-                  value: '${widget.pet.latestMeasurement.bpm}',
+                  value: '${_pet.latestMeasurement.bpm}',
                   label: l10n.bpm,
                 ),
               ),
@@ -176,7 +283,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 child: _InfoTile(
                   icon: Icons.access_time,
                   iconColor: c.lightBlue,
-                  value: widget.pet.latestMeasurement.timeAgo,
+                  value: _pet.latestMeasurement.timeAgo,
                   label: l10n.lastMeasured,
                 ),
               ),
@@ -190,10 +297,10 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   Widget _buildMeasurementHistory() {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
-    final storeMeasurements = measurementStore.getMeasurements(widget.pet.name);
+    final storeMeasurements = measurementStore.getMeasurements(_pet.name);
     final measurements = storeMeasurements.isNotEmpty
         ? storeMeasurements
-        : [widget.pet.latestMeasurement];
+        : [_pet.latestMeasurement];
 
     return NeumorphicCard(
       radius: const BorderRadius.all(AppRadii.medium),
@@ -287,7 +394,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   Widget _buildClinicalNotes() {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
-    final notes = noteStore.getNotes(widget.pet.name);
+    final notes = noteStore.getNotes(_pet.name);
     return NeumorphicCard(
       radius: const BorderRadius.all(AppRadii.medium),
       padding: const EdgeInsets.all(20),
@@ -391,7 +498,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          ...widget.pet.careCircle.map(
+          ..._pet.careCircle.map(
             (member) => _MemberTile(member: member),
           ),
         ],
@@ -524,13 +631,13 @@ class _MemberTile extends StatelessWidget {
                   style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500),
                 ),
                 Text(
-                  member.role,
+                  member.roleLabel,
                   style: AppTextStyles.caption.copyWith(color: c.chocolate),
                 ),
               ],
             ),
           ),
-          _RoleBadge(role: member.role),
+          _RoleBadge(role: member.role, label: member.roleLabel),
         ],
       ),
     );
@@ -538,21 +645,20 @@ class _MemberTile extends StatelessWidget {
 }
 
 class _RoleBadge extends StatelessWidget {
-  const _RoleBadge({required this.role});
+  const _RoleBadge({required this.role, required this.label});
 
-  final String role;
+  final CareCircleRole role;
+  final String label;
 
   Color _color(BuildContext context) {
     final c = AppColorsTheme.of(context);
-    switch (role.toLowerCase()) {
-      case 'owner':
-        return c.lightBlue;
-      case 'veterinarian':
+    switch (role) {
+      case CareCircleRole.admin:
         return c.chocolate;
-      case 'caregiver':
+      case CareCircleRole.member:
         return c.lightBlue;
-      default:
-        return c.chocolate;
+      case CareCircleRole.viewer:
+        return c.blue;
     }
   }
 
@@ -562,11 +668,11 @@ class _RoleBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: const BorderRadius.all(AppRadii.small),
       ),
       child: Text(
-        role,
+        label,
         style: AppTextStyles.caption.copyWith(
           color: color,
           fontWeight: FontWeight.w500,

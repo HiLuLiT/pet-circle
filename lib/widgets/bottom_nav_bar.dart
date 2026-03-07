@@ -46,12 +46,36 @@ class BottomNavBar extends StatelessWidget {
             isSelected: selectedIndex == 2,
             onTap: () => onTap(2),
           ),
-          _NavItem(
-            iconAsset: _messageIconAsset,
+          _NavItemIcon(
+            icon: Icons.medication_outlined,
             isSelected: selectedIndex == 3,
             onTap: () => onTap(3),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _NavItemIcon extends StatelessWidget {
+  const _NavItemIcon({
+    required this.icon,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppColorsTheme.of(context);
+    return GestureDetector(
+      onTap: onTap,
+      child: Opacity(
+        opacity: isSelected ? 1 : 0.3,
+        child: Icon(icon, size: 36, color: c.chocolate),
       ),
     );
   }

@@ -4,18 +4,22 @@ import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep2 extends StatefulWidget {
-  const OnboardingStep2({super.key, this.onBack, this.onNext, this.onDiagnosisChanged});
+  const OnboardingStep2({super.key, this.onBack, this.onNext, this.nextLabel, this.onDiagnosisChanged, this.initialDiagnosis});
 
   final VoidCallback? onBack;
   final VoidCallback? onNext;
+  final String? nextLabel;
   final ValueChanged<String>? onDiagnosisChanged;
+  final String? initialDiagnosis;
 
   @override
   State<OnboardingStep2> createState() => _OnboardingStep2State();
 }
 
 class _OnboardingStep2State extends State<OnboardingStep2>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   final _diagnoses = const [
     'Diagnosis 01',
     'Diagnosis 02',
@@ -30,6 +34,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
   @override
   void initState() {
     super.initState();
+    _selectedDiagnosis = widget.initialDiagnosis?.isNotEmpty == true ? widget.initialDiagnosis : null;
     _chevronController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
@@ -57,12 +62,14 @@ class _OnboardingStep2State extends State<OnboardingStep2>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
+    super.build(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
       stepLabel: l10n.onboardingStep(2, 4),
       progress: 0.5,
       onBack: widget.onBack,
       onNext: widget.onNext,
+      nextLabel: widget.nextLabel,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

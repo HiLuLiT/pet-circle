@@ -264,5 +264,22 @@
   "deleteMeasurement": "Delete measurement",
   "measurementDeleted": "Measurement deleted",
   "deleteMeasurementConfirmation": "Delete this {bpm} BPM reading from {date}?",
-  "@deleteMeasurementConfirmation": { "placeholders": { "bpm": { "type": "int" }, "date": { "type": "String" } } }
+  "@deleteMeasurementConfirmation": { "placeholders": { "bpm": { "type": "int" }, "date": { "type": "String" } } },
+  "editPet": "Edit Pet",
+  "deletePet": "Delete Pet",
+  "petDeleted": "Pet deleted",
+  "deletePetConfirmation": "Delete {name}? This will remove all associated data.",
+  "@deletePetConfirmation": { "placeholders": { "name": { "type": "String" } } },
+  "petUpdated": "Pet updated",
+  "editProfile": "Edit Profile",
+  "profileUpdated": "Profile updated",
+  "displayName": "Display Name",
+  "profilePhoto": "Profile Photo URL",
+  "removeMember": "Remove",
+  "memberRemoved": "Member removed",
+  "removeMemberConfirmation": "Remove {name} from the care circle?",
+  "@removeMemberConfirmation": { "placeholders": { "name": { "type": "String" } } },
+  "back": "Back",
+  "next": "Next",
+  "complete": "Complete"
 }

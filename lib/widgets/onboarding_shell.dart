@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_assets.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 class OnboardingShell extends StatelessWidget {
@@ -11,6 +11,7 @@ class OnboardingShell extends StatelessWidget {
     required this.child,
     this.onBack,
     this.onNext,
+    this.nextLabel,
   });
 
   final String stepLabel;
@@ -19,27 +20,76 @@ class OnboardingShell extends StatelessWidget {
   final Widget child;
   final VoidCallback? onBack;
   final VoidCallback? onNext;
+  final String? nextLabel;
 
   @override
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: c.white,
-      body: Center(
-        child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 24),
-          padding: const EdgeInsets.all(32),
-          decoration: BoxDecoration(
-            color: c.offWhite,
-            borderRadius: const BorderRadius.all(AppRadii.medium),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _Header(stepLabel: stepLabel, progress: progress, title: title),
-              const SizedBox(height: 32),
-              Flexible(child: child),
-            ],
+      body: SafeArea(
+        child: Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: c.offWhite,
+              borderRadius: const BorderRadius.all(AppRadii.medium),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _Header(stepLabel: stepLabel, progress: progress, title: title),
+                const SizedBox(height: 32),
+                Flexible(child: child),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    if (onBack != null)
+                      Expanded(
+                        child: SizedBox(
+                          height: 48,
+                          child: TextButton(
+                            onPressed: onBack,
+                            style: TextButton.styleFrom(
+                              backgroundColor: c.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: const BorderRadius.all(AppRadii.full),
+                              ),
+                            ),
+                            child: Text(
+                              l10n.back,
+                              style: AppTextStyles.body.copyWith(color: c.chocolate, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (onBack != null && onNext != null)
+                      const SizedBox(width: 12),
+                    if (onNext != null)
+                      Expanded(
+                        child: SizedBox(
+                          height: 48,
+                          child: TextButton(
+                            onPressed: onNext,
+                            style: TextButton.styleFrom(
+                              backgroundColor: c.chocolate,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: const BorderRadius.all(AppRadii.full),
+                              ),
+                            ),
+                            child: Text(
+                              nextLabel ?? l10n.done,
+                              style: AppTextStyles.body.copyWith(color: c.white, fontWeight: FontWeight.w600),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

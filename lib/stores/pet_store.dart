@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
+import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
+import 'package:pet_circle/stores/user_store.dart';
 
 final petStore = PetStore();
 
@@ -48,6 +50,36 @@ class PetStore extends ChangeNotifier {
   void removePet(String name) {
     _ownerPets.removeWhere((p) => p.name == name);
     _clinicPets.removeWhere((p) => p.name == name);
+    notifyListeners();
+  }
+
+  CareCircleRole? currentUserRoleFor(String petName) {
+    final user = userStore.currentUser;
+    if (user == null) return null;
+    final pet = getPetByName(petName);
+    if (pet == null) return null;
+    final match = pet.careCircle.where((m) => m.name == user.name).firstOrNull;
+    return match?.role;
+  }
+
+  void removeCareCircleMember(String petName, String memberName) {
+    for (final list in [_ownerPets, _clinicPets]) {
+      final idx = list.indexWhere((p) => p.name == petName);
+      if (idx != -1) {
+        final pet = list[idx];
+        final updated = Pet(
+          name: pet.name,
+          breedAndAge: pet.breedAndAge,
+          imageUrl: pet.imageUrl,
+          statusLabel: pet.statusLabel,
+          statusColorHex: pet.statusColorHex,
+          latestMeasurement: pet.latestMeasurement,
+          careCircle: pet.careCircle.where((m) => m.name != memberName).toList(),
+          diagnosis: pet.diagnosis,
+        );
+        list[idx] = updated;
+      }
+    }
     notifyListeners();
   }
 }

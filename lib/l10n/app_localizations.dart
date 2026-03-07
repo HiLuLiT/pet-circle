@@ -1549,6 +1549,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete this {bpm} BPM reading from {date}?'**
   String deleteMeasurementConfirmation(int bpm, String date);
+
+  /// No description provided for @editPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Pet'**
+  String get editPet;
+
+  /// No description provided for @deletePet.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Pet'**
+  String get deletePet;
+
+  /// No description provided for @petDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet deleted'**
+  String get petDeleted;
+
+  /// No description provided for @deletePetConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}? This will remove all associated data.'**
+  String deletePetConfirmation(String name);
+
+  /// No description provided for @petUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet updated'**
+  String get petUpdated;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @profileUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated'**
+  String get profileUpdated;
+
+  /// No description provided for @displayName.
+  ///
+  /// In en, this message translates to:
+  /// **'Display Name'**
+  String get displayName;
+
+  /// No description provided for @profilePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile Photo URL'**
+  String get profilePhoto;
+
+  /// No description provided for @removeMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get removeMember;
+
+  /// No description provided for @memberRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Member removed'**
+  String get memberRemoved;
+
+  /// No description provided for @removeMemberConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from the care circle?'**
+  String removeMemberConfirmation(String name);
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @complete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get complete;
 }
 
 class _AppLocalizationsDelegate

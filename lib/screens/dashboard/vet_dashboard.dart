@@ -247,7 +247,7 @@ class _PetCard extends StatelessWidget {
   }
 
   String _getOwnerName(List<CareCircleMember> circle, String fallback) {
-    final owner = circle.where((m) => m.role == 'Owner').firstOrNull;
+    final owner = circle.where((m) => m.role == CareCircleRole.admin).firstOrNull;
     return owner?.name ?? fallback;
   }
 }

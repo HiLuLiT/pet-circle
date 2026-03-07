@@ -18,11 +18,22 @@ A single platform where every member of a pet's care team — owners, family mem
 
 ### 1.2 Target Users
 
+**App-Level Roles** (selected at sign-in):
+
 | Role | Description |
 |------|-------------|
-| **Pet Owner** | Primary caregiver who manages pet profiles, takes measurements, and coordinates the care circle |
-| **Veterinarian** | Clinician who monitors patients remotely, reviews trends, and adds clinical notes |
-| **Caregiver** | Family members, pet sitters, or other trusted individuals invited to contribute measurements |
+| **Pet Owner** | Creates pet profiles, takes measurements, manages care circles, and coordinates monitoring |
+| **Veterinarian** | Monitors patients remotely, reviews trends, and adds clinical notes |
+
+**Care Circle Roles** (per-pet, assigned via invite):
+
+| Role | Permissions |
+|------|------------|
+| **Admin** | Full control: edit pet, manage circle, delete pet, measure, view all |
+| **Member** | Measure, view history/trends, add notes. Cannot edit pet or manage circle |
+| **Viewer** | View all data, add clinical notes. Cannot measure or edit |
+
+Pet owners who create a pet are automatically assigned the Admin role. When they invite others, they choose Member or Viewer. This enables multi-household sharing -- invited users see the shared pet in their dashboard with role-appropriate permissions.
 
 ---
 

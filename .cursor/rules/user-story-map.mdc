@@ -4,9 +4,9 @@ globs: "lib/**/*.dart"
 alwaysApply: false
 ---
 
-# Pet Circle — User Story Map
+# Pet Circle -- User Story Map
 
-Last updated: 2026-03-06 (Sprint 2 complete: trends & data integrity)
+Last updated: 2026-03-06 (Medication moved to bottom nav, Messages tab removed)
 
 ## Update Protocol
 
@@ -18,19 +18,29 @@ After completing work on any user story listed below:
 
 ---
 
-## Status: DONE (46 stories)
+## App Architecture
 
-These stories are fully functional in the current mock-data mode.
+Two app-level roles: **Owner** and **Vet** (selected at sign-in).
+Per-pet sharing via care circle with three roles:
+- **Admin**: Pet creator. Full control (edit, delete, manage circle, measure).
+- **Member**: Invited family/sitter. Can measure, view, add notes. Cannot edit pet or manage circle.
+- **Viewer**: Typically the vet. Can view everything, add clinical notes. Cannot measure or edit.
+
+Permissions are enforced via `CareCircleRole` enum with `CareCirclePermissions` extension in `lib/models/care_circle_member.dart`.
+
+---
+
+## Status: DONE (50 stories) -- Phase 1 Complete
 
 ### Authentication & Onboarding
 - A1: Welcome screen with sign-up and sign-in buttons
 - A2: Role selection (Vet / Pet Owner)
 - A3-A7: Email auth, Google, Apple, password reset (behind Firebase flag)
 - A8-A10: Email verification with resend and account switch (behind Firebase flag)
-- B1: Onboarding Step 1 — name, breed, age persisted to `petStore`
-- B2: Onboarding Step 2 — diagnosis saved to `Pet.diagnosis` field
-- B3: Onboarding Step 3 — target rate saved to `settingsStore`
-- B4: Onboarding Step 4 — care circle emails converted to `CareCircleMember` objects
+- B1: Onboarding Step 1 -- name, breed, age persisted to `petStore`
+- B2: Onboarding Step 2 -- diagnosis saved to `Pet.diagnosis` field
+- B3: Onboarding Step 3 -- target rate saved to `settingsStore`
+- B4: Onboarding Step 4 -- care circle emails converted to `CareCircleMember` with role
 
 ### Owner Experience
 - B5: Owner dashboard with pet cards from `petStore` + empty state CTA
@@ -39,91 +49,77 @@ These stories are fully functional in the current mock-data mode.
 - B8: Manual tap-to-count with haptics and BPM calculation
 - B9: Configurable timer durations (15s / 30s / 60s)
 - B10: "Add to Graph" saves measurement via `measurementStore`
-- B11: Trends SRR chart reads from `measurementStore` with empty state (no hardcoded fallback)
-- B12: Trends time-range filtering — period dropdown filters chart data and stats
+- B11: Trends SRR chart -- data-driven with empty state
+- B12: Trends time-range filtering -- period dropdown filters chart + stats
 - B13: Medication save wired to `medicationStore`
-- B14: Export measurement data — CSV preview dialog (no file download)
+- B14: Export measurement data -- CSV preview dialog
 - B15: Pet detail reads from `noteStore` and `measurementStore`
 - B16: "View Graph" navigates to trends tab
 - B17: Notifications from `notificationStore` with tap-to-mark-read
 - B18: Dark mode toggle
 - B19: Language switcher (EN / HE)
 - B20: SRR thresholds saved to `settingsStore`
-- B21: Care circle invite dialog from settings
+- B21: Care circle invite dialog from settings (role selection: Member/Viewer)
 - B22: Export all data dialog from settings
 - B23: Share with vet dialog from settings
 - B24: Push / emergency notification toggles wired to `settingsStore`
-- M1: "Add Pet" button on owner dashboard navigates to onboarding
-- M4: Pet selector on measurement screen — chip list when multiple pets exist
-- M5: Pet switcher in header — bottom sheet to switch active pet context
-- M7: Sign out from settings drawer with confirmation dialog
-- M10: Measurement deletion — swipe-to-delete in history with confirmation dialog
+- M1: "Add Pet" button on owner dashboard
+- M2: Edit pet profile -- admin-only, bottom sheet on pet detail
+- M3: Delete pet -- admin-only, long-press on pet card
+- M4: Pet selector on measurement screen
+- M5: Pet switcher in header
+- M6: User profile management -- edit name/photo from settings
+- M7: Sign out from settings drawer
+- M9: Care circle management -- remove members with confirmation
+- M10: Measurement deletion -- swipe-to-delete in history
+
+### Care Circle Sharing
+- S1: CareCircleRole enum (admin/member/viewer) with permissions extension
+- S2: Role-aware UI -- edit/delete only for admins, measure only for admin+member
+- S3: Invite flow offers Member or Viewer role selection
 
 ### Vet Experience
 - C1: Clinic overview dashboard from stores with real stats
-- C2: Summary stats (normal / elevated / measurements) from stores
+- C2: Summary stats from stores
 - C3: Patient card tap navigates to pet detail
 - C4: Clinical notes persisted via `noteStore`
-- C5: Vet SRR trends — same data-driven chart as B11
+- C5: Vet SRR trends -- data-driven chart
 - C6: Notifications from `notificationStore`
 
-### Caregiver
-- D2: Take measurements (same as B8-B10)
-- D3: View pet details (same as B15)
-
 ### Cross-Cutting
-- E1: Persistent tab navigation (Home, Trends, Measure, Messages)
+- E1: Bottom nav: Home, Trends, Measure, Medication (Messages removed, notifications via bell drawer)
 - E2: Settings drawer from avatar tap
 - E3: Notifications drawer from bell icon
 - E4: RTL layout for Hebrew
 - E5: Full dark mode support
+- E6: Standalone Medication screen extracted from Trends into `lib/screens/medication/medication_screen.dart`
 
 ---
 
-## Status: PARTIAL (1 story)
-
-| ID | Story | Gap | File |
-|----|-------|-----|------|
-| D1 | Caregiver dashboard | Screen exists with store data but has NO ROUTE — unreachable | `care_circle_dashboard.dart` |
-
----
-
-## Status: MISSING (4 stories — Phase 1 gaps)
-
-No implementation exists. These should be built before Phase 2.
-
-| ID | Story | Notes |
-|----|-------|-------|
-| M2 | Edit pet profile | Pet detail is read-only; `petStore.updatePet` exists |
-| M3 | Delete / archive pet | `petStore.removePet` exists but no UI |
-| M6 | User profile management | No way to edit name or photo; `userService.updateUser` exists |
-| M8 | Caregiver route / role | `CareCircleDashboard` exists but no route, no role option |
-
----
-
-## Status: FUTURE (16 stories — Phase 2-5)
+## Status: FUTURE (16 stories -- Phase 2-5)
 
 | Phase | Stories |
 |-------|---------|
-| 2 | Firebase Auth production, Firestore persistence, real-time sync, push notifications (FCM), care circle invitation flow |
+| 2 | Firebase Auth production, Firestore persistence, real-time sync, push notifications (FCM), care circle invitation flow (send/accept/decline with email matching) |
 | 3 | VisionRR camera measurement, trend anomaly detection, automated SRR alerts, measurement reminders, vet-to-owner messaging |
-| 4 | PDF report generation, CSV file export, shareable health summaries, vet clinic analytics |
+| 4 | PDF report generation, CSV file export (actual file), shareable health summaries, vet clinic analytics |
 | 5 | Apple Watch / WearOS companion, offline mode with sync |
 
 ---
 
-## Recommended Next Priorities
+## Recommended Next: Phase 2 (Backend & Persistence)
 
-1. Add caregiver route (M8 + D1) — register route, enable caregiver role
-2. Edit pet profile (M2) — edit mode on pet detail screen
-3. Delete pet UI (M3) — swipe or menu action on dashboard
-4. User profile management (M6) — edit name/photo in settings
-5. Care circle management (M9 partial) — remove member, change roles
+1. Enable Firebase Auth (`kEnableFirebase = true`)
+2. Firestore data persistence for pets, measurements, notes, medications
+3. Care circle as Firestore subcollection -- invited users see shared pets
+4. Real-time sync across care circle members via Firestore streams
+5. Push notifications via FCM
+6. Invitation flow: send email, recipient joins via deep link, matched to care circle role
 
 ---
 
 ## Related Rules
 
-- `screen-completion-guide.mdc` — granular screen-level checklist with line numbers
-- `state-management.mdc` — store patterns, access conventions, migration guide
-- `figma-design-system.mdc` — design tokens, colors, typography, spacing
+- `screen-completion-guide.mdc` -- screen-level checklist
+- `state-management.mdc` -- store patterns, access conventions
+- `figma-design-system.mdc` -- design tokens, colors, typography, spacing

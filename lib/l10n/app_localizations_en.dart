@@ -777,4 +777,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String deleteMeasurementConfirmation(int bpm, String date) {
     return 'Delete this $bpm BPM reading from $date?';
   }
+
+  @override
+  String get editPet => 'Edit Pet';
+
+  @override
+  String get deletePet => 'Delete Pet';
+
+  @override
+  String get petDeleted => 'Pet deleted';
+
+  @override
+  String deletePetConfirmation(String name) {
+    return 'Delete $name? This will remove all associated data.';
+  }
+
+  @override
+  String get petUpdated => 'Pet updated';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get profileUpdated => 'Profile updated';
+
+  @override
+  String get displayName => 'Display Name';
+
+  @override
+  String get profilePhoto => 'Profile Photo URL';
+
+  @override
+  String get removeMember => 'Remove';
+
+  @override
+  String get memberRemoved => 'Member removed';
+
+  @override
+  String removeMemberConfirmation(String name) {
+    return 'Remove $name from the care circle?';
+  }
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get complete => 'Complete';
 }

@@ -1,84 +1,55 @@
 ---
-description: Screen-by-screen completion guide for Pet Circle. Lists what works, what is partial or missing, and what needs to be done for each screen. Use this as a checklist when implementing remaining features.
+description: Screen-by-screen completion guide for Pet Circle. Phase 1 is complete with care circle role system. This file tracks remaining polish and Phase 2+ items.
 globs: "lib/screens/**/*.dart"
 alwaysApply: false
 ---
 
-# Pet Circle — Screen Completion Guide
+# Pet Circle -- Screen Completion Guide
 
-## How to Use This File
+## Phase 1 Status: COMPLETE
 
-This is a checklist of remaining gaps in the app UI. When working on a screen, consult the relevant section below. Completed items have been removed — only open work remains.
+All Phase 1 user stories are implemented including the care circle role system (Admin/Member/Viewer).
 
-Stores are documented in the `state-management.mdc` rule file.
-User story status is tracked in the `user-story-map.mdc` rule file.
+## Role System
 
----
+- Two app-level roles: Owner and Vet (selected at sign-in via role_selection_screen)
+- Three care circle roles per pet: Admin, Member, Viewer (defined in `care_circle_member.dart`)
+- `CareCirclePermissions` extension provides `canMeasure`, `canEditPet`, `canManageCircle`, `canAddNotes`, `canDeletePet`
+- `PetStore.currentUserRoleFor(petName)` returns the current user's role for a given pet
+- Pet detail edit button: admin-only
+- Dashboard delete (long-press): admin-only
+- Invite flow: offers Member or Viewer (Admin is auto-assigned to pet creator)
 
-## Priority 1 — Missing Features (no implementation)
+## Navigation Structure
 
-These features have zero UI and need to be built from scratch.
+```
+Bottom Nav: Home(0) | Trends(1) | Measure(2) | Medication(3)
+Trends tabs: Overview | Measurement History
+Notifications: bell icon drawer only (no dedicated tab)
+Medication: standalone screen at lib/screens/medication/medication_screen.dart
+```
 
-| Feature | Impact | Suggested Location |
-|---------|--------|--------------------|
-| Edit pet profile | Can't update name, breed, photo | Edit mode on `pet_detail_screen.dart` or edit sheet |
-| Delete / archive pet | Can't remove a pet | Swipe-to-delete or menu on `owner_dashboard.dart`; `petStore.removePet()` exists |
-| User profile management | No way to edit name or photo | Profile section in settings or dedicated screen |
-| Caregiver route | `CareCircleDashboard` unreachable | Add route to `app_routes.dart` and `main.dart`; add caregiver role option |
+## Remaining Polish (Optional)
 
----
+| Item | Details |
+|------|---------|
+| VisionRR placeholder | `measurement_screen.dart` -- Phase 3 feature |
+| Care circle role change | Can remove members but can't change existing roles |
+| Care circle pending invites | No display of pending invitations |
+| CSV file download | Export dialogs show preview but don't write actual files |
+| Multi-household demo | Mock data shows single-owner; for Phase 2, Firestore queries will show shared pets |
 
-## Priority 2 — Remaining Polish
+## Phase 1 Completion Checklist
 
-### Trends Screen (`lib/screens/trends/trends_screen.dart`)
-
-| Status | Item | Details |
-|--------|------|---------|
-| PLACEHOLDER | VisionRR mode tab | Just an icon and description text — Phase 3 feature |
-
-### Care Circle Dashboard (`lib/screens/dashboard/care_circle_dashboard.dart`)
-
-| Status | Item | Details |
-|--------|------|---------|
-| MISSING | No route in app | Screen exists but is unreachable |
-
-### Care Circle Management
-
-| Status | Item | Details |
-|--------|------|---------|
-| DONE | Invite member | Dialog with email in settings |
-| MISSING | Remove member | No UI to remove a care circle member |
-| MISSING | Change member role | No role change capability |
-| MISSING | View pending invites | No pending invite display |
-
----
-
-## Completion Checklist Summary
-
-- [x] Measurement save flow (store + "Add to Graph" button)
-- [x] Trends chart: data-driven with empty state, no hardcoded fallback
-- [x] Trends time-range filtering: period dropdown filters chart + stats
-- [x] Measurement deletion: swipe-to-delete with confirmation dialog
-- [x] Onboarding persists pet to store
-- [x] Onboarding: diagnosis field added to Pet model and persisted
-- [x] Onboarding: care circle emails converted to CareCircleMember objects
-- [x] 5 dead buttons wired to actions
-- [x] Owner dashboard pet cards tappable
-- [x] Notification cards have tap handlers and read from store
-- [x] Clinical notes persist via noteStore
-- [x] Medication save persists via medicationStore
-- [x] Settings thresholds persist via settingsStore
-- [x] All MockData imports replaced with store reads
-- [x] Hardcoded strings derived from data
-- [x] Care circle stats derived from data
-- [x] Vet dashboard stats derived from data
-- [x] Add pet after onboarding (M1) — button on owner dashboard
-- [x] Pet selector in measurement screen (M4) — chip list for multi-pet
-- [x] Wire pet switcher in header (M5) — bottom sheet selector
-- [x] Sign out from main app (M7) — settings drawer with confirmation
-- [x] Measurement deletion (M10) — swipe + store method
-- [ ] Edit pet profile (M2)
-- [ ] Delete pet UI (M3)
-- [ ] User profile management (M6)
-- [ ] Caregiver route and role (M8)
-- [ ] Care circle remove / roles (M9)
+- [x] All data flows wired to stores
+- [x] All buttons functional
+- [x] Care circle role system (Admin/Member/Viewer)
+- [x] Role-aware UI (edit/delete/measure permissions)
+- [x] Multi-pet support (add, edit, delete, switch, select)
+- [x] User profile management
+- [x] Sign out
+- [x] Measurement lifecycle (add, view, filter, delete)
+- [x] Clinical notes persistence
+- [x] Medication management
+- [x] Dark mode + i18n (EN/HE)
+- [x] Caregiver app-level role removed (sharing via care circle instead)

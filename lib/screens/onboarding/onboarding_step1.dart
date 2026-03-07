@@ -8,22 +8,32 @@ class OnboardingStep1 extends StatefulWidget {
   const OnboardingStep1({
     super.key,
     this.onNext,
+    this.nextLabel,
     this.onNameChanged,
     this.onBreedChanged,
     this.onAgeChanged,
+    this.initialName,
+    this.initialBreed,
+    this.initialAge,
   });
 
   final VoidCallback? onNext;
+  final String? nextLabel;
   final ValueChanged<String>? onNameChanged;
   final ValueChanged<String>? onBreedChanged;
   final ValueChanged<String>? onAgeChanged;
+  final String? initialName;
+  final String? initialBreed;
+  final String? initialAge;
 
   @override
   State<OnboardingStep1> createState() => _OnboardingStep1State();
 }
 
 class _OnboardingStep1State extends State<OnboardingStep1>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
   // Hardcoded breed list from Dog CEO API
   static const _allBreeds = [
     _BreedItem(displayName: 'Affenpinscher', breed: 'affenpinscher'),
@@ -177,19 +187,38 @@ class _OnboardingStep1State extends State<OnboardingStep1>
 
   String? _selectedBreed;
   bool _breedDropdownOpen = false;
+  final _breedSearchController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _ageController = TextEditingController();
+  String _breedQuery = '';
   late AnimationController _chevronController;
+
+  List<_BreedItem> get _filteredBreeds {
+    if (_breedQuery.isEmpty) return _allBreeds;
+    final q = _breedQuery.toLowerCase();
+    return _allBreeds.where((b) => b.displayName.toLowerCase().contains(q)).toList();
+  }
 
   @override
   void initState() {
     super.initState();
+    _selectedBreed = widget.initialBreed?.isNotEmpty == true ? widget.initialBreed : null;
+    _nameController.text = widget.initialName ?? '';
+    _ageController.text = widget.initialAge ?? '';
     _chevronController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
+    _breedSearchController.addListener(() {
+      setState(() => _breedQuery = _breedSearchController.text);
+    });
   }
 
   @override
   void dispose() {
+    _breedSearchController.dispose();
+    _nameController.dispose();
+    _ageController.dispose();
     _chevronController.dispose();
     super.dispose();
   }
@@ -201,6 +230,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
         _chevronController.forward();
       } else {
         _chevronController.reverse();
+        _breedSearchController.clear();
       }
     });
   }
@@ -214,11 +244,13 @@ class _OnboardingStep1State extends State<OnboardingStep1>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
+    super.build(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
       stepLabel: l10n.onboardingStep(1, 4),
       progress: 0.25,
       onNext: widget.onNext,
+      nextLabel: widget.nextLabel,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -227,6 +259,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
           LabeledTextField(
             label: l10n.petName,
             hintText: 'e.g., Max',
+            controller: _nameController,
             onChanged: widget.onNameChanged,
           ),
           const SizedBox(height: AppSpacing.md),
@@ -284,65 +317,90 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                 color: c.white,
                 borderRadius: const BorderRadius.all(AppRadii.xs),
               ),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 180),
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  shrinkWrap: true,
-                  itemCount: _allBreeds.length,
-                  itemBuilder: (context, index) {
-                    final breed = _allBreeds[index];
-                    final isSelected = breed.displayName == _selectedBreed;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedBreed = breed.displayName;
-                          _breedDropdownOpen = false;
-                        });
-                        _chevronController.reverse();
-                        widget.onBreedChanged?.call(breed.displayName);
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
+                    child: SizedBox(
+                      height: 36,
+                      child: TextField(
+                        controller: _breedSearchController,
+                        autofocus: true,
+                        decoration: InputDecoration(
+                          hintText: 'Search breeds...',
+                          hintStyle: AppTextStyles.body.copyWith(color: c.chocolate.withValues(alpha: 0.3)),
+                          prefixIcon: Icon(Icons.search, size: 18, color: c.chocolate.withValues(alpha: 0.4)),
+                          prefixIconConstraints: const BoxConstraints(minWidth: 36),
+                          filled: true,
+                          fillColor: c.offWhite,
+                          border: OutlineInputBorder(
+                            borderRadius: const BorderRadius.all(AppRadii.xs),
+                            borderSide: BorderSide.none,
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                         ),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? c.lightYellow
-                              : Colors.transparent,
-                          borderRadius: const BorderRadius.all(AppRadii.xs),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                breed.displayName,
-                                style: AppTextStyles.body.copyWith(
-                                  fontWeight: isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                            if (breed.subBreed != null)
-                              Text(
-                                _capitalize(breed.breed),
-                                style: AppTextStyles.caption.copyWith(
-                                  color: c.chocolate,
-                                  fontSize: 10,
-                                ),
-                              ),
-                          ],
-                        ),
+                        style: AppTextStyles.body,
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 160),
+                    child: _filteredBreeds.isEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Text(
+                              'No breeds found',
+                              style: AppTextStyles.body.copyWith(color: c.chocolate.withValues(alpha: 0.4)),
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            shrinkWrap: true,
+                            itemCount: _filteredBreeds.length,
+                            itemBuilder: (context, index) {
+                              final breed = _filteredBreeds[index];
+                              final isSelected = breed.displayName == _selectedBreed;
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedBreed = breed.displayName;
+                                    _breedDropdownOpen = false;
+                                  });
+                                  _breedSearchController.clear();
+                                  _chevronController.reverse();
+                                  widget.onBreedChanged?.call(breed.displayName);
+                                },
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? c.lightYellow : Colors.transparent,
+                                    borderRadius: const BorderRadius.all(AppRadii.xs),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          breed.displayName,
+                                          style: AppTextStyles.body.copyWith(
+                                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                          ),
+                                        ),
+                                      ),
+                                      if (breed.subBreed != null)
+                                        Text(
+                                          _capitalize(breed.breed),
+                                          style: AppTextStyles.caption.copyWith(color: c.chocolate, fontSize: 10),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
             ),
           const SizedBox(height: AppSpacing.md),
@@ -350,6 +408,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
             label: l10n.ageYears,
             hintText: 'e.g., 8',
             keyboardType: TextInputType.number,
+            controller: _ageController,
             onChanged: widget.onAgeChanged,
           ),
           const SizedBox(height: AppSpacing.md),

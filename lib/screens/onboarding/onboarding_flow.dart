@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/models/measurement.dart';
@@ -42,7 +43,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         .map((email) => CareCircleMember(
               name: email,
               avatarUrl: 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(email)}&background=E8B4B8&color=5B2C3F',
-              role: 'Caregiver',
+              role: CareCircleRole.member,
             ))
         .toList();
     petStore.addPet(Pet(
@@ -71,26 +72,35 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return PageView(
       controller: _controller,
-      physics: const PageScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       onPageChanged: (index) => setState(() => _currentIndex = index),
       children: [
         OnboardingStep1(
           onNext: () => _goTo(1),
+          nextLabel: l10n.next,
           onNameChanged: (name) => _petName = name,
           onBreedChanged: (breed) => _breedAndAge = breed,
           onAgeChanged: (age) => _age = age,
+          initialName: _petName,
+          initialBreed: _breedAndAge,
+          initialAge: _age,
         ),
         OnboardingStep2(
           onBack: () => _goTo(0),
           onNext: () => _goTo(2),
+          nextLabel: l10n.next,
           onDiagnosisChanged: (diagnosis) => _diagnosis = diagnosis,
+          initialDiagnosis: _diagnosis,
         ),
         OnboardingStep3(
           onBack: () => _goTo(1),
           onNext: () => _goTo(3),
+          nextLabel: l10n.next,
           onTargetRateChanged: (rate) => _targetRate = rate,
+          initialTargetRate: _targetRate,
         ),
         OnboardingStep4(
           onBack: () => _goTo(2),

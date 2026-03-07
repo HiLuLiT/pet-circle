@@ -6,7 +6,8 @@ import 'package:pet_circle/screens/settings/settings_screen.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
 import 'package:pet_circle/screens/measurement/measurement_screen.dart';
-import 'package:pet_circle/screens/messages/messages_screen.dart' show MessagesScreen, NotificationsDrawer;
+import 'package:pet_circle/screens/medication/medication_screen.dart' show MedicationScreen;
+import 'package:pet_circle/screens/messages/messages_screen.dart' show NotificationsDrawer;
 import 'package:pet_circle/screens/trends/trends_screen.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/app_header.dart';
@@ -132,7 +133,7 @@ class _MainShellState extends State<MainShell> {
                   homeScreen,
                   const TrendsScreen(showScaffold: false),
                   const MeasurementScreen(showScaffold: false),
-                  const MessagesScreen(showScaffold: false),
+                  const MedicationScreen(showScaffold: false),
                 ],
               ),
             ),

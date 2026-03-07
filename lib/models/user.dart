@@ -33,4 +33,22 @@ class User {
         return 'Caregiver';
     }
   }
+
+  User copyWith({
+    String? id,
+    String? name,
+    String? email,
+    UserRole? role,
+    String? avatarUrl,
+    List<Pet>? pets,
+  }) {
+    return User(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      role: role ?? this.role,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      pets: pets ?? this.pets,
+    );
+  }
 }
