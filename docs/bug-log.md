@@ -282,6 +282,30 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-017: Pet permissions drift across screens and can show owner as viewer
+
+**Found during:** Returning owner sign-in and pet action flow
+**Severity:** High (incorrect permissions and confusing blocked actions)
+**Status:** Fixed
+
+**Symptom:** After signing in, an owner could see viewer-level restrictions on their own pet. In particular, tapping Measure/heart from a pet card could open a shared tab that treated the user as a viewer instead of an admin/member.
+
+**Root cause:** Pet permissions were reconstructed in multiple screens using `currentUserRoleFor(...) ?? viewer`, while shared tabs relied on `petStore.activePet`. The Owner Dashboard navigated to shared tabs without first selecting the clicked pet, and several screens used inconsistent pet sources (`activePet`, `pets.first`, or pet name lookups). This fragmented logic let screens drift and fall back to viewer too easily. A separate local edit path in `PetDetailScreen` also rebuilt `Pet` without preserving identity fields, which could strip `ownerId` in memory.
+
+**Fix:** Added a centralized `PetAccess` resolver in `PetStore` that derives a concrete per-pet persona from `ownerId`, care-circle UID matches, and legacy fallbacks. Updated dashboards and shared screens to use `accessForPet(...)` / `accessForActivePet()` instead of local viewer fallbacks, switched Settings and Medication to `activePet`, set the clicked pet active before opening shared tabs, and preserved `id`/`ownerId` when editing a pet locally.
+
+**Files changed:**
+- `lib/models/pet_access.dart`
+- `lib/stores/pet_store.dart`
+- `lib/screens/dashboard/owner_dashboard.dart`
+- `lib/screens/measurement/measurement_screen.dart`
+- `lib/screens/pet_detail/pet_detail_screen.dart`
+- `lib/screens/settings/settings_screen.dart`
+- `lib/screens/trends/trends_screen.dart`
+- `lib/screens/medication/medication_screen.dart`
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

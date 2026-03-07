@@ -113,12 +113,20 @@ class _SettingsContentState extends State<_SettingsContent> {
     final c = AppColorsTheme.of(context);
     return Container(
       color: c.white,
-      child: SingleChildScrollView(
-        controller: widget.scrollController,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      child: ListenableBuilder(
+        listenable: petStore,
+        builder: (context, _) {
+          final activePet = petStore.activePet;
+          final access = petStore.accessForPet(activePet);
+          final canManageActivePet =
+              activePet != null && access.canManageCircle;
+
+          return SingleChildScrollView(
+            controller: widget.scrollController,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             // Top bar with title and optional close chevron
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -196,22 +204,15 @@ class _SettingsContentState extends State<_SettingsContent> {
               ),
               const SizedBox(height: 16),
               Builder(builder: (context) {
-                final pets = petStore.ownerPets;
-                final activePet = pets.isNotEmpty ? pets.first : null;
-                final currentRole = activePet != null
-                    ? (petStore.currentUserRoleFor(activePet.name) ?? CareCircleRole.viewer)
-                    : CareCircleRole.viewer;
-                final canManage = currentRole.canManageCircle;
-
                 return _SettingsCard(
                   title: l10n.careCircle,
                   subtitle: l10n.manageCaregivers,
-                  trailing: canManage
+                  trailing: canManageActivePet
                       ? _InviteButton(onTap: () => _showInviteDialog(context))
                       : null,
                   child: Builder(builder: (context) {
                     if (activePet == null) {
-                      return Text(l10n.noClinicalNotesYet, style: AppTextStyles.body);
+                      return Text(l10n.noPetsYet, style: AppTextStyles.body);
                     }
                     final members = activePet.careCircle;
                     if (members.isEmpty) {
@@ -229,7 +230,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                             roleColor: isViewer ? c.blue : isAdmin ? c.chocolate : c.lightYellow,
                             statusLabel: l10n.active,
                             statusColor: c.pink,
-                            onRemove: canManage
+                            onRemove: canManageActivePet
                                 ? () => _confirmRemoveMember(context, activePet.name, member.name)
                                 : null,
                           ),
@@ -337,7 +338,9 @@ class _SettingsContentState extends State<_SettingsContent> {
                       iconAsset: _settingsShareAsset,
                       title: l10n.shareWithVet,
                       description: l10n.shareWithVetDesc,
-                      onTap: () => _showShareWithVetDialog(context),
+                      onTap: canManageActivePet
+                          ? () => _showShareWithVetDialog(context)
+                          : null,
                     ),
                   ],
                 ),
@@ -397,8 +400,10 @@ class _SettingsContentState extends State<_SettingsContent> {
               const SizedBox(height: 24),
             ],
           ),
-        ),
-      );
+          );
+        },
+      ),
+    );
   }
 
   void _showSignOutDialog(BuildContext context) {
@@ -1572,7 +1577,7 @@ class _ActionRow extends StatelessWidget {
   final String iconAsset;
   final String title;
   final String description;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1582,7 +1587,7 @@ class _ActionRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: c.white,
+          color: onTap == null ? c.white.withValues(alpha: 0.7) : c.white,
           borderRadius: const BorderRadius.all(AppRadii.small),
         ),
         child: Row(
@@ -1598,7 +1603,9 @@ class _ActionRow extends StatelessWidget {
                     Text(
                       title,
                       style: AppTextStyles.body.copyWith(
-                        color: c.chocolate,
+                        color: onTap == null
+                            ? c.chocolate.withValues(alpha: 0.5)
+                            : c.chocolate,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.31,
@@ -1608,7 +1615,9 @@ class _ActionRow extends StatelessWidget {
                     Text(
                       description,
                       style: AppTextStyles.caption.copyWith(
-                        color: c.chocolate,
+                        color: onTap == null
+                            ? c.chocolate.withValues(alpha: 0.5)
+                            : c.chocolate,
                         fontSize: 12,
                       ),
                     ),

@@ -5,6 +5,7 @@ import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
+import 'package:pet_circle/models/pet_access.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
@@ -141,29 +142,35 @@ class OwnerDashboard extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: 24),
                   child: Builder(
                     builder: (context) {
-                      final role = petStore.currentUserRoleFor(pet.name) ?? CareCircleRole.viewer;
+                      final access = petStore.accessForPet(pet);
                       return _PetCard(
                         data: pet,
-                        userRole: role,
-                        onLongPress: role.canDeletePet
+                        access: access,
+                        onLongPress: access.canDeletePet
                             ? () => _confirmDeletePet(context, pet)
                             : null,
-                        onMeasure: role.canMeasure
-                            ? () => Navigator.of(context).pushNamed(
+                        onMeasure: access.canMeasure
+                            ? () {
+                                petStore.setActivePet(pet);
+                                Navigator.of(context).pushNamed(
                                   AppRoutes.mainShell,
                                   arguments: {
                                     'role': AppUserRole.owner,
                                     'initialIndex': 2,
                                   },
-                                )
+                                );
+                              }
                             : null,
-                        onTrends: () => Navigator.of(context).pushNamed(
-                          AppRoutes.mainShell,
-                          arguments: {
-                            'role': AppUserRole.owner,
-                            'initialIndex': 1,
-                          },
-                        ),
+                        onTrends: () {
+                          petStore.setActivePet(pet);
+                          Navigator.of(context).pushNamed(
+                            AppRoutes.mainShell,
+                            arguments: {
+                              'role': AppUserRole.owner,
+                              'initialIndex': 1,
+                            },
+                          );
+                        },
                       );
                     },
                   ),
@@ -222,7 +229,7 @@ class _PetCard extends StatelessWidget {
     required this.data,
     required this.onMeasure,
     required this.onTrends,
-    required this.userRole,
+    required this.access,
     this.onTap,
     this.onLongPress,
   });
@@ -230,7 +237,7 @@ class _PetCard extends StatelessWidget {
   final Pet data;
   final VoidCallback? onMeasure;
   final VoidCallback onTrends;
-  final CareCircleRole userRole;
+  final PetAccess access;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
@@ -276,19 +283,19 @@ class _PetCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      if (userRole != CareCircleRole.admin)
+                      if (access.role != CareCircleRole.admin)
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: userRole == CareCircleRole.member
+                            color: access.role == CareCircleRole.member
                                 ? c.lightBlue.withValues(alpha: 0.12)
                                 : c.blue.withValues(alpha: 0.12),
                             borderRadius: const BorderRadius.all(AppRadii.small),
                           ),
                           child: Text(
-                            userRole.name[0].toUpperCase() + userRole.name.substring(1),
+                            access.role.name[0].toUpperCase() + access.role.name.substring(1),
                             style: AppTextStyles.caption.copyWith(
-                              color: userRole == CareCircleRole.member ? c.lightBlue : c.blue,
+                              color: access.role == CareCircleRole.member ? c.lightBlue : c.blue,
                               fontWeight: FontWeight.w500,
                             ),
                           ),

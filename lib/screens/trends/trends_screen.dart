@@ -119,29 +119,33 @@ class _TrendsScreenState extends State<TrendsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
-    final periodOptions = [
-      l10n.last24Hours,
-      l10n.last3Days,
-      l10n.last7Days,
-      l10n.last30Days,
-      l10n.last90Days,
-      l10n.customRange,
-    ];
-    _selectedPeriod ??= l10n.last7Days;
+    return ListenableBuilder(
+      listenable: Listenable.merge([measurementStore, petStore]),
+      builder: (context, _) {
+        final l10n = AppLocalizations.of(context)!;
+        final c = AppColorsTheme.of(context);
+        final access = petStore.accessForActivePet();
+        final periodOptions = [
+          l10n.last24Hours,
+          l10n.last3Days,
+          l10n.last7Days,
+          l10n.last30Days,
+          l10n.last90Days,
+          l10n.customRange,
+        ];
+        _selectedPeriod ??= l10n.last7Days;
 
-    final petName = petStore.activePet?.name ?? 'Pet';
-    final allMeasurements = measurementStore.getMeasurements(petName);
-    final filtered = _filterByPeriod(allMeasurements, l10n);
+        final petName = petStore.activePet?.name ?? l10n.petName;
+        final allMeasurements = measurementStore.getMeasurements(petName);
+        final filtered = _filterByPeriod(allMeasurements, l10n);
 
-    final content = SafeArea(
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+        final content = SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
               const SizedBox(height: AppSpacing.md),
               Text(l10n.healthTrends, style: AppTextStyles.heading2),
               const SizedBox(height: AppSpacing.sm),
@@ -222,7 +226,9 @@ class _TrendsScreenState extends State<TrendsScreen> {
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Dismissible(
                       key: ValueKey('${m.recordedAt.millisecondsSinceEpoch}-${m.bpm}'),
-                      direction: DismissDirection.endToStart,
+                      direction: access.canDeleteMeasurements
+                          ? DismissDirection.endToStart
+                          : DismissDirection.none,
                       background: Container(
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 20),
@@ -233,6 +239,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                         child: Icon(Icons.delete, color: c.white),
                       ),
                       confirmDismiss: (_) async {
+                        if (!access.canDeleteMeasurements) return false;
                         _confirmDelete(context, petName, m);
                         return false;
                       },
@@ -273,14 +280,18 @@ class _TrendsScreenState extends State<TrendsScreen> {
                   );
                 }),
               ],
-            ],
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-    );
+        );
 
-    if (!widget.showScaffold) return Container(color: c.white, child: content);
-    return Scaffold(backgroundColor: c.white, body: content);
+        if (!widget.showScaffold) {
+          return Container(color: c.white, child: content);
+        }
+        return Scaffold(backgroundColor: c.white, body: content);
+      },
+    );
   }
 }
 

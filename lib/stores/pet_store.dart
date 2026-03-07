@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/care_circle_member.dart';
+import 'package:pet_circle/models/pet_access.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/services/pet_service.dart';
 import 'package:pet_circle/services/user_service.dart';
@@ -28,6 +29,15 @@ class PetStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setActivePet(Pet pet) {
+    final index = _ownerPets.indexWhere((candidate) =>
+        (candidate.id != null && candidate.id == pet.id) ||
+        candidate.name == pet.name);
+    if (index == -1) return;
+    _activePetIndex = index;
+    notifyListeners();
+  }
+
   /// Seed from mock data (when kEnableFirebase == false).
   void seed({
     required List<Pet> ownerPets,
@@ -35,6 +45,7 @@ class PetStore extends ChangeNotifier {
   }) {
     _ownerPets = List.of(ownerPets);
     _clinicPets = List.of(clinicPets);
+    _activePetIndex = activePetIndex;
     notifyListeners();
   }
 
@@ -45,8 +56,16 @@ class PetStore extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     _petsSubscription = PetService.streamPetsForUser(uid).listen((pets) {
+      final previousActivePetId = activePet?.id;
       _ownerPets = pets;
       _clinicPets = pets;
+      if (previousActivePetId != null) {
+        final newIndex =
+            _ownerPets.indexWhere((pet) => pet.id == previousActivePetId);
+        _activePetIndex = newIndex == -1 ? 0 : newIndex;
+      } else {
+        _activePetIndex = activePetIndex;
+      }
       _isLoading = false;
       notifyListeners();
     });
@@ -130,20 +149,75 @@ class PetStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  CareCircleRole? currentUserRoleFor(String petName) {
+  PetAccess accessForActivePet() => accessForPet(activePet);
+
+  PetAccess accessForPetId(String? petId) {
+    if (petId == null) return PetAccess.unknown();
+    return accessForPet(getPetById(petId));
+  }
+
+  PetAccess accessForPet(Pet? pet) {
+    if (pet == null) return PetAccess.unknown();
+
     final uid = userStore.currentUserUid;
-    final name = userStore.currentUser?.name;
-    if (uid == null && name == null) return null;
+    final email = userStore.currentUserEmail?.toLowerCase();
+    final displayName = userStore.currentUserDisplayName;
+
+    if (uid != null && pet.ownerId == uid) {
+      return PetAccess(
+        pet: pet,
+        role: CareCircleRole.admin,
+        source: PetAccessSource.ownerId,
+        isOwner: true,
+      );
+    }
+
+    if (uid != null) {
+      final uidMatch = pet.careCircle
+          .where((member) => member.uid == uid)
+          .firstOrNull;
+      if (uidMatch != null) {
+        return PetAccess(
+          pet: pet,
+          role: uidMatch.role,
+          source: PetAccessSource.careCircleUid,
+        );
+      }
+    }
+
+    if (email != null && email.isNotEmpty) {
+      final emailMatch = pet.careCircle
+          .where((member) => member.name.toLowerCase() == email)
+          .firstOrNull;
+      if (emailMatch != null) {
+        return PetAccess(
+          pet: pet,
+          role: emailMatch.role,
+          source: PetAccessSource.careCircleEmailFallback,
+        );
+      }
+    }
+
+    if (displayName != null && displayName.isNotEmpty) {
+      final nameMatch = pet.careCircle
+          .where((member) => member.name == displayName)
+          .firstOrNull;
+      if (nameMatch != null) {
+        return PetAccess(
+          pet: pet,
+          role: nameMatch.role,
+          source: PetAccessSource.legacyNameFallback,
+        );
+      }
+    }
+
+    return PetAccess.unknown(pet);
+  }
+
+  CareCircleRole? currentUserRoleFor(String petName) {
     final pet = getPetByName(petName);
     if (pet == null) return null;
-
-    // Owner of the pet is always admin, even if careCircle data is inconsistent
-    if (uid != null && pet.ownerId == uid) return CareCircleRole.admin;
-
-    final match = pet.careCircle
-        .where((m) => (m.uid != null && m.uid == uid) || m.name == name)
-        .firstOrNull;
-    return match?.role;
+    return accessForPet(pet).role;
   }
 
   /// Remove a care circle member from Firestore (stream updates local state) or locally in mock mode.

@@ -17,6 +17,8 @@ class MedicationScreen extends StatefulWidget {
 
 class _MedicationScreenState extends State<MedicationScreen> {
   void _openMedicationSheet([Medication? medication]) {
+    final access = petStore.accessForActivePet();
+    if (!access.canManageMedication) return;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -28,7 +30,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
   void _exportMedicationLog() {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
-    final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+    final petName = petStore.activePet?.name ?? l10n.petName;
     final meds = medicationStore.getMedications(petName);
     final csvLines = meds.map((m) {
       final start = '${m.startDate.year}-${m.startDate.month.toString().padLeft(2, '0')}-${m.startDate.day.toString().padLeft(2, '0')}';
@@ -87,9 +89,12 @@ class _MedicationScreenState extends State<MedicationScreen> {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final content = ListenableBuilder(
-      listenable: medicationStore,
+      listenable: Listenable.merge([medicationStore, petStore]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context)!;
+        final access = petStore.accessForActivePet();
+        final petName = petStore.activePet?.name ?? l10n.petName;
+        final count = medicationStore.getActiveMedications(petName).length;
         return SafeArea(
           child: SingleChildScrollView(
             child: Padding(
@@ -105,9 +110,12 @@ class _MedicationScreenState extends State<MedicationScreen> {
                       SizedBox(
                         height: 32,
                         child: TextButton.icon(
-                          onPressed: _openMedicationSheet,
+                          onPressed:
+                              access.canManageMedication ? _openMedicationSheet : null,
                           style: TextButton.styleFrom(
                             backgroundColor: c.lightBlue,
+                            disabledBackgroundColor:
+                                c.lightBlue.withValues(alpha: 0.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: const BorderRadius.all(AppRadii.full),
                             ),
@@ -122,16 +130,14 @@ class _MedicationScreenState extends State<MedicationScreen> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  Builder(builder: (context) {
-                    final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
-                    final count = medicationStore.getActiveMedications(petName).length;
-                    return Text(
-                      '$petName • $count active treatments',
-                      style: AppTextStyles.body,
-                    );
-                  }),
+                  Text(
+                    '$petName • $count active treatments',
+                    style: AppTextStyles.body,
+                  ),
                   const SizedBox(height: 24),
-                  _ActiveMedicationsList(onEdit: _openMedicationSheet),
+                  _ActiveMedicationsList(
+                    onEdit: access.canManageMedication ? _openMedicationSheet : null,
+                  ),
                   const SizedBox(height: 24),
                   _SectionCard(
                     child: Column(
@@ -201,7 +207,7 @@ class _ActiveMedicationsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final petName = petStore.ownerPets.isNotEmpty ? petStore.ownerPets.first.name : 'Pet';
+    final petName = petStore.activePet?.name ?? l10n.petName;
     final meds = medicationStore.getMedications(petName);
 
     if (meds.isEmpty) {
@@ -427,6 +433,8 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                     const SizedBox(width: 8),
                     TextButton(
                       onPressed: () {
+                        final access = petStore.accessForActivePet();
+                        if (!access.canManageMedication) return;
                         final petName = petStore.activePet?.name ?? 'Pet';
                         final name = _nameController.text.isNotEmpty ? _nameController.text : l10n.newMedication;
                         final dosage = _dosageController.text;

@@ -7,7 +7,6 @@ import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
-import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/breed_search_field.dart';
@@ -102,15 +101,14 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                     const SizedBox(width: 8),
                     TextButton(
                       onPressed: () {
-                        final updated = Pet(
+                        final updated = _pet.copyWith(
                           name: nameCtrl.text.isNotEmpty ? nameCtrl.text : _pet.name,
-                          breedAndAge: selectedBreed.isNotEmpty ? selectedBreed : _pet.breedAndAge,
-                          imageUrl: imageCtrl.text.isNotEmpty ? imageCtrl.text : _pet.imageUrl,
-                          statusLabel: _pet.statusLabel,
-                          statusColorHex: _pet.statusColorHex,
-                          latestMeasurement: _pet.latestMeasurement,
-                          careCircle: _pet.careCircle,
-                          diagnosis: _pet.diagnosis,
+                          breedAndAge: selectedBreed.isNotEmpty
+                              ? selectedBreed
+                              : _pet.breedAndAge,
+                          imageUrl: imageCtrl.text.isNotEmpty
+                              ? imageCtrl.text
+                              : _pet.imageUrl,
                         );
                         petStore.updatePet(_pet.name, updated);
                         setState(() => _pet = updated);
@@ -133,7 +131,8 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   }
 
   void _addNote() {
-    if (_noteController.text.trim().isEmpty) return;
+    final access = petStore.accessForPet(_pet);
+    if (!access.canAddNotes || _noteController.text.trim().isEmpty) return;
 
     final user = userStore.currentUser;
     noteStore.addNote(
@@ -164,7 +163,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     return Scaffold(
       backgroundColor: c.white,
       body: ListenableBuilder(
-        listenable: Listenable.merge([noteStore, measurementStore]),
+        listenable: Listenable.merge([noteStore, measurementStore, petStore]),
         builder: (context, _) => CustomScrollView(
         slivers: [
           _buildAppBar(),
@@ -191,6 +190,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
 
   Widget _buildAppBar() {
     final c = AppColorsTheme.of(context);
+    final access = petStore.accessForPet(_pet);
     return SliverAppBar(
       expandedHeight: 280,
       pinned: true,
@@ -200,7 +200,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         onPressed: () => Navigator.of(context).pop(),
       ),
       actions: [
-        if ((petStore.currentUserRoleFor(_pet.name) ?? CareCircleRole.viewer).canEditPet)
+        if (access.canEditPet)
           IconButton(
             icon: Icon(Icons.edit, color: c.white),
             onPressed: _showEditSheet,
@@ -218,7 +218,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    c.chocolate.withOpacity(0.8),
+                    c.chocolate.withValues(alpha: 0.8),
                   ],
                 ),
               ),
@@ -245,7 +245,9 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   ),
                   Text(
                     _pet.breedAndAge,
-                    style: AppTextStyles.body.copyWith(color: c.white.withOpacity(0.8)),
+                    style: AppTextStyles.body.copyWith(
+                      color: c.white.withValues(alpha: 0.8),
+                    ),
                   ),
                 ],
               ),
@@ -318,13 +320,16 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 style: AppTextStyles.heading3.copyWith(color: c.chocolate),
               ),
               TextButton.icon(
-                onPressed: () => Navigator.of(context).pushNamed(
-                  AppRoutes.mainShell,
-                  arguments: {
-                    'role': userStore.role,
-                    'initialIndex': 1,
-                  },
-                ),
+                onPressed: () {
+                  petStore.setActivePet(_pet);
+                  Navigator.of(context).pushNamed(
+                    AppRoutes.mainShell,
+                    arguments: {
+                      'role': userStore.role,
+                      'initialIndex': 1,
+                    },
+                  );
+                },
                 icon: const Icon(Icons.show_chart, size: 18),
                 label: Text(l10n.viewGraph),
                 style: TextButton.styleFrom(foregroundColor: c.lightBlue),
@@ -358,8 +363,8 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                           height: height.clamp(20, 60),
                           decoration: BoxDecoration(
                             color: isElevated
-                                ? c.cherry.withOpacity(0.3)
-                                : c.lightBlue.withOpacity(0.3),
+                                ? c.cherry.withValues(alpha: 0.3)
+                                : c.lightBlue.withValues(alpha: 0.3),
                             borderRadius: const BorderRadius.all(AppRadii.xs),
                             border: Border.all(
                               color: isElevated ? c.cherry : c.lightBlue,
@@ -396,6 +401,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   Widget _buildClinicalNotes() {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
+    final access = petStore.accessForPet(_pet);
     final notes = noteStore.getNotes(_pet.name);
     return NeumorphicCard(
       radius: const BorderRadius.all(AppRadii.medium),
@@ -426,6 +432,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 TextField(
                   controller: _noteController,
                   maxLines: 3,
+                  readOnly: !access.canAddNotes,
                   decoration: InputDecoration(
                     hintText: l10n.addClinicalNoteHint,
                     hintStyle: AppTextStyles.body.copyWith(color: c.chocolate),
@@ -438,7 +445,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
-                    onPressed: _addNote,
+                    onPressed: access.canAddNotes ? _addNote : null,
                     icon: const Icon(Icons.add, size: 18),
                     label: Text(l10n.addNote),
                     style: ElevatedButton.styleFrom(
@@ -465,7 +472,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             Center(
               child: Column(
                 children: [
-                  Icon(Icons.notes, size: 40, color: c.chocolate.withOpacity(0.5)),
+                  Icon(
+                    Icons.notes,
+                    size: 40,
+                    color: c.chocolate.withValues(alpha: 0.5),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     l10n.noClinicalNotesYet,
@@ -536,7 +547,7 @@ class _InfoTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.15),
+              color: iconColor.withValues(alpha: 0.15),
               borderRadius: const BorderRadius.all(AppRadii.small),
             ),
             child: Icon(icon, color: iconColor, size: 22),
