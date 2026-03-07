@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "999352037269",
+    "project_id": "pet-circle-app",
+    "storage_bucket": "pet-circle-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:999352037269:android:a53d2788fdbee30519d09c",
+        "android_client_info": {
+          "package_name": "com.example.pet_circle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyANdBoQEe7PzWShp5afWC0sM6d4M6zo498"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

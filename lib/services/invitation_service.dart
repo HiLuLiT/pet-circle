@@ -8,6 +8,9 @@ class InvitationService {
   static final _firestore = FirebaseFirestore.instance;
   static final _invitationsCollection = _firestore.collection('invitations');
 
+  static const int maxVetsPerPet = 2;
+  static const int maxInvitesPerDay = 5;
+
   static String _generateToken() {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     final random = Random.secure();
@@ -22,6 +25,7 @@ class InvitationService {
     required CareCircleRole role,
     required String invitedByUid,
     required String invitedByName,
+    InvitationType type = InvitationType.careCircle,
   }) async {
     final token = _generateToken();
     final now = DateTime.now();
@@ -35,6 +39,7 @@ class InvitationService {
       invitedByName: invitedByName,
       createdAt: now,
       expiresAt: now.add(const Duration(days: 7)),
+      type: type,
     );
 
     await _invitationsCollection.doc(token).set(invitation.toFirestore());
@@ -93,6 +98,61 @@ class InvitationService {
         .map((doc) => Invitation.fromFirestore(doc))
         .where((inv) => inv.isPending)
         .toList();
+  }
+
+  /// Check if a pending invitation already exists for this pet + email combo.
+  static Future<bool> hasDuplicateInvitation({
+    required String petId,
+    required String email,
+  }) async {
+    final snapshot = await _invitationsCollection
+        .where('petId', isEqualTo: petId)
+        .where('invitedEmail', isEqualTo: email.toLowerCase())
+        .where('status', isEqualTo: InvitationStatus.pending.name)
+        .limit(1)
+        .get();
+    return snapshot.docs.isNotEmpty;
+  }
+
+  /// Count pending + accepted vet invitations for a given pet.
+  static Future<int> vetCountForPet(String petId) async {
+    final snapshot = await _invitationsCollection
+        .where('petId', isEqualTo: petId)
+        .where('type', isEqualTo: InvitationType.vet.name)
+        .get();
+    return snapshot.docs
+        .map((doc) => Invitation.fromFirestore(doc))
+        .where((inv) => inv.status == InvitationStatus.pending || inv.status == InvitationStatus.accepted)
+        .length;
+  }
+
+  /// Count how many invitations a user has sent in the last 24 hours.
+  static Future<int> invitesSentToday(String uid) async {
+    final cutoff = DateTime.now().subtract(const Duration(hours: 24));
+    final snapshot = await _invitationsCollection
+        .where('invitedByUid', isEqualTo: uid)
+        .where('createdAt', isGreaterThan: Timestamp.fromDate(cutoff))
+        .get();
+    return snapshot.docs.length;
+  }
+
+  /// Validate that a vet invitation can be created. Returns null if valid,
+  /// or an error key string suitable for localisation lookup.
+  static Future<String?> validateVetInvitation({
+    required String petId,
+    required String email,
+    required String invitedByUid,
+  }) async {
+    if (await hasDuplicateInvitation(petId: petId, email: email)) {
+      return 'vetAlreadyInvited';
+    }
+    if (await vetCountForPet(petId) >= maxVetsPerPet) {
+      return 'maxVetsReached';
+    }
+    if (await invitesSentToday(invitedByUid) >= maxInvitesPerDay) {
+      return 'dailyInviteLimitReached';
+    }
+    return null;
   }
 
   /// Cancel an invitation.

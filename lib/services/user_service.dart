@@ -69,4 +69,26 @@ class UserService {
       return AppUser.fromFirestore(doc);
     });
   }
+
+  /// Look up a user by email address.
+  static Future<AppUser?> findUserByEmail(String email) async {
+    final snapshot = await _usersCollection
+        .where('email', isEqualTo: email.toLowerCase())
+        .limit(1)
+        .get();
+    if (snapshot.docs.isEmpty) return null;
+    return AppUser.fromFirestore(snapshot.docs.first);
+  }
+
+  /// Look up a registered vet by email. Returns null if no user with that
+  /// email exists or the user is not a vet.
+  static Future<AppUser?> findVetByEmail(String email) async {
+    final snapshot = await _usersCollection
+        .where('email', isEqualTo: email.toLowerCase())
+        .where('role', isEqualTo: 'vet')
+        .limit(1)
+        .get();
+    if (snapshot.docs.isEmpty) return null;
+    return AppUser.fromFirestore(snapshot.docs.first);
+  }
 }

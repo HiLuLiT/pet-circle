@@ -11,16 +11,17 @@ import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key, required this.role});
+  const AuthScreen({super.key, this.role, this.startWithSignIn = false});
 
-  final AppUserRole role;
+  final AppUserRole? role;
+  final bool startWithSignIn;
 
   @override
   State<AuthScreen> createState() => _AuthScreenState();
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  bool _isSignUp = true;
+  late bool _isSignUp = !widget.startWithSignIn;
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -55,7 +56,7 @@ class _AuthScreenState extends State<AuthScreen> {
       result = await AuthService.signUpWithEmail(
         email: _emailController.text.trim(),
         password: _passwordController.text,
-        role: widget.role,
+        role: widget.role ?? AppUserRole.owner,
         displayName: _nameController.text.trim(),
       );
     } else {
@@ -158,7 +159,9 @@ class _AuthScreenState extends State<AuthScreen> {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     final isAppleAvailable = !kIsWeb && (Platform.isIOS || Platform.isMacOS);
-    final roleLabel = widget.role == AppUserRole.vet ? l10n.veterinarian : l10n.petOwner;
+    final roleLabel = widget.role != null
+        ? (widget.role == AppUserRole.vet ? l10n.veterinarian : l10n.petOwner)
+        : null;
 
     return Scaffold(
       backgroundColor: c.white,
@@ -190,11 +193,12 @@ class _AuthScreenState extends State<AuthScreen> {
                 style: AppTextStyles.heading1.copyWith(color: c.chocolate),
                 textAlign: TextAlign.center,
               ),
+              if (roleLabel != null) ...[
               const SizedBox(height: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: c.pink.withOpacity(0.3),
+                  color: c.pink.withValues(alpha: 0.3),
                   borderRadius: const BorderRadius.all(AppRadii.large),
                 ),
                 child: Row(
@@ -216,6 +220,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   ],
                 ),
               ),
+              ],
               const SizedBox(height: 32),
 
               // Error message

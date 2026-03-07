@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/main.dart' show appLocale, appDarkMode;
+import 'package:pet_circle/main.dart' show appLocale, appDarkMode, kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
+import 'package:pet_circle/models/invitation.dart';
+import 'package:pet_circle/services/invitation_service.dart';
+import 'package:pet_circle/services/user_service.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 import 'package:pet_circle/stores/pet_store.dart';
@@ -514,13 +518,15 @@ class _SettingsContentState extends State<_SettingsContent> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           TextButton(
-            onPressed: () {
-              petStore.removeCareCircleMember(petName, memberName);
+            onPressed: () async {
               Navigator.pop(ctx);
+              await petStore.removeCareCircleMemberWithFirestore(petName, memberName);
               setState(() {});
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.memberRemoved)),
-              );
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.memberRemoved)),
+                );
+              }
             },
             style: TextButton.styleFrom(backgroundColor: c.cherry),
             child: Text(l10n.removeMember, style: TextStyle(color: c.white)),
@@ -536,6 +542,7 @@ class _SettingsContentState extends State<_SettingsContent> {
     final emailController = TextEditingController();
     String selectedRole = 'Member';
     final roles = ['Admin', 'Member', 'Viewer'];
+    bool isSending = false;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -602,14 +609,45 @@ class _SettingsContentState extends State<_SettingsContent> {
                     ),
                     const SizedBox(width: 8),
                     TextButton(
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text(l10n.invitationSentTo(emailController.text, selectedRole))),
-                        );
+                      onPressed: isSending ? null : () async {
+                        final email = emailController.text.trim();
+                        if (email.isEmpty) return;
+
+                        if (kEnableFirebase) {
+                          setSheetState(() => isSending = true);
+                          final activePet = petStore.activePet;
+                          if (activePet?.id == null) {
+                            Navigator.pop(ctx);
+                            return;
+                          }
+                          final careCircleRole = CareCirclePermissions.fromString(selectedRole.toLowerCase());
+                          final token = await InvitationService.createInvitation(
+                            petId: activePet!.id!,
+                            petName: activePet.name,
+                            invitedEmail: email,
+                            role: careCircleRole,
+                            invitedByUid: userStore.currentUserUid ?? '',
+                            invitedByName: userStore.currentUserDisplayName ?? '',
+                          );
+                          Navigator.pop(ctx);
+                          final link = 'https://petcircle.app/invite?token=$token';
+                          await Clipboard.setData(ClipboardData(text: link));
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.invitationSentTo(email, selectedRole))),
+                            );
+                          }
+                        } else {
+                          Navigator.pop(ctx);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text(l10n.invitationSentTo(email, selectedRole))),
+                          );
+                        }
                       },
                       style: TextButton.styleFrom(backgroundColor: c.lightBlue),
-                      child: Text(l10n.sendInvite, style: TextStyle(color: c.chocolate)),
+                      child: isSending
+                          ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: c.chocolate))
+                          : Text(l10n.sendInvite, style: TextStyle(color: c.chocolate)),
                     ),
                   ],
                 ),
@@ -657,62 +695,280 @@ class _SettingsContentState extends State<_SettingsContent> {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     final emailController = TextEditingController();
+
+    // 0 = idle, 1 = looking up, 2 = found vet, 3 = not a vet, 4 = not found, 5 = sending, 6 = error
+    int state = 0;
+    String? errorMessage;
+    AppUser? foundVet;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: c.white,
-            borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(l10n.shareWithVet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
-              const SizedBox(height: 8),
-              Text(l10n.enterVetEmail, style: AppTextStyles.body),
-              const SizedBox(height: 16),
-              TextField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  hintText: 'vet@clinic.com',
-                  filled: true,
-                  fillColor: c.offWhite,
-                  border: OutlineInputBorder(
-                    borderRadius: const BorderRadius.all(AppRadii.small),
-                    borderSide: BorderSide.none,
-                  ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: c.white,
+              borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.local_hospital, size: 20, color: c.blue),
+                    const SizedBox(width: AppSpacing.sm),
+                    Text(l10n.inviteYourVet,
+                        style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(l10n.cancel),
+                const SizedBox(height: AppSpacing.sm),
+                Text(l10n.inviteYourVetDesc, style: AppTextStyles.body),
+                const SizedBox(height: AppSpacing.md),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                          hintText: 'vet@clinic.com',
+                          filled: true,
+                          fillColor: c.offWhite,
+                          border: OutlineInputBorder(
+                            borderRadius: const BorderRadius.all(AppRadii.small),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: c.blue,
+                          elevation: 0,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(AppRadii.small),
+                          ),
+                        ),
+                        onPressed: state == 1 ? null : () async {
+                          final email = emailController.text.trim();
+                          if (email.isEmpty) return;
+                          setSheetState(() { state = 1; errorMessage = null; });
+
+                          if (!kEnableFirebase) {
+                            setSheetState(() { state = 4; foundVet = null; });
+                            return;
+                          }
+
+                          final vet = await UserService.findVetByEmail(email);
+                          if (vet != null) {
+                            setSheetState(() { state = 2; foundVet = vet; });
+                            return;
+                          }
+                          final user = await UserService.findUserByEmail(email);
+                          setSheetState(() {
+                            foundVet = null;
+                            state = user != null ? 3 : 4;
+                          });
+                        },
+                        child: Text(l10n.lookUpVet,
+                            style: AppTextStyles.caption.copyWith(color: c.white)),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: AppSpacing.sm),
+
+                // Lookup feedback
+                if (state == 1)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                      child: SizedBox(
+                        width: 20, height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: c.blue),
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 8),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      final vetL10n = AppLocalizations.of(context)!;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(vetL10n.dataSharedWith(emailController.text))),
-                      );
-                    },
-                    style: TextButton.styleFrom(backgroundColor: c.lightBlue),
-                    child: Text(l10n.shareWithVet, style: TextStyle(color: c.chocolate)),
+
+                if (state == 2) ...[
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: c.lightBlue.withValues(alpha: 0.15),
+                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                    ),
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 18,
+                          backgroundColor: c.blue.withValues(alpha: 0.2),
+                          child: Icon(Icons.verified, size: 18, color: c.blue),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(l10n.vetFound,
+                                  style: AppTextStyles.caption.copyWith(color: c.blue)),
+                              Text(foundVet?.displayName ?? emailController.text,
+                                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  const SizedBox(height: AppSpacing.sm),
                 ],
-              ),
-            ],
+
+                if (state == 3)
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: c.cherry.withValues(alpha: 0.1),
+                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.warning_amber_rounded, size: 18, color: c.cherry),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(l10n.notAVetAccount,
+                              style: AppTextStyles.caption.copyWith(color: c.cherry)),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                if (state == 4)
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: c.lightYellow.withValues(alpha: 0.5),
+                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline, size: 16, color: c.chocolate),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(l10n.vetNotFound,
+                              style: AppTextStyles.caption.copyWith(color: c.chocolate)),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                if (state == 6 && errorMessage != null)
+                  Container(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: c.cherry.withValues(alpha: 0.1),
+                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.error_outline, size: 18, color: c.cherry),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(errorMessage!,
+                              style: AppTextStyles.caption.copyWith(color: c.cherry)),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                const SizedBox(height: AppSpacing.md),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: Text(l10n.cancel),
+                    ),
+                    const SizedBox(width: AppSpacing.sm),
+                    if (state == 2 || state == 4)
+                      TextButton(
+                        onPressed: state == 5 ? null : () async {
+                          final email = emailController.text.trim();
+                          if (email.isEmpty) return;
+
+                          if (kEnableFirebase) {
+                            setSheetState(() => state = 5);
+                            final activePet = petStore.activePet;
+                            if (activePet?.id == null) {
+                              Navigator.pop(ctx);
+                              return;
+                            }
+
+                            final validationError = await InvitationService.validateVetInvitation(
+                              petId: activePet!.id!,
+                              email: email,
+                              invitedByUid: userStore.currentUserUid ?? '',
+                            );
+                            if (validationError != null) {
+                              String msg;
+                              switch (validationError) {
+                                case 'vetAlreadyInvited':
+                                  msg = l10n.vetAlreadyInvited;
+                                case 'maxVetsReached':
+                                  msg = l10n.maxVetsReached;
+                                case 'dailyInviteLimitReached':
+                                  msg = l10n.dailyInviteLimitReached;
+                                default:
+                                  msg = validationError;
+                              }
+                              setSheetState(() { state = 6; errorMessage = msg; });
+                              return;
+                            }
+
+                            await InvitationService.createInvitation(
+                              petId: activePet.id!,
+                              petName: activePet.name,
+                              invitedEmail: email,
+                              role: CareCircleRole.viewer,
+                              invitedByUid: userStore.currentUserUid ?? '',
+                              invitedByName: userStore.currentUserDisplayName ?? '',
+                              type: InvitationType.vet,
+                            );
+                            Navigator.pop(ctx);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(l10n.vetInviteSent(email))),
+                              );
+                            }
+                          } else {
+                            Navigator.pop(ctx);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.vetInviteSent(email))),
+                            );
+                          }
+                        },
+                        style: TextButton.styleFrom(backgroundColor: c.blue),
+                        child: state == 5
+                            ? SizedBox(
+                                width: 16, height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2, color: c.white))
+                            : Text(
+                                state == 2 ? l10n.addAsVet : l10n.sendVetInvite,
+                                style: TextStyle(color: c.white)),
+                      ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

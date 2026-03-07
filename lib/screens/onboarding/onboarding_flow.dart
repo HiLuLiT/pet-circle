@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/models/measurement.dart';
+import 'package:pet_circle/models/invitation.dart';
+import 'package:pet_circle/services/invitation_service.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step1.dart';
@@ -28,7 +32,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   String _age = '';
   String _diagnosis = '';
   int _targetRate = 30;
-  List<String> _careCircleEmails = [];
+  bool _isSubmitting = false;
+  final List<({String email, String role})> _careCircleInvites = [];
+  final List<({String email, String? vetName})> _vetInvites = [];
 
   @override
   void dispose() {
@@ -36,28 +42,78 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     super.dispose();
   }
 
-  void _onComplete() {
+  Future<void> _onComplete() async {
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+
     final breedAge = _breedAndAge.isNotEmpty ? _breedAndAge : 'Unknown breed';
-    final careCircleMembers = _careCircleEmails
-        .where((e) => e.isNotEmpty)
-        .map((email) => CareCircleMember(
-              name: email,
-              avatarUrl: 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(email)}&background=E8B4B8&color=5B2C3F',
-              role: CareCircleRole.member,
+
+    final ownerMember = CareCircleMember(
+      uid: userStore.currentUserUid,
+      name: userStore.currentUserDisplayName ?? '',
+      avatarUrl: userStore.currentUserAvatarUrl ??
+          'https://ui-avatars.com/api/?name=${Uri.encodeComponent(userStore.currentUserDisplayName ?? '')}&background=E8B4B8&color=5B2C3F',
+      role: CareCircleRole.admin,
+    );
+
+    final invitedMembers = _careCircleInvites
+        .map((inv) => CareCircleMember(
+              name: inv.email,
+              avatarUrl: 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(inv.email)}&background=E8B4B8&color=5B2C3F',
+              role: CareCirclePermissions.fromString(inv.role.toLowerCase()),
             ))
         .toList();
-    petStore.addPet(Pet(
-      name: _petName.isNotEmpty ? _petName : 'New Pet',
+
+    final petName = _petName.isNotEmpty ? _petName : 'New Pet';
+    final pet = Pet(
+      name: petName,
       breedAndAge: '$breedAge${_age.isNotEmpty ? " • $_age" : ""}',
       imageUrl: AppAssets.petPlaceholder,
       statusLabel: 'Normal',
       statusColorHex: AppColors.lightBlue.value,
       latestMeasurement: Measurement(bpm: 0, recordedAt: DateTime.now(), recordedAtLabel: 'No measurements yet'),
-      careCircle: careCircleMembers,
+      careCircle: [ownerMember, ...invitedMembers],
       diagnosis: _diagnosis.isNotEmpty ? _diagnosis : null,
-    ));
+      ownerId: kEnableFirebase ? userStore.currentUserUid : null,
+    );
+
+    final createdPet = await petStore.createPetWithFirestore(pet);
     settingsStore.updateThresholds(elevated: _targetRate);
-    Navigator.of(context).pushReplacementNamed(AppRoutes.ownerDashboard);
+
+    if (kEnableFirebase && createdPet.id != null) {
+      for (final inv in _careCircleInvites) {
+        await InvitationService.createInvitation(
+          petId: createdPet.id!,
+          petName: petName,
+          invitedEmail: inv.email,
+          role: CareCirclePermissions.fromString(inv.role.toLowerCase()),
+          invitedByUid: userStore.currentUserUid ?? '',
+          invitedByName: userStore.currentUserDisplayName ?? '',
+        );
+      }
+      for (final vet in _vetInvites) {
+        await InvitationService.createInvitation(
+          petId: createdPet.id!,
+          petName: petName,
+          invitedEmail: vet.email,
+          role: CareCircleRole.viewer,
+          invitedByUid: userStore.currentUserUid ?? '',
+          invitedByName: userStore.currentUserDisplayName ?? '',
+          type: InvitationType.vet,
+        );
+      }
+    }
+
+    if (!mounted) return;
+
+    if (kEnableFirebase) {
+      Navigator.of(context).pushReplacementNamed(
+        AppRoutes.mainShell,
+        arguments: userStore.role,
+      );
+    } else {
+      Navigator.of(context).pushReplacementNamed(AppRoutes.ownerDashboard);
+    }
   }
 
   void _goTo(int index) {
@@ -105,8 +161,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         OnboardingStep4(
           onBack: () => _goTo(2),
           onComplete: _onComplete,
-          onEmailAdded: (email) {
-            _careCircleEmails = [..._careCircleEmails, email];
+          isSubmitting: _isSubmitting,
+          onInviteAdded: (email, role) {
+            _careCircleInvites.add((email: email, role: role));
+          },
+          onVetInvited: (email, vetName) {
+            _vetInvites.add((email: email, vetName: vetName));
           },
         ),
       ],

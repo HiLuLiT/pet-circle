@@ -3,20 +3,38 @@ import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
+import 'package:pet_circle/providers/auth_provider.dart';
+import 'package:pet_circle/services/user_service.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
 
-  void _handleRoleSelect(BuildContext context, AppUserRole role) {
-    if (kEnableFirebase) {
-      Navigator.of(context).pushNamed(AppRoutes.auth, arguments: role);
-    } else {
+  Future<void> _handleRoleSelect(BuildContext context, AppUserRole role) async {
+    if (!kEnableFirebase) {
       Navigator.of(context).pushReplacementNamed(
         AppRoutes.mainShell,
         arguments: role,
       );
+      return;
+    }
+
+    final firebaseUser = authProvider.firebaseUser;
+    if (firebaseUser != null) {
+      await UserService.createUser(
+        uid: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+        role: role,
+        displayName: firebaseUser.displayName,
+        photoUrl: firebaseUser.photoURL,
+      );
+      await authProvider.refresh();
+      if (context.mounted) {
+        Navigator.of(context).pushReplacementNamed(AppRoutes.authGate);
+      }
+    } else {
+      Navigator.of(context).pushNamed(AppRoutes.auth, arguments: role);
     }
   }
 

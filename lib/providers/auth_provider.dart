@@ -55,6 +55,10 @@ class AuthProvider extends ChangeNotifier {
       return;
     }
 
+    _appUser = null;
+    _isLoading = true;
+    notifyListeners();
+
     _userSubscription = UserService.streamUser(user.uid).listen((appUser) {
       _appUser = appUser;
       _isLoading = false;
@@ -64,6 +68,7 @@ class AuthProvider extends ChangeNotifier {
 
   Future<void> refresh() async {
     await AuthService.reloadUser();
+    _firebaseUser = AuthService.currentUser;
     if (_firebaseUser != null) {
       _appUser = await UserService.getUser(_firebaseUser!.uid);
     }

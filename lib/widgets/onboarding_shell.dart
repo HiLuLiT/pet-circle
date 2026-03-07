@@ -12,6 +12,7 @@ class OnboardingShell extends StatelessWidget {
     this.onBack,
     this.onNext,
     this.nextLabel,
+    this.isNextLoading = false,
   });
 
   final String stepLabel;
@@ -21,6 +22,7 @@ class OnboardingShell extends StatelessWidget {
   final VoidCallback? onBack;
   final VoidCallback? onNext;
   final String? nextLabel;
+  final bool isNextLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -51,38 +53,56 @@ class OnboardingShell extends StatelessWidget {
                         child: SizedBox(
                           height: 48,
                           child: TextButton(
-                            onPressed: onBack,
+                            onPressed: isNextLoading ? null : onBack,
                             style: TextButton.styleFrom(
                               backgroundColor: c.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: const BorderRadius.all(AppRadii.full),
+                              disabledBackgroundColor: c.white.withValues(alpha: 0.6),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(AppRadii.full),
                               ),
                             ),
                             child: Text(
                               l10n.back,
-                              style: AppTextStyles.body.copyWith(color: c.chocolate, fontWeight: FontWeight.w600),
+                              style: AppTextStyles.body.copyWith(
+                                color: isNextLoading
+                                    ? c.chocolate.withValues(alpha: 0.4)
+                                    : c.chocolate,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    if (onBack != null && onNext != null)
+                    if (onBack != null && (onNext != null || isNextLoading))
                       const SizedBox(width: 12),
-                    if (onNext != null)
+                    if (onNext != null || isNextLoading)
                       Expanded(
                         child: SizedBox(
                           height: 48,
                           child: TextButton(
-                            onPressed: onNext,
+                            onPressed: isNextLoading ? null : onNext,
                             style: TextButton.styleFrom(
                               backgroundColor: c.chocolate,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: const BorderRadius.all(AppRadii.full),
+                              disabledBackgroundColor: c.chocolate,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.all(AppRadii.full),
                               ),
                             ),
-                            child: Text(
-                              nextLabel ?? l10n.done,
-                              style: AppTextStyles.body.copyWith(color: c.white, fontWeight: FontWeight.w600),
-                            ),
+                            child: isNextLoading
+                                ? SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: c.white,
+                                    ),
+                                  )
+                                : Text(
+                                    nextLabel ?? l10n.done,
+                                    style: AppTextStyles.body.copyWith(
+                                        color: c.white,
+                                        fontWeight: FontWeight.w600),
+                                  ),
                           ),
                         ),
                       ),

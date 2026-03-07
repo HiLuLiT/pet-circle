@@ -887,4 +887,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get completed => 'Completed';
+
+  @override
+  String get inviteYourVet => 'Invite Your Veterinarian';
+
+  @override
+  String get inviteYourVetDesc =>
+      'Look up your vet by email to connect them to this pet.';
+
+  @override
+  String get lookUpVet => 'Look Up';
+
+  @override
+  String get vetFound => 'Veterinarian found';
+
+  @override
+  String get vetNotFound =>
+      'No account found — an invitation will be sent when you continue.';
+
+  @override
+  String get notAVetAccount =>
+      'This email is registered but is not a veterinarian account.';
+
+  @override
+  String get addAsVet => 'Add as Vet';
+
+  @override
+  String get sendVetInvite => 'Send Vet Invite';
+
+  @override
+  String vetInviteSent(String email) {
+    return 'Vet invitation sent to $email';
+  }
+
+  @override
+  String get vetAlreadyInvited =>
+      'This veterinarian has already been invited for this pet.';
+
+  @override
+  String get maxVetsReached =>
+      'Maximum of 2 veterinarians per pet has been reached.';
+
+  @override
+  String get dailyInviteLimitReached =>
+      'You have reached the daily invitation limit. Please try again tomorrow.';
+
+  @override
+  String get pendingRequests => 'Pending Requests';
+
+  @override
+  String get acceptRequest => 'Accept';
+
+  @override
+  String get declineRequest => 'Decline';
+
+  @override
+  String vetInvitationFrom(String name) {
+    return 'Invitation from $name';
+  }
+
+  @override
+  String petAssociationRequest(String ownerName, String petName) {
+    return '$ownerName wants you to monitor $petName';
+  }
+
+  @override
+  String get requestAccepted => 'Request accepted — pet added to your clinic';
+
+  @override
+  String get requestDeclined => 'Request declined';
+
+  @override
+  String get noPendingRequests => 'No pending requests';
+
+  @override
+  String vetSlotsRemaining(int count) {
+    return '$count vet slots remaining';
+  }
 }

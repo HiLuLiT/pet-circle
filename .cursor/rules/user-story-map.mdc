@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Pet Circle -- User Story Map
 
-Last updated: 2026-03-06 (Phase 1 complete, all rules + PRD synced)
+Last updated: 2026-03-07 (Phase 2 in progress -- Firebase Auth + Firestore + Dual-Layer Roles)
 
 ## Update Protocol
 
@@ -32,18 +32,21 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 
 ---
 
-## Status: DONE (53 stories) -- Phase 1 Complete
+## Status: DONE (63 stories) -- Phase 1 Complete + Phase 2 Partial
 
 ### Authentication & Onboarding
 - A1: Welcome screen with sign-up and sign-in buttons
-- A2: Role selection (Vet / Pet Owner)
-- A3-A7: Email auth, Google, Apple, password reset (behind Firebase flag)
-- A8-A10: Email verification with resend and account switch (behind Firebase flag)
+- A2: Role selection (Vet / Pet Owner) -- creates Firestore user doc if already authenticated
+- A3-A7: Email auth, Google, Apple, password reset -- LIVE (kEnableFirebase = true)
+- A8-A10: Email verification with resend and account switch -- LIVE
+- A11: AuthGate routing widget -- routes based on AuthProvider.routeState
+- A12: AuthProvider global singleton -- streams Firebase Auth + Firestore user profile
 - B1: Onboarding Step 1 -- name, searchable breed dropdown (BreedSearchField), age
 - B2: Onboarding Step 2 -- diagnosis saved to `Pet.diagnosis` field
 - B3: Onboarding Step 3 -- target rate saved to `settingsStore`
-- B4: Onboarding Step 4 -- care circle emails converted to `CareCircleMember` with role
+- B4: Onboarding Step 4 -- care circle emails + role selection (Admin/Member/Viewer)
 - B25: Onboarding Back/Next buttons with persistent state (AutomaticKeepAliveClientMixin)
+- B26: Pet creation writes to Firestore via `PetStore.createPetWithFirestore()`, auto-adds owner as Admin
 
 ### Owner Experience
 - B5: Owner dashboard with pet cards from `petStore` + empty state CTA
@@ -80,9 +83,16 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - E7: Medication list with add, edit (tap to open pre-filled sheet), status, export
 
 ### Care Circle Sharing
-- S1: CareCircleRole enum (admin/member/viewer) with permissions extension
-- S2: Role-aware UI -- edit/delete only for admins, measure only for admin+member
-- S3: Invite flow offers Member or Viewer role selection
+- S1: CareCircleRole enum (admin/member/viewer) with permissions extension + Firestore serialization
+- S2: Role-aware UI -- edit/delete only for admins, measure only for admin+member, viewer lock screen
+- S3: Invite flow offers Admin/Member/Viewer role selection (updated from Member/Viewer only)
+- S4: InvitationService -- creates Firestore invitation tokens, accepts via deep link
+- S5: DeepLinkService -- parses `petcircle://invite?token=XYZ`, stores pending tokens
+- S6: AuthGate handles invitation acceptance after authentication
+- S7: Settings invite dialog calls InvitationService + copies invite link to clipboard
+- S8: Remove member calls PetService.removeCareCircleMember() via Firestore
+- S9: Shared pets appear on owner dashboard with Member/Viewer role badge
+- S10: Delete pet calls PetService.deletePet() + UserService.removePetFromUser() via Firestore
 
 ### Vet Experience
 - C1: Clinic overview dashboard from stores with real stats
@@ -104,31 +114,38 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 
 ---
 
-## Status: FUTURE (16 stories -- Phase 2-5)
+## Status: Phase 2 IN PROGRESS
+
+### Done in Phase 2
+- Firebase Auth enabled (`kEnableFirebase = true`)
+- Firestore user profiles via `UserService`
+- Firestore pet persistence via `PetService` (create, delete, care circle management)
+- `PetStore` streams pets from Firestore via `subscribeForUser(uid)`
+- Dual-layer role architecture (App-Level: vet/owner + Care Circle: admin/member/viewer)
+- Invitation flow with deep link acceptance
+- Permission enforcement across all screens
+
+### Remaining in Phase 2
+- Wire subcollection operations to Firestore (measurements, notes, medications)
+- Wire `PetStore.updatePet()` to `PetService.updatePet()`
+- Push notifications via FCM
+- Real-time sync for measurements/notes/medications across care circle members
+- Production Firestore security rules
+
+## Status: FUTURE (Phase 3-5)
 
 | Phase | Stories |
 |-------|---------|
-| 2 | Firebase Auth production, Firestore persistence, real-time sync, push notifications (FCM), care circle invitation flow (send/accept/decline with email matching) |
 | 3 | VisionRR camera measurement, trend anomaly detection, automated SRR alerts, measurement reminders, vet-to-owner messaging |
 | 4 | PDF report generation, CSV file export (actual file), shareable health summaries, vet clinic analytics |
 | 5 | Apple Watch / WearOS companion, offline mode with sync |
 
 ---
 
-## Recommended Next: Phase 2 (Backend & Persistence)
-
-1. Enable Firebase Auth (`kEnableFirebase = true`)
-2. Firestore data persistence for pets, measurements, notes, medications
-3. Care circle as Firestore subcollection -- invited users see shared pets
-4. Real-time sync across care circle members via Firestore streams
-5. Push notifications via FCM
-6. Invitation flow: send email, recipient joins via deep link, matched to care circle role
-
----
-
 ## Related Rules
 
-- `screen-completion-guide.mdc` -- screen-level checklist and remaining polish
-- `state-management.mdc` -- store patterns, access conventions, store registry
+- `screen-completion-guide.mdc` -- screen-level checklist, auth screens, remaining work, feature backlog
+- `state-management.mdc` -- store patterns, access conventions, store registry, Firebase integration status, services
 - `figma-design-system.mdc` -- design tokens, colors, typography, spacing, Figma workflow
 - `design-system-enforcement.mdc` -- always-apply enforcement: tokens, components, i18n
+- `bug-tracking.mdc` -- always-apply: log all bugs to `docs/bug-log.md`

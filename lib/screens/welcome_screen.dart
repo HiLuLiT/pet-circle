@@ -42,9 +42,9 @@ class WelcomeScreen extends StatelessWidget {
                         Navigator.of(context).pushNamed(AppRoutes.roleSelection),
                   ),
                   const SizedBox(height: 12),
-                  _GoogleButton(
+                  _SignInButton(
                     onTap: () =>
-                        Navigator.of(context).pushNamed(AppRoutes.roleSelection),
+                        Navigator.of(context).pushNamed(AppRoutes.auth, arguments: {'signIn': true}),
                   ),
                 ],
               ),
@@ -96,8 +96,8 @@ class _PrimaryPillButton extends StatelessWidget {
   }
 }
 
-class _GoogleButton extends StatelessWidget {
-  const _GoogleButton({required this.onTap});
+class _SignInButton extends StatelessWidget {
+  const _SignInButton({required this.onTap});
 
   final VoidCallback onTap;
 

@@ -3,6 +3,8 @@ import 'package:pet_circle/models/care_circle_member.dart';
 
 enum InvitationStatus { pending, accepted, expired, cancelled }
 
+enum InvitationType { careCircle, vet }
+
 class Invitation {
   const Invitation({
     required this.id,
@@ -15,6 +17,7 @@ class Invitation {
     required this.createdAt,
     required this.expiresAt,
     this.status = InvitationStatus.pending,
+    this.type = InvitationType.careCircle,
   });
 
   final String id;
@@ -27,6 +30,7 @@ class Invitation {
   final DateTime createdAt;
   final DateTime expiresAt;
   final InvitationStatus status;
+  final InvitationType type;
 
   bool get isExpired => DateTime.now().isAfter(expiresAt);
   bool get isPending => status == InvitationStatus.pending && !isExpired;
@@ -42,6 +46,7 @@ class Invitation {
       'createdAt': Timestamp.fromDate(createdAt),
       'expiresAt': Timestamp.fromDate(expiresAt),
       'status': status.name,
+      'type': type.name,
     };
   }
 
@@ -58,6 +63,7 @@ class Invitation {
       createdAt: (data['createdAt'] as Timestamp).toDate(),
       expiresAt: (data['expiresAt'] as Timestamp).toDate(),
       status: _parseStatus(data['status']),
+      type: _parseType(data['type']),
     );
   }
 
@@ -71,6 +77,15 @@ class Invitation {
         return InvitationStatus.cancelled;
       default:
         return InvitationStatus.pending;
+    }
+  }
+
+  static InvitationType _parseType(String? value) {
+    switch (value) {
+      case 'vet':
+        return InvitationType.vet;
+      default:
+        return InvitationType.careCircle;
     }
   }
 }

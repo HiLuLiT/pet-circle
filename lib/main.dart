@@ -34,7 +34,7 @@ import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 // Set to true when Firebase is fully configured
-const bool kEnableFirebase = false;
+const bool kEnableFirebase = true;
 
 /// Global locale notifier – updated from Settings language switcher.
 final ValueNotifier<Locale> appLocale = ValueNotifier(const Locale('en'));
@@ -166,7 +166,15 @@ class PetCircleApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => const WelcomeScreen());
 
           case AppRoutes.auth:
-            final role = settings.arguments as AppUserRole? ?? AppUserRole.owner;
+            final args = settings.arguments;
+            if (args is Map<String, dynamic>) {
+              final signIn = args['signIn'] as bool? ?? false;
+              final role = args['role'] as AppUserRole?;
+              return MaterialPageRoute(
+                builder: (_) => AuthScreen(role: role, startWithSignIn: signIn),
+              );
+            }
+            final role = args as AppUserRole?;
             return MaterialPageRoute(
               builder: (_) => AuthScreen(role: role),
             );

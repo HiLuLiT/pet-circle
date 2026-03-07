@@ -32,12 +32,14 @@ class OwnerDashboard extends StatelessWidget {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           TextButton(
-            onPressed: () {
-              petStore.removePet(pet.name);
+            onPressed: () async {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.petDeleted)),
-              );
+              await petStore.removePetWithFirestore(pet.name);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.petDeleted)),
+                );
+              }
             },
             style: TextButton.styleFrom(backgroundColor: c.cherry),
             child: Text(l10n.deletePet, style: TextStyle(color: c.white)),
@@ -49,9 +51,24 @@ class OwnerDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: petStore,
+      builder: (context, _) => _buildContent(context),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final pets = petStore.ownerPets;
     final l10n = AppLocalizations.of(context)!;
+
+    if (petStore.isLoading) {
+      final loader = Center(
+        child: CircularProgressIndicator(color: c.chocolate),
+      );
+      if (!showScaffold) return Container(color: c.white, child: loader);
+      return Scaffold(backgroundColor: c.white, body: loader);
+    }
 
     if (pets.isEmpty) {
       final emptyContent = SafeArea(
@@ -128,10 +145,6 @@ class OwnerDashboard extends StatelessWidget {
                       return _PetCard(
                         data: pet,
                         userRole: role,
-                        onTap: () => Navigator.of(context).pushNamed(
-                          AppRoutes.petDetail,
-                          arguments: pet,
-                        ),
                         onLongPress: role.canDeletePet
                             ? () => _confirmDeletePet(context, pet)
                             : null,
@@ -252,13 +265,35 @@ class _PetCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Name and breed
-                  Text(
-                    data.name,
-                    style: AppTextStyles.heading2.copyWith(
-                      color: c.chocolate,
-                      letterSpacing: -0.96,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          data.name,
+                          style: AppTextStyles.heading2.copyWith(
+                            color: c.chocolate,
+                            letterSpacing: -0.96,
+                          ),
+                        ),
+                      ),
+                      if (userRole != CareCircleRole.admin)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: userRole == CareCircleRole.member
+                                ? c.lightBlue.withValues(alpha: 0.12)
+                                : c.blue.withValues(alpha: 0.12),
+                            borderRadius: const BorderRadius.all(AppRadii.small),
+                          ),
+                          child: Text(
+                            userRole.name[0].toUpperCase() + userRole.name.substring(1),
+                            style: AppTextStyles.caption.copyWith(
+                              color: userRole == CareCircleRole.member ? c.lightBlue : c.blue,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(

@@ -885,4 +885,77 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get completed => 'הושלם';
+
+  @override
+  String get inviteYourVet => 'הזמן את הווטרינר שלך';
+
+  @override
+  String get inviteYourVetDesc =>
+      'חפש את הווטרינר שלך לפי אימייל כדי לחבר אותו לחיית המחמד הזו.';
+
+  @override
+  String get lookUpVet => 'חיפוש';
+
+  @override
+  String get vetFound => 'וטרינר נמצא';
+
+  @override
+  String get vetNotFound => 'לא נמצא חשבון — הזמנה תישלח כשתמשיך.';
+
+  @override
+  String get notAVetAccount => 'אימייל זה רשום אך אינו חשבון וטרינר.';
+
+  @override
+  String get addAsVet => 'הוסף כווטרינר';
+
+  @override
+  String get sendVetInvite => 'שלח הזמנה לווטרינר';
+
+  @override
+  String vetInviteSent(String email) {
+    return 'הזמנת וטרינר נשלחה ל-$email';
+  }
+
+  @override
+  String get vetAlreadyInvited => 'וטרינר זה כבר הוזמן עבור חיית מחמד זו.';
+
+  @override
+  String get maxVetsReached => 'הגעת למקסימום של 2 וטרינרים לכל חיית מחמד.';
+
+  @override
+  String get dailyInviteLimitReached =>
+      'הגעת למגבלת ההזמנות היומית. נסה שוב מחר.';
+
+  @override
+  String get pendingRequests => 'בקשות ממתינות';
+
+  @override
+  String get acceptRequest => 'אישור';
+
+  @override
+  String get declineRequest => 'דחייה';
+
+  @override
+  String vetInvitationFrom(String name) {
+    return 'הזמנה מ-$name';
+  }
+
+  @override
+  String petAssociationRequest(String ownerName, String petName) {
+    return '$ownerName מבקש/ת שתנטר/י את $petName';
+  }
+
+  @override
+  String get requestAccepted => 'הבקשה אושרה — חיית המחמד נוספה למרפאה שלך';
+
+  @override
+  String get requestDeclined => 'הבקשה נדחתה';
+
+  @override
+  String get noPendingRequests => 'אין בקשות ממתינות';
+
+  @override
+  String vetSlotsRemaining(int count) {
+    return '$count מקומות וטרינר נותרו';
+  }
 }

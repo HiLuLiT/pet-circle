@@ -4,6 +4,7 @@ import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/services/invitation_service.dart';
+import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
@@ -88,6 +89,7 @@ class _AuthGateState extends State<AuthGate> {
   void _handleAuthenticated() {
     final appUser = authProvider.appUser!;
     userStore.seedFromAppUser(appUser);
+    petStore.subscribeForUser(appUser.uid);
 
     final pendingToken = deepLinkService.pendingInvitationToken;
     if (pendingToken != null) {
@@ -95,22 +97,10 @@ class _AuthGateState extends State<AuthGate> {
       return;
     }
 
-    final role = appUser.role;
-    if (role == AppUserRole.vet) {
-      Navigator.of(context).pushReplacementNamed(
-        AppRoutes.mainShell,
-        arguments: AppUserRole.vet,
-      );
-    } else {
-      if (appUser.hasPets) {
-        Navigator.of(context).pushReplacementNamed(
-          AppRoutes.mainShell,
-          arguments: AppUserRole.owner,
-        );
-      } else {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
-      }
-    }
+    Navigator.of(context).pushReplacementNamed(
+      AppRoutes.mainShell,
+      arguments: appUser.role,
+    );
   }
 
   @override

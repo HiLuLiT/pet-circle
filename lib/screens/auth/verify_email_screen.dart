@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
@@ -37,18 +38,13 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   }
 
   Future<void> _checkVerification() async {
-    await AuthService.reloadUser();
-    if (AuthService.isEmailVerified) {
+    await authProvider.refresh();
+    if (authProvider.isEmailVerified) {
       _checkTimer?.cancel();
       if (mounted) {
-        _navigateAfterVerification();
+        Navigator.of(context).pushReplacementNamed(AppRoutes.authGate);
       }
     }
-  }
-
-  Future<void> _navigateAfterVerification() async {
-    if (!mounted) return;
-    Navigator.of(context).pushReplacementNamed(AppRoutes.authGate);
   }
 
   Future<void> _resendEmail() async {
@@ -201,12 +197,11 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
               const SizedBox(height: 16),
 
-              // Check manually button
-              TextButton.icon(
+              PrimaryButton(
+                label: l10n.iveVerifiedMyEmail,
                 onPressed: _checkVerification,
-                icon: const Icon(Icons.refresh, size: 18),
-                label: Text(l10n.iveVerifiedMyEmail),
-                style: TextButton.styleFrom(foregroundColor: c.chocolate),
+                backgroundColor: c.lightBlue,
+                icon: Icons.check_circle_outline,
               ),
 
               const SizedBox(height: 32),

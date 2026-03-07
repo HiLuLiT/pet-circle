@@ -66,7 +66,7 @@ final petStore = PetStore();
 final measurementStore = MeasurementStore();
 ```
 
-Stores are seeded in `main()` before `runApp()` via `_seedStores()`.
+Stores are seeded in `main()` before `runApp()` via `_seedMockStores()` (only when `kEnableFirebase == false`). When Firebase is enabled, `PetStore` subscribes to Firestore streams via `subscribeForUser(uid)` in `AuthGate`.
 
 ## Accessing Stores in Widgets
 
@@ -135,22 +135,32 @@ The global instance (e.g. `petStore`) is exported from the store file itself, NO
 
 | Store | Global | Key Methods |
 |-------|--------|-------------|
-| `PetStore` | `petStore` | `addPet`, `updatePet`, `removePet`, `getPetByName`, `activePet`, `activePetIndex`, `setActivePetIndex`, `currentUserRoleFor`, `removeCareCircleMember` |
+| `PetStore` | `petStore` | `addPet`, `createPetWithFirestore`, `updatePet`, `removePet`, `removePetWithFirestore`, `getPetByName`, `getPetById`, `activePet`, `activePetIndex`, `setActivePetIndex`, `currentUserRoleFor`, `removeCareCircleMember`, `removeCareCircleMemberWithFirestore`, `subscribeForUser`, `cancelSubscription` |
 | `MeasurementStore` | `measurementStore` | `addMeasurement`, `removeMeasurement`, `getMeasurements`, `latestForPet`, `countForPet`, `thisWeekCount` |
 | `NoteStore` | `noteStore` | `addNote`, `getNotes` |
 | `MedicationStore` | `medicationStore` | `addMedication`, `updateMedication`, `removeMedication`, `toggleMedication`, `getMedications`, `getActiveMedications` |
 | `NotificationStore` | `notificationStore` | `addNotification`, `markRead`, `markAllRead`, `unreadCount` |
-| `UserStore` | `userStore` | `setUser`, `setRole`, `currentUser`, `role`, `isVet`, `isOwner` |
+| `UserStore` | `userStore` | `seed`, `seedFromAppUser`, `setUser`, `setRole`, `currentUser`, `appUser`, `role`, `isVet`, `isOwner`, `currentUserUid`, `currentUserEmail`, `currentUserDisplayName`, `currentUserAvatarUrl` |
 | `SettingsStore` | `settingsStore` | `updateThresholds`, `classifyStatus`, `togglePushNotifications`, `toggleEmergencyAlerts`, `toggleVisionRR`, `toggleAutoExport` |
+
+## Providers
+
+| Provider | Global | Purpose |
+|----------|--------|---------|
+| `AuthProvider` | `authProvider` | Firebase Auth state. Exposes `routeState` (loading/unauthenticated/needsEmailVerification/needsRole/authenticated), `firebaseUser`, `appUser`, `isAuthenticated`, `isEmailVerified`. Listens to `AuthService.authStateChanges` + `UserService.streamUser`. |
 
 ## Data Flow
 
 ```
-MockData (seed) --> Stores (ChangeNotifier) --> Screens (ListenableBuilder)
-                         ^                            |
-                         |                            |
-                         +---- User Actions ----------+
-                              (store.method())
+When kEnableFirebase == false (mock mode):
+  MockData (seed) --> Stores (ChangeNotifier) --> Screens (ListenableBuilder)
+                           ^                            |
+                           +---- User Actions ----------+
+
+When kEnableFirebase == true (Firebase mode):
+  Firestore streams --> PetStore.subscribeForUser(uid) --> Screens
+  AuthProvider --> AuthGate (routing) --> Screens
+  User Actions --> store.*WithFirestore() --> PetService/UserService --> Firestore
 ```
 
 ## Active Pet Pattern
@@ -165,11 +175,28 @@ petStore.setActivePetIndex(newIndex);     // Switch pet (from header)
 
 All data-driven screens (trends, measurement, medication) should read from `petStore.activePet` to stay in sync with the header pet switcher.
 
-## Future: Firebase Migration
+## Firebase Integration (Phase 2 -- In Progress)
 
-When `kEnableFirebase` is set to `true`, stores will be updated to:
-1. Load initial data from Firestore instead of MockData
-2. Write mutations to Firestore, then update local state
-3. Listen to Firestore streams for real-time sync
+`kEnableFirebase` in `main.dart` controls mock vs Firebase mode. Currently set to `true`.
 
-The screen-facing API (getters, methods) will NOT change -- only the store internals.
+### What's wired to Firestore
+- `PetStore`: `subscribeForUser(uid)` streams all pets where user is in careCircle. `createPetWithFirestore()`, `removePetWithFirestore()`, `removeCareCircleMemberWithFirestore()` call `PetService` + `UserService`.
+- `AuthProvider`: Listens to `AuthService.authStateChanges` + `UserService.streamUser`. Routes via `AuthGate`.
+- `InvitationService`: Creates/accepts invitations in `/invitations` collection.
+- `DeepLinkService`: Handles `petcircle://invite?token=XYZ` deep links.
+
+### What's NOT yet wired to Firestore (local store only)
+- `MeasurementStore`: `addMeasurement`/`removeMeasurement` -- should also call `PetService.addMeasurement()`/`deleteMeasurement()`
+- `NoteStore`: `addNote` -- should also call `PetService.addNote()`
+- `MedicationStore`: `addMedication`/`updateMedication` -- should also call `PetService.addMedication()`/`updateMedication()`
+- `PetStore.updatePet()` -- does not call `PetService.updatePet()` yet
+
+### Services
+
+| Service | File | Purpose |
+|---------|------|---------|
+| `AuthService` | `lib/services/auth_service.dart` | Firebase Auth (email, Google, Apple) |
+| `UserService` | `lib/services/user_service.dart` | Firestore CRUD for `/users/{uid}` |
+| `PetService` | `lib/services/pet_service.dart` | Firestore CRUD for `/pets/{petId}` + subcollections (measurements, notes, medications) |
+| `InvitationService` | `lib/services/invitation_service.dart` | Firestore CRUD for `/invitations/{token}` |
+| `DeepLinkService` | `lib/services/deep_link_service.dart` | Deep link parsing for invitation tokens |

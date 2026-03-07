@@ -73,8 +73,10 @@ class AppHeader extends StatelessWidget {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  Icon(Icons.keyboard_arrow_down, size: 16, color: c.chocolate),
+                  if (onPetSelectorTap != null) ...[
+                    const SizedBox(width: 4),
+                    Icon(Icons.keyboard_arrow_down, size: 16, color: c.chocolate),
+                  ],
                 ],
               ),
             ),

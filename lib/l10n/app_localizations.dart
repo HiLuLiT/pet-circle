@@ -1747,6 +1747,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Completed'**
   String get completed;
+
+  /// No description provided for @inviteYourVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Your Veterinarian'**
+  String get inviteYourVet;
+
+  /// No description provided for @inviteYourVetDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Look up your vet by email to connect them to this pet.'**
+  String get inviteYourVetDesc;
+
+  /// No description provided for @lookUpVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Look Up'**
+  String get lookUpVet;
+
+  /// No description provided for @vetFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Veterinarian found'**
+  String get vetFound;
+
+  /// No description provided for @vetNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No account found — an invitation will be sent when you continue.'**
+  String get vetNotFound;
+
+  /// No description provided for @notAVetAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is registered but is not a veterinarian account.'**
+  String get notAVetAccount;
+
+  /// No description provided for @addAsVet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add as Vet'**
+  String get addAsVet;
+
+  /// No description provided for @sendVetInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Vet Invite'**
+  String get sendVetInvite;
+
+  /// No description provided for @vetInviteSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Vet invitation sent to {email}'**
+  String vetInviteSent(String email);
+
+  /// No description provided for @vetAlreadyInvited.
+  ///
+  /// In en, this message translates to:
+  /// **'This veterinarian has already been invited for this pet.'**
+  String get vetAlreadyInvited;
+
+  /// No description provided for @maxVetsReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum of 2 veterinarians per pet has been reached.'**
+  String get maxVetsReached;
+
+  /// No description provided for @dailyInviteLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You have reached the daily invitation limit. Please try again tomorrow.'**
+  String get dailyInviteLimitReached;
+
+  /// No description provided for @pendingRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Requests'**
+  String get pendingRequests;
+
+  /// No description provided for @acceptRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get acceptRequest;
+
+  /// No description provided for @declineRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Decline'**
+  String get declineRequest;
+
+  /// No description provided for @vetInvitationFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation from {name}'**
+  String vetInvitationFrom(String name);
+
+  /// No description provided for @petAssociationRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'{ownerName} wants you to monitor {petName}'**
+  String petAssociationRequest(String ownerName, String petName);
+
+  /// No description provided for @requestAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Request accepted — pet added to your clinic'**
+  String get requestAccepted;
+
+  /// No description provided for @requestDeclined.
+  ///
+  /// In en, this message translates to:
+  /// **'Request declined'**
+  String get requestDeclined;
+
+  /// No description provided for @noPendingRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending requests'**
+  String get noPendingRequests;
+
+  /// No description provided for @vetSlotsRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} vet slots remaining'**
+  String vetSlotsRemaining(int count);
 }
 
 class _AppLocalizationsDelegate
