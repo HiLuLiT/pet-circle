@@ -70,8 +70,6 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 ### Phase 2 -- Remaining Firebase/Data Work
 | Item | Details |
 |------|---------|
-| Settings/preferences persistence | `settingsStore` remains local-only (thresholds, toggles, export prefs are not saved per user in Firestore) |
-| In-app notifications persistence | `notificationStore` remains local-only; notification history is still seeded/mock and not backed by Firestore |
 | Push notifications | FCM not yet integrated |
 | Firestore security rules | Currently in test mode (allow all) |
 
@@ -116,8 +114,8 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 - [x] Subcollection operations wired to Firestore (measurements, notes, medications)
 - [x] Pet edit wired to Firestore
 - [x] Pet latest measurement snapshot synced to parent pet doc
-- [ ] Settings/preferences persisted to Firestore
-- [ ] In-app notifications persisted to Firestore
+- [x] Settings/preferences persisted to Firestore
+- [x] In-app notifications persisted to Firestore
 - [ ] Push notifications (FCM)
 - [ ] Production Firestore security rules
 

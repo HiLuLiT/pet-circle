@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum NotificationType {
   measurement,
   medication,
@@ -23,6 +25,30 @@ class AppNotification {
   final DateTime createdAt;
   final bool isRead;
   final String? petName;
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'title': title,
+      'body': body,
+      'type': type.name,
+      'createdAt': Timestamp.fromDate(createdAt),
+      'isRead': isRead,
+      'petName': petName,
+    };
+  }
+
+  factory AppNotification.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return AppNotification(
+      id: doc.id,
+      title: data['title'] ?? '',
+      body: data['body'] ?? '',
+      type: _typeFromString(data['type']),
+      createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      isRead: data['isRead'] ?? false,
+      petName: data['petName'],
+    );
+  }
 
   AppNotification copyWith({
     String? id,
@@ -55,5 +81,19 @@ class AppNotification {
       return '${diff.inMinutes}m ago';
     }
     return 'Just now';
+  }
+}
+
+NotificationType _typeFromString(Object? value) {
+  switch (value) {
+    case 'medication':
+      return NotificationType.medication;
+    case 'careCircle':
+      return NotificationType.careCircle;
+    case 'report':
+      return NotificationType.report;
+    case 'measurement':
+    default:
+      return NotificationType.measurement;
   }
 }

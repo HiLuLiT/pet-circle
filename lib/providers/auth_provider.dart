@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/services/user_service.dart';
+import 'package:pet_circle/stores/notification_store.dart';
+import 'package:pet_circle/stores/settings_store.dart';
 
 enum AuthRouteState {
   loading,
@@ -51,6 +53,9 @@ class AuthProvider extends ChangeNotifier {
     if (user == null) {
       _appUser = null;
       _isLoading = false;
+      notificationStore.cancelSubscription();
+      notificationStore.reset();
+      settingsStore.reset();
       notifyListeners();
       return;
     }
@@ -61,6 +66,11 @@ class AuthProvider extends ChangeNotifier {
 
     _userSubscription = UserService.streamUser(user.uid).listen((appUser) {
       _appUser = appUser;
+      if (appUser != null) {
+        settingsStore.seedFromAppUser(appUser);
+      } else {
+        settingsStore.reset();
+      }
       _isLoading = false;
       notifyListeners();
     });
@@ -71,6 +81,9 @@ class AuthProvider extends ChangeNotifier {
     _firebaseUser = AuthService.currentUser;
     if (_firebaseUser != null) {
       _appUser = await UserService.getUser(_firebaseUser!.uid);
+      if (_appUser != null) {
+        settingsStore.seedFromAppUser(_appUser!);
+      }
     }
     notifyListeners();
   }

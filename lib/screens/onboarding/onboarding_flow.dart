@@ -78,7 +78,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     );
 
     final createdPet = await petStore.createPetWithFirestore(pet);
-    settingsStore.updateThresholds(elevated: _targetRate);
+    await settingsStore.updateThresholds(elevated: _targetRate);
 
     if (kEnableFirebase && createdPet.id != null) {
       for (final inv in _careCircleInvites) {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/app_routes.dart';
-import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/services/invitation_service.dart';
+import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
@@ -90,6 +90,7 @@ class _AuthGateState extends State<AuthGate> {
     final appUser = authProvider.appUser!;
     userStore.seedFromAppUser(appUser);
     petStore.subscribeForUser(appUser.uid);
+    notificationStore.subscribeForUser(appUser.uid);
 
     final pendingToken = deepLinkService.pendingInvitationToken;
     if (pendingToken != null) {

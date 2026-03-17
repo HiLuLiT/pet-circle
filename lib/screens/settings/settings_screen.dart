@@ -4,11 +4,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show appLocale, appDarkMode, kEnableFirebase;
+import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/invitation.dart';
 import 'package:pet_circle/services/invitation_service.dart';
 import 'package:pet_circle/services/user_service.dart';
+import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 import 'package:pet_circle/stores/pet_store.dart';
@@ -250,8 +252,9 @@ class _SettingsContentState extends State<_SettingsContent> {
                       label: l10n.pushNotifications,
                       description: l10n.pushNotificationsDesc,
                       isOn: settingsStore.pushNotifications,
-                      onChanged: () {
-                        settingsStore.togglePushNotifications();
+                      onChanged: () async {
+                        await settingsStore.togglePushNotifications();
+                        if (!mounted) return;
                         setState(() {});
                       },
                     ),
@@ -260,8 +263,9 @@ class _SettingsContentState extends State<_SettingsContent> {
                       label: l10n.emergencyAlerts,
                       description: l10n.emergencyAlertsDesc,
                       isOn: settingsStore.emergencyAlerts,
-                      onChanged: () {
-                        settingsStore.toggleEmergencyAlerts();
+                      onChanged: () async {
+                        await settingsStore.toggleEmergencyAlerts();
+                        if (!mounted) return;
                         setState(() {});
                       },
                     ),
@@ -280,8 +284,9 @@ class _SettingsContentState extends State<_SettingsContent> {
                           label: l10n.visionRRCameraMode,
                           description: l10n.visionRRDesc,
                           isOn: settingsStore.visionRREnabled,
-                          onChanged: () {
-                            settingsStore.toggleVisionRR();
+                          onChanged: () async {
+                            await settingsStore.toggleVisionRR();
+                            if (!mounted) return;
                             setState(() {});
                           },
                         ),
@@ -321,8 +326,9 @@ class _SettingsContentState extends State<_SettingsContent> {
                       label: l10n.autoExportData,
                       description: l10n.autoExportDesc,
                       isOn: settingsStore.autoExport,
-                      onChanged: () {
-                        settingsStore.toggleAutoExport();
+                      onChanged: () async {
+                        await settingsStore.toggleAutoExport();
+                        if (!mounted) return;
                         setState(() {});
                       },
                     ),
@@ -625,6 +631,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                             Navigator.pop(ctx);
                             return;
                           }
+                          final navigator = Navigator.of(ctx);
                           final careCircleRole = CareCirclePermissions.fromString(selectedRole.toLowerCase());
                           final token = await InvitationService.createInvitation(
                             petId: activePet!.id!,
@@ -634,7 +641,17 @@ class _SettingsContentState extends State<_SettingsContent> {
                             invitedByUid: userStore.currentUserUid ?? '',
                             invitedByName: userStore.currentUserDisplayName ?? '',
                           );
-                          Navigator.pop(ctx);
+                          await notificationStore.addNotification(
+                            AppNotification(
+                              id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+                              title: l10n.careCircleUpdated,
+                              body: l10n.invitationSentTo(email, selectedRole),
+                              type: NotificationType.careCircle,
+                              createdAt: DateTime.now(),
+                              petName: activePet.name,
+                            ),
+                          );
+                          navigator.pop();
                           final link = 'https://petcircle.app/invite?token=$token';
                           await Clipboard.setData(ClipboardData(text: link));
                           if (context.mounted) {
@@ -917,6 +934,7 @@ class _SettingsContentState extends State<_SettingsContent> {
                               Navigator.pop(ctx);
                               return;
                             }
+                          final navigator = Navigator.of(ctx);
 
                             final validationError = await InvitationService.validateVetInvitation(
                               petId: activePet!.id!,
@@ -948,7 +966,17 @@ class _SettingsContentState extends State<_SettingsContent> {
                               invitedByName: userStore.currentUserDisplayName ?? '',
                               type: InvitationType.vet,
                             );
-                            Navigator.pop(ctx);
+                            await notificationStore.addNotification(
+                              AppNotification(
+                                id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+                                title: l10n.careCircleUpdated,
+                                body: l10n.vetInviteSent(email),
+                                type: NotificationType.careCircle,
+                                createdAt: DateTime.now(),
+                                petName: activePet.name,
+                              ),
+                            );
+                            navigator.pop();
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(content: Text(l10n.vetInviteSent(email))),
@@ -1048,12 +1076,18 @@ class _SettingsContentState extends State<_SettingsContent> {
                     ),
                     const SizedBox(width: 12),
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        final navigator = Navigator.of(context);
+                        final messenger = ScaffoldMessenger.of(this.context);
                         final elevated = int.tryParse(normalController.text) ?? 30;
                         final critical = int.tryParse(alertController.text) ?? 40;
-                        settingsStore.updateThresholds(elevated: elevated, critical: critical);
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        await settingsStore.updateThresholds(
+                          elevated: elevated,
+                          critical: critical,
+                        );
+                        if (!mounted) return;
+                        navigator.pop();
+                        messenger.showSnackBar(
                           SnackBar(content: Text(l10n.thresholdsUpdated)),
                         );
                       },

@@ -61,14 +61,14 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - B14: Export measurement data -- CSV preview dialog
 - B15: Pet detail reads from Firestore-backed `noteStore` and `measurementStore`
 - B16: "View Graph" navigates to trends tab
-- B17: Notifications from `notificationStore` with tap-to-mark-read
+- B17: Notifications from Firestore-backed `notificationStore` with tap-to-mark-read
 - B18: Dark mode toggle
 - B19: Language switcher (EN / HE)
-- B20: SRR thresholds saved to `settingsStore`
+- B20: SRR thresholds saved to Firestore-backed `settingsStore`
 - B21: Care circle invite dialog from settings (role selection: Member/Viewer)
 - B22: Export all data dialog from settings
 - B23: Share with vet dialog from settings
-- B24: Push / emergency notification toggles wired to `settingsStore`
+- B24: Push / emergency notification toggles wired to Firestore-backed `settingsStore`
 - M1: "Add Pet" button on owner dashboard navigates to onboarding
 - M2: Edit pet profile -- admin-only, bottom sheet with searchable breed dropdown + Firestore persistence
 - M3: Delete pet -- admin-only, long-press on pet card with confirmation
@@ -100,7 +100,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - C3: Patient card tap navigates to pet detail
 - C4: Clinical notes persisted via `noteStore` + Firestore subcollection
 - C5: Vet SRR trends -- data-driven chart
-- C6: Notifications from `notificationStore`
+- C6: Notifications from Firestore-backed `notificationStore`
 
 ### Cross-Cutting
 - E1: Bottom nav: Home, Trends, Measure, Medication
@@ -124,13 +124,13 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - Measurements, notes, and medications stream from Firestore subcollections
 - Pet edit persistence via `PetService.updatePet()`
 - Parent `Pet.latestMeasurement` stays in sync with measurement subcollection writes
+- User thresholds and preference toggles persist via Firestore-backed `settingsStore`
+- In-app notifications persist via Firestore-backed `notificationStore`
 - Dual-layer role architecture (App-Level: vet/owner + Care Circle: admin/member/viewer)
 - Invitation flow with deep link acceptance
 - Permission enforcement across all screens
 
 ### Remaining in Phase 2
-- Persist `settingsStore` data per user in Firestore
-- Persist `notificationStore` data in Firestore
 - Push notifications via FCM
 - Production Firestore security rules
 

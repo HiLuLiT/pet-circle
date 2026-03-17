@@ -139,9 +139,9 @@ The global instance (e.g. `petStore`) is exported from the store file itself, NO
 | `MeasurementStore` | `measurementStore` | `addMeasurement`, `removeMeasurement`, `getMeasurements`, `latestForPet`, `countForPet`, `thisWeekCount`, `subscribeForPets`, `cancelSubscriptions` |
 | `NoteStore` | `noteStore` | `addNote`, `getNotes`, `subscribeForPets`, `cancelSubscriptions` |
 | `MedicationStore` | `medicationStore` | `addMedication`, `updateMedication`, `removeMedication`, `toggleMedication`, `getMedications`, `getActiveMedications`, `subscribeForPets`, `cancelSubscriptions` |
-| `NotificationStore` | `notificationStore` | `addNotification`, `markRead`, `markAllRead`, `unreadCount` |
+| `NotificationStore` | `notificationStore` | `seed`, `reset`, `subscribeForUser`, `cancelSubscription`, `addNotification`, `markRead`, `markAllRead`, `unreadCount` |
 | `UserStore` | `userStore` | `seed`, `seedFromAppUser`, `setUser`, `setRole`, `currentUser`, `appUser`, `role`, `isVet`, `isOwner`, `currentUserUid`, `currentUserEmail`, `currentUserDisplayName`, `currentUserAvatarUrl` |
-| `SettingsStore` | `settingsStore` | `updateThresholds`, `classifyStatus`, `togglePushNotifications`, `toggleEmergencyAlerts`, `toggleVisionRR`, `toggleAutoExport` |
+| `SettingsStore` | `settingsStore` | `seedFromAppUser`, `reset`, `updateThresholds`, `setPushNotifications`, `togglePushNotifications`, `setEmergencyAlerts`, `toggleEmergencyAlerts`, `setVisionRREnabled`, `toggleVisionRR`, `setAutoExport`, `toggleAutoExport`, `classifyStatus` |
 
 ## Providers
 
@@ -186,13 +186,14 @@ All data-driven screens (trends, measurement, medication) should read from `petS
 - `NoteStore`: keyed by `petId`, streams `/pets/{petId}/notes`, writes via `PetService.addNote()`.
 - `MedicationStore`: keyed by `petId`, streams `/pets/{petId}/medications`, writes via `PetService.addMedication()` / `updateMedication()` / `deleteMedication()`.
 - `PetService.addMeasurement()` / `deleteMeasurement()`: resync parent `/pets/{petId}.latestMeasurement` after subcollection writes.
+- `SettingsStore`: seeds from `AppUser.settings` and persists thresholds/toggles back to `/users/{uid}.settings`.
+- `NotificationStore`: streams `/users/{uid}/notifications` and persists read state / newly created in-app notifications.
 - `AuthProvider`: Listens to `AuthService.authStateChanges` + `UserService.streamUser`. Routes via `AuthGate`.
 - `InvitationService`: Creates/accepts invitations in `/invitations` collection.
+- `NotificationService`: Firestore CRUD for `/users/{uid}/notifications`.
 - `DeepLinkService`: Handles `petcircle://invite?token=XYZ` deep links.
 
 ### What's NOT yet wired to Firestore (local store only)
-- `SettingsStore`: thresholds and preferences are still local-only
-- `NotificationStore`: in-app notification history is still local-only
 
 ### Services
 

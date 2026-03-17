@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/stores/medication_store.dart';
+import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
@@ -438,6 +440,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                         final access = petStore.accessForActivePet();
                         if (!access.canManageMedication) return;
                         final petId = petStore.activePet?.id ?? '';
+                        final petName = petStore.activePet?.name ?? l10n.petName;
                         if (petId.isEmpty) return;
                         final name = _nameController.text.isNotEmpty ? _nameController.text : l10n.newMedication;
                         final dosage = _dosageController.text;
@@ -464,6 +467,16 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                             ),
                           );
                         }
+                        await notificationStore.addNotification(
+                          AppNotification(
+                            id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+                            title: _isEditing ? l10n.medicationUpdated : l10n.medicationAdded,
+                            body: name,
+                            type: NotificationType.medication,
+                            createdAt: DateTime.now(),
+                            petName: petName,
+                          ),
+                        );
                         if (!context.mounted) return;
                         Navigator.of(context).pop();
                         ScaffoldMessenger.of(context).showSnackBar(

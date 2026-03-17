@@ -13,80 +13,83 @@ class NotificationsDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 1.0,
-      minChildSize: 0.4,
-      maxChildSize: 1.0,
-      builder: (context, scrollController) {
-        final c = AppColorsTheme.of(context);
-        final l10n = AppLocalizations.of(context)!;
-        final notifications = notificationStore.all;
+    return ListenableBuilder(
+      listenable: notificationStore,
+      builder: (context, _) => DraggableScrollableSheet(
+        initialChildSize: 1.0,
+        minChildSize: 0.4,
+        maxChildSize: 1.0,
+        builder: (context, scrollController) {
+          final c = AppColorsTheme.of(context);
+          final l10n = AppLocalizations.of(context)!;
+          final notifications = notificationStore.all;
 
-        return ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
-          child: Container(
-            color: c.white,
-            child: SingleChildScrollView(
-              controller: scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              l10n.notifications,
-                              style: AppTextStyles.heading2.copyWith(
-                                color: c.chocolate,
-                                letterSpacing: -0.96,
+          return ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+            child: Container(
+              color: c.white,
+              child: SingleChildScrollView(
+                controller: scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.notifications,
+                                style: AppTextStyles.heading2.copyWith(
+                                  color: c.chocolate,
+                                  letterSpacing: -0.96,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              l10n.unreadNotifications(
-                                notificationStore.unreadCount,
+                              const SizedBox(height: 4),
+                              Text(
+                                l10n.unreadNotifications(
+                                  notificationStore.unreadCount,
+                                ),
+                                style: AppTextStyles.body.copyWith(color: c.chocolate),
                               ),
-                              style: AppTextStyles.body.copyWith(color: c.chocolate),
-                            ),
-                          ],
-                        ),
-                      ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: c.offWhite,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: c.white, width: 2),
-                          ),
-                          child: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: c.chocolate,
-                            size: 24,
+                            ],
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  ...notifications.map((notification) => Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _AppNotificationCard(notification: notification),
-                  )),
-                ],
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: c.offWhite,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: c.white, width: 2),
+                            ),
+                            child: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: c.chocolate,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    ...notifications.map((notification) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _AppNotificationCard(notification: notification),
+                    )),
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
@@ -98,48 +101,53 @@ class MessagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
-    final notifications = notificationStore.all;
+    return ListenableBuilder(
+      listenable: notificationStore,
+      builder: (context, _) {
+        final l10n = AppLocalizations.of(context)!;
+        final c = AppColorsTheme.of(context);
+        final notifications = notificationStore.all;
 
-    final content = SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            Text(
-              l10n.notifications,
-              style: AppTextStyles.heading2.copyWith(
-                color: c.chocolate,
-                letterSpacing: -0.96,
-              ),
+        final content = SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                Text(
+                  l10n.notifications,
+                  style: AppTextStyles.heading2.copyWith(
+                    color: c.chocolate,
+                    letterSpacing: -0.96,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.unreadNotifications(notificationStore.unreadCount),
+                  style: AppTextStyles.body.copyWith(
+                    color: c.chocolate,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ...notifications.map((notification) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _AppNotificationCard(notification: notification),
+                )),
+              ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              l10n.unreadNotifications(notificationStore.unreadCount),
-              style: AppTextStyles.body.copyWith(
-                color: c.chocolate,
-              ),
-            ),
-            const SizedBox(height: 24),
-            ...notifications.map((notification) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _AppNotificationCard(notification: notification),
-            )),
-          ],
-        ),
-      ),
-    );
+          ),
+        );
 
-    if (!showScaffold) {
-      return Container(color: c.white, child: content);
-    }
+        if (!showScaffold) {
+          return Container(color: c.white, child: content);
+        }
 
-    return Scaffold(
-      backgroundColor: c.white,
-      body: content,
+        return Scaffold(
+          backgroundColor: c.white,
+          body: content,
+        );
+      },
     );
   }
 }
@@ -177,8 +185,9 @@ class _AppNotificationCard extends StatelessWidget {
     };
 
     return GestureDetector(
-      onTap: () {
-        notificationStore.markRead(notification.id);
+      onTap: () async {
+        await notificationStore.markRead(notification.id);
+        if (!context.mounted) return;
         final scaffold = ScaffoldMessenger.of(context);
         switch (notification.type) {
           case notif.NotificationType.medication:

@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
@@ -336,12 +338,23 @@ class _ManualModeState extends State<_ManualMode>
                     GestureDetector(
                       onTap: () async {
                         final petId = petStore.activePet?.id ?? '';
+                        final petName = petStore.activePet?.name ?? l10n.petName;
                         if (petId.isEmpty) return;
                         await measurementStore.addMeasurement(
                           petId,
                           Measurement(
                             bpm: bpm,
                             recordedAt: DateTime.now(),
+                          ),
+                        );
+                        await notificationStore.addNotification(
+                          AppNotification(
+                            id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+                            title: l10n.measurementComplete,
+                            body: l10n.measurementSavedBpm(bpm),
+                            type: NotificationType.measurement,
+                            createdAt: DateTime.now(),
+                            petName: petName,
                           ),
                         );
                         if (!context.mounted) return;
