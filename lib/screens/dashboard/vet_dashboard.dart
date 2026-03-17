@@ -85,104 +85,108 @@ class _VetDashboardState extends State<VetDashboard> {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    final pets = petStore.allClinicPets;
-    final l10n = AppLocalizations.of(context)!;
+    return ListenableBuilder(
+      listenable: Listenable.merge([petStore, measurementStore]),
+      builder: (context, _) {
+        final c = AppColorsTheme.of(context);
+        final pets = petStore.allClinicPets;
+        final l10n = AppLocalizations.of(context)!;
 
-    if (petStore.isLoading) {
-      final loader = Center(
-        child: CircularProgressIndicator(color: c.chocolate),
-      );
-      if (!widget.showScaffold) return Container(color: c.white, child: loader);
-      return Scaffold(backgroundColor: c.white, body: loader);
-    }
+        if (petStore.isLoading) {
+          final loader = Center(
+            child: CircularProgressIndicator(color: c.chocolate),
+          );
+          if (!widget.showScaffold) {
+            return Container(color: c.white, child: loader);
+          }
+          return Scaffold(backgroundColor: c.white, body: loader);
+        }
 
-    final normalCount = pets.where((p) => p.statusLabel == 'Normal').length;
-    final elevatedCount = pets.where((p) => p.statusLabel != 'Normal').length;
+        final normalCount = pets.where((p) => p.statusLabel == 'Normal').length;
+        final elevatedCount = pets.where((p) => p.statusLabel != 'Normal').length;
 
-    final content = SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: AppSpacing.md),
-
-              // Pending Requests section
-              if (_pendingInvitations.isNotEmpty) ...[
-                _PendingRequestsSection(
-                  invitations: _pendingInvitations,
-                  processingTokens: _processingTokens,
-                  onAccept: _acceptInvitation,
-                  onDecline: _declineInvitation,
-                ),
-                const SizedBox(height: AppSpacing.lg),
-              ],
-
-              Text(
-                l10n.clinicOverview,
-                style: AppTextStyles.heading2.copyWith(color: c.chocolate),
-              ),
-              Text(
-                l10n.patientsInYourCare(pets.length),
-                style: AppTextStyles.bodyMuted,
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              _ResponsiveGrid(
-                maxCrossAxisCount: 3,
-                minItemWidth: 280,
-                children: pets
-                    .map(
-                      (pet) => _PetCard(
-                        data: pet,
-                        onTap: () => Navigator.of(context).pushNamed(
-                          AppRoutes.petDetail,
-                          arguments: pet,
-                        ),
-                      ),
-                    )
-                    .toList(),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              _ResponsiveGrid(
-                maxCrossAxisCount: 3,
-                minItemWidth: 280,
-                childAspectRatio: 3.3,
+        final content = SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SummaryCard(
-                    iconColor: c.lightBlue.withValues(alpha: 0.15),
-                    icon: Icons.check_circle_outline,
-                    value: '$normalCount',
-                    label: l10n.normalStatus,
+                  const SizedBox(height: AppSpacing.md),
+                  if (_pendingInvitations.isNotEmpty) ...[
+                    _PendingRequestsSection(
+                      invitations: _pendingInvitations,
+                      processingTokens: _processingTokens,
+                      onAccept: _acceptInvitation,
+                      onDecline: _declineInvitation,
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                  ],
+                  Text(
+                    l10n.clinicOverview,
+                    style: AppTextStyles.heading2.copyWith(color: c.chocolate),
                   ),
-                  _SummaryCard(
-                    iconColor: c.cherry.withValues(alpha: 0.15),
-                    icon: Icons.warning_amber_outlined,
-                    value: '$elevatedCount',
-                    label: l10n.needAttention,
+                  Text(
+                    l10n.patientsInYourCare(pets.length),
+                    style: AppTextStyles.bodyMuted,
                   ),
-                  _SummaryCard(
-                    iconColor: c.lightBlue.withValues(alpha: 0.1),
-                    icon: Icons.bar_chart,
-                    value: '${measurementStore.thisWeekCount}',
-                    label: l10n.measurementsThisWeek,
+                  const SizedBox(height: AppSpacing.lg),
+                  _ResponsiveGrid(
+                    maxCrossAxisCount: 3,
+                    minItemWidth: 280,
+                    children: pets
+                        .map(
+                          (pet) => _PetCard(
+                            data: pet,
+                            onTap: () => Navigator.of(context).pushNamed(
+                              AppRoutes.petDetail,
+                              arguments: pet,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  _ResponsiveGrid(
+                    maxCrossAxisCount: 3,
+                    minItemWidth: 280,
+                    childAspectRatio: 3.3,
+                    children: [
+                      _SummaryCard(
+                        iconColor: c.lightBlue.withValues(alpha: 0.15),
+                        icon: Icons.check_circle_outline,
+                        value: '$normalCount',
+                        label: l10n.normalStatus,
+                      ),
+                      _SummaryCard(
+                        iconColor: c.cherry.withValues(alpha: 0.15),
+                        icon: Icons.warning_amber_outlined,
+                        value: '$elevatedCount',
+                        label: l10n.needAttention,
+                      ),
+                      _SummaryCard(
+                        iconColor: c.lightBlue.withValues(alpha: 0.1),
+                        icon: Icons.bar_chart,
+                        value: '${measurementStore.thisWeekCount}',
+                        label: l10n.measurementsThisWeek,
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        );
 
-    if (!widget.showScaffold) {
-      return Container(color: c.white, child: content);
-    }
+        if (!widget.showScaffold) {
+          return Container(color: c.white, child: content);
+        }
 
-    return Scaffold(
-      backgroundColor: c.white,
-      body: content,
+        return Scaffold(
+          backgroundColor: c.white,
+          body: content,
+        );
+      },
     );
   }
 }
@@ -330,6 +334,9 @@ class _PetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final latestFromStore = measurementStore.latestForPet(data.id ?? '');
+    final latest = latestFromStore ?? data.latestMeasurement;
+    final hasMeasurement = latest.bpm > 0;
     return GestureDetector(
       onTap: onTap,
       child: NeumorphicCard(
@@ -423,7 +430,7 @@ class _PetCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${data.latestMeasurement.bpm}',
+                                hasMeasurement ? '${latest.bpm}' : '--',
                                 style: AppTextStyles.heading3
                                     .copyWith(color: c.chocolate),
                               ),
@@ -434,7 +441,7 @@ class _PetCard extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        data.latestMeasurement.timeAgo,
+                        hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
                         style: AppTextStyles.caption,
                       ),
                     ],

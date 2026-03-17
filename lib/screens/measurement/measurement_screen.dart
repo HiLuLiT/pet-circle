@@ -334,15 +334,17 @@ class _ManualModeState extends State<_ManualMode>
                     ),
                     const SizedBox(width: 12),
                     GestureDetector(
-                      onTap: () {
-                        final petName = petStore.activePet?.name ?? 'Pet';
-                        measurementStore.addMeasurement(
-                          petName,
+                      onTap: () async {
+                        final petId = petStore.activePet?.id ?? '';
+                        if (petId.isEmpty) return;
+                        await measurementStore.addMeasurement(
+                          petId,
                           Measurement(
                             bpm: bpm,
                             recordedAt: DateTime.now(),
                           ),
                         );
+                        if (!context.mounted) return;
                         Navigator.pop(context);
                         setState(() {
                           _remainingSeconds = widget.selectedDuration;

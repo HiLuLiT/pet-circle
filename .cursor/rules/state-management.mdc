@@ -66,7 +66,7 @@ final petStore = PetStore();
 final measurementStore = MeasurementStore();
 ```
 
-Stores are seeded in `main()` before `runApp()` via `_seedMockStores()` (only when `kEnableFirebase == false`). When Firebase is enabled, `PetStore` subscribes to Firestore streams via `subscribeForUser(uid)` in `AuthGate`.
+Stores are seeded in `main()` before `runApp()` via `_seedMockStores()` (only when `kEnableFirebase == false`). When Firebase is enabled, `PetStore` subscribes to Firestore streams via `subscribeForUser(uid)` in `AuthGate` and coordinates Firestore subcollection subscriptions for measurements, notes, and medications.
 
 ## Accessing Stores in Widgets
 
@@ -106,7 +106,7 @@ Call store methods directly -- no context needed:
 
 ```dart
 onPressed: () {
-  measurementStore.addMeasurement('Princess', Measurement(
+  measurementStore.addMeasurement(petStore.activePet!.id!, Measurement(
     bpm: calculatedBpm,
     recordedAt: DateTime.now(),
   ));
@@ -135,10 +135,10 @@ The global instance (e.g. `petStore`) is exported from the store file itself, NO
 
 | Store | Global | Key Methods |
 |-------|--------|-------------|
-| `PetStore` | `petStore` | `addPet`, `createPetWithFirestore`, `updatePet`, `removePet`, `removePetWithFirestore`, `getPetByName`, `getPetById`, `activePet`, `activePetIndex`, `setActivePetIndex`, `currentUserRoleFor`, `removeCareCircleMember`, `removeCareCircleMemberWithFirestore`, `subscribeForUser`, `cancelSubscription` |
-| `MeasurementStore` | `measurementStore` | `addMeasurement`, `removeMeasurement`, `getMeasurements`, `latestForPet`, `countForPet`, `thisWeekCount` |
-| `NoteStore` | `noteStore` | `addNote`, `getNotes` |
-| `MedicationStore` | `medicationStore` | `addMedication`, `updateMedication`, `removeMedication`, `toggleMedication`, `getMedications`, `getActiveMedications` |
+| `PetStore` | `petStore` | `addPet`, `createPetWithFirestore`, `updatePet`, `updatePetWithFirestore`, `removePet`, `removePetWithFirestore`, `getPetByName`, `getPetById`, `activePet`, `activePetIndex`, `setActivePetIndex`, `currentUserRoleFor`, `removeCareCircleMember`, `removeCareCircleMemberWithFirestore`, `subscribeForUser`, `cancelSubscription` |
+| `MeasurementStore` | `measurementStore` | `addMeasurement`, `removeMeasurement`, `getMeasurements`, `latestForPet`, `countForPet`, `thisWeekCount`, `subscribeForPets`, `cancelSubscriptions` |
+| `NoteStore` | `noteStore` | `addNote`, `getNotes`, `subscribeForPets`, `cancelSubscriptions` |
+| `MedicationStore` | `medicationStore` | `addMedication`, `updateMedication`, `removeMedication`, `toggleMedication`, `getMedications`, `getActiveMedications`, `subscribeForPets`, `cancelSubscriptions` |
 | `NotificationStore` | `notificationStore` | `addNotification`, `markRead`, `markAllRead`, `unreadCount` |
 | `UserStore` | `userStore` | `seed`, `seedFromAppUser`, `setUser`, `setRole`, `currentUser`, `appUser`, `role`, `isVet`, `isOwner`, `currentUserUid`, `currentUserEmail`, `currentUserDisplayName`, `currentUserAvatarUrl` |
 | `SettingsStore` | `settingsStore` | `updateThresholds`, `classifyStatus`, `togglePushNotifications`, `toggleEmergencyAlerts`, `toggleVisionRR`, `toggleAutoExport` |
@@ -158,9 +158,9 @@ When kEnableFirebase == false (mock mode):
                            +---- User Actions ----------+
 
 When kEnableFirebase == true (Firebase mode):
-  Firestore streams --> PetStore.subscribeForUser(uid) --> Screens
+  Firestore streams --> PetStore.subscribeForUser(uid) --> Pet/Measurement/Note/Medication stores --> Screens
   AuthProvider --> AuthGate (routing) --> Screens
-  User Actions --> store.*WithFirestore() --> PetService/UserService --> Firestore
+  User Actions --> stores/services --> PetService/UserService --> Firestore
 ```
 
 ## Active Pet Pattern
@@ -181,15 +181,18 @@ All data-driven screens (trends, measurement, medication) should read from `petS
 
 ### What's wired to Firestore
 - `PetStore`: `subscribeForUser(uid)` streams all pets where user is in careCircle. `createPetWithFirestore()`, `removePetWithFirestore()`, `removeCareCircleMemberWithFirestore()` call `PetService` + `UserService`.
+- `PetStore.updatePetWithFirestore()`: persists editable pet fields via `PetService.updatePet()`.
+- `MeasurementStore`: keyed by `petId`, streams `/pets/{petId}/measurements`, writes via `PetService.addMeasurement()` / `deleteMeasurement()`.
+- `NoteStore`: keyed by `petId`, streams `/pets/{petId}/notes`, writes via `PetService.addNote()`.
+- `MedicationStore`: keyed by `petId`, streams `/pets/{petId}/medications`, writes via `PetService.addMedication()` / `updateMedication()` / `deleteMedication()`.
+- `PetService.addMeasurement()` / `deleteMeasurement()`: resync parent `/pets/{petId}.latestMeasurement` after subcollection writes.
 - `AuthProvider`: Listens to `AuthService.authStateChanges` + `UserService.streamUser`. Routes via `AuthGate`.
 - `InvitationService`: Creates/accepts invitations in `/invitations` collection.
 - `DeepLinkService`: Handles `petcircle://invite?token=XYZ` deep links.
 
 ### What's NOT yet wired to Firestore (local store only)
-- `MeasurementStore`: `addMeasurement`/`removeMeasurement` -- should also call `PetService.addMeasurement()`/`deleteMeasurement()`
-- `NoteStore`: `addNote` -- should also call `PetService.addNote()`
-- `MedicationStore`: `addMedication`/`updateMedication` -- should also call `PetService.addMedication()`/`updateMedication()`
-- `PetStore.updatePet()` -- does not call `PetService.updatePet()` yet
+- `SettingsStore`: thresholds and preferences are still local-only
+- `NotificationStore`: in-app notification history is still local-only
 
 ### Services
 

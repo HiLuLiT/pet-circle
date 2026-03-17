@@ -306,6 +306,28 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-018: Pet latest measurement snapshot gets stale after Firestore subcollection writes
+
+**Found during:** Firestore subcollection wiring audit
+**Severity:** Medium (some screens show outdated summary data)
+**Status:** Fixed
+
+**Symptom:** After adding or deleting measurements, the measurement history and trends update from the `measurements` subcollection, but some pet summary surfaces can still show an outdated latest BPM/time. In particular, `Pet.latestMeasurement` on the parent `/pets/{petId}` document is not kept in sync.
+
+**Root cause:** `PetService.addMeasurement()` and `deleteMeasurement()` only write to `/pets/{petId}/measurements`. They do not also update the parent pet document's `latestMeasurement` field. Several screens still read summary values from `Pet.latestMeasurement` on the parent pet document.
+
+**Fix:** Updated `PetService.addMeasurement()` and `deleteMeasurement()` to resync the parent `/pets/{petId}.latestMeasurement` field after each subcollection write. Also updated owner, vet, care-circle, and pet-detail summary surfaces to prefer live values from `measurementStore` and show empty-state placeholders when no measurements exist.
+
+**Files changed:**
+- `lib/services/pet_service.dart`
+- `lib/models/pet.dart`
+- `lib/screens/pet_detail/pet_detail_screen.dart`
+- `lib/screens/dashboard/owner_dashboard.dart`
+- `lib/screens/dashboard/vet_dashboard.dart`
+- `lib/screens/dashboard/care_circle_dashboard.dart`
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

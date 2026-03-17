@@ -38,8 +38,8 @@ class _TrendsScreenState extends State<TrendsScreen> {
   void _showExportDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
-    final petName = petStore.activePet?.name ?? 'Pet';
-    final measurements = measurementStore.getMeasurements(petName);
+    final petId = petStore.activePet?.id ?? '';
+    final measurements = measurementStore.getMeasurements(petId);
     final csvLines = measurements.map((m) => '${m.recordedAt.toIso8601String()},${m.bpm}').join('\n');
     final csvData = 'Date,BPM\n$csvLines';
 
@@ -89,7 +89,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
     );
   }
 
-  void _confirmDelete(BuildContext context, String petName, Measurement m) {
+  void _confirmDelete(BuildContext context, String petId, Measurement m) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     final dateStr = '${m.recordedAt.month}/${m.recordedAt.day}';
@@ -102,8 +102,9 @@ class _TrendsScreenState extends State<TrendsScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           TextButton(
-            onPressed: () {
-              measurementStore.removeMeasurement(petName, m);
+            onPressed: () async {
+              await measurementStore.removeMeasurement(petId, m);
+              if (!context.mounted) return;
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(l10n.measurementDeleted)),
@@ -136,7 +137,8 @@ class _TrendsScreenState extends State<TrendsScreen> {
         _selectedPeriod ??= l10n.last7Days;
 
         final petName = petStore.activePet?.name ?? l10n.petName;
-        final allMeasurements = measurementStore.getMeasurements(petName);
+        final petId = petStore.activePet?.id ?? '';
+        final allMeasurements = measurementStore.getMeasurements(petId);
         final filtered = _filterByPeriod(allMeasurements, l10n);
 
         final content = SafeArea(
@@ -240,7 +242,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                       ),
                       confirmDismiss: (_) async {
                         if (!access.canDeleteMeasurements) return false;
-                        _confirmDelete(context, petName, m);
+                        _confirmDelete(context, petId, m);
                         return false;
                       },
                       child: Container(
@@ -475,8 +477,8 @@ class _StatusCard extends StatelessWidget {
             Text(l10n.status, style: AppTextStyles.caption.copyWith(fontSize: 12)),
             const SizedBox(height: 16),
             Builder(builder: (context) {
-              final petName = petStore.activePet?.name ?? 'Pet';
-              final measurements = measurementStore.getMeasurements(petName);
+              final petId = petStore.activePet?.id ?? '';
+              final measurements = measurementStore.getMeasurements(petId);
               final normal = measurements.where((m) => m.bpm < settingsStore.elevatedThreshold).length;
               final elevated = measurements.where((m) => m.bpm >= settingsStore.elevatedThreshold && m.bpm < settingsStore.criticalThreshold).length;
               final critical = measurements.where((m) => m.bpm >= settingsStore.criticalThreshold).length;

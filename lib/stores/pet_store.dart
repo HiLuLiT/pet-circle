@@ -6,6 +6,9 @@ import 'package:pet_circle/models/pet_access.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/services/pet_service.dart';
 import 'package:pet_circle/services/user_service.dart';
+import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/stores/medication_store.dart';
+import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 
 final petStore = PetStore();
@@ -43,8 +46,8 @@ class PetStore extends ChangeNotifier {
     required List<Pet> ownerPets,
     required List<Pet> clinicPets,
   }) {
-    _ownerPets = List.of(ownerPets);
-    _clinicPets = List.of(clinicPets);
+    _ownerPets = ownerPets.map(_withFallbackId).toList();
+    _clinicPets = clinicPets.map(_withFallbackId).toList();
     _activePetIndex = activePetIndex;
     notifyListeners();
   }
@@ -66,6 +69,14 @@ class PetStore extends ChangeNotifier {
       } else {
         _activePetIndex = activePetIndex;
       }
+      final petIds = _ownerPets
+          .map((pet) => pet.id)
+          .whereType<String>()
+          .where((id) => id.isNotEmpty)
+          .toList();
+      measurementStore.subscribeForPets(petIds);
+      noteStore.subscribeForPets(petIds);
+      medicationStore.subscribeForPets(petIds);
       _isLoading = false;
       notifyListeners();
     });
@@ -74,6 +85,9 @@ class PetStore extends ChangeNotifier {
   void cancelSubscription() {
     _petsSubscription?.cancel();
     _petsSubscription = null;
+    measurementStore.cancelSubscriptions();
+    noteStore.cancelSubscriptions();
+    medicationStore.cancelSubscriptions();
   }
 
   Pet? getPetByName(String name) {
@@ -92,11 +106,17 @@ class PetStore extends ChangeNotifier {
   }
 
   void addPet(Pet pet) {
-    _ownerPets.add(pet);
-    if (!_clinicPets.any((p) => p.name == pet.name)) {
-      _clinicPets.add(pet);
+    final normalizedPet = _withFallbackId(pet);
+    _ownerPets.add(normalizedPet);
+    if (!_clinicPets.any((p) => p.name == normalizedPet.name)) {
+      _clinicPets.add(normalizedPet);
     }
     notifyListeners();
+  }
+
+  Pet _withFallbackId(Pet pet) {
+    if (pet.id != null && pet.id!.isNotEmpty) return pet;
+    return pet.copyWith(id: 'mock-${pet.name.toLowerCase().replaceAll(' ', '-')}');
   }
 
   /// Create a pet and persist to Firestore when Firebase is enabled.
@@ -115,6 +135,18 @@ class PetStore extends ChangeNotifier {
     }
   }
 
+  Future<void> updatePetWithFirestore(Pet updated) async {
+    if (kEnableFirebase && updated.id != null) {
+      await PetService.updatePet(updated.id!, {
+        'name': updated.name,
+        'breedAndAge': updated.breedAndAge,
+        'imageUrl': updated.imageUrl,
+      });
+      return;
+    }
+    _replacePetLocal(updated);
+  }
+
   void updatePet(String name, Pet updated) {
     final ownerIdx = _ownerPets.indexWhere((p) => p.name == name);
     if (ownerIdx != -1) _ownerPets[ownerIdx] = updated;
@@ -122,6 +154,18 @@ class PetStore extends ChangeNotifier {
     final clinicIdx = _clinicPets.indexWhere((p) => p.name == name);
     if (clinicIdx != -1) _clinicPets[clinicIdx] = updated;
 
+    notifyListeners();
+  }
+
+  void _replacePetLocal(Pet updated) {
+    for (final list in [_ownerPets, _clinicPets]) {
+      final idx = list.indexWhere((pet) =>
+          (updated.id != null && pet.id == updated.id) ||
+          pet.name == updated.name);
+      if (idx != -1) {
+        list[idx] = updated;
+      }
+    }
     notifyListeners();
   }
 

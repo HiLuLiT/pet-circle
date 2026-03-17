@@ -68,17 +68,20 @@ void _seedMockStores() {
     clinicPets: MockData.vetClinicPets,
   );
 
+  final princessId = petStore.getPetByName('Princess')?.id ?? 'mock-princess';
+  final maxId = petStore.getPetByName('Max')?.id ?? 'mock-max';
+
   measurementStore.seed({
-    'Princess': MockData.princessMeasurements,
+    princessId: MockData.princessMeasurements,
   });
 
   noteStore.seed({
-    'Princess': MockData.princessNotes,
-    'Max': MockData.maxNotes,
+    princessId: MockData.princessNotes,
+    maxId: MockData.maxNotes,
   });
 
   medicationStore.seed({
-    'Princess': [
+    princessId: [
       Medication(
         id: 'med-1',
         name: 'Furosemide',

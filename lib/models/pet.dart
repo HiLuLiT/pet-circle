@@ -66,7 +66,10 @@ class Pet {
             bpm: measurementData['bpm'] ?? 0,
             recordedAt: (measurementData['recordedAt'] as Timestamp).toDate(),
           )
-        : Measurement(bpm: 0, recordedAt: DateTime.now());
+        : Measurement(
+            bpm: 0,
+            recordedAt: DateTime.fromMillisecondsSinceEpoch(0),
+          );
 
     return Pet(
       id: doc.id,

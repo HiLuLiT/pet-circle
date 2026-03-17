@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/clinical_note.dart';
+import 'package:pet_circle/services/pet_service.dart';
 
 final noteStore = NoteStore();
 
 class NoteStore extends ChangeNotifier {
   Map<String, List<ClinicalNote>> _notes = {};
+  final Map<String, StreamSubscription<List<ClinicalNote>>> _subscriptions = {};
 
   void seed(Map<String, List<ClinicalNote>> initial) {
     _notes = {
@@ -13,17 +17,46 @@ class NoteStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<ClinicalNote> getNotes(String petName) {
-    return List.unmodifiable(_notes[petName] ?? []);
+  List<ClinicalNote> getNotes(String petId) {
+    return List.unmodifiable(_notes[petId] ?? []);
   }
 
-  void addNote(String petName, ClinicalNote note) {
-    _notes.putIfAbsent(petName, () => []);
-    _notes[petName]!.insert(0, note);
-    notifyListeners();
+  Future<void> addNote(String petId, ClinicalNote note) async {
+    if (kEnableFirebase) {
+      await PetService.addNote(petId, note);
+    } else {
+      _notes.putIfAbsent(petId, () => []);
+      _notes[petId]!.insert(0, note);
+      notifyListeners();
+    }
   }
 
-  int countForPet(String petName) {
-    return _notes[petName]?.length ?? 0;
+  void subscribeForPets(List<String> petIds) {
+    final currentIds = _subscriptions.keys.toSet();
+    final newIds = petIds.toSet();
+
+    for (final id in currentIds.difference(newIds)) {
+      _subscriptions[id]?.cancel();
+      _subscriptions.remove(id);
+      _notes.remove(id);
+    }
+
+    for (final id in newIds.difference(currentIds)) {
+      _subscriptions[id] = PetService.streamNotes(id).listen((list) {
+        _notes[id] = list;
+        notifyListeners();
+      });
+    }
+  }
+
+  void cancelSubscriptions() {
+    for (final sub in _subscriptions.values) {
+      sub.cancel();
+    }
+    _subscriptions.clear();
+  }
+
+  int countForPet(String petId) {
+    return _notes[petId]?.length ?? 0;
   }
 }

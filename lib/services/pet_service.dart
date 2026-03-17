@@ -77,6 +77,7 @@ class PetService {
 
   static Future<void> addMeasurement(String petId, Measurement m) async {
     await _measurementsRef(petId).add(m.toFirestore());
+    await _syncLatestMeasurement(petId);
   }
 
   static Stream<List<Measurement>> streamMeasurements(String petId) {
@@ -89,6 +90,30 @@ class PetService {
 
   static Future<void> deleteMeasurement(String petId, String measurementId) async {
     await _measurementsRef(petId).doc(measurementId).delete();
+    await _syncLatestMeasurement(petId);
+  }
+
+  static Future<void> _syncLatestMeasurement(String petId) async {
+    final latestSnapshot = await _measurementsRef(petId)
+        .orderBy('recordedAt', descending: true)
+        .limit(1)
+        .get();
+
+    if (latestSnapshot.docs.isEmpty) {
+      await _petsCollection.doc(petId).update({
+        'latestMeasurement': FieldValue.delete(),
+      });
+      return;
+    }
+
+    final latestMeasurement =
+        Measurement.fromFirestore(latestSnapshot.docs.first);
+    await _petsCollection.doc(petId).update({
+      'latestMeasurement': {
+        'bpm': latestMeasurement.bpm,
+        'recordedAt': Timestamp.fromDate(latestMeasurement.recordedAt),
+      },
+    });
   }
 
   // --- Notes subcollection ---

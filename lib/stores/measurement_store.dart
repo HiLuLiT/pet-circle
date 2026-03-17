@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/measurement.dart';
+import 'package:pet_circle/services/pet_service.dart';
 
 final measurementStore = MeasurementStore();
 
 class MeasurementStore extends ChangeNotifier {
   Map<String, List<Measurement>> _measurements = {};
+  final Map<String, StreamSubscription<List<Measurement>>> _subscriptions = {};
 
   void seed(Map<String, List<Measurement>> initial) {
     _measurements = {
@@ -13,29 +17,62 @@ class MeasurementStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Measurement> getMeasurements(String petName) {
-    return List.unmodifiable(_measurements[petName] ?? []);
+  List<Measurement> getMeasurements(String petId) {
+    return List.unmodifiable(_measurements[petId] ?? []);
   }
 
-  Measurement? latestForPet(String petName) {
-    final list = _measurements[petName];
+  Measurement? latestForPet(String petId) {
+    final list = _measurements[petId];
     if (list == null || list.isEmpty) return null;
     return list.first;
   }
 
-  void addMeasurement(String petName, Measurement measurement) {
-    _measurements.putIfAbsent(petName, () => []);
-    _measurements[petName]!.insert(0, measurement);
-    notifyListeners();
+  Future<void> addMeasurement(String petId, Measurement measurement) async {
+    if (kEnableFirebase) {
+      await PetService.addMeasurement(petId, measurement);
+    } else {
+      _measurements.putIfAbsent(petId, () => []);
+      _measurements[petId]!.insert(0, measurement);
+      notifyListeners();
+    }
   }
 
-  void removeMeasurement(String petName, Measurement measurement) {
-    final list = _measurements[petName];
-    if (list == null) return;
-    list.removeWhere((m) =>
-        m.bpm == measurement.bpm &&
-        m.recordedAt.isAtSameMomentAs(measurement.recordedAt));
-    notifyListeners();
+  Future<void> removeMeasurement(String petId, Measurement measurement) async {
+    if (kEnableFirebase && measurement.id != null) {
+      await PetService.deleteMeasurement(petId, measurement.id!);
+    } else {
+      final list = _measurements[petId];
+      if (list == null) return;
+      list.removeWhere((m) =>
+          m.bpm == measurement.bpm &&
+          m.recordedAt.isAtSameMomentAs(measurement.recordedAt));
+      notifyListeners();
+    }
+  }
+
+  void subscribeForPets(List<String> petIds) {
+    final currentIds = _subscriptions.keys.toSet();
+    final newIds = petIds.toSet();
+
+    for (final id in currentIds.difference(newIds)) {
+      _subscriptions[id]?.cancel();
+      _subscriptions.remove(id);
+      _measurements.remove(id);
+    }
+
+    for (final id in newIds.difference(currentIds)) {
+      _subscriptions[id] = PetService.streamMeasurements(id).listen((list) {
+        _measurements[id] = list;
+        notifyListeners();
+      });
+    }
+  }
+
+  void cancelSubscriptions() {
+    for (final sub in _subscriptions.values) {
+      sub.cancel();
+    }
+    _subscriptions.clear();
   }
 
   int get totalCount =>
@@ -50,8 +87,8 @@ class MeasurementStore extends ChangeNotifier {
     return count;
   }
 
-  int countForPet(String petName) {
-    return _measurements[petName]?.length ?? 0;
+  int countForPet(String petId) {
+    return _measurements[petId]?.length ?? 0;
   }
 
   Map<String, List<Measurement>> get all => Map.unmodifiable(_measurements);

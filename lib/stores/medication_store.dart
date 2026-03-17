@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/medication.dart';
+import 'package:pet_circle/services/pet_service.dart';
 
 final medicationStore = MedicationStore();
 
 class MedicationStore extends ChangeNotifier {
   Map<String, List<Medication>> _medications = {};
+  final Map<String, StreamSubscription<List<Medication>>> _subscriptions = {};
 
   void seed(Map<String, List<Medication>> initial) {
     _medications = {
@@ -13,42 +17,85 @@ class MedicationStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Medication> getMedications(String petName) {
-    return List.unmodifiable(_medications[petName] ?? []);
+  List<Medication> getMedications(String petId) {
+    return List.unmodifiable(_medications[petId] ?? []);
   }
 
-  List<Medication> getActiveMedications(String petName) {
+  List<Medication> getActiveMedications(String petId) {
     return List.unmodifiable(
-      (_medications[petName] ?? []).where((m) => m.isActive).toList(),
+      (_medications[petId] ?? []).where((m) => m.isActive).toList(),
     );
   }
 
-  void addMedication(String petName, Medication medication) {
-    _medications.putIfAbsent(petName, () => []);
-    _medications[petName]!.add(medication);
-    notifyListeners();
+  Future<void> addMedication(String petId, Medication medication) async {
+    if (kEnableFirebase) {
+      await PetService.addMedication(petId, medication);
+    } else {
+      _medications.putIfAbsent(petId, () => []);
+      _medications[petId]!.add(medication);
+      notifyListeners();
+    }
   }
 
-  void removeMedication(String petName, String medicationId) {
-    _medications[petName]?.removeWhere((m) => m.id == medicationId);
-    notifyListeners();
+  Future<void> removeMedication(String petId, String medicationId) async {
+    if (kEnableFirebase) {
+      await PetService.deleteMedication(petId, medicationId);
+    } else {
+      _medications[petId]?.removeWhere((m) => m.id == medicationId);
+      notifyListeners();
+    }
   }
 
-  void updateMedication(String petName, String medicationId, Medication updated) {
-    final list = _medications[petName];
+  Future<void> updateMedication(String petId, String medicationId, Medication updated) async {
+    if (kEnableFirebase) {
+      await PetService.updateMedication(petId, medicationId, updated.toFirestore());
+    } else {
+      final list = _medications[petId];
+      if (list == null) return;
+      final idx = list.indexWhere((m) => m.id == medicationId);
+      if (idx == -1) return;
+      list[idx] = updated;
+      notifyListeners();
+    }
+  }
+
+  Future<void> toggleMedication(String petId, String medicationId) async {
+    final list = _medications[petId];
     if (list == null) return;
     final idx = list.indexWhere((m) => m.id == medicationId);
     if (idx == -1) return;
-    list[idx] = updated;
-    notifyListeners();
+    final toggled = list[idx].copyWith(isActive: !list[idx].isActive);
+
+    if (kEnableFirebase) {
+      await PetService.updateMedication(petId, medicationId, {'isActive': toggled.isActive});
+    } else {
+      list[idx] = toggled;
+      notifyListeners();
+    }
   }
 
-  void toggleMedication(String petName, String medicationId) {
-    final list = _medications[petName];
-    if (list == null) return;
-    final idx = list.indexWhere((m) => m.id == medicationId);
-    if (idx == -1) return;
-    list[idx] = list[idx].copyWith(isActive: !list[idx].isActive);
-    notifyListeners();
+  void subscribeForPets(List<String> petIds) {
+    final currentIds = _subscriptions.keys.toSet();
+    final newIds = petIds.toSet();
+
+    for (final id in currentIds.difference(newIds)) {
+      _subscriptions[id]?.cancel();
+      _subscriptions.remove(id);
+      _medications.remove(id);
+    }
+
+    for (final id in newIds.difference(currentIds)) {
+      _subscriptions[id] = PetService.streamMedications(id).listen((list) {
+        _medications[id] = list;
+        notifyListeners();
+      });
+    }
+  }
+
+  void cancelSubscriptions() {
+    for (final sub in _subscriptions.values) {
+      sub.cancel();
+    }
+    _subscriptions.clear();
   }
 }

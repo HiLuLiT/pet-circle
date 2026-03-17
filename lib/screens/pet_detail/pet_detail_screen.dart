@@ -7,6 +7,7 @@ import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
+import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/breed_search_field.dart';
@@ -100,7 +101,9 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                     ),
                     const SizedBox(width: 8),
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
+                        final navigator = Navigator.of(ctx);
+                        final messenger = ScaffoldMessenger.of(context);
                         final updated = _pet.copyWith(
                           name: nameCtrl.text.isNotEmpty ? nameCtrl.text : _pet.name,
                           breedAndAge: selectedBreed.isNotEmpty
@@ -110,10 +113,11 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                               ? imageCtrl.text
                               : _pet.imageUrl,
                         );
-                        petStore.updatePet(_pet.name, updated);
+                        await petStore.updatePetWithFirestore(updated);
+                        if (!mounted) return;
                         setState(() => _pet = updated);
-                        Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        navigator.pop();
+                        messenger.showSnackBar(
                           SnackBar(content: Text(l10n.petUpdated)),
                         );
                       },
@@ -130,21 +134,25 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     );
   }
 
-  void _addNote() {
+  Future<void> _addNote() async {
     final access = petStore.accessForPet(_pet);
     if (!access.canAddNotes || _noteController.text.trim().isEmpty) return;
 
+    final petId = _pet.id;
+    if (petId == null || petId.isEmpty) return;
     final user = userStore.currentUser;
-    noteStore.addNote(
-      _pet.name,
+    await noteStore.addNote(
+      petId,
       ClinicalNote(
         id: 'note-${DateTime.now().millisecondsSinceEpoch}',
+        authorUid: userStore.currentUserUid,
         authorName: user?.name ?? 'Unknown',
         authorAvatarUrl: user?.avatarUrl ?? '',
         content: _noteController.text.trim(),
         createdAt: DateTime.now(),
       ),
     );
+    if (!mounted) return;
     _noteController.clear();
 
     final l10n = AppLocalizations.of(context)!;
@@ -261,6 +269,9 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   Widget _buildInfoSection() {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
+    final latestFromStore = measurementStore.latestForPet(_pet.id ?? '');
+    final latest = latestFromStore ?? _pet.latestMeasurement;
+    final hasMeasurement = latest.bpm > 0;
     return NeumorphicCard(
       radius: const BorderRadius.all(AppRadii.medium),
       padding: const EdgeInsets.all(20),
@@ -278,7 +289,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 child: _InfoTile(
                   icon: Icons.favorite,
                   iconColor: c.pink,
-                  value: '${_pet.latestMeasurement.bpm}',
+                  value: hasMeasurement ? '${latest.bpm}' : '--',
                   label: l10n.bpm,
                 ),
               ),
@@ -287,7 +298,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 child: _InfoTile(
                   icon: Icons.access_time,
                   iconColor: c.lightBlue,
-                  value: _pet.latestMeasurement.timeAgo,
+                  value: hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
                   label: l10n.lastMeasured,
                 ),
               ),
@@ -301,10 +312,10 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   Widget _buildMeasurementHistory() {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
-    final storeMeasurements = measurementStore.getMeasurements(_pet.name);
-    final measurements = storeMeasurements.isNotEmpty
+    final storeMeasurements = measurementStore.getMeasurements(_pet.id ?? '');
+    final List<Measurement> measurements = storeMeasurements.isNotEmpty
         ? storeMeasurements
-        : [_pet.latestMeasurement];
+        : (_pet.latestMeasurement.bpm > 0 ? [_pet.latestMeasurement] : <Measurement>[]);
 
     return NeumorphicCard(
       radius: const BorderRadius.all(AppRadii.medium),
@@ -402,7 +413,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     final access = petStore.accessForPet(_pet);
-    final notes = noteStore.getNotes(_pet.name);
+    final notes = noteStore.getNotes(_pet.id ?? '');
     return NeumorphicCard(
       radius: const BorderRadius.all(AppRadii.medium),
       padding: const EdgeInsets.all(20),

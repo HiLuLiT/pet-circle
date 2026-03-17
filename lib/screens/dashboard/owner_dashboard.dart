@@ -245,8 +245,9 @@ class _PetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final latestFromStore = measurementStore.latestForPet(data.name);
+    final latestFromStore = measurementStore.latestForPet(data.id ?? '');
     final latest = latestFromStore ?? data.latestMeasurement;
+    final hasMeasurement = latest.bpm > 0;
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
@@ -339,7 +340,7 @@ class _PetCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                '${latest.bpm}',
+                                hasMeasurement ? '${latest.bpm}' : '--',
                                 style: AppTextStyles.heading2.copyWith(
                                   color: c.chocolate,
                                   fontSize: 24,
@@ -358,7 +359,7 @@ class _PetCard extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        latest.timeAgo,
+                        hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
                         style: AppTextStyles.caption.copyWith(
                           color: c.chocolate,
                           fontSize: 12,

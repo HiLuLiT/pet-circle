@@ -3,18 +3,13 @@ import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:pet_circle/screens/messages/messages_screen.dart' show NotificationsDrawer;
-import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
-import 'package:pet_circle/widgets/round_icon_button.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 
 class CareCircleDashboard extends StatelessWidget {
@@ -22,67 +17,74 @@ class CareCircleDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    final pets = petStore.allClinicPets;
-    final l10n = AppLocalizations.of(context)!;
+    return ListenableBuilder(
+      listenable: Listenable.merge([petStore, measurementStore]),
+      builder: (context, _) {
+        final c = AppColorsTheme.of(context);
+        final pets = petStore.allClinicPets;
+        final l10n = AppLocalizations.of(context)!;
 
-    return Container(
-      color: c.white,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _ResponsiveGrid(
-                  maxCrossAxisCount: 3,
-                  minItemWidth: 280,
-                  children: pets
-                      .map(
-                        (pet) => _PetCard(
-                          data: pet,
-                          onTap: () => Navigator.of(context).pushNamed(
-                            AppRoutes.mainShell,
-                            arguments: {
-                              'role': userStore.role,
-                              'initialIndex': 2,
-                            },
-                          ),
-                        ),
-                      )
-                      .toList(),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                _ResponsiveGrid(
-                  maxCrossAxisCount: 3,
-                  minItemWidth: 280,
-                  childAspectRatio: 3.3,
+        return Container(
+          color: c.white,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    _SummaryCard(
-                      iconColor: c.lightBlue.withValues(alpha: 0.15),
-                      iconUrl: AppAssets.statusOkIcon,
-                      value: '${pets.where((p) => p.statusLabel == 'Normal').length}',
-                      label: l10n.normalStatus,
+                    _ResponsiveGrid(
+                      maxCrossAxisCount: 3,
+                      minItemWidth: 280,
+                      children: pets
+                          .map(
+                            (pet) => _PetCard(
+                              data: pet,
+                              onTap: () => Navigator.of(context).pushNamed(
+                                AppRoutes.mainShell,
+                                arguments: {
+                                  'role': userStore.role,
+                                  'initialIndex': 2,
+                                },
+                              ),
+                            ),
+                          )
+                          .toList(),
                     ),
-                    _SummaryCard(
-                      iconColor: c.cherry.withValues(alpha: 0.15),
-                      iconUrl: AppAssets.attentionIcon,
-                      value: '${pets.where((p) => p.statusLabel != 'Normal').length}',
-                      label: l10n.needAttention,
-                    ),
-                    _SummaryCard(
-                      iconColor: c.lightBlue.withValues(alpha: 0.1),
-                      iconUrl: AppAssets.chartIcon,
-                      value: '${measurementStore.thisWeekCount}',
-                      label: l10n.measurementsThisWeek,
+                    const SizedBox(height: AppSpacing.lg),
+                    _ResponsiveGrid(
+                      maxCrossAxisCount: 3,
+                      minItemWidth: 280,
+                      childAspectRatio: 3.3,
+                      children: [
+                        _SummaryCard(
+                          iconColor: c.lightBlue.withValues(alpha: 0.15),
+                          iconUrl: AppAssets.statusOkIcon,
+                          value:
+                              '${pets.where((p) => p.statusLabel == 'Normal').length}',
+                          label: l10n.normalStatus,
+                        ),
+                        _SummaryCard(
+                          iconColor: c.cherry.withValues(alpha: 0.15),
+                          iconUrl: AppAssets.attentionIcon,
+                          value:
+                              '${pets.where((p) => p.statusLabel != 'Normal').length}',
+                          label: l10n.needAttention,
+                        ),
+                        _SummaryCard(
+                          iconColor: c.lightBlue.withValues(alpha: 0.1),
+                          iconUrl: AppAssets.chartIcon,
+                          value: '${measurementStore.thisWeekCount}',
+                          label: l10n.measurementsThisWeek,
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -97,6 +99,9 @@ class _PetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final latestFromStore = measurementStore.latestForPet(data.id ?? '');
+    final latest = latestFromStore ?? data.latestMeasurement;
+    final hasMeasurement = latest.bpm > 0;
     return GestureDetector(
       onTap: onTap,
       child: NeumorphicCard(
@@ -156,7 +161,7 @@ class _PetCard extends StatelessWidget {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${data.latestMeasurement.bpm}',
+                            Text(hasMeasurement ? '${latest.bpm}' : '--',
                                 style: AppTextStyles.heading3
                                     .copyWith(color: c.chocolate)),
                             Text(l10n.bpm, style: AppTextStyles.caption),
@@ -164,7 +169,7 @@ class _PetCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Text(data.latestMeasurement.timeAgo,
+                    Text(hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
                         style: AppTextStyles.caption),
                   ],
                 ),

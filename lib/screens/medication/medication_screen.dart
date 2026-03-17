@@ -30,8 +30,8 @@ class _MedicationScreenState extends State<MedicationScreen> {
   void _exportMedicationLog() {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
-    final petName = petStore.activePet?.name ?? l10n.petName;
-    final meds = medicationStore.getMedications(petName);
+    final petId = petStore.activePet?.id ?? '';
+    final meds = medicationStore.getMedications(petId);
     final csvLines = meds.map((m) {
       final start = '${m.startDate.year}-${m.startDate.month.toString().padLeft(2, '0')}-${m.startDate.day.toString().padLeft(2, '0')}';
       final status = m.isActive ? l10n.ongoing : l10n.completed;
@@ -93,8 +93,9 @@ class _MedicationScreenState extends State<MedicationScreen> {
       builder: (context, _) {
         final l10n = AppLocalizations.of(context)!;
         final access = petStore.accessForActivePet();
+        final petId = petStore.activePet?.id ?? '';
         final petName = petStore.activePet?.name ?? l10n.petName;
-        final count = medicationStore.getActiveMedications(petName).length;
+        final count = medicationStore.getActiveMedications(petId).length;
         return SafeArea(
           child: SingleChildScrollView(
             child: Padding(
@@ -207,8 +208,9 @@ class _ActiveMedicationsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final petId = petStore.activePet?.id ?? '';
     final petName = petStore.activePet?.name ?? l10n.petName;
-    final meds = medicationStore.getMedications(petName);
+    final meds = medicationStore.getMedications(petId);
 
     if (meds.isEmpty) {
       return _SectionCard(
@@ -432,16 +434,17 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                     ),
                     const SizedBox(width: 8),
                     TextButton(
-                      onPressed: () {
+                      onPressed: () async {
                         final access = petStore.accessForActivePet();
                         if (!access.canManageMedication) return;
-                        final petName = petStore.activePet?.name ?? 'Pet';
+                        final petId = petStore.activePet?.id ?? '';
+                        if (petId.isEmpty) return;
                         final name = _nameController.text.isNotEmpty ? _nameController.text : l10n.newMedication;
                         final dosage = _dosageController.text;
 
                         if (_isEditing) {
-                          medicationStore.updateMedication(
-                            petName,
+                          await medicationStore.updateMedication(
+                            petId,
                             widget.medication!.id,
                             widget.medication!.copyWith(
                               name: name,
@@ -450,8 +453,8 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                             ),
                           );
                         } else {
-                          medicationStore.addMedication(
-                            petName,
+                          await medicationStore.addMedication(
+                            petId,
                             Medication(
                               id: 'med-${DateTime.now().millisecondsSinceEpoch}',
                               name: name,
@@ -461,6 +464,7 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
                             ),
                           );
                         }
+                        if (!context.mounted) return;
                         Navigator.of(context).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text(_isEditing ? l10n.medicationUpdated : l10n.medicationAdded)),

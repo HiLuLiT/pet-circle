@@ -6,7 +6,7 @@ alwaysApply: false
 
 # Pet Circle -- User Story Map
 
-Last updated: 2026-03-07 (Phase 2 in progress -- Firebase Auth + Firestore + Dual-Layer Roles)
+Last updated: 2026-03-17 (Phase 2 in progress -- Firebase Auth + Firestore pets + Firestore subcollections)
 
 ## Update Protocol
 
@@ -54,12 +54,12 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - B7: Quick-action Measure / Trends buttons per pet
 - B8: Manual tap-to-count with haptics and BPM calculation
 - B9: Configurable timer durations (15s / 30s / 60s)
-- B10: "Add to Graph" saves measurement for active pet via `measurementStore`
+- B10: "Add to Graph" saves measurement for active pet via `measurementStore` + Firestore subcollection
 - B11: Unified health trends -- single scrollable view with stats, chart, history
 - B12: Trends time-range filtering -- period dropdown filters chart + stats
-- B13: Medication add/edit wired to `medicationStore`
+- B13: Medication add/edit wired to `medicationStore` + Firestore subcollection
 - B14: Export measurement data -- CSV preview dialog
-- B15: Pet detail reads from `noteStore` and `measurementStore`
+- B15: Pet detail reads from Firestore-backed `noteStore` and `measurementStore`
 - B16: "View Graph" navigates to trends tab
 - B17: Notifications from `notificationStore` with tap-to-mark-read
 - B18: Dark mode toggle
@@ -70,7 +70,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - B23: Share with vet dialog from settings
 - B24: Push / emergency notification toggles wired to `settingsStore`
 - M1: "Add Pet" button on owner dashboard navigates to onboarding
-- M2: Edit pet profile -- admin-only, bottom sheet with searchable breed dropdown
+- M2: Edit pet profile -- admin-only, bottom sheet with searchable breed dropdown + Firestore persistence
 - M3: Delete pet -- admin-only, long-press on pet card with confirmation
 - M5: Global pet switcher in header -- `petStore.activePetIndex` shared across all screens
 - M6: User profile management -- edit name/photo from settings
@@ -98,7 +98,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - C1: Clinic overview dashboard from stores with real stats
 - C2: Summary stats from stores
 - C3: Patient card tap navigates to pet detail
-- C4: Clinical notes persisted via `noteStore`
+- C4: Clinical notes persisted via `noteStore` + Firestore subcollection
 - C5: Vet SRR trends -- data-driven chart
 - C6: Notifications from `notificationStore`
 
@@ -121,15 +121,17 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - Firestore user profiles via `UserService`
 - Firestore pet persistence via `PetService` (create, delete, care circle management)
 - `PetStore` streams pets from Firestore via `subscribeForUser(uid)`
+- Measurements, notes, and medications stream from Firestore subcollections
+- Pet edit persistence via `PetService.updatePet()`
+- Parent `Pet.latestMeasurement` stays in sync with measurement subcollection writes
 - Dual-layer role architecture (App-Level: vet/owner + Care Circle: admin/member/viewer)
 - Invitation flow with deep link acceptance
 - Permission enforcement across all screens
 
 ### Remaining in Phase 2
-- Wire subcollection operations to Firestore (measurements, notes, medications)
-- Wire `PetStore.updatePet()` to `PetService.updatePet()`
+- Persist `settingsStore` data per user in Firestore
+- Persist `notificationStore` data in Firestore
 - Push notifications via FCM
-- Real-time sync for measurements/notes/medications across care circle members
 - Production Firestore security rules
 
 ## Status: FUTURE (Phase 3-5)
