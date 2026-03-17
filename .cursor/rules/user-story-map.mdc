@@ -132,7 +132,8 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 
 ### Remaining in Phase 2
 - Push notifications via FCM
-- Production Firestore security rules
+- Deploy repo-managed Firestore security rules
+- Harden invitation acceptance so strict rules do not need a self-join exception
 
 ## Status: FUTURE (Phase 3-5)
 

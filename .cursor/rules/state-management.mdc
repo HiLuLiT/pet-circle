@@ -192,8 +192,11 @@ All data-driven screens (trends, measurement, medication) should read from `petS
 - `InvitationService`: Creates/accepts invitations in `/invitations` collection.
 - `NotificationService`: Firestore CRUD for `/users/{uid}/notifications`.
 - `DeepLinkService`: Handles `petcircle://invite?token=XYZ` deep links.
+- Repo-managed Firestore rules now live in `firestore.rules` and are wired via `firebase.json`.
 
 ### What's NOT yet wired to Firestore (local store only)
+- Firestore rules are not deployed yet; Firebase may still be running in test mode
+- Invitation acceptance still needs a stricter server-verified path to remove the current self-join rules exception
 
 ### Services
 

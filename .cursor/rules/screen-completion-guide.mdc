@@ -71,7 +71,7 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 | Item | Details |
 |------|---------|
 | Push notifications | FCM not yet integrated |
-| Firestore security rules | Currently in test mode (allow all) |
+| Firestore security rules | Repo-managed `firestore.rules` and `firebase.json` are now added, but the rules still need to be deployed to Firebase. Current rules also keep a narrow self-join exception for client-side invitation acceptance until that flow is hardened |
 
 ### Polish (Optional)
 | Item | Details |
@@ -117,7 +117,7 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 - [x] Settings/preferences persisted to Firestore
 - [x] In-app notifications persisted to Firestore
 - [ ] Push notifications (FCM)
-- [ ] Production Firestore security rules
+- [ ] Production Firestore security rules deployed
 
 ## Phase 1 Completion Checklist
 

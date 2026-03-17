@@ -328,6 +328,24 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-019: Invitation acceptance still requires a self-join exception in Firestore rules
+
+**Found during:** Firestore security rules design
+**Severity:** High (security hardening gap)
+**Status:** Known limitation
+
+**Symptom:** Strict Firestore rules cannot fully validate invitation acceptance, because the app currently accepts invitations client-side by reading an invitation document and then directly updating the pet's `careCircle` / `memberUids` fields.
+
+**Root cause:** Firestore rules for `/pets/{petId}` can see the pet document being updated, but they cannot validate an arbitrary invitation token unless the pet update itself carries trusted invitation state. The current data model stores invitations in `/invitations/{token}` and performs acceptance purely from the client, so production rules need a narrow self-join exception to keep the current flow working.
+
+**Fix:** Partially mitigated by adding repo-managed `firestore.rules` with a constrained self-join path. Still needs a stronger acceptance design, such as a trusted backend step (Cloud Function) or pet-side pending-invite state that rules can verify directly.
+
+**Files changed:**
+- `firestore.rules`
+- `lib/services/invitation_service.dart`
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

@@ -1,0 +1,185 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function petPath(petId) {
+      return /databases/$(database)/documents/pets/$(petId);
+    }
+
+    function petExists(petId) {
+      return exists(petPath(petId));
+    }
+
+    function petData(petId) {
+      return get(petPath(petId)).data;
+    }
+
+    function isPetMemberData(data) {
+      return signedIn() &&
+          (data.ownerId == request.auth.uid ||
+              request.auth.uid in data.memberUids);
+    }
+
+    function isPetAdminData(data) {
+      return signedIn() &&
+          (data.ownerId == request.auth.uid ||
+              (data.careCircle[request.auth.uid] != null &&
+                  data.careCircle[request.auth.uid].role == 'admin'));
+    }
+
+    function canManagePetHealthData(data) {
+      return signedIn() &&
+          (isPetAdminData(data) ||
+              (data.careCircle[request.auth.uid] != null &&
+                  data.careCircle[request.auth.uid].role == 'member'));
+    }
+
+    function isPetMember(petId) {
+      return petExists(petId) && isPetMemberData(petData(petId));
+    }
+
+    function isPetAdmin(petId) {
+      return petExists(petId) && isPetAdminData(petData(petId));
+    }
+
+    function canManagePetHealthDataFor(petId) {
+      return petExists(petId) && canManagePetHealthData(petData(petId));
+    }
+
+    function canCreatePet() {
+      return signedIn() &&
+          request.resource.data.ownerId == request.auth.uid &&
+          request.resource.data.careCircle[request.auth.uid] != null &&
+          request.resource.data.careCircle[request.auth.uid].role == 'admin' &&
+          request.auth.uid in request.resource.data.memberUids;
+    }
+
+    function canAdminUpdatePet() {
+      return isPetAdminData(resource.data) &&
+          request.resource.data.ownerId == resource.data.ownerId;
+    }
+
+    function canUpdateLatestMeasurementOnly() {
+      return canManagePetHealthData(resource.data) &&
+          request.resource.data.ownerId == resource.data.ownerId &&
+          request.resource.data
+              .diff(resource.data)
+              .affectedKeys()
+              .hasOnly(['latestMeasurement']);
+    }
+
+    function canSelfJoinPet() {
+      return signedIn() &&
+          !isPetMemberData(resource.data) &&
+          request.resource.data.ownerId == resource.data.ownerId &&
+          request.resource.data
+              .diff(resource.data)
+              .affectedKeys()
+              .hasOnly(['careCircle', 'memberUids']) &&
+          !(request.auth.uid in resource.data.memberUids) &&
+          request.auth.uid in request.resource.data.memberUids &&
+          request.resource.data.memberUids.size() ==
+              resource.data.memberUids.size() + 1 &&
+          request.resource.data.careCircle[request.auth.uid] != null &&
+          (
+              request.resource.data.careCircle[request.auth.uid].role ==
+                  'admin' ||
+              request.resource.data.careCircle[request.auth.uid].role ==
+                  'member' ||
+              request.resource.data.careCircle[request.auth.uid].role ==
+                  'viewer') &&
+          (
+              request.resource.data.careCircle[request.auth.uid].name ==
+                  request.auth.token.email ||
+              request.resource.data.careCircle[request.auth.uid].name ==
+                  request.auth.token.name);
+    }
+
+    function canReadInvitation() {
+      return signedIn() &&
+          (resource.data.invitedByUid == request.auth.uid ||
+              resource.data.invitedEmail == request.auth.token.email ||
+              isPetAdmin(resource.data.petId));
+    }
+
+    function canCreateInvitation() {
+      return signedIn() &&
+          request.resource.data.invitedByUid == request.auth.uid &&
+          isPetAdmin(request.resource.data.petId);
+    }
+
+    function canCancelInvitation() {
+      return signedIn() &&
+          resource.data.invitedByUid == request.auth.uid &&
+          request.resource.data
+              .diff(resource.data)
+              .affectedKeys()
+              .hasOnly(['status']) &&
+          request.resource.data.status == 'cancelled';
+    }
+
+    function canAcceptInvitation() {
+      return signedIn() &&
+          resource.data.invitedEmail == request.auth.token.email &&
+          request.resource.data
+              .diff(resource.data)
+              .affectedKeys()
+              .hasOnly(['status']) &&
+          request.resource.data.status == 'accepted';
+    }
+
+    match /users/{userId} {
+      allow create: if isSelf(userId);
+      allow read, update, delete: if isSelf(userId);
+
+      match /notifications/{notificationId} {
+        allow read, create, update, delete: if isSelf(userId);
+      }
+    }
+
+    match /pets/{petId} {
+      allow create: if canCreatePet();
+      allow read: if isPetMemberData(resource.data);
+      allow update: if canAdminUpdatePet() ||
+          canUpdateLatestMeasurementOnly() ||
+          canSelfJoinPet();
+      allow delete: if isPetAdminData(resource.data);
+
+      match /measurements/{measurementId} {
+        allow read: if isPetMember(petId);
+        allow create, delete: if canManagePetHealthDataFor(petId);
+        allow update: if false;
+      }
+
+      match /notes/{noteId} {
+        allow read: if isPetMember(petId);
+        allow create: if isPetMember(petId);
+        allow update, delete: if false;
+      }
+
+      match /medications/{medicationId} {
+        allow read: if isPetMember(petId);
+        allow create, update, delete: if canManagePetHealthDataFor(petId);
+      }
+    }
+
+    match /invitations/{token} {
+      allow create: if canCreateInvitation();
+      allow read: if canReadInvitation();
+      allow update: if canCancelInvitation() || canAcceptInvitation();
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
