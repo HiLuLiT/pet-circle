@@ -334,5 +334,15 @@
   "invitationAlreadyUsed": "כבר נעשה שימוש בהזמנה הזו.",
   "invitationNotAuthorized": "ההזמנה הזו נשלחה לכתובת אימייל אחרת.",
   "invitationNoLongerValid": "ההזמנה הזו כבר לא תקפה עבור חיית המחמד הזו.",
-  "invitationAcceptFailed": "לא הצלחנו לאשר את ההזמנה כרגע. אפשר לנסות שוב."
+  "invitationAcceptFailed": "לא הצלחנו לאשר את ההזמנה כרגע. אפשר לנסות שוב.",
+
+  "fieldRequired": "שדה חובה",
+  "dateFormatHint": "YYYY-MM-DD",
+  "endDateBeforeStartDate": "תאריך הסיום חייב להיות אחרי תאריך ההתחלה",
+  "clinicalRecordDisclaimer": "נתוני התרופות מאוחסנים באופן מקומי ונכללים בדוחות קליניים מיוצאים. יש להתייעץ תמיד עם הווטרינר שלך לפני התחלה, הפסקה או שינוי של משטר תרופות כלשהו. כלי זה מיועד למעקב בלבד ואינו מחליף ייעוץ וטרינרי מקצועי.",
+  "medicationReminderTitle": "תרופה: {name}",
+  "@medicationReminderTitle": { "placeholders": { "name": { "type": "String" } } },
+  "medicationReminderBody": "{dosage} — {frequency}",
+  "@medicationReminderBody": { "placeholders": { "dosage": { "type": "String" }, "frequency": { "type": "String" } } },
+  "shareMedicationLog": "שיתוף יומן תרופות"
 }

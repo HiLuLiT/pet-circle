@@ -31,6 +31,7 @@ import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
+import 'package:pet_circle/services/reminder_service.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 // Set to true when Firebase is fully configured
@@ -52,6 +53,8 @@ void main() async {
     authProvider.init();
     await deepLinkService.init();
   }
+
+  await ReminderService.instance.init();
 
   if (!kEnableFirebase) {
     _seedMockStores();

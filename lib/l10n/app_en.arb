@@ -334,5 +334,15 @@
   "invitationAlreadyUsed": "This invitation has already been used.",
   "invitationNotAuthorized": "This invitation was sent to a different email address.",
   "invitationNoLongerValid": "This invitation is no longer valid for this pet.",
-  "invitationAcceptFailed": "We couldn't accept this invitation right now. Please try again."
+  "invitationAcceptFailed": "We couldn't accept this invitation right now. Please try again.",
+
+  "fieldRequired": "This field is required",
+  "dateFormatHint": "YYYY-MM-DD",
+  "endDateBeforeStartDate": "End date must be after start date",
+  "clinicalRecordDisclaimer": "Medication data is stored locally and included in exported clinical reports. Always consult with your veterinarian before starting, stopping, or modifying any medication regimen. This tool is for tracking purposes only and does not replace professional veterinary advice.",
+  "medicationReminderTitle": "Medication Due: {name}",
+  "@medicationReminderTitle": { "placeholders": { "name": { "type": "String" } } },
+  "medicationReminderBody": "{dosage} — {frequency}",
+  "@medicationReminderBody": { "placeholders": { "dosage": { "type": "String" }, "frequency": { "type": "String" } } },
+  "shareMedicationLog": "Share Medication Log"
 }

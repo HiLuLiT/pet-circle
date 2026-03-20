@@ -51,6 +51,12 @@ dependencies:
   syncfusion_flutter_charts: ^32.1.24
   app_links: ^6.3.3
 
+  # Notifications & export
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.0
+  share_plus: ^10.1.4
+  path_provider: ^2.1.5
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

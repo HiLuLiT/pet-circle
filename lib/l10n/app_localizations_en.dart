@@ -986,4 +986,30 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get invitationAcceptFailed =>
       'We couldn\'t accept this invitation right now. Please try again.';
+
+  @override
+  String get fieldRequired => 'This field is required';
+
+  @override
+  String get dateFormatHint => 'YYYY-MM-DD';
+
+  @override
+  String get endDateBeforeStartDate => 'End date must be after start date';
+
+  @override
+  String get clinicalRecordDisclaimer =>
+      'Medication data is stored locally and included in exported clinical reports. Always consult with your veterinarian before starting, stopping, or modifying any medication regimen. This tool is for tracking purposes only and does not replace professional veterinary advice.';
+
+  @override
+  String medicationReminderTitle(String name) {
+    return 'Medication Due: $name';
+  }
+
+  @override
+  String medicationReminderBody(String dosage, String frequency) {
+    return '$dosage — $frequency';
+  }
+
+  @override
+  String get shareMedicationLog => 'Share Medication Log';
 }

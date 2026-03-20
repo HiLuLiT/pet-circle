@@ -349,6 +349,77 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-020: Medication form only saves name, dosage, and frequency — other fields ignored
+
+**Found during:** Manual testing — adding a medication with all fields filled
+**Severity:** High (data loss — user input silently discarded)
+**Status:** Fixed
+
+**Symptom:** When filling out the Add Medication form (start date, end date, prescribed by, purpose/condition, additional notes, and reminders toggle), only medication name, dosage, and frequency were saved. All other fields were silently discarded. Start date was always hardcoded to `DateTime.now()` regardless of user input.
+
+**Root cause:** Three compounding issues:
+1. The `Medication` model only had 5 fields (`name`, `dosage`, `frequency`, `startDate`, `isActive`), missing `endDate`, `prescribedBy`, `purpose`, `notes`, and `remindersEnabled`.
+2. The `_AddMedicationSheet` only created `TextEditingController`s for `name` and `dosage`. The start/end date, prescribed by, purpose, and notes fields had no controllers and were purely visual.
+3. The save handler only read `_nameController.text`, `_dosageController.text`, and `_frequency`, ignoring all other form input.
+
+**Fix:**
+- Expanded `Medication` model with 5 new fields: `endDate` (`DateTime?`), `prescribedBy` (`String?`), `purpose` (`String?`), `notes` (`String?`), and `remindersEnabled` (`bool`). Updated `toFirestore()`, `fromFirestore()`, and `copyWith()`.
+- Added `TextEditingController`s for all form fields. Replaced free-text date fields with date-picker-backed read-only fields (`showDatePicker`).
+- Replaced `TextField` with `TextFormField` and added a `Form` with `GlobalKey<FormState>` for validation (required fields: name, dosage, start date).
+- Updated the save handler to include all fields when creating or editing a medication.
+
+**Files changed:**
+- `lib/models/medication.dart`
+- `lib/screens/medication/medication_screen.dart`
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_he.arb`
+
+---
+
+## BUG-021: Medication export is a UI placeholder — does not actually download a file
+
+**Found during:** Manual testing — tapping "Download CSV" in Export Medication Log dialog
+**Severity:** High (feature does not work as advertised)
+**Status:** Fixed
+
+**Symptom:** Tapping "Download CSV" in the export dialog only closes the dialog and shows a success snackbar. No file is actually saved or shared.
+
+**Root cause:** `_exportMedicationLog()` built a CSV string and displayed it in an `AlertDialog` preview, but the "Download CSV" button handler only called `Navigator.pop()` + showed a snackbar. No file I/O or share sheet invocation existed.
+
+**Fix:** Added `share_plus` and `path_provider` dependencies. The "Download CSV" button now writes the CSV to a temporary file via `path_provider`, then invokes the native OS share sheet via `SharePlus.instance.share()` (iOS: `UIActivityViewController`, Android: `ACTION_SEND` intent). Also expanded the CSV to include all new medication fields (end date, prescribed by, purpose, notes).
+
+**Files changed:**
+- `lib/screens/medication/medication_screen.dart`
+- `pubspec.yaml`
+
+---
+
+## BUG-022: Medication reminders toggle is UI-only — no native notifications scheduled
+
+**Found during:** Manual testing — enabling medication reminders and checking device notifications
+**Severity:** High (feature does not work as advertised)
+**Status:** Fixed
+
+**Symptom:** Toggling "Medication Reminders" on in the Add Medication sheet has no effect. No native device notifications are scheduled. The toggle only controls a local boolean state that is discarded on save.
+
+**Root cause:** The `_remindersEnabled` state variable existed in the sheet widget but was never persisted to the `Medication` model (which lacked the field) and no notification scheduling service existed.
+
+**Fix:** Added `flutter_local_notifications` and `timezone` dependencies. Created `ReminderService` (`lib/services/reminder_service.dart`) with platform-native notification scheduling (iOS: `UNUserNotificationCenter`, Android: `NotificationManager`). Reminders are scheduled as daily recurring notifications at 9:00 AM (once daily) or 9:00 AM + 9:00 PM (twice daily). The `remindersEnabled` field is now persisted on the `Medication` model and drives scheduling/cancellation in the save flow. Configured iOS `Info.plist` and Android `AndroidManifest.xml` with required notification permissions and boot receivers.
+
+**Files changed:**
+- `lib/services/reminder_service.dart` (new)
+- `lib/models/medication.dart`
+- `lib/screens/medication/medication_screen.dart`
+- `lib/stores/medication_store.dart`
+- `lib/main.dart`
+- `pubspec.yaml`
+- `ios/Runner/Info.plist`
+- `android/app/src/main/AndroidManifest.xml`
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_he.arb`
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

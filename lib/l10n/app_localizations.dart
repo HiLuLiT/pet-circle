@@ -1909,6 +1909,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We couldn\'t accept this invitation right now. Please try again.'**
   String get invitationAcceptFailed;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get fieldRequired;
+
+  /// No description provided for @dateFormatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'YYYY-MM-DD'**
+  String get dateFormatHint;
+
+  /// No description provided for @endDateBeforeStartDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End date must be after start date'**
+  String get endDateBeforeStartDate;
+
+  /// No description provided for @clinicalRecordDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication data is stored locally and included in exported clinical reports. Always consult with your veterinarian before starting, stopping, or modifying any medication regimen. This tool is for tracking purposes only and does not replace professional veterinary advice.'**
+  String get clinicalRecordDisclaimer;
+
+  /// No description provided for @medicationReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Due: {name}'**
+  String medicationReminderTitle(String name);
+
+  /// No description provided for @medicationReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{dosage} — {frequency}'**
+  String medicationReminderBody(String dosage, String frequency);
+
+  /// No description provided for @shareMedicationLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Medication Log'**
+  String get shareMedicationLog;
 }
 
 class _AppLocalizationsDelegate

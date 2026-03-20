@@ -7,6 +7,11 @@ class Medication {
     required this.dosage,
     required this.frequency,
     required this.startDate,
+    this.endDate,
+    this.prescribedBy,
+    this.purpose,
+    this.notes,
+    this.remindersEnabled = false,
     this.isActive = true,
   });
 
@@ -15,6 +20,11 @@ class Medication {
   final String dosage;
   final String frequency;
   final DateTime startDate;
+  final DateTime? endDate;
+  final String? prescribedBy;
+  final String? purpose;
+  final String? notes;
+  final bool remindersEnabled;
   final bool isActive;
 
   Map<String, dynamic> toFirestore() {
@@ -23,6 +33,12 @@ class Medication {
       'dosage': dosage,
       'frequency': frequency,
       'startDate': Timestamp.fromDate(startDate),
+      if (endDate != null) 'endDate': Timestamp.fromDate(endDate!),
+      if (prescribedBy != null && prescribedBy!.isNotEmpty)
+        'prescribedBy': prescribedBy,
+      if (purpose != null && purpose!.isNotEmpty) 'purpose': purpose,
+      if (notes != null && notes!.isNotEmpty) 'notes': notes,
+      'remindersEnabled': remindersEnabled,
       'isActive': isActive,
     };
   }
@@ -35,6 +51,13 @@ class Medication {
       dosage: data['dosage'] ?? '',
       frequency: data['frequency'] ?? '',
       startDate: (data['startDate'] as Timestamp).toDate(),
+      endDate: data['endDate'] != null
+          ? (data['endDate'] as Timestamp).toDate()
+          : null,
+      prescribedBy: data['prescribedBy'] as String?,
+      purpose: data['purpose'] as String?,
+      notes: data['notes'] as String?,
+      remindersEnabled: data['remindersEnabled'] ?? false,
       isActive: data['isActive'] ?? true,
     );
   }
@@ -45,6 +68,12 @@ class Medication {
     String? dosage,
     String? frequency,
     DateTime? startDate,
+    DateTime? endDate,
+    bool clearEndDate = false,
+    String? prescribedBy,
+    String? purpose,
+    String? notes,
+    bool? remindersEnabled,
     bool? isActive,
   }) {
     return Medication(
@@ -53,6 +82,11 @@ class Medication {
       dosage: dosage ?? this.dosage,
       frequency: frequency ?? this.frequency,
       startDate: startDate ?? this.startDate,
+      endDate: clearEndDate ? null : (endDate ?? this.endDate),
+      prescribedBy: prescribedBy ?? this.prescribedBy,
+      purpose: purpose ?? this.purpose,
+      notes: notes ?? this.notes,
+      remindersEnabled: remindersEnabled ?? this.remindersEnabled,
       isActive: isActive ?? this.isActive,
     );
   }

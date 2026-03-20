@@ -979,4 +979,31 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get invitationAcceptFailed =>
       'לא הצלחנו לאשר את ההזמנה כרגע. אפשר לנסות שוב.';
+
+  @override
+  String get fieldRequired => 'שדה חובה';
+
+  @override
+  String get dateFormatHint => 'YYYY-MM-DD';
+
+  @override
+  String get endDateBeforeStartDate =>
+      'תאריך הסיום חייב להיות אחרי תאריך ההתחלה';
+
+  @override
+  String get clinicalRecordDisclaimer =>
+      'נתוני התרופות מאוחסנים באופן מקומי ונכללים בדוחות קליניים מיוצאים. יש להתייעץ תמיד עם הווטרינר שלך לפני התחלה, הפסקה או שינוי של משטר תרופות כלשהו. כלי זה מיועד למעקב בלבד ואינו מחליף ייעוץ וטרינרי מקצועי.';
+
+  @override
+  String medicationReminderTitle(String name) {
+    return 'תרופה: $name';
+  }
+
+  @override
+  String medicationReminderBody(String dosage, String frequency) {
+    return '$dosage — $frequency';
+  }
+
+  @override
+  String get shareMedicationLog => 'שיתוף יומן תרופות';
 }
