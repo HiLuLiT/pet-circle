@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/services/invitation_service.dart';
@@ -44,6 +45,7 @@ class _AuthGateState extends State<AuthGate> {
     final result = await InvitationService.acceptInvitation(
       token: token,
       uid: appUser.uid,
+      email: appUser.email,
       displayName: appUser.displayName ?? appUser.email,
       avatarUrl: appUser.photoUrl ??
           'https://ui-avatars.com/api/?name=${Uri.encodeComponent(appUser.displayName ?? appUser.email)}&background=E8B4B8&color=5B2C3F',
@@ -51,11 +53,41 @@ class _AuthGateState extends State<AuthGate> {
 
     deepLinkService.clearPendingToken();
 
-    if (mounted && result.success) {
+    if (!mounted) return;
+
+    if (result.success) {
       Navigator.of(context).pushReplacementNamed(
         AppRoutes.mainShell,
         arguments: appUser.role,
       );
+      return;
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(_invitationErrorText(l10n, result.errorCode))),
+    );
+    Navigator.of(context).pushReplacementNamed(
+      AppRoutes.mainShell,
+      arguments: appUser.role,
+    );
+  }
+
+  String _invitationErrorText(AppLocalizations l10n, String? errorCode) {
+    switch (errorCode) {
+      case 'invitationExpired':
+        return l10n.invitationExpired;
+      case 'invitationAlreadyUsed':
+        return l10n.invitationAlreadyUsed;
+      case 'invitationNotAuthorized':
+        return l10n.invitationNotAuthorized;
+      case 'invitationNoLongerValid':
+        return l10n.invitationNoLongerValid;
+      case 'invitationAcceptFailed':
+        return l10n.invitationAcceptFailed;
+      case 'invitationNotFound':
+      default:
+        return l10n.invitationNotFound;
     }
   }
 

@@ -395,13 +395,13 @@ abstract class AppLocalizations {
   /// No description provided for @pushNotifications.
   ///
   /// In en, this message translates to:
-  /// **'Push notifications'**
+  /// **'In-app notifications'**
   String get pushNotifications;
 
   /// No description provided for @pushNotificationsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Receive notifications for measurements'**
+  /// **'Show reminders and care updates inside the app'**
   String get pushNotificationsDesc;
 
   /// No description provided for @emergencyAlerts.
@@ -1873,6 +1873,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} vet slots remaining'**
   String vetSlotsRemaining(int count);
+
+  /// No description provided for @invitationNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation could not be found.'**
+  String get invitationNotFound;
+
+  /// No description provided for @invitationExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation has expired.'**
+  String get invitationExpired;
+
+  /// No description provided for @invitationAlreadyUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation has already been used.'**
+  String get invitationAlreadyUsed;
+
+  /// No description provided for @invitationNotAuthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation was sent to a different email address.'**
+  String get invitationNotAuthorized;
+
+  /// No description provided for @invitationNoLongerValid.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation is no longer valid for this pet.'**
+  String get invitationNoLongerValid;
+
+  /// No description provided for @invitationAcceptFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t accept this invitation right now. Please try again.'**
+  String get invitationAcceptFailed;
 }
 
 class _AppLocalizationsDelegate

@@ -2,11 +2,11 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/invitation.dart';
-import 'package:pet_circle/services/pet_service.dart';
 
 class InvitationService {
   static final _firestore = FirebaseFirestore.instance;
   static final _invitationsCollection = _firestore.collection('invitations');
+  static final _petsCollection = _firestore.collection('pets');
 
   static const int maxVetsPerPet = 2;
   static const int maxInvitesPerDay = 5;
@@ -15,6 +15,16 @@ class InvitationService {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     final random = Random.secure();
     return List.generate(32, (_) => chars[random.nextInt(chars.length)]).join();
+  }
+
+  static Map<String, dynamic> _pendingInviteData(Invitation invitation) {
+    return {
+      'invitedEmail': invitation.invitedEmail.toLowerCase(),
+      'role': invitation.role.name,
+      'type': invitation.type.name,
+      'expiresAt': Timestamp.fromDate(invitation.expiresAt),
+      'createdAt': Timestamp.fromDate(invitation.createdAt),
+    };
   }
 
   /// Create a new invitation and return the token.
@@ -42,7 +52,12 @@ class InvitationService {
       type: type,
     );
 
-    await _invitationsCollection.doc(token).set(invitation.toFirestore());
+    final batch = _firestore.batch();
+    batch.set(_invitationsCollection.doc(token), invitation.toFirestore());
+    batch.update(_petsCollection.doc(petId), {
+      'pendingInvites.$token': _pendingInviteData(invitation),
+    });
+    await batch.commit();
     return token;
   }
 
@@ -57,34 +72,94 @@ class InvitationService {
   static Future<AcceptResult> acceptInvitation({
     required String token,
     required String uid,
+    required String email,
     required String displayName,
     required String avatarUrl,
   }) async {
-    final invitation = await getInvitation(token);
-    if (invitation == null) {
-      return AcceptResult(success: false, error: 'Invitation not found');
+    final normalizedEmail = email.trim().toLowerCase();
+    final invitationRef = _invitationsCollection.doc(token);
+
+    try {
+      return await _firestore.runTransaction((transaction) async {
+        final invitationDoc = await transaction.get(invitationRef);
+        if (!invitationDoc.exists) {
+          return AcceptResult(success: false, errorCode: 'invitationNotFound');
+        }
+
+        final invitation = Invitation.fromFirestore(invitationDoc);
+        if (!invitation.isPending) {
+          return AcceptResult(
+            success: false,
+            errorCode: invitation.isExpired
+                ? 'invitationExpired'
+                : 'invitationAlreadyUsed',
+          );
+        }
+        if (invitation.invitedEmail.toLowerCase() != normalizedEmail) {
+          return AcceptResult(success: false, errorCode: 'invitationNotAuthorized');
+        }
+
+        final petRef = _petsCollection.doc(invitation.petId);
+        final petDoc = await transaction.get(petRef);
+        if (!petDoc.exists) {
+          return AcceptResult(success: false, errorCode: 'invitationNotFound');
+        }
+
+        final petData = petDoc.data() as Map<String, dynamic>;
+        final pendingInvites =
+            Map<String, dynamic>.from(petData['pendingInvites'] as Map? ?? const {});
+        final pendingInvite =
+            Map<String, dynamic>.from(pendingInvites[token] as Map? ?? const {});
+        if (pendingInvite.isEmpty) {
+          return AcceptResult(success: false, errorCode: 'invitationNoLongerValid');
+        }
+
+        final pendingEmail =
+            (pendingInvite['invitedEmail'] as String? ?? '').trim().toLowerCase();
+        if (pendingEmail != normalizedEmail) {
+          return AcceptResult(success: false, errorCode: 'invitationNotAuthorized');
+        }
+
+        final expiresAt = (pendingInvite['expiresAt'] as Timestamp?)?.toDate();
+        if (expiresAt == null || !expiresAt.isAfter(DateTime.now())) {
+          return AcceptResult(success: false, errorCode: 'invitationExpired');
+        }
+
+        final memberUids = List<String>.from(
+          (petData['memberUids'] as List<dynamic>? ?? const []).whereType<String>(),
+        );
+        final careCircle =
+            Map<String, dynamic>.from(petData['careCircle'] as Map? ?? const {});
+
+        if (!memberUids.contains(uid)) {
+          memberUids.add(uid);
+          careCircle[uid] = CareCircleMember(
+            uid: uid,
+            name: displayName,
+            avatarUrl: avatarUrl,
+            role: invitation.role,
+          ).toFirestore();
+        }
+
+        pendingInvites.remove(token);
+
+        transaction.update(petRef, {
+          'careCircle': careCircle,
+          'memberUids': memberUids,
+          'pendingInvites': pendingInvites,
+          'lastAcceptedInvitationToken': token,
+        });
+        transaction.update(invitationRef, {
+          'status': InvitationStatus.accepted.name,
+        });
+
+        return AcceptResult(success: true, petId: invitation.petId);
+      });
+    } on FirebaseException {
+      return AcceptResult(success: false, errorCode: 'invitationAcceptFailed');
+    } catch (_) {
+      return AcceptResult(success: false, errorCode: 'invitationAcceptFailed');
     }
-    if (!invitation.isPending) {
-      return AcceptResult(
-        success: false,
-        error: invitation.isExpired ? 'Invitation has expired' : 'Invitation already used',
-      );
-    }
-
-    final member = CareCircleMember(
-      uid: uid,
-      name: displayName,
-      avatarUrl: avatarUrl,
-      role: invitation.role,
-    );
-
-    await PetService.addCareCircleMember(invitation.petId, uid, member);
-
-    await _invitationsCollection.doc(token).update({
-      'status': InvitationStatus.accepted.name,
-    });
-
-    return AcceptResult(success: true, petId: invitation.petId);
   }
 
   /// Get all pending invitations for an email address.
@@ -157,16 +232,24 @@ class InvitationService {
 
   /// Cancel an invitation.
   static Future<void> cancelInvitation(String token) async {
-    await _invitationsCollection.doc(token).update({
+    final invitation = await getInvitation(token);
+    if (invitation == null) return;
+
+    final batch = _firestore.batch();
+    batch.update(_invitationsCollection.doc(token), {
       'status': InvitationStatus.cancelled.name,
     });
+    batch.update(_petsCollection.doc(invitation.petId), {
+      'pendingInvites.$token': FieldValue.delete(),
+    });
+    await batch.commit();
   }
 }
 
 class AcceptResult {
   final bool success;
-  final String? error;
+  final String? errorCode;
   final String? petId;
 
-  AcceptResult({required this.success, this.error, this.petId});
+  AcceptResult({required this.success, this.errorCode, this.petId});
 }

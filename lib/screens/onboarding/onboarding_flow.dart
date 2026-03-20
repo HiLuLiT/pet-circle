@@ -26,7 +26,6 @@ class OnboardingFlow extends StatefulWidget {
 
 class _OnboardingFlowState extends State<OnboardingFlow> {
   final _controller = PageController();
-  int _currentIndex = 0;
   String _petName = '';
   String _breedAndAge = '';
   String _age = '';
@@ -56,23 +55,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       role: CareCircleRole.admin,
     );
 
-    final invitedMembers = _careCircleInvites
-        .map((inv) => CareCircleMember(
-              name: inv.email,
-              avatarUrl: 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(inv.email)}&background=E8B4B8&color=5B2C3F',
-              role: CareCirclePermissions.fromString(inv.role.toLowerCase()),
-            ))
-        .toList();
-
     final petName = _petName.isNotEmpty ? _petName : 'New Pet';
     final pet = Pet(
       name: petName,
       breedAndAge: '$breedAge${_age.isNotEmpty ? " • $_age" : ""}',
       imageUrl: AppAssets.petPlaceholder,
       statusLabel: 'Normal',
-      statusColorHex: AppColors.lightBlue.value,
+      statusColorHex: AppColors.lightBlue.toARGB32(),
       latestMeasurement: Measurement(bpm: 0, recordedAt: DateTime.now(), recordedAtLabel: 'No measurements yet'),
-      careCircle: [ownerMember, ...invitedMembers],
+      careCircle: [ownerMember],
       diagnosis: _diagnosis.isNotEmpty ? _diagnosis : null,
       ownerId: kEnableFirebase ? userStore.currentUserUid : null,
     );
@@ -118,7 +109,6 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
   void _goTo(int index) {
     if (index < 0 || index > 3) return;
-    setState(() => _currentIndex = index);
     _controller.animateToPage(
       index,
       duration: const Duration(milliseconds: 300),
@@ -132,7 +122,6 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     return PageView(
       controller: _controller,
       physics: const NeverScrollableScrollPhysics(),
-      onPageChanged: (index) => setState(() => _currentIndex = index),
       children: [
         OnboardingStep1(
           onNext: () => _goTo(1),

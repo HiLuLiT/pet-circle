@@ -45,7 +45,7 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 **Found during:** Test 1 — Pet Owner sign-up flow
 **Severity:** Medium (usability issue, not a code bug)
-**Status:** Known limitation
+**Status:** Fixed
 
 **Symptom:** Firebase verification emails sent from `noreply@pet-circle-app.firebaseapp.com` are flagged as spam by Gmail and other providers.
 
@@ -338,9 +338,12 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 **Root cause:** Firestore rules for `/pets/{petId}` can see the pet document being updated, but they cannot validate an arbitrary invitation token unless the pet update itself carries trusted invitation state. The current data model stores invitations in `/invitations/{token}` and performs acceptance purely from the client, so production rules need a narrow self-join exception to keep the current flow working.
 
-**Fix:** Partially mitigated by adding repo-managed `firestore.rules` with a constrained self-join path. Still needs a stronger acceptance design, such as a trusted backend step (Cloud Function) or pet-side pending-invite state that rules can verify directly.
+**Fix:** Invitation creation now writes a trusted `pendingInvites.{token}` entry onto the pet document, and invitation acceptance removes that entry in the same transaction that adds the authenticated member to `careCircle` / `memberUids`. Firestore rules now verify the accepted token against the pet's trusted pending-invite state instead of relying on a broad self-join exception. The updated rules were deployed to Firebase after the repo changes landed.
 
 **Files changed:**
+- `lib/screens/onboarding/onboarding_flow.dart`
+- `lib/screens/auth/auth_gate.dart`
+- `lib/screens/dashboard/vet_dashboard.dart`
 - `firestore.rules`
 - `lib/services/invitation_service.dart`
 

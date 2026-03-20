@@ -54,6 +54,10 @@ flutter pub get
 flutter run -d chrome
 ```
 
+## Firebase
+
+Firebase Auth and Firestore are already wired for the main app flows. Current setup status, local regeneration steps for ignored Firebase config files, deployment commands, and deferred Firebase products are documented in `docs/firebase-status.md`.
+
 ### Running on Different Platforms
 
 ```bash
@@ -124,7 +128,7 @@ For demo purposes, the app includes:
 - [ ] VisionRR AI-powered measurement
 - [ ] Push notifications for measurement reminders
 - [ ] Data export (PDF reports)
-- [ ] Cloud sync with Firebase
+- [x] Cloud sync with Firebase Auth + Firestore
 - [ ] Apple Watch / WearOS companion apps
 
 ## License

@@ -161,10 +161,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get manageAlerts => 'Manage alerts and reminders';
 
   @override
-  String get pushNotifications => 'Push notifications';
+  String get pushNotifications => 'In-app notifications';
 
   @override
-  String get pushNotificationsDesc => 'Receive notifications for measurements';
+  String get pushNotificationsDesc =>
+      'Show reminders and care updates inside the app';
 
   @override
   String get emergencyAlerts => 'Emergency alerts';
@@ -964,4 +965,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String vetSlotsRemaining(int count) {
     return '$count vet slots remaining';
   }
+
+  @override
+  String get invitationNotFound => 'This invitation could not be found.';
+
+  @override
+  String get invitationExpired => 'This invitation has expired.';
+
+  @override
+  String get invitationAlreadyUsed => 'This invitation has already been used.';
+
+  @override
+  String get invitationNotAuthorized =>
+      'This invitation was sent to a different email address.';
+
+  @override
+  String get invitationNoLongerValid =>
+      'This invitation is no longer valid for this pet.';
+
+  @override
+  String get invitationAcceptFailed =>
+      'We couldn\'t accept this invitation right now. Please try again.';
 }

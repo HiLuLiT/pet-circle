@@ -50,6 +50,7 @@ class _VetDashboardState extends State<VetDashboard> {
     final result = await InvitationService.acceptInvitation(
       token: inv.id,
       uid: userStore.currentUserUid ?? '',
+      email: userStore.currentUserEmail ?? '',
       displayName: userStore.currentUserDisplayName ?? '',
       avatarUrl: userStore.currentUserAvatarUrl ??
           'https://ui-avatars.com/api/?name=${Uri.encodeComponent(userStore.currentUserDisplayName ?? '')}&background=E8B4B8&color=5B2C3F',
@@ -63,10 +64,28 @@ class _VetDashboardState extends State<VetDashboard> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          result.success ? l10n.requestAccepted : (result.error ?? ''),
+          result.success ? l10n.requestAccepted : _invitationErrorText(l10n, result.errorCode),
         ),
       ),
     );
+  }
+
+  String _invitationErrorText(AppLocalizations l10n, String? errorCode) {
+    switch (errorCode) {
+      case 'invitationExpired':
+        return l10n.invitationExpired;
+      case 'invitationAlreadyUsed':
+        return l10n.invitationAlreadyUsed;
+      case 'invitationNotAuthorized':
+        return l10n.invitationNotAuthorized;
+      case 'invitationNoLongerValid':
+        return l10n.invitationNoLongerValid;
+      case 'invitationAcceptFailed':
+        return l10n.invitationAcceptFailed;
+      case 'invitationNotFound':
+      default:
+        return l10n.invitationNotFound;
+    }
   }
 
   Future<void> _declineInvitation(Invitation inv) async {

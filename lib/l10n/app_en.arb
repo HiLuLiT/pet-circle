@@ -51,8 +51,8 @@
   "invite": "Invite",
   "notifications": "Notifications",
   "manageAlerts": "Manage alerts and reminders",
-  "pushNotifications": "Push notifications",
-  "pushNotificationsDesc": "Receive notifications for measurements",
+  "pushNotifications": "In-app notifications",
+  "pushNotificationsDesc": "Show reminders and care updates inside the app",
   "emergencyAlerts": "Emergency alerts",
   "emergencyAlertsDesc": "Critical alerts when SRR exceeds thresholds",
   "measurementSettings": "Measurement settings",
@@ -328,5 +328,11 @@
   "requestDeclined": "Request declined",
   "noPendingRequests": "No pending requests",
   "vetSlotsRemaining": "{count} vet slots remaining",
-  "@vetSlotsRemaining": { "placeholders": { "count": { "type": "int" } } }
+  "@vetSlotsRemaining": { "placeholders": { "count": { "type": "int" } } },
+  "invitationNotFound": "This invitation could not be found.",
+  "invitationExpired": "This invitation has expired.",
+  "invitationAlreadyUsed": "This invitation has already been used.",
+  "invitationNotAuthorized": "This invitation was sent to a different email address.",
+  "invitationNoLongerValid": "This invitation is no longer valid for this pet.",
+  "invitationAcceptFailed": "We couldn't accept this invitation right now. Please try again."
 }

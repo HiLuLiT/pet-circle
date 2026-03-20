@@ -195,8 +195,8 @@ All data-driven screens (trends, measurement, medication) should read from `petS
 - Repo-managed Firestore rules now live in `firestore.rules` and are wired via `firebase.json`.
 
 ### What's NOT yet wired to Firestore (local store only)
-- Firestore rules are not deployed yet; Firebase may still be running in test mode
-- Invitation acceptance still needs a stricter server-verified path to remove the current self-join rules exception
+- Push delivery is not wired yet; notifications are currently Firestore-backed in-app alerts only
+- Invitation email delivery still needs a trusted backend sender (Cloud Functions, Trigger Email, etc.)
 
 ### Services
 

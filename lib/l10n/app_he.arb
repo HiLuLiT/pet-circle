@@ -51,8 +51,8 @@
   "invite": "הזמנה",
   "notifications": "התראות",
   "manageAlerts": "ניהול התראות ותזכורות",
-  "pushNotifications": "התראות פוש",
-  "pushNotificationsDesc": "קבלת התראות עבור מדידות",
+  "pushNotifications": "התראות בתוך האפליקציה",
+  "pushNotificationsDesc": "הצגת תזכורות ועדכוני מעגל טיפול בתוך האפליקציה",
   "emergencyAlerts": "התראות חירום",
   "emergencyAlertsDesc": "התראות קריטיות כאשר SRR חורג מהסף",
   "measurementSettings": "הגדרות מדידה",
@@ -328,5 +328,11 @@
   "requestDeclined": "הבקשה נדחתה",
   "noPendingRequests": "אין בקשות ממתינות",
   "vetSlotsRemaining": "{count} מקומות וטרינר נותרו",
-  "@vetSlotsRemaining": { "placeholders": { "count": { "type": "int" } } }
+  "@vetSlotsRemaining": { "placeholders": { "count": { "type": "int" } } },
+  "invitationNotFound": "לא ניתן למצוא את ההזמנה הזו.",
+  "invitationExpired": "תוקף ההזמנה הזו פג.",
+  "invitationAlreadyUsed": "כבר נעשה שימוש בהזמנה הזו.",
+  "invitationNotAuthorized": "ההזמנה הזו נשלחה לכתובת אימייל אחרת.",
+  "invitationNoLongerValid": "ההזמנה הזו כבר לא תקפה עבור חיית המחמד הזו.",
+  "invitationAcceptFailed": "לא הצלחנו לאשר את ההזמנה כרגע. אפשר לנסות שוב."
 }

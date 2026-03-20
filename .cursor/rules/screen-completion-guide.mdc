@@ -70,8 +70,8 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 ### Phase 2 -- Remaining Firebase/Data Work
 | Item | Details |
 |------|---------|
-| Push notifications | FCM not yet integrated |
-| Firestore security rules | Repo-managed `firestore.rules` and `firebase.json` are now added, but the rules still need to be deployed to Firebase. Current rules also keep a narrow self-join exception for client-side invitation acceptance until that flow is hardened |
+| Push notifications | Current notification support is Firestore-backed in-app alerts; FCM is not yet integrated |
+| Firestore security rules | Repo-managed `firestore.rules` are deployed, and invitation acceptance now requires a trusted pet-side `pendingInvites` entry that the rules can verify |
 
 ### Polish (Optional)
 | Item | Details |
@@ -91,7 +91,7 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 | FB-004 | Invite abuse prevention | Add safeguards to care circle invitations: email format validation before sending, prevent duplicate invites to same email for same pet, rate-limit invitations per user (e.g., max 10 per day), cap care circle size (e.g., max 20 members per pet), show warning when re-inviting an email that already has a pending invitation. Affects `onboarding_step4.dart`, `settings_screen.dart` invite dialog, and `InvitationService`. Consider Firestore security rules for server-side enforcement. | Medium |
 | FB-005 | Diary view | Pet health diary for logging daily activities. Bottom nav adds a 5th "Diary" tab. Tapping opens a category picker sheet (Poop, Meal, Water, Weight, Vomit, Grooming, Mood, Custom) with color-coded icons. Each category opens a detail form with Date, Time, category-specific fields (e.g. Consistency/Color for Poop), optional Notes, and Save/Cancel. Requires new `DiaryEntry` model, `diary_store`, Firestore subcollection, diary list/timeline screen, and bottom nav update. Figma refs: `136-888`, `137-296`, `137-772`. | Low |
 | FB-006 | Verify email spam hint | Update the verify-email screen (`verify_email_screen.dart`) to inform users that the verification email may land in their spam/junk folder. Add a new l10n key (e.g. `checkSpamFolder`) to both `app_en.arb` and `app_he.arb`, and display it below the existing `clickLinkToVerify` text. | High |
-| FB-007 | Push notifications (FCM) | Integrate Firebase Cloud Messaging for real-time push notifications. Currently `NotificationStore` is local-only and `settingsStore.pushNotifications` toggle has no backend. Requires: add `firebase_messaging` dependency, create `NotificationService` for FCM token registration + permission prompts, store FCM tokens in Firestore user docs, implement Cloud Functions (or Firestore triggers) to send notifications on events (new measurement, care circle invite accepted, medication reminder, SRR threshold alert), handle foreground/background notification display, wire settings toggle to enable/disable, and support notification tap routing to relevant screens. Affects `main.dart`, `notification_store.dart`, `settings_store.dart`, and new `lib/services/notification_service.dart`. | High |
+| FB-007 | Push notifications (FCM) | Integrate Firebase Cloud Messaging for real-time push notifications. Current notifications are Firestore-backed in-app alerts, and the settings toggle should be treated as an in-app preference until FCM exists. Requires: add `firebase_messaging` dependency, create device-token registration + permission prompts, store FCM tokens in Firestore user docs, implement Cloud Functions (or another trusted backend) to send notifications on events (new measurement, care circle invite accepted, medication reminder, SRR threshold alert), handle foreground/background notification display, wire settings toggle to enable/disable, and support notification tap routing to relevant screens. Affects `main.dart`, `notification_store.dart`, `settings_store.dart`, and new `lib/services/notification_service.dart`. | High |
 
 ## Phase 2 Completion Checklist
 
@@ -117,7 +117,7 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 - [x] Settings/preferences persisted to Firestore
 - [x] In-app notifications persisted to Firestore
 - [ ] Push notifications (FCM)
-- [ ] Production Firestore security rules deployed
+- [x] Production Firestore security rules deployed
 
 ## Phase 1 Completion Checklist
 

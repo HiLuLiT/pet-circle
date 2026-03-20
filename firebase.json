@@ -1,5 +1,43 @@
 {
   "firestore": {
     "rules": "firestore.rules"
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "pet-circle-app",
+          "appId": "1:999352037269:android:a53d2788fdbee30519d09c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "pet-circle-app",
+          "appId": "1:999352037269:ios:a02ee9ef3d7fa48d19d09c",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "macos": {
+        "default": {
+          "projectId": "pet-circle-app",
+          "appId": "1:999352037269:ios:a02ee9ef3d7fa48d19d09c",
+          "uploadDebugSymbols": false,
+          "fileOutput": "macos/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "pet-circle-app",
+          "configurations": {
+            "android": "1:999352037269:android:a53d2788fdbee30519d09c",
+            "ios": "1:999352037269:ios:a02ee9ef3d7fa48d19d09c",
+            "macos": "1:999352037269:ios:a02ee9ef3d7fa48d19d09c",
+            "web": "1:999352037269:web:b6fc3103e6f3a9b419d09c"
+          }
+        }
+      }
+    }
   }
 }

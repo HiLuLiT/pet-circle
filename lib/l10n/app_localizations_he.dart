@@ -160,10 +160,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get manageAlerts => 'ניהול התראות ותזכורות';
 
   @override
-  String get pushNotifications => 'התראות פוש';
+  String get pushNotifications => 'התראות בתוך האפליקציה';
 
   @override
-  String get pushNotificationsDesc => 'קבלת התראות עבור מדידות';
+  String get pushNotificationsDesc =>
+      'הצגת תזכורות ועדכוני מעגל טיפול בתוך האפליקציה';
 
   @override
   String get emergencyAlerts => 'התראות חירום';
@@ -958,4 +959,24 @@ class AppLocalizationsHe extends AppLocalizations {
   String vetSlotsRemaining(int count) {
     return '$count מקומות וטרינר נותרו';
   }
+
+  @override
+  String get invitationNotFound => 'לא ניתן למצוא את ההזמנה הזו.';
+
+  @override
+  String get invitationExpired => 'תוקף ההזמנה הזו פג.';
+
+  @override
+  String get invitationAlreadyUsed => 'כבר נעשה שימוש בהזמנה הזו.';
+
+  @override
+  String get invitationNotAuthorized => 'ההזמנה הזו נשלחה לכתובת אימייל אחרת.';
+
+  @override
+  String get invitationNoLongerValid =>
+      'ההזמנה הזו כבר לא תקפה עבור חיית המחמד הזו.';
+
+  @override
+  String get invitationAcceptFailed =>
+      'לא הצלחנו לאשר את ההזמנה כרגע. אפשר לנסות שוב.';
 }
