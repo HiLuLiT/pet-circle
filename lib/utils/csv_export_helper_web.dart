@@ -1,7 +1,7 @@
 // TODO(web): Migrate to package:web + dart:js_interop when Flutter SDK minimum
 // is raised to 3.16+. dart:html is deprecated but functional for Flutter 3.10.x.
-// ignore: avoid_web_libraries_in_flutter
 import 'dart:convert';
+// ignore: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:html' as html;
 
 Future<void> exportCsvImpl(String filename, String csvContent) async {

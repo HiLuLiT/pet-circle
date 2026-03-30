@@ -102,7 +102,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                       _selectedDiagnosis ?? l10n.selectDiagnosis,
                       style: AppTextStyles.body.copyWith(
                         color: _selectedDiagnosis == null
-                            ? c.chocolate.withOpacity(0.5)
+                            ? c.chocolate.withValues(alpha: 0.5)
                             : c.chocolate,
                       ),
                     ),

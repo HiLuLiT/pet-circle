@@ -87,7 +87,7 @@ class CareCircleDashboard extends StatelessWidget {
 }
 
 class _PetCard extends StatelessWidget {
-  _PetCard({required this.data, this.onTap});
+  const _PetCard({required this.data, this.onTap});
 
   final Pet data;
   final VoidCallback? onTap;
@@ -197,7 +197,7 @@ class _PetCard extends StatelessWidget {
 }
 
 class _AvatarStack extends StatelessWidget {
-  _AvatarStack({required this.avatars});
+  const _AvatarStack({required this.avatars});
 
   final List<CareCircleMember> avatars;
 
@@ -239,7 +239,7 @@ class _AvatarStack extends StatelessWidget {
 }
 
 class _SummaryCard extends StatelessWidget {
-  _SummaryCard({
+  const _SummaryCard({
     required this.iconColor,
     required this.iconUrl,
     required this.value,

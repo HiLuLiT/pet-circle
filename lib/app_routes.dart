@@ -55,15 +55,15 @@ GoRouter buildRouter() {
     routes: [
       GoRoute(
         path: '/',
-        builder: (_, __) => const WelcomeScreen(),
+        builder: (_, _) => const WelcomeScreen(),
       ),
       GoRoute(
         path: '/auth-gate',
-        builder: (_, __) => const AuthGate(),
+        builder: (_, _) => const AuthGate(),
       ),
       GoRoute(
         path: '/role-selection',
-        builder: (_, __) => const RoleSelectionScreen(),
+        builder: (_, _) => const RoleSelectionScreen(),
       ),
       GoRoute(
         path: '/auth',
@@ -77,11 +77,11 @@ GoRouter buildRouter() {
       ),
       GoRoute(
         path: '/verify-email',
-        builder: (_, __) => const VerifyEmailScreen(),
+        builder: (_, _) => const VerifyEmailScreen(),
       ),
       GoRoute(
         path: '/onboarding',
-        builder: (_, __) => const OnboardingFlow(),
+        builder: (_, _) => const OnboardingFlow(),
       ),
       GoRoute(
         path: '/invite',
@@ -106,7 +106,7 @@ GoRouter buildRouter() {
       ),
       GoRoute(
         path: '/vet-dashboard',
-        builder: (_, __) => const VetDashboard(),
+        builder: (_, _) => const VetDashboard(),
       ),
       GoRoute(
         path: '/shell/:role',

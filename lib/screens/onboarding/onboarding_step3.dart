@@ -156,18 +156,16 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
 }
 
 class _TargetOption extends StatelessWidget {
-  _TargetOption({
+  const _TargetOption({
     required this.title,
     required this.subtitle,
     required this.selected,
-    this.trailingLabel,
     this.onTap,
   });
 
   final String title;
   final String? subtitle;
   final bool selected;
-  final String? trailingLabel;
   final VoidCallback? onTap;
 
   @override
@@ -233,18 +231,6 @@ class _TargetOption extends StatelessWidget {
                 ],
               ),
             ),
-            if (trailingLabel != null)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                decoration: BoxDecoration(
-                  color: c.lightYellow,
-                  borderRadius: const BorderRadius.all(AppRadii.xs),
-                ),
-                child: Text(
-                  trailingLabel!,
-                  style: AppTextStyles.caption.copyWith(color: c.chocolate),
-                ),
-              ),
           ],
         ),
       ),

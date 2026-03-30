@@ -240,12 +240,11 @@ class OwnerDashboard extends StatelessWidget {
 }
 
 class _PetCard extends StatelessWidget {
-  _PetCard({
+  const _PetCard({
     required this.data,
     required this.onMeasure,
     required this.onTrends,
     required this.access,
-    this.onTap,
     this.onLongPress,
   });
 
@@ -253,7 +252,6 @@ class _PetCard extends StatelessWidget {
   final VoidCallback? onMeasure;
   final VoidCallback onTrends;
   final PetAccess access;
-  final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
   @override
@@ -264,7 +262,6 @@ class _PetCard extends StatelessWidget {
     final latest = latestFromStore ?? data.latestMeasurement;
     final hasMeasurement = latest.bpm > 0;
     return GestureDetector(
-      onTap: onTap,
       onLongPress: onLongPress,
       child: ClipRRect(
       borderRadius: const BorderRadius.all(AppRadii.medium),
@@ -456,7 +453,7 @@ class _PetCard extends StatelessWidget {
 }
 
 class _ActionButton extends StatelessWidget {
-  _ActionButton({
+  const _ActionButton({
     required this.label,
     required this.iconAsset,
     required this.isPrimary,

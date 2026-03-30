@@ -370,7 +370,7 @@ class _AuthScreenState extends State<AuthScreen> {
               // Divider
               Row(
                 children: [
-                  Expanded(child: Divider(color: c.chocolate.withOpacity(0.3))),
+                  Expanded(child: Divider(color: c.chocolate.withValues(alpha: 0.3))),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
@@ -378,7 +378,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       style: AppTextStyles.caption.copyWith(color: c.chocolate),
                     ),
                   ),
-                  Expanded(child: Divider(color: c.chocolate.withOpacity(0.3))),
+                  Expanded(child: Divider(color: c.chocolate.withValues(alpha: 0.3))),
                 ],
               ),
 
@@ -522,7 +522,7 @@ class _SocialButton extends StatelessWidget {
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 14),
-        side: BorderSide(color: c.chocolate.withOpacity(0.3)),
+        side: BorderSide(color: c.chocolate.withValues(alpha: 0.3)),
         shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.small)),
       ),
       child: Row(

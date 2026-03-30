@@ -14,7 +14,7 @@ class TogglePill extends StatelessWidget {
       height: 36,
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        color: isOn ? c.chocolate : c.chocolate.withOpacity(0.2),
+        color: isOn ? c.chocolate : c.chocolate.withValues(alpha: 0.2),
         borderRadius: const BorderRadius.all(AppRadii.pill),
       ),
       child: Align(

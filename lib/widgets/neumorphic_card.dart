@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 class NeumorphicCard extends StatelessWidget {
-  NeumorphicCard({
+  const NeumorphicCard({
     super.key,
     required this.child,
     this.padding,

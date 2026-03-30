@@ -39,7 +39,7 @@ class LabeledTextField extends StatelessWidget {
               fillColor: c.white,
               hintText: hintText,
               hintStyle: AppTextStyles.body.copyWith(
-                color: c.chocolate.withOpacity(0.3),
+                color: c.chocolate.withValues(alpha: 0.3),
               ),
               border: OutlineInputBorder(
                 borderRadius: const BorderRadius.all(AppRadii.xs),

@@ -24,7 +24,7 @@ class AppImage extends StatelessWidget {
       width: width,
       height: height,
       fit: fit,
-      errorBuilder: (_, __, ___) => _Fallback(
+      errorBuilder: (_, _, _) => _Fallback(
         width: width,
         height: height,
         icon: fallbackIcon,
@@ -34,7 +34,7 @@ class AppImage extends StatelessWidget {
 }
 
 class _Fallback extends StatelessWidget {
-  _Fallback({this.width, this.height, required this.icon});
+  const _Fallback({this.width, this.height, required this.icon});
 
   final double? width;
   final double? height;

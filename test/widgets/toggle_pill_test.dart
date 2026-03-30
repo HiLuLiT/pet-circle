@@ -38,7 +38,7 @@ void main() {
       final decoration = container.decoration as BoxDecoration;
       // When off, color is chocolate with 0.2 opacity
       expect(decoration.color, isNot(AppColors.chocolate));
-      expect(decoration.color?.opacity, closeTo(0.2, 0.01));
+      expect(decoration.color?.a, closeTo(0.2, 0.01));
     });
 
     testWidgets('isOn: true aligns knob to the right', (tester) async {
