@@ -28,25 +28,41 @@ class MeasurementStore extends ChangeNotifier {
   }
 
   Future<void> addMeasurement(String petId, Measurement measurement) async {
+    _measurements.putIfAbsent(petId, () => []);
+    _measurements[petId]!.insert(0, measurement);
+    notifyListeners();
+
     if (kEnableFirebase) {
-      await PetService.addMeasurement(petId, measurement);
-    } else {
-      _measurements.putIfAbsent(petId, () => []);
-      _measurements[petId]!.insert(0, measurement);
-      notifyListeners();
+      try {
+        await PetService.addMeasurement(petId, measurement);
+      } catch (e) {
+        _measurements[petId]?.remove(measurement);
+        notifyListeners();
+        rethrow;
+      }
     }
   }
 
   Future<void> removeMeasurement(String petId, Measurement measurement) async {
+    final list = _measurements[petId];
+    if (list == null) return;
+
+    final idx = list.indexWhere((m) =>
+        m.bpm == measurement.bpm &&
+        m.recordedAt.isAtSameMomentAs(measurement.recordedAt));
+    if (idx == -1) return;
+
+    list.removeAt(idx);
+    notifyListeners();
+
     if (kEnableFirebase && measurement.id != null) {
-      await PetService.deleteMeasurement(petId, measurement.id!);
-    } else {
-      final list = _measurements[petId];
-      if (list == null) return;
-      list.removeWhere((m) =>
-          m.bpm == measurement.bpm &&
-          m.recordedAt.isAtSameMomentAs(measurement.recordedAt));
-      notifyListeners();
+      try {
+        await PetService.deleteMeasurement(petId, measurement.id!);
+      } catch (e) {
+        list.insert(idx.clamp(0, list.length), measurement);
+        notifyListeners();
+        rethrow;
+      }
     }
   }
 

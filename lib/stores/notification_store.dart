@@ -42,36 +42,52 @@ class NotificationStore extends ChangeNotifier {
       List.unmodifiable(_notifications.where((n) => !n.isRead).toList());
 
   Future<void> addNotification(AppNotification notification) async {
+    _notifications.insert(0, notification);
+    notifyListeners();
+
     final uid = userStore.currentUserUid;
     if (kEnableFirebase && uid != null && uid.isNotEmpty) {
       await NotificationService.addNotification(uid, notification);
-      return;
     }
-    _notifications.insert(0, notification);
-    notifyListeners();
   }
 
   Future<void> markRead(String id) async {
+    final idx = _notifications.indexWhere((n) => n.id == id);
+    if (idx != -1 && !_notifications[idx].isRead) {
+      _notifications[idx] = _notifications[idx].copyWith(isRead: true);
+      notifyListeners();
+    }
+
     final uid = userStore.currentUserUid;
     if (kEnableFirebase && uid != null && uid.isNotEmpty) {
-      await NotificationService.markRead(uid, id);
-      return;
+      try {
+        await NotificationService.markRead(uid, id);
+      } catch (e) {
+        if (idx != -1) {
+          _notifications[idx] = _notifications[idx].copyWith(isRead: false);
+          notifyListeners();
+        }
+        rethrow;
+      }
     }
-    final idx = _notifications.indexWhere((n) => n.id == id);
-    if (idx == -1) return;
-    _notifications[idx] = _notifications[idx].copyWith(isRead: true);
-    notifyListeners();
   }
 
   Future<void> markAllRead() async {
-    final uid = userStore.currentUserUid;
-    if (kEnableFirebase && uid != null && uid.isNotEmpty) {
-      await NotificationService.markAllRead(uid);
-      return;
-    }
+    final previous = List<AppNotification>.of(_notifications);
     _notifications = _notifications
         .map((n) => n.isRead ? n : n.copyWith(isRead: true))
         .toList();
     notifyListeners();
+
+    final uid = userStore.currentUserUid;
+    if (kEnableFirebase && uid != null && uid.isNotEmpty) {
+      try {
+        await NotificationService.markAllRead(uid);
+      } catch (e) {
+        _notifications = previous;
+        notifyListeners();
+        rethrow;
+      }
+    }
   }
 }

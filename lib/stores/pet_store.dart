@@ -136,15 +136,30 @@ class PetStore extends ChangeNotifier {
   }
 
   Future<void> updatePetWithFirestore(Pet updated) async {
-    if (kEnableFirebase && updated.id != null) {
-      await PetService.updatePet(updated.id!, {
-        'name': updated.name,
-        'breedAndAge': updated.breedAndAge,
-        'imageUrl': updated.imageUrl,
-      });
-      return;
-    }
+    final previousOwner = updated.id != null
+        ? _ownerPets.where((p) => p.id == updated.id).firstOrNull
+        : _ownerPets.where((p) => p.name == updated.name).firstOrNull;
+    final previousClinic = updated.id != null
+        ? _clinicPets.where((p) => p.id == updated.id).firstOrNull
+        : _clinicPets.where((p) => p.name == updated.name).firstOrNull;
+
     _replacePetLocal(updated);
+
+    if (kEnableFirebase && updated.id != null) {
+      try {
+        await PetService.updatePet(updated.id!, {
+          'name': updated.name,
+          'breedAndAge': updated.breedAndAge,
+          'imageUrl': updated.imageUrl,
+        });
+      } catch (e) {
+        if (previousOwner != null) _replacePetLocal(previousOwner);
+        if (previousClinic != null && previousOwner == null) {
+          _replacePetLocal(previousClinic);
+        }
+        rethrow;
+      }
+    }
   }
 
   void updatePet(String name, Pet updated) {
@@ -169,21 +184,31 @@ class PetStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Remove a pet from Firestore (stream updates local state) or locally in mock mode.
   Future<void> removePetWithFirestore(String name) async {
-    if (kEnableFirebase) {
-      final pet = getPetByName(name);
-      if (pet?.id != null) {
+    final pet = getPetByName(name);
+    final ownerIdx = _ownerPets.indexWhere((p) => p.name == name);
+    final clinicIdx = _clinicPets.indexWhere((p) => p.name == name);
+    final removedOwner = ownerIdx != -1 ? _ownerPets.removeAt(ownerIdx) : null;
+    final removedClinic = clinicIdx != -1 ? _clinicPets.removeAt(clinicIdx) : null;
+    if (removedOwner != null || removedClinic != null) notifyListeners();
+
+    if (kEnableFirebase && pet?.id != null) {
+      try {
         final uid = userStore.currentUserUid;
         await PetService.deletePet(pet!.id!);
         if (uid != null) {
           await UserService.removePetFromUser(uid, pet.id!);
         }
+      } catch (e) {
+        if (removedOwner != null) {
+          _ownerPets.insert(ownerIdx.clamp(0, _ownerPets.length), removedOwner);
+        }
+        if (removedClinic != null) {
+          _clinicPets.insert(clinicIdx.clamp(0, _clinicPets.length), removedClinic);
+        }
+        notifyListeners();
+        rethrow;
       }
-    } else {
-      _ownerPets.removeWhere((p) => p.name == name);
-      _clinicPets.removeWhere((p) => p.name == name);
-      notifyListeners();
     }
   }
 
@@ -264,21 +289,33 @@ class PetStore extends ChangeNotifier {
     return accessForPet(pet).role;
   }
 
-  /// Remove a care circle member from Firestore (stream updates local state) or locally in mock mode.
   Future<void> removeCareCircleMemberWithFirestore(String petName, String memberName) async {
-    if (kEnableFirebase) {
-      final pet = getPetByName(petName);
-      if (pet?.id != null) {
-        final member = pet!.careCircle.firstWhere(
-          (m) => m.name == memberName,
-          orElse: () => CareCircleMember(name: '', avatarUrl: '', role: CareCircleRole.viewer),
-        );
-        if (member.uid != null) {
-          await PetService.removeCareCircleMember(pet.id!, member.uid!);
+    final pet = getPetByName(petName);
+    final previousCareCircle = pet?.careCircle.toList();
+
+    _removeCareCircleMemberLocal(petName, memberName);
+
+    if (kEnableFirebase && pet?.id != null) {
+      final member = previousCareCircle?.firstWhere(
+        (m) => m.name == memberName,
+        orElse: () => CareCircleMember(name: '', avatarUrl: '', role: CareCircleRole.viewer),
+      );
+      if (member?.uid != null) {
+        try {
+          await PetService.removeCareCircleMember(pet!.id!, member!.uid!);
+        } catch (e) {
+          if (previousCareCircle != null) {
+            for (final list in [_ownerPets, _clinicPets]) {
+              final idx = list.indexWhere((p) => p.name == petName);
+              if (idx != -1) {
+                list[idx] = list[idx].copyWith(careCircle: previousCareCircle);
+              }
+            }
+            notifyListeners();
+          }
+          rethrow;
         }
       }
-    } else {
-      _removeCareCircleMemberLocal(petName, memberName);
     }
   }
 

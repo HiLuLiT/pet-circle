@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
@@ -77,7 +79,7 @@ class PetService {
 
   static Future<void> addMeasurement(String petId, Measurement m) async {
     await _measurementsRef(petId).add(m.toFirestore());
-    await _syncLatestMeasurement(petId);
+    unawaited(_updateLatestMeasurement(petId, m));
   }
 
   static Stream<List<Measurement>> streamMeasurements(String petId) {
@@ -93,6 +95,20 @@ class PetService {
     await _syncLatestMeasurement(petId);
   }
 
+  /// Write the known latest measurement directly onto the pet doc (no re-query).
+  static Future<void> _updateLatestMeasurement(
+    String petId,
+    Measurement m,
+  ) async {
+    await _petsCollection.doc(petId).update({
+      'latestMeasurement': {
+        'bpm': m.bpm,
+        'recordedAt': Timestamp.fromDate(m.recordedAt),
+      },
+    });
+  }
+
+  /// Re-query the subcollection to find the true latest (used by delete).
   static Future<void> _syncLatestMeasurement(String petId) async {
     final latestSnapshot = await _measurementsRef(petId)
         .orderBy('recordedAt', descending: true)

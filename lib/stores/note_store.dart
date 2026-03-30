@@ -22,12 +22,18 @@ class NoteStore extends ChangeNotifier {
   }
 
   Future<void> addNote(String petId, ClinicalNote note) async {
+    _notes.putIfAbsent(petId, () => []);
+    _notes[petId]!.insert(0, note);
+    notifyListeners();
+
     if (kEnableFirebase) {
-      await PetService.addNote(petId, note);
-    } else {
-      _notes.putIfAbsent(petId, () => []);
-      _notes[petId]!.insert(0, note);
-      notifyListeners();
+      try {
+        await PetService.addNote(petId, note);
+      } catch (e) {
+        _notes[petId]?.remove(note);
+        notifyListeners();
+        rethrow;
+      }
     }
   }
 

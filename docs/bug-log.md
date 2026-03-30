@@ -420,6 +420,118 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-023: "Add to graph" button freezes UI while awaiting sequential Firestore operations
+
+**Found during:** Manual testing — completing a measurement and tapping "Add to graph"
+**Severity:** High (confusing/broken — app appears frozen for several seconds)
+**Status:** Fixed
+
+**Symptom:** After tapping "Add to graph" the dialog stays open and the UI is unresponsive for several seconds before finally closing and showing the success snackbar.
+
+**Root cause:** The `onTap` handler awaited 4 sequential Firestore operations before touching the UI: (1) write measurement subcollection doc, (2) query the latest measurement back, (3) update the pet document's denormalized `latestMeasurement` field, (4) write a notification doc to the user's notifications collection. On a slow connection this chain could take multiple seconds. Additionally, `MeasurementStore.addMeasurement` did not update the local in-memory list when Firebase was enabled — it relied entirely on the Firestore stream listener to refresh, adding even more perceived delay.
+
+**Fix:** Made the save flow optimistic: `MeasurementStore.addMeasurement` now inserts the measurement into the local list and calls `notifyListeners()` immediately (with rollback on error). `PetService.addMeasurement` eliminates the redundant re-query by writing the known latest measurement directly onto the pet doc, and that write is fire-and-forget (`unawaited`). The button handler no longer awaits either the measurement or notification store calls — the dialog closes and the snackbar appears instantly. Also replaced a hardcoded `Color(0xFF75ACFF)` in the snackbar with `c.lightBlue` per design system rules.
+
+**Files changed:**
+- `lib/stores/measurement_store.dart`
+- `lib/services/pet_service.dart`
+- `lib/screens/measurement/measurement_screen.dart`
+
+---
+
+## BUG-024: "Add to graph" button allows double-tap, creating duplicate measurements
+
+**Found during:** Manual testing — tapping "Add to graph" after completing a measurement
+**Severity:** High (data corruption — duplicate entries skew averages and counts)
+**Status:** Fixed
+
+**Symptom:** Two identical measurement entries appear in Measurement History with the same BPM and timestamp, inflating averages and status counts.
+
+**Root cause:** The "Add to graph" `GestureDetector` had no re-entry guard. Before the BUG-023 optimistic fix, the dialog stayed open for several seconds while awaiting Firestore, allowing the user to tap the button multiple times. Each tap triggered a separate `addMeasurement` call, creating a duplicate Firestore document.
+
+**Fix:** Added an `_isSaving` boolean flag to `_ManualModeState`. The flag is set to `true` at the start of the `onTap` handler and checked at entry — subsequent taps are ignored. The flag never needs resetting because `Navigator.pop` dismisses the dialog immediately after.
+
+**Files changed:**
+- `lib/screens/measurement/measurement_screen.dart`
+
+---
+
+## BUG-025: Health Trends status counts do not update after a new measurement
+
+**Found during:** Manual testing — adding a measurement and checking the Status card on the Trends screen
+**Severity:** Medium (stale data until manual refresh)
+**Status:** Fixed
+
+**Symptom:** The Status card (Normal / Elevated / Critical counts) in Health Trends does not reflect a newly added measurement. The counts only update after navigating away and back or refreshing the screen.
+
+**Root cause:** `_StatusCard` was instantiated as `const _StatusCard()` inside `_StatGrid`. Because `const` produces an identical widget instance across rebuilds, Flutter's reconciliation skips calling `build()` on it, so the status counts computed inside `build()` become stale. Additionally, `_StatusCard` read directly from `measurementStore` without respecting the selected time period filter, inconsistent with the other stat cards.
+
+**Fix:** Changed `_StatusCard` to accept a `List<Measurement> measurements` parameter. Removed `const` from both call sites so the widget rebuilds when data changes. The measurements list now comes from the same `filtered` data used by Average, Range, and Trend cards, so status counts respect the selected time period.
+
+**Files changed:**
+- `lib/screens/trends/trends_screen.dart`
+
+---
+
+## BUG-026: All Firestore-backed mutations block the UI until the network round-trip completes
+
+**Found during:** Manual testing — updating medication data and observing multi-second UI freeze
+**Severity:** High (app feels stuck on every save/delete/toggle action)
+**Status:** Fixed
+
+**Symptom:** Any mutation across the app (adding/editing/deleting medications, deleting measurements, editing pet profiles, adding clinical notes, marking notifications read, removing care circle members, saving thresholds, deleting pets) causes the UI to freeze for the duration of the Firestore write. Dialogs stay open, sheets don't close, and snackbars don't appear until the network round-trip finishes.
+
+**Root cause:** Every store mutation method (except `MeasurementStore.addMeasurement` fixed in BUG-023 and `SettingsStore` toggles) awaited the Firestore service call before updating local state or calling `notifyListeners()`. Screen-level handlers then `await`ed these store methods before closing dialogs or showing feedback. This created a chain: user tap -> await Firestore write -> only then update UI.
+
+**Fix:** Applied the same optimistic pattern across all 5 stores (12 methods total) and 6 screens (8 handlers):
+
+**Stores** — Each mutation now updates local state and calls `notifyListeners()` immediately, then fires the Firestore write in the background. On error, the local change is rolled back and listeners are notified again. Affected methods:
+- `MeasurementStore.removeMeasurement`
+- `MedicationStore.addMedication`, `removeMedication`, `updateMedication`, `toggleMedication`
+- `NoteStore.addNote`
+- `NotificationStore.addNotification`, `markRead`, `markAllRead`
+- `PetStore.updatePetWithFirestore`, `removePetWithFirestore`, `removeCareCircleMemberWithFirestore`
+
+**Screens** — Removed `await` from all store mutation calls in event handlers so dialogs close and snackbars show instantly:
+- `medication_screen.dart` `_save()`
+- `trends_screen.dart` delete confirmation
+- `pet_detail_screen.dart` edit pet dialog and `_addNote()`
+- `messages_screen.dart` notification tap
+- `owner_dashboard.dart` delete pet dialog
+- `settings_screen.dart` remove care circle member and threshold save
+
+**Files changed:**
+- `lib/stores/measurement_store.dart`
+- `lib/stores/medication_store.dart`
+- `lib/stores/note_store.dart`
+- `lib/stores/notification_store.dart`
+- `lib/stores/pet_store.dart`
+- `lib/screens/medication/medication_screen.dart`
+- `lib/screens/trends/trends_screen.dart`
+- `lib/screens/pet_detail/pet_detail_screen.dart`
+- `lib/screens/messages/messages_screen.dart`
+- `lib/screens/dashboard/owner_dashboard.dart`
+- `lib/screens/settings/settings_screen.dart`
+
+---
+
+## BUG-027: Edit medication Save and Close buttons do nothing
+
+**Found during:** Manual testing — editing an existing medication and tapping Save or the X close button
+**Severity:** Critical (blocks medication editing flow entirely)
+**Status:** Fixed
+
+**Symptom:** After tapping a medication to edit it, the bottom sheet opens with pre-filled data, but tapping Save or the X close button has no visible effect — the sheet stays open and no snackbar appears.
+
+**Root cause:** The BUG-026 optimistic-update refactor removed all `await` calls from `_save()` but left the method as `Future<void> _save() async`. With no remaining `await` expressions, the entire method body ran synchronously, yet exceptions were still silently caught by the async mechanism and turned into unhandled `Future` errors that were discarded (since `onPressed: _save` treats the return as `void`). Specifically, after `Navigator.of(context).pop()` started dismissing the sheet, the subsequent `ScaffoldMessenger.of(context).showSnackBar(...)` called `of(context)` on the now-deactivating widget context, throwing a `FlutterError`. This exception was swallowed by the async wrapper, preventing the pop from visually completing. Additionally, unlike the settings and pet-detail screens (which pre-captured `Navigator` and `ScaffoldMessenger` references before mutations), the medication screen called `Navigator.of(context)` and `ScaffoldMessenger.of(context)` directly after store mutations that trigger `notifyListeners()`.
+
+**Fix:** Changed `_save()` from `Future<void> _save() async` to `void _save()` so exceptions propagate normally instead of being silently swallowed. Pre-captured `Navigator.of(context)` and `ScaffoldMessenger.of(context)` at the top of the method (before any store mutations or navigation), matching the pattern already used in `settings_screen.dart` and `pet_detail_screen.dart`. The captured references are then used for `navigator.pop()` and `messenger.showSnackBar(...)`.
+
+**Files changed:**
+- `lib/screens/medication/medication_screen.dart`
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]
