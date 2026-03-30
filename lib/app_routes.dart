@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
+import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/screens/auth/auth_gate.dart';
 import 'package:pet_circle/screens/auth/auth_screen.dart';
 import 'package:pet_circle/screens/auth/role_selection_screen.dart';
 import 'package:pet_circle/screens/auth/verify_email_screen.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
+import 'package:pet_circle/screens/invite/invite_screen.dart';
 import 'package:pet_circle/screens/main_shell.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_flow.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_screen.dart';
 import 'package:pet_circle/screens/welcome_screen.dart';
+import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 
 /// Named path constants for use with context.go() / context.push().
@@ -21,6 +24,7 @@ class AppRoutes {
   static const auth = '/auth';
   static const verifyEmail = '/verify-email';
   static const onboarding = '/onboarding';
+  static const invite = '/invite';
   static const vetDashboard = '/vet-dashboard';
 
   /// Build shell path for a given role and optional tab index.
@@ -74,6 +78,27 @@ GoRouter buildRouter() {
       GoRoute(
         path: '/onboarding',
         builder: (_, __) => const OnboardingFlow(),
+      ),
+      GoRoute(
+        path: '/invite',
+        builder: (_, state) {
+          final token = state.uri.queryParameters['token'] ?? '';
+          return InviteScreen(token: token);
+        },
+        redirect: (context, state) {
+          final token = state.uri.queryParameters['token'];
+          if (token == null || token.isEmpty) {
+            // No token — redirect to the auth gate / welcome.
+            return kEnableFirebase ? AppRoutes.authGate : AppRoutes.welcome;
+          }
+          if (authProvider.routeState != AuthRouteState.authenticated) {
+            // Not logged in — stash the token for after authentication.
+            deepLinkService.setPendingToken(token);
+            return AppRoutes.authGate;
+          }
+          // Authenticated with valid token — render InviteScreen.
+          return null;
+        },
       ),
       GoRoute(
         path: '/vet-dashboard',

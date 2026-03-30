@@ -51,7 +51,6 @@ void main() async {
       options: DefaultFirebaseOptions.currentPlatform,
     );
     authProvider.init();
-    await deepLinkService.init();
   }
 
   final AbstractReminderService reminderService =
@@ -63,6 +62,13 @@ void main() async {
   }
 
   router = buildRouter();
+
+  // Initialise deep links *after* the router is created so that native
+  // incoming URIs can be forwarded to GoRouter.  On web the `/invite` route
+  // is handled directly by GoRouter from the browser URL bar.
+  if (kEnableFirebase) {
+    await deepLinkService.init(router: router);
+  }
 
   runApp(const PetCircleApp());
 }
