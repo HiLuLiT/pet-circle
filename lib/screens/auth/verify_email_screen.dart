@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
@@ -42,7 +43,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     if (authProvider.isEmailVerified) {
       _checkTimer?.cancel();
       if (mounted) {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.authGate);
+        context.go(AppRoutes.authGate);
       }
     }
   }
@@ -98,7 +99,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   Future<void> _signOut() async {
     await AuthService.signOut();
     if (mounted) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.welcome);
+      context.go(AppRoutes.welcome);
     }
   }
 

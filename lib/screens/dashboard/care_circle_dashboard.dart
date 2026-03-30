@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
@@ -39,12 +40,8 @@ class CareCircleDashboard extends StatelessWidget {
                           .map(
                             (pet) => _PetCard(
                               data: pet,
-                              onTap: () => Navigator.of(context).pushNamed(
-                                AppRoutes.mainShell,
-                                arguments: {
-                                  'role': userStore.role,
-                                  'initialIndex': 2,
-                                },
+                              onTap: () => context.go(
+                                AppRoutes.shell(userStore.role, tab: 2),
                               ),
                             ),
                           )

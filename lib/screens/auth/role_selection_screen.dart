@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
@@ -13,10 +14,7 @@ class RoleSelectionScreen extends StatelessWidget {
 
   Future<void> _handleRoleSelect(BuildContext context, AppUserRole role) async {
     if (!kEnableFirebase) {
-      Navigator.of(context).pushReplacementNamed(
-        AppRoutes.mainShell,
-        arguments: role,
-      );
+      context.go(AppRoutes.shell(role));
       return;
     }
 
@@ -31,10 +29,10 @@ class RoleSelectionScreen extends StatelessWidget {
       );
       await authProvider.refresh();
       if (context.mounted) {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.authGate);
+        context.go(AppRoutes.authGate);
       }
     } else {
-      Navigator.of(context).pushNamed(AppRoutes.auth, arguments: role);
+      context.push('${AppRoutes.auth}?role=${role.name}');
     }
   }
 

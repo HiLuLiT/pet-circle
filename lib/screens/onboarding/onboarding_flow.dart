@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
@@ -97,14 +98,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
     if (!mounted) return;
 
-    if (kEnableFirebase) {
-      Navigator.of(context).pushReplacementNamed(
-        AppRoutes.mainShell,
-        arguments: userStore.role,
-      );
-    } else {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.ownerDashboard);
-    }
+    final role = userStore.role;
+    context.go(AppRoutes.shell(role));
   }
 
   void _goTo(int index) {

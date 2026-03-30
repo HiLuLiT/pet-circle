@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
@@ -185,9 +186,8 @@ class _AppNotificationCard extends StatelessWidget {
     };
 
     return GestureDetector(
-      onTap: () async {
-        await notificationStore.markRead(notification.id);
-        if (!context.mounted) return;
+      onTap: () {
+        notificationStore.markRead(notification.id);
         final scaffold = ScaffoldMessenger.of(context);
         switch (notification.type) {
           case notif.NotificationType.medication:
@@ -195,13 +195,7 @@ class _AppNotificationCard extends StatelessWidget {
               SnackBar(content: Text(l10n.medicationLogged), backgroundColor: c.lightBlue),
             );
           case notif.NotificationType.measurement:
-            Navigator.of(context).pushReplacementNamed(
-              AppRoutes.mainShell,
-              arguments: {
-                'role': userStore.role,
-                'initialIndex': 1,
-              },
-            );
+            context.go(AppRoutes.shell(userStore.role, tab: 1));
           case notif.NotificationType.careCircle:
             scaffold.showSnackBar(
               SnackBar(content: Text(l10n.careCircleUpdated), backgroundColor: c.lightBlue),

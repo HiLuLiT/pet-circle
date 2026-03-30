@@ -201,6 +201,7 @@ class _ManualMode extends StatefulWidget {
 class _ManualModeState extends State<_ManualMode>
     with SingleTickerProviderStateMixin {
   bool _isRunning = false;
+  bool _isSaving = false;
   int _remainingSeconds = 0;
   int _tapCount = 0;
   Timer? _timer;
@@ -336,18 +337,21 @@ class _ManualModeState extends State<_ManualMode>
                     ),
                     const SizedBox(width: 12),
                     GestureDetector(
-                      onTap: () async {
+                      onTap: () {
+                        if (_isSaving) return;
+                        _isSaving = true;
                         final petId = petStore.activePet?.id ?? '';
                         final petName = petStore.activePet?.name ?? l10n.petName;
                         if (petId.isEmpty) return;
-                        await measurementStore.addMeasurement(
+
+                        measurementStore.addMeasurement(
                           petId,
                           Measurement(
                             bpm: bpm,
                             recordedAt: DateTime.now(),
                           ),
                         );
-                        await notificationStore.addNotification(
+                        notificationStore.addNotification(
                           AppNotification(
                             id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
                             title: l10n.measurementComplete,
@@ -357,7 +361,7 @@ class _ManualModeState extends State<_ManualMode>
                             petName: petName,
                           ),
                         );
-                        if (!context.mounted) return;
+
                         Navigator.pop(context);
                         setState(() {
                           _remainingSeconds = widget.selectedDuration;
@@ -366,7 +370,7 @@ class _ManualModeState extends State<_ManualMode>
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(l10n.measurementSavedBpm(bpm)),
-                            backgroundColor: const Color(0xFF75ACFF),
+                            backgroundColor: c.lightBlue,
                           ),
                         );
                       },

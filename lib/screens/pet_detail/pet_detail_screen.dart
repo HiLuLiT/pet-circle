@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
@@ -101,7 +102,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                     ),
                     const SizedBox(width: 8),
                     TextButton(
-                      onPressed: () async {
+                      onPressed: () {
                         final navigator = Navigator.of(ctx);
                         final messenger = ScaffoldMessenger.of(context);
                         final updated = _pet.copyWith(
@@ -113,8 +114,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                               ? imageCtrl.text
                               : _pet.imageUrl,
                         );
-                        await petStore.updatePetWithFirestore(updated);
-                        if (!mounted) return;
+                        petStore.updatePetWithFirestore(updated);
                         setState(() => _pet = updated);
                         navigator.pop();
                         messenger.showSnackBar(
@@ -134,14 +134,14 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     );
   }
 
-  Future<void> _addNote() async {
+  void _addNote() {
     final access = petStore.accessForPet(_pet);
     if (!access.canAddNotes || _noteController.text.trim().isEmpty) return;
 
     final petId = _pet.id;
     if (petId == null || petId.isEmpty) return;
     final user = userStore.currentUser;
-    await noteStore.addNote(
+    noteStore.addNote(
       petId,
       ClinicalNote(
         id: 'note-${DateTime.now().millisecondsSinceEpoch}',
@@ -152,7 +152,6 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         createdAt: DateTime.now(),
       ),
     );
-    if (!mounted) return;
     _noteController.clear();
 
     final l10n = AppLocalizations.of(context)!;
@@ -205,7 +204,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
       backgroundColor: c.chocolate,
       leading: IconButton(
         icon: Icon(Icons.arrow_back, color: c.white),
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () => context.pop(),
       ),
       actions: [
         if (access.canEditPet)
@@ -333,13 +332,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               TextButton.icon(
                 onPressed: () {
                   petStore.setActivePet(_pet);
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.mainShell,
-                    arguments: {
-                      'role': userStore.role,
-                      'initialIndex': 1,
-                    },
-                  );
+                  context.go(AppRoutes.shell(userStore.role, tab: 1));
                 },
                 icon: const Icon(Icons.show_chart, size: 18),
                 label: Text(l10n.viewGraph),

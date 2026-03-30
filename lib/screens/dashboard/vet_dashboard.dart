@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/invitation.dart';
 import 'package:pet_circle/models/pet.dart';
@@ -128,7 +131,10 @@ class _VetDashboardState extends State<VetDashboard> {
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: SingleChildScrollView(
-              child: Column(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
+                  child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: AppSpacing.md),
@@ -157,9 +163,8 @@ class _VetDashboardState extends State<VetDashboard> {
                         .map(
                           (pet) => _PetCard(
                             data: pet,
-                            onTap: () => Navigator.of(context).pushNamed(
-                              AppRoutes.petDetail,
-                              arguments: pet,
+                            onTap: () => context.push(
+                              AppRoutes.petDetail(AppUserRole.vet, pet.id ?? ''),
                             ),
                           ),
                         )
@@ -192,6 +197,8 @@ class _VetDashboardState extends State<VetDashboard> {
                     ],
                   ),
                 ],
+              ),
+            ),
               ),
             ),
           ),

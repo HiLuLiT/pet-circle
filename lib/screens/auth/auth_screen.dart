@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/app_user.dart';
@@ -71,7 +72,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
     if (result.success) {
       if (_isSignUp || !(result.user?.emailVerified ?? true)) {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.verifyEmail);
+        context.go(AppRoutes.verifyEmail);
       } else {
         _navigateAfterAuth();
       }
@@ -119,7 +120,7 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   void _navigateAfterAuth() {
-    Navigator.of(context).pushReplacementNamed(AppRoutes.authGate);
+    context.go(AppRoutes.authGate);
   }
 
   Future<void> _handleForgotPassword() async {
@@ -169,7 +170,10 @@ class _AuthScreenState extends State<AuthScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
-          child: Column(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 20),
@@ -440,6 +444,8 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
             ],
+          ),
+        ),
           ),
         ),
       ),

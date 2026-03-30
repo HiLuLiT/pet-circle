@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
@@ -56,10 +57,7 @@ class _AuthGateState extends State<AuthGate> {
     if (!mounted) return;
 
     if (result.success) {
-      Navigator.of(context).pushReplacementNamed(
-        AppRoutes.mainShell,
-        arguments: appUser.role,
-      );
+      context.go(AppRoutes.shell(appUser.role));
       return;
     }
 
@@ -67,10 +65,7 @@ class _AuthGateState extends State<AuthGate> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(_invitationErrorText(l10n, result.errorCode))),
     );
-    Navigator.of(context).pushReplacementNamed(
-      AppRoutes.mainShell,
-      arguments: appUser.role,
-    );
+    context.go(AppRoutes.shell(appUser.role));
   }
 
   String _invitationErrorText(AppLocalizations l10n, String? errorCode) {
@@ -105,11 +100,11 @@ class _AuthGateState extends State<AuthGate> {
 
       switch (state) {
         case AuthRouteState.unauthenticated:
-          Navigator.of(context).pushReplacementNamed(AppRoutes.welcome);
+          context.go(AppRoutes.welcome);
         case AuthRouteState.needsEmailVerification:
-          Navigator.of(context).pushReplacementNamed(AppRoutes.verifyEmail);
+          context.go(AppRoutes.verifyEmail);
         case AuthRouteState.needsRole:
-          Navigator.of(context).pushReplacementNamed(AppRoutes.roleSelection);
+          context.go(AppRoutes.roleSelection);
         case AuthRouteState.authenticated:
           _handleAuthenticated();
         case AuthRouteState.loading:
@@ -130,10 +125,7 @@ class _AuthGateState extends State<AuthGate> {
       return;
     }
 
-    Navigator.of(context).pushReplacementNamed(
-      AppRoutes.mainShell,
-      arguments: appUser.role,
-    );
+    context.go(AppRoutes.shell(appUser.role));
   }
 
   @override

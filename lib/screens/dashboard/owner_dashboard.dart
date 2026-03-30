@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
@@ -9,6 +10,7 @@ import 'package:pet_circle/models/pet_access.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 
 const _bpmIconAsset = 'assets/figma/bpm_icon.svg';
@@ -33,14 +35,12 @@ class OwnerDashboard extends StatelessWidget {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           TextButton(
-            onPressed: () async {
+            onPressed: () {
               Navigator.pop(ctx);
-              await petStore.removePetWithFirestore(pet.name);
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.petDeleted)),
-                );
-              }
+              petStore.removePetWithFirestore(pet.name);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.petDeleted)),
+              );
             },
             style: TextButton.styleFrom(backgroundColor: c.cherry),
             child: Text(l10n.deletePet, style: TextStyle(color: c.white)),
@@ -93,7 +93,7 @@ class OwnerDashboard extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 GestureDetector(
-                  onTap: () => Navigator.of(context).pushNamed(AppRoutes.onboarding),
+                  onTap: () => context.push(AppRoutes.onboarding),
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     decoration: BoxDecoration(
@@ -121,93 +121,108 @@ class OwnerDashboard extends StatelessWidget {
       return Scaffold(backgroundColor: c.white, body: emptyContent);
     }
 
+    final petCards = pets.map(
+      (pet) => Builder(
+        builder: (context) {
+          final access = petStore.accessForPet(pet);
+          return _PetCard(
+            data: pet,
+            access: access,
+            onLongPress: access.canDeletePet
+                ? () => _confirmDeletePet(context, pet)
+                : null,
+            onMeasure: access.canMeasure
+                ? () {
+                    petStore.setActivePet(pet);
+                    context.go(AppRoutes.shell(AppUserRole.owner, tab: 2));
+                  }
+                : null,
+            onTrends: () {
+              petStore.setActivePet(pet);
+              context.go(AppRoutes.shell(AppUserRole.owner, tab: 1));
+            },
+          );
+        },
+      ),
+    ).toList();
+
     final content = SafeArea(
       child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 24),
-              Text(
-                l10n.myPets,
-                style: AppTextStyles.heading2.copyWith(
-                  color: c.chocolate,
-                  letterSpacing: -0.96,
-                ),
-              ),
-              const SizedBox(height: 24),
-              ...pets.map(
-                (pet) => Padding(
-                  padding: const EdgeInsets.only(bottom: 24),
-                  child: Builder(
-                    builder: (context) {
-                      final access = petStore.accessForPet(pet);
-                      return _PetCard(
-                        data: pet,
-                        access: access,
-                        onLongPress: access.canDeletePet
-                            ? () => _confirmDeletePet(context, pet)
-                            : null,
-                        onMeasure: access.canMeasure
-                            ? () {
-                                petStore.setActivePet(pet);
-                                Navigator.of(context).pushNamed(
-                                  AppRoutes.mainShell,
-                                  arguments: {
-                                    'role': AppUserRole.owner,
-                                    'initialIndex': 2,
-                                  },
-                                );
-                              }
-                            : null,
-                        onTrends: () {
-                          petStore.setActivePet(pet);
-                          Navigator.of(context).pushNamed(
-                            AppRoutes.mainShell,
-                            arguments: {
-                              'role': AppUserRole.owner,
-                              'initialIndex': 1,
-                            },
-                          );
-                        },
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  Text(
+                    l10n.myPets,
+                    style: AppTextStyles.heading2.copyWith(
+                      color: c.chocolate,
+                      letterSpacing: -0.96,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isWide = constraints.maxWidth >= kTabletBreakpoint;
+                      if (isWide) {
+                        return GridView.count(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 24,
+                          mainAxisSpacing: 24,
+                          childAspectRatio: 0.75,
+                          children: petCards,
+                        );
+                      }
+                      return Column(
+                        children: petCards
+                            .map((card) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 24),
+                                  child: card,
+                                ))
+                            .toList(),
                       );
                     },
                   ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.of(context).pushNamed(AppRoutes.onboarding),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    color: c.offWhite,
-                    borderRadius: const BorderRadius.all(AppRadii.medium),
-                    border: Border.all(
-                      color: c.chocolate.withValues(alpha: 0.15),
-                      width: 1.5,
-                      strokeAlign: BorderSide.strokeAlignInside,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add, size: 20, color: c.chocolate),
-                      const SizedBox(width: 8),
-                      Text(
-                        l10n.addPet,
-                        style: AppTextStyles.body.copyWith(
-                          color: c.chocolate,
-                          fontWeight: FontWeight.w600,
+                  GestureDetector(
+                    onTap: () => context.push(AppRoutes.onboarding),
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: c.offWhite,
+                        borderRadius: const BorderRadius.all(AppRadii.medium),
+                        border: Border.all(
+                          color: c.chocolate.withValues(alpha: 0.15),
+                          width: 1.5,
+                          strokeAlign: BorderSide.strokeAlignInside,
                         ),
                       ),
-                    ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add, size: 20, color: c.chocolate),
+                          const SizedBox(width: 8),
+                          Text(
+                            l10n.addPet,
+                            style: AppTextStyles.body.copyWith(
+                              color: c.chocolate,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 24),
+                ],
               ),
-              const SizedBox(height: 24),
-            ],
+            ),
           ),
         ),
       ),
