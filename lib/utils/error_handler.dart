@@ -1,13 +1,13 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pet_circle/main.dart' show kEnableFirebase;
 
 /// Centralized error handler for unhandled Flutter and platform errors.
 ///
 /// Initialise once at startup via [AppErrorHandler.instance.init].
 /// Use [reportError] to surface caught errors from business logic.
 /// Use [showUserError] to display a recoverable error in the UI.
-///
-/// Crashlytics integration is deferred to ERR-002.
 class AppErrorHandler {
   AppErrorHandler._();
 
@@ -35,12 +35,16 @@ class AppErrorHandler {
     if (details.stack != null) {
       debugPrint('[AppErrorHandler] Stack:\n${details.stack}');
     }
-    // TODO(ERR-002): forward to Crashlytics.
+    if (kEnableFirebase) {
+      FirebaseCrashlytics.instance.recordFlutterFatalError(details);
+    }
   }
 
   bool _handlePlatformError(Object error, StackTrace stack) {
     debugPrint('[AppErrorHandler] PlatformError: $error\n$stack');
-    // TODO(ERR-002): forward to Crashlytics.
+    if (kEnableFirebase) {
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    }
     return true; // Mark as handled so the OS does not terminate the app.
   }
 
@@ -50,11 +54,13 @@ class AppErrorHandler {
 
   /// Report a caught error from business / store logic.
   ///
-  /// Logs locally; will forward to Crashlytics in ERR-002.
+  /// Logs locally and forwards to Crashlytics when Firebase is enabled.
   void reportError(Object error, [StackTrace? stack]) {
     debugPrint('[AppErrorHandler] reportError: $error');
     if (stack != null) debugPrint('[AppErrorHandler] Stack:\n$stack');
-    // TODO(ERR-002): forward to Crashlytics.
+    if (kEnableFirebase) {
+      FirebaseCrashlytics.instance.recordError(error, stack);
+    }
   }
 
   /// Show a user-friendly [SnackBar] for a recoverable error.

@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
@@ -48,6 +49,9 @@ AppUserRole parseRole(String? roleStr) {
 GoRouter buildRouter() {
   return GoRouter(
     initialLocation: kEnableFirebase ? AppRoutes.authGate : AppRoutes.welcome,
+    observers: kEnableFirebase
+        ? [FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance)]
+        : [],
     routes: [
       GoRoute(
         path: '/',
