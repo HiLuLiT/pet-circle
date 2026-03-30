@@ -1,9 +1,9 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:pet_circle/models/medication.dart';
+import 'package:pet_circle/services/abstract_reminder_service.dart';
 
 @pragma('vm:entry-point')
 void _onDidReceiveBackgroundNotificationResponse(
@@ -11,7 +11,7 @@ void _onDidReceiveBackgroundNotificationResponse(
   // Background tap handler -- no-op for now; can deep-link later.
 }
 
-class ReminderService {
+class ReminderService implements AbstractReminderService {
   ReminderService._();
   static final ReminderService instance = ReminderService._();
 
@@ -19,6 +19,7 @@ class ReminderService {
       FlutterLocalNotificationsPlugin();
   bool _initialized = false;
 
+  @override
   Future<void> init() async {
     if (_initialized) return;
 
@@ -51,8 +52,10 @@ class ReminderService {
     _initialized = true;
   }
 
+  @override
   Future<bool> requestPermission() async {
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
       final result = await _plugin
           .resolvePlatformSpecificImplementation<
               IOSFlutterLocalNotificationsPlugin>()
@@ -60,7 +63,7 @@ class ReminderService {
       return result ?? false;
     }
 
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       final android = _plugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
       final granted = await android?.requestNotificationsPermission();
@@ -73,6 +76,7 @@ class ReminderService {
   /// Stable numeric id derived from the medication string id.
   int _notifIdFromMedId(String medId) => medId.hashCode & 0x7FFFFFFF;
 
+  @override
   Future<void> scheduleMedicationReminder(Medication med) async {
     if (!_initialized) await init();
 
@@ -147,12 +151,14 @@ class ReminderService {
     // 'As needed' -- no automatic schedule
   }
 
+  @override
   Future<void> cancelMedicationReminder(String medicationId) async {
     final baseId = _notifIdFromMedId(medicationId);
     await _plugin.cancel(baseId);
     await _plugin.cancel(baseId + 1);
   }
 
+  @override
   Future<void> cancelAllReminders() async {
     await _plugin.cancelAll();
   }

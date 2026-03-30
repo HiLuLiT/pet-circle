@@ -33,30 +33,32 @@ class PrimaryButton extends StatelessWidget {
     final fg = isFilled ? c.white : c.chocolate;
     final style = textStyle ?? AppTextStyles.button.copyWith(color: fg);
 
-    return SizedBox(
-      height: minHeight,
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: bg,
-          elevation: 0,
-          side: isFilled
-              ? BorderSide.none
-              : BorderSide(color: c.chocolate.withValues(alpha: 0.15)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
+    return ConstrainedBox(
+      constraints: BoxConstraints(minHeight: minHeight),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: bg,
+            elevation: 0,
+            side: isFilled
+                ? BorderSide.none
+                : BorderSide(color: c.chocolate.withValues(alpha: 0.15)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(borderRadius),
+            ),
           ),
-        ),
-        onPressed: onPressed,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, color: style.color ?? fg, size: 22),
-              const SizedBox(width: 10),
+          onPressed: onPressed,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, color: style.color ?? fg, size: 22),
+                const SizedBox(width: 10),
+              ],
+              Text(label, style: style),
             ],
-            Text(label, style: style),
-          ],
+          ),
         ),
       ),
     );

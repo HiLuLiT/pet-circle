@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
@@ -30,8 +31,10 @@ import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
+import 'package:pet_circle/services/abstract_reminder_service.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/services/reminder_service.dart';
+import 'package:pet_circle/services/web_reminder_service.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 // Set to true when Firebase is fully configured
@@ -54,7 +57,9 @@ void main() async {
     await deepLinkService.init();
   }
 
-  await ReminderService.instance.init();
+  final AbstractReminderService reminderService =
+      kIsWeb ? WebReminderService() : ReminderService.instance;
+  await reminderService.init();
 
   if (!kEnableFirebase) {
     _seedMockStores();

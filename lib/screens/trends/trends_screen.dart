@@ -1,3 +1,5 @@
+import 'dart:math' show max;
+
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/measurement.dart';
@@ -5,7 +7,8 @@ import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:pet_circle/utils/csv_export_helper.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class TrendsScreen extends StatefulWidget {
   const TrendsScreen({super.key, this.showScaffold = true});
@@ -39,13 +42,14 @@ class _TrendsScreenState extends State<TrendsScreen> {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
     final petId = petStore.activePet?.id ?? '';
+    final petName = petStore.activePet?.name ?? l10n.petName;
     final measurements = measurementStore.getMeasurements(petId);
     final csvLines = measurements.map((m) => '${m.recordedAt.toIso8601String()},${m.bpm}').join('\n');
     final csvData = 'Date,BPM\n$csvLines';
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
         title: Text(l10n.exportLabel, style: AppTextStyles.heading3),
         content: SingleChildScrollView(
@@ -68,15 +72,26 @@ class _TrendsScreenState extends State<TrendsScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx),
             child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: c.chocolate)),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.medicationLogExported)),
-              );
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                final timestamp = DateTime.now().millisecondsSinceEpoch;
+                final filename = '${petName}_srr_trends_$timestamp.csv';
+                await exportCsv(filename, csvData);
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.medicationLogExported)),
+                );
+              } catch (_) {
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Export failed. Please try again.')),
+                );
+              }
             },
             style: TextButton.styleFrom(
               backgroundColor: c.lightBlue,
@@ -102,9 +117,8 @@ class _TrendsScreenState extends State<TrendsScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           TextButton(
-            onPressed: () async {
-              await measurementStore.removeMeasurement(petId, m);
-              if (!context.mounted) return;
+            onPressed: () {
+              measurementStore.removeMeasurement(petId, m);
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text(l10n.measurementDeleted)),
@@ -317,7 +331,7 @@ class _StatGrid extends StatelessWidget {
           Row(children: [
             _StatCard(title: l10n.trend, value: '--', footnote: l10n.bpmChange),
             const SizedBox(width: 8),
-            const _StatusCard(),
+            _StatusCard(measurements: filtered),
           ]),
         ]),
       );
@@ -346,7 +360,7 @@ class _StatGrid extends StatelessWidget {
         Row(children: [
           _StatCard(title: l10n.trend, value: trendStr, footnote: l10n.bpmChange),
           const SizedBox(width: 8),
-          const _StatusCard(),
+          _StatusCard(measurements: filtered),
         ]),
       ]),
     );
@@ -457,12 +471,17 @@ class _StatCard extends StatelessWidget {
 }
 
 class _StatusCard extends StatelessWidget {
-  const _StatusCard();
+  const _StatusCard({required this.measurements});
+
+  final List<Measurement> measurements;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppColorsTheme.of(context);
+    final normal = measurements.where((m) => m.bpm < settingsStore.elevatedThreshold).length;
+    final elevated = measurements.where((m) => m.bpm >= settingsStore.elevatedThreshold && m.bpm < settingsStore.criticalThreshold).length;
+    final critical = measurements.where((m) => m.bpm >= settingsStore.criticalThreshold).length;
     return Expanded(
       child: Container(
         height: 109,
@@ -476,20 +495,13 @@ class _StatusCard extends StatelessWidget {
           children: [
             Text(l10n.status, style: AppTextStyles.caption.copyWith(fontSize: 12)),
             const SizedBox(height: 16),
-            Builder(builder: (context) {
-              final petId = petStore.activePet?.id ?? '';
-              final measurements = measurementStore.getMeasurements(petId);
-              final normal = measurements.where((m) => m.bpm < settingsStore.elevatedThreshold).length;
-              final elevated = measurements.where((m) => m.bpm >= settingsStore.elevatedThreshold && m.bpm < settingsStore.criticalThreshold).length;
-              final critical = measurements.where((m) => m.bpm >= settingsStore.criticalThreshold).length;
-              return Row(children: [
-                _StatusPill(value: '$normal', color: c.lightBlue),
-                const SizedBox(width: 8),
-                _StatusPill(value: '$elevated', color: c.lightYellow),
-                const SizedBox(width: 8),
-                _StatusPill(value: '$critical', color: c.cherry, muted: critical == 0),
-              ]);
-            }),
+            Row(children: [
+              _StatusPill(value: '$normal', color: c.lightBlue),
+              const SizedBox(width: 8),
+              _StatusPill(value: '$elevated', color: c.lightYellow),
+              const SizedBox(width: 8),
+              _StatusPill(value: '$critical', color: c.cherry, muted: critical == 0),
+            ]),
           ],
         ),
       ),
@@ -546,88 +558,188 @@ class _SrrChart extends StatelessWidget {
             const SizedBox(height: 12),
             Text(l10n.noMeasurementsYet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
             const SizedBox(height: 8),
-            Text(l10n.noMeasurementsDescription, style: AppTextStyles.body.copyWith(color: c.chocolate), textAlign: TextAlign.center),
+            Text(
+              l10n.noMeasurementsDescription,
+              style: AppTextStyles.body.copyWith(color: c.chocolate),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       );
     }
 
-    final data = measurements.reversed.map((m) {
-      final day = '${m.recordedAt.month}/${m.recordedAt.day}';
-      return _SrrPoint(day, m.bpm.toDouble());
-    }).toList();
+    // Build chronological list (reversed from reversed-order source list)
+    final ordered = measurements.reversed.toList();
+    final spots = ordered.indexed
+        .map((entry) => FlSpot(entry.$1.toDouble(), entry.$2.bpm.toDouble()))
+        .toList();
+
+    // X-axis labels: show up to 6 evenly-spaced date strings to avoid crowding
+    final labels = ordered
+        .map((m) => '${m.recordedAt.month}/${m.recordedAt.day}')
+        .toList();
+    final labelStep = (labels.length / 6).ceil().clamp(1, labels.length);
+
+    final maxBpm = spots.isEmpty ? 50.0 : spots.map((s) => s.y).reduce((a, b) => a > b ? a : b);
+    final maxY = max(50.0, maxBpm + 10.0);
+
+    final chocolateColor = c.chocolate;
+    final offWhiteColor = c.offWhite;
+    final blueColor = c.blue;
+    final whiteColor = c.white;
 
     return Container(
       height: 280,
       width: double.infinity,
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.only(top: 12, right: 12, bottom: 4, left: 4),
       decoration: BoxDecoration(
-        color: c.white,
+        color: whiteColor,
         borderRadius: const BorderRadius.all(AppRadii.small),
       ),
-      child: SfCartesianChart(
-        plotAreaBorderWidth: 0,
-        margin: EdgeInsets.zero,
-        primaryXAxis: CategoryAxis(
-          axisLine: AxisLine(width: 1, color: c.chocolate),
-          majorGridLines: MajorGridLines(width: 0.5, color: c.offWhite, dashArray: const [3, 3]),
-          majorTickLines: const MajorTickLines(size: 6, width: 1),
-          labelStyle: AppTextStyles.caption.copyWith(color: c.chocolate, fontSize: 10),
-          labelRotation: 0,
-        ),
-        primaryYAxis: NumericAxis(
-          minimum: 0,
-          maximum: 50,
-          interval: 10,
-          axisLine: AxisLine(width: 1, color: c.chocolate),
-          majorTickLines: const MajorTickLines(size: 6, width: 1),
-          majorGridLines: MajorGridLines(width: 0.5, color: c.offWhite, dashArray: const [3, 3]),
-          labelStyle: AppTextStyles.caption.copyWith(color: c.chocolate, fontSize: 10),
-          plotBands: [
-            PlotBand(
-              start: 30, end: 30, borderColor: c.chocolate, borderWidth: 1,
-              dashArray: const [4, 4],
-              text: 'Normal Threshold (30 BPM)',
-              textStyle: AppTextStyles.caption.copyWith(color: c.chocolate),
-              horizontalTextAlignment: TextAnchor.end,
-              verticalTextAlignment: TextAnchor.middle,
+      child: LineChart(
+        LineChartData(
+          minX: 0,
+          maxX: (spots.length - 1).toDouble(),
+          minY: 0,
+          maxY: maxY,
+          clipData: const FlClipData.all(),
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: true,
+            horizontalInterval: 10,
+            verticalInterval: labelStep.toDouble(),
+            getDrawingHorizontalLine: (_) => FlLine(
+              color: offWhiteColor,
+              strokeWidth: 0.5,
+              dashArray: [3, 3],
             ),
-            PlotBand(
-              start: 40, end: 40, borderColor: c.chocolate, borderWidth: 1,
-              dashArray: const [4, 4],
-              text: 'Alert Threshold (40 BPM)',
-              textStyle: AppTextStyles.caption.copyWith(color: c.chocolate),
-              horizontalTextAlignment: TextAnchor.end,
-              verticalTextAlignment: TextAnchor.middle,
+            getDrawingVerticalLine: (_) => FlLine(
+              color: offWhiteColor,
+              strokeWidth: 0.5,
+              dashArray: [3, 3],
+            ),
+          ),
+          borderData: FlBorderData(
+            show: true,
+            border: Border(
+              bottom: BorderSide(color: chocolateColor, width: 1),
+              left: BorderSide(color: chocolateColor, width: 1),
+              top: BorderSide.none,
+              right: BorderSide.none,
+            ),
+          ),
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: 10,
+                reservedSize: 28,
+                getTitlesWidget: (value, meta) {
+                  if (value % 10 != 0) return const SizedBox.shrink();
+                  return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    child: Text(
+                      value.toInt().toString(),
+                      style: AppTextStyles.caption.copyWith(
+                        color: chocolateColor,
+                        fontSize: 10,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                interval: labelStep.toDouble(),
+                reservedSize: 22,
+                getTitlesWidget: (value, meta) {
+                  final index = value.toInt();
+                  if (index < 0 || index >= labels.length) {
+                    return const SizedBox.shrink();
+                  }
+                  if (index % labelStep != 0) return const SizedBox.shrink();
+                  return SideTitleWidget(
+                    axisSide: meta.axisSide,
+                    child: Text(
+                      labels[index],
+                      style: AppTextStyles.caption.copyWith(
+                        color: chocolateColor,
+                        fontSize: 10,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          ),
+          extraLinesData: ExtraLinesData(
+            horizontalLines: [
+              HorizontalLine(
+                y: settingsStore.elevatedThreshold.toDouble(),
+                color: chocolateColor,
+                strokeWidth: 1,
+                dashArray: [4, 4],
+                label: HorizontalLineLabel(
+                  show: true,
+                  alignment: Alignment.topRight,
+                  labelResolver: (_) => 'Normal Threshold (${settingsStore.elevatedThreshold} BPM)',
+                  style: AppTextStyles.caption.copyWith(
+                    color: chocolateColor,
+                    fontSize: 9,
+                  ),
+                ),
+              ),
+              HorizontalLine(
+                y: settingsStore.criticalThreshold.toDouble(),
+                color: chocolateColor,
+                strokeWidth: 1,
+                dashArray: [4, 4],
+                label: HorizontalLineLabel(
+                  show: true,
+                  alignment: Alignment.topRight,
+                  labelResolver: (_) => 'Alert Threshold (${settingsStore.criticalThreshold} BPM)',
+                  style: AppTextStyles.caption.copyWith(
+                    color: chocolateColor,
+                    fontSize: 9,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          lineBarsData: [
+            LineChartBarData(
+              spots: spots,
+              isCurved: false,
+              color: blueColor,
+              barWidth: 2,
+              dotData: FlDotData(
+                show: true,
+                getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
+                  radius: 4,
+                  color: blueColor,
+                  strokeWidth: 2,
+                  strokeColor: whiteColor,
+                ),
+              ),
+              belowBarData: BarAreaData(
+                show: true,
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    blueColor.withValues(alpha: 0.25),
+                    blueColor.withValues(alpha: 0.0),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
-        series: [
-          AreaSeries<_SrrPoint, String>(
-            dataSource: data,
-            xValueMapper: (_SrrPoint point, _) => point.label,
-            yValueMapper: (_SrrPoint point, _) => point.value,
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [c.blue.withValues(alpha: 0.25), c.blue.withValues(alpha: 0.0)],
-            ),
-            borderColor: c.blue,
-            borderWidth: 2,
-            markerSettings: MarkerSettings(
-              isVisible: true, width: 8, height: 8,
-              color: c.blue, borderWidth: 2, borderColor: c.white,
-            ),
-          ),
-        ],
       ),
     );
   }
-}
-
-class _SrrPoint {
-  const _SrrPoint(this.label, this.value);
-
-  final String label;
-  final double value;
 }

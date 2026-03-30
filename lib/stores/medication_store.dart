@@ -29,35 +29,61 @@ class MedicationStore extends ChangeNotifier {
   }
 
   Future<void> addMedication(String petId, Medication medication) async {
+    _medications.putIfAbsent(petId, () => []);
+    _medications[petId]!.add(medication);
+    notifyListeners();
+
     if (kEnableFirebase) {
-      await PetService.addMedication(petId, medication);
-    } else {
-      _medications.putIfAbsent(petId, () => []);
-      _medications[petId]!.add(medication);
-      notifyListeners();
+      try {
+        await PetService.addMedication(petId, medication);
+      } catch (e) {
+        _medications[petId]?.remove(medication);
+        notifyListeners();
+        rethrow;
+      }
     }
   }
 
   Future<void> removeMedication(String petId, String medicationId) async {
-    await ReminderService.instance.cancelMedicationReminder(medicationId);
+    final list = _medications[petId];
+    final idx = list?.indexWhere((m) => m.id == medicationId) ?? -1;
+    final removed = (list != null && idx != -1) ? list.removeAt(idx) : null;
+    if (removed != null) notifyListeners();
+
+    if (!kIsWeb) {
+      ReminderService.instance.cancelMedicationReminder(medicationId);
+    }
+
     if (kEnableFirebase) {
-      await PetService.deleteMedication(petId, medicationId);
-    } else {
-      _medications[petId]?.removeWhere((m) => m.id == medicationId);
-      notifyListeners();
+      try {
+        await PetService.deleteMedication(petId, medicationId);
+      } catch (e) {
+        if (removed != null && list != null) {
+          list.insert(idx.clamp(0, list.length), removed);
+          notifyListeners();
+        }
+        rethrow;
+      }
     }
   }
 
   Future<void> updateMedication(String petId, String medicationId, Medication updated) async {
+    final list = _medications[petId];
+    if (list == null) return;
+    final idx = list.indexWhere((m) => m.id == medicationId);
+    if (idx == -1) return;
+    final previous = list[idx];
+    list[idx] = updated;
+    notifyListeners();
+
     if (kEnableFirebase) {
-      await PetService.updateMedication(petId, medicationId, updated.toFirestore());
-    } else {
-      final list = _medications[petId];
-      if (list == null) return;
-      final idx = list.indexWhere((m) => m.id == medicationId);
-      if (idx == -1) return;
-      list[idx] = updated;
-      notifyListeners();
+      try {
+        await PetService.updateMedication(petId, medicationId, updated.toFirestore());
+      } catch (e) {
+        list[idx] = previous;
+        notifyListeners();
+        rethrow;
+      }
     }
   }
 
@@ -66,17 +92,23 @@ class MedicationStore extends ChangeNotifier {
     if (list == null) return;
     final idx = list.indexWhere((m) => m.id == medicationId);
     if (idx == -1) return;
-    final toggled = list[idx].copyWith(isActive: !list[idx].isActive);
+    final previous = list[idx];
+    final toggled = previous.copyWith(isActive: !previous.isActive);
+    list[idx] = toggled;
+    notifyListeners();
 
-    if (!toggled.isActive) {
-      await ReminderService.instance.cancelMedicationReminder(medicationId);
+    if (!kIsWeb && !toggled.isActive) {
+      ReminderService.instance.cancelMedicationReminder(medicationId);
     }
 
     if (kEnableFirebase) {
-      await PetService.updateMedication(petId, medicationId, {'isActive': toggled.isActive});
-    } else {
-      list[idx] = toggled;
-      notifyListeners();
+      try {
+        await PetService.updateMedication(petId, medicationId, {'isActive': toggled.isActive});
+      } catch (e) {
+        list[idx] = previous;
+        notifyListeners();
+        rethrow;
+      }
     }
   }
 

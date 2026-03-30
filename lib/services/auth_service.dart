@@ -1,6 +1,5 @@
-import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:pet_circle/models/app_user.dart';
@@ -189,7 +188,10 @@ class AuthService {
   /// Check if Apple Sign In is available
   static Future<bool> isAppleSignInAvailable() async {
     if (kIsWeb) return false;
-    if (!Platform.isIOS && !Platform.isMacOS) return false;
+    if (defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.macOS) {
+      return false;
+    }
     return await SignInWithApple.isAvailable();
   }
 

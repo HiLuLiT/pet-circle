@@ -1,7 +1,5 @@
-import 'dart:io';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/medication.dart';
@@ -10,8 +8,8 @@ import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/utils/csv_export_helper.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
-import 'package:share_plus/share_plus.dart';
 
 class MedicationScreen extends StatefulWidget {
   const MedicationScreen({super.key, this.showScaffold = true});
@@ -106,21 +104,18 @@ class _MedicationScreenState extends State<MedicationScreen> {
           ),
           TextButton(
             onPressed: () async {
+              final messenger = ScaffoldMessenger.of(context);
               Navigator.pop(ctx);
               try {
-                final dir = await getTemporaryDirectory();
                 final timestamp = DateTime.now().millisecondsSinceEpoch;
-                final file = File(
-                    '${dir.path}/${petName}_medications_$timestamp.csv');
-                await file.writeAsString(csvData);
-                await Share.shareXFiles(
-                  [XFile(file.path)],
-                  subject: l10n.exportMedicationLog,
-                );
-              } catch (_) {
-                if (!ctx.mounted) return;
-                ScaffoldMessenger.of(ctx).showSnackBar(
+                final filename = '${petName}_medications_$timestamp.csv';
+                await exportCsv(filename, csvData);
+                messenger.showSnackBar(
                   SnackBar(content: Text(l10n.medicationLogExported)),
+                );
+              } catch (e) {
+                messenger.showSnackBar(
+                  SnackBar(content: Text('Export failed: $e')),
                 );
               }
             },
@@ -490,8 +485,11 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
     });
   }
 
-  Future<void> _save() async {
+  void _save() {
     if (!_formKey.currentState!.validate()) return;
+
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
 
     final access = petStore.accessForActivePet();
     if (!access.canManageMedication) return;
@@ -520,12 +518,12 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
         notes: notes.isNotEmpty ? notes : null,
         remindersEnabled: _remindersEnabled,
       );
-      await medicationStore.updateMedication(petId, widget.medication!.id, updated);
+      medicationStore.updateMedication(petId, widget.medication!.id, updated);
 
-      if (_remindersEnabled && _frequency != 'As needed') {
-        await ReminderService.instance.scheduleMedicationReminder(updated);
-      } else {
-        await ReminderService.instance.cancelMedicationReminder(widget.medication!.id);
+      if (!kIsWeb && _remindersEnabled && _frequency != 'As needed') {
+        ReminderService.instance.scheduleMedicationReminder(updated);
+      } else if (!kIsWeb) {
+        ReminderService.instance.cancelMedicationReminder(widget.medication!.id);
       }
     } else {
       final newMed = Medication(
@@ -540,14 +538,14 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
         notes: notes.isNotEmpty ? notes : null,
         remindersEnabled: _remindersEnabled,
       );
-      await medicationStore.addMedication(petId, newMed);
+      medicationStore.addMedication(petId, newMed);
 
-      if (_remindersEnabled && _frequency != 'As needed') {
-        await ReminderService.instance.scheduleMedicationReminder(newMed);
+      if (!kIsWeb && _remindersEnabled && _frequency != 'As needed') {
+        ReminderService.instance.scheduleMedicationReminder(newMed);
       }
     }
 
-    await notificationStore.addNotification(
+    notificationStore.addNotification(
       AppNotification(
         id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
         title: _isEditing ? l10n.medicationUpdated : l10n.medicationAdded,
@@ -557,9 +555,9 @@ class _AddMedicationSheetState extends State<_AddMedicationSheet> {
         petName: petName,
       ),
     );
-    if (!mounted) return;
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
+
+    navigator.pop();
+    messenger.showSnackBar(
       SnackBar(
           content: Text(
               _isEditing ? l10n.medicationUpdated : l10n.medicationAdded)),
