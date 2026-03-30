@@ -22,21 +22,13 @@ class _AuthGateState extends State<AuthGate> {
   void initState() {
     super.initState();
     authProvider.addListener(_onAuthChanged);
-    deepLinkService.onInvitationToken = _onInvitationToken;
     _navigate();
   }
 
   @override
   void dispose() {
     authProvider.removeListener(_onAuthChanged);
-    deepLinkService.onInvitationToken = null;
     super.dispose();
-  }
-
-  void _onInvitationToken(String token) {
-    if (authProvider.routeState == AuthRouteState.authenticated) {
-      _acceptInvitation(token);
-    }
   }
 
   Future<void> _acceptInvitation(String token) async {
