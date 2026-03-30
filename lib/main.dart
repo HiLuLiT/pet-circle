@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
@@ -21,6 +22,7 @@ import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/services/reminder_service.dart';
 import 'package:pet_circle/services/web_reminder_service.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/utils/error_handler.dart';
 
 // Set to true when Firebase is fully configured
 const bool kEnableFirebase = true;
@@ -36,6 +38,13 @@ late final GoRouter router;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Wire up global Flutter / platform error handlers before anything else.
+  AppErrorHandler.instance.init();
+
+  // Disable runtime font fetching so Inter is only loaded from bundled assets.
+  // Falls back gracefully to the system font when the TTF is not bundled.
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   if (kEnableFirebase) {
     await Firebase.initializeApp(

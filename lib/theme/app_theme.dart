@@ -248,8 +248,21 @@ class AppColorsTheme extends ThemeExtension<AppColorsTheme> {
   }
 }
 
+/// Returns the Inter text theme, falling back to the default text theme when
+/// the font is unavailable offline (e.g. runtime fetching is disabled and no
+/// bundled asset is present).
+TextTheme _interTextTheme([TextTheme? base]) {
+  try {
+    return base != null
+        ? GoogleFonts.interTextTheme(base)
+        : GoogleFonts.interTextTheme();
+  } catch (_) {
+    return base ?? const TextTheme();
+  }
+}
+
 ThemeData buildAppTheme() {
-  final baseTextTheme = GoogleFonts.interTextTheme();
+  final baseTextTheme = _interTextTheme();
   return ThemeData(
     brightness: Brightness.light,
     scaffoldBackgroundColor: AppColors.white,
@@ -282,7 +295,7 @@ ThemeData buildAppTheme() {
 }
 
 ThemeData buildDarkTheme() {
-  final baseTextTheme = GoogleFonts.interTextTheme(ThemeData.dark().textTheme);
+  final baseTextTheme = _interTextTheme(ThemeData.dark().textTheme);
   return ThemeData(
     brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColorsDark.white,
