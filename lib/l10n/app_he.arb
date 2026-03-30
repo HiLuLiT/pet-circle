@@ -344,5 +344,11 @@
   "@medicationReminderTitle": { "placeholders": { "name": { "type": "String" } } },
   "medicationReminderBody": "{dosage} — {frequency}",
   "@medicationReminderBody": { "placeholders": { "dosage": { "type": "String" }, "frequency": { "type": "String" } } },
-  "shareMedicationLog": "שיתוף יומן תרופות"
+  "shareMedicationLog": "שיתוף יומן תרופות",
+  "navHome": "בית",
+  "navTrends": "מגמות",
+  "navMeasure": "מדידה",
+  "navMedication": "תרופות",
+  "processingInvitation": "מעבד הזמנה…",
+  "continueButton": "המשך"
 }

@@ -1951,6 +1951,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Share Medication Log'**
   String get shareMedicationLog;
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navTrends.
+  ///
+  /// In en, this message translates to:
+  /// **'Trends'**
+  String get navTrends;
+
+  /// No description provided for @navMeasure.
+  ///
+  /// In en, this message translates to:
+  /// **'Measure'**
+  String get navMeasure;
+
+  /// No description provided for @navMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication'**
+  String get navMedication;
+
+  /// No description provided for @processingInvitation.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing invitation…'**
+  String get processingInvitation;
+
+  /// No description provided for @continueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get continueButton;
 }
 
 class _AppLocalizationsDelegate

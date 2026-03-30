@@ -1006,4 +1006,22 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get shareMedicationLog => 'שיתוף יומן תרופות';
+
+  @override
+  String get navHome => 'בית';
+
+  @override
+  String get navTrends => 'מגמות';
+
+  @override
+  String get navMeasure => 'מדידה';
+
+  @override
+  String get navMedication => 'תרופות';
+
+  @override
+  String get processingInvitation => 'מעבד הזמנה…';
+
+  @override
+  String get continueButton => 'המשך';
 }

@@ -1012,4 +1012,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get shareMedicationLog => 'Share Medication Log';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navTrends => 'Trends';
+
+  @override
+  String get navMeasure => 'Measure';
+
+  @override
+  String get navMedication => 'Medication';
+
+  @override
+  String get processingInvitation => 'Processing invitation…';
+
+  @override
+  String get continueButton => 'Continue';
 }
