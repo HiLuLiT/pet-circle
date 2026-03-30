@@ -5,7 +5,6 @@ import 'package:pet_circle/theme/app_theme.dart';
 const _homeIconAsset = 'assets/figma/nav_home.svg';
 const _heartbeatIconAsset = 'assets/figma/nav_heartbeat.svg';
 const _heartIconAsset = 'assets/figma/nav_heart.svg';
-const _messageIconAsset = 'assets/figma/nav_message.svg';
 
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
@@ -31,25 +30,41 @@ class BottomNavBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _NavItem(
-            iconAsset: _homeIconAsset,
-            isSelected: selectedIndex == 0,
-            onTap: () => onTap(0),
+          Semantics(
+            label: 'Home',
+            button: true,
+            child: _NavItem(
+              iconAsset: _homeIconAsset,
+              isSelected: selectedIndex == 0,
+              onTap: () => onTap(0),
+            ),
           ),
-          _NavItem(
-            iconAsset: _heartbeatIconAsset,
-            isSelected: selectedIndex == 1,
-            onTap: () => onTap(1),
+          Semantics(
+            label: 'Trends',
+            button: true,
+            child: _NavItem(
+              iconAsset: _heartbeatIconAsset,
+              isSelected: selectedIndex == 1,
+              onTap: () => onTap(1),
+            ),
           ),
-          _NavItem(
-            iconAsset: _heartIconAsset,
-            isSelected: selectedIndex == 2,
-            onTap: () => onTap(2),
+          Semantics(
+            label: 'Pets',
+            button: true,
+            child: _NavItem(
+              iconAsset: _heartIconAsset,
+              isSelected: selectedIndex == 2,
+              onTap: () => onTap(2),
+            ),
           ),
-          _NavItemIcon(
-            icon: Icons.medication_outlined,
-            isSelected: selectedIndex == 3,
-            onTap: () => onTap(3),
+          Semantics(
+            label: 'Medications',
+            button: true,
+            child: _NavItemIcon(
+              icon: Icons.medication_outlined,
+              isSelected: selectedIndex == 3,
+              onTap: () => onTap(3),
+            ),
           ),
         ],
       ),

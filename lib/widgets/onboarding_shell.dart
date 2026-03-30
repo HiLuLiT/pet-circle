@@ -146,9 +146,9 @@ class _Header extends StatelessWidget {
           borderRadius: const BorderRadius.all(AppRadii.pill),
           child: Container(
             height: 8,
-            color: c.chocolate.withOpacity(0.08),
+            color: c.chocolate.withValues(alpha: 0.08),
             child: Align(
-              alignment: Alignment.centerLeft,
+              alignment: AlignmentDirectional.centerStart,
               child: FractionallySizedBox(
                 widthFactor: progress,
                 child: Container(color: c.pink),

@@ -494,7 +494,7 @@ class _ManualModeState extends State<_ManualMode>
                 builder: (context, constraints) {
                   final width = constraints.maxWidth;
                   return Stack(
-                    alignment: Alignment.centerLeft,
+                    alignment: AlignmentDirectional.centerStart,
                     children: [
                       Container(
                         height: 8,
