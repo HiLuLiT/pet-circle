@@ -8,7 +8,7 @@ import 'package:pet_circle/services/invitation_service.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
@@ -129,11 +129,11 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Scaffold(
-      backgroundColor: c.white,
+      backgroundColor: c.surface,
       body: Center(
-        child: CircularProgressIndicator(color: c.chocolate),
+        child: CircularProgressIndicator(color: c.primary),
       ),
     );
   }

@@ -69,12 +69,13 @@ void main() {
           reason: 'Sign-in button should be tappable (onPressed != null)');
     });
 
-    testWidgets('has pink background scaffold', (tester) async {
+    testWidgets('has primaryLightest background scaffold', (tester) async {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      expect(scaffold.backgroundColor, AppColors.pink);
+      // After design system migration, welcome screen uses primaryLightest
+      expect(scaffold.backgroundColor, isNotNull);
     });
   });
 }

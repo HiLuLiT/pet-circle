@@ -12,7 +12,7 @@ import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/app_assets.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step1.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step2.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step3.dart';
@@ -62,7 +62,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       breedAndAge: '$breedAge${_age.isNotEmpty ? " • $_age" : ""}',
       imageUrl: AppAssets.petPlaceholder,
       statusLabel: 'Normal',
-      statusColorHex: AppColors.lightBlue.toARGB32(),
+      statusColorHex: AppPrimitives.blueLight.toARGB32(),
       latestMeasurement: Measurement(bpm: 0, recordedAt: DateTime.now(), recordedAtLabel: 'No measurements yet'),
       careCircle: [ownerMember],
       diagnosis: _diagnosis.isNotEmpty ? _diagnosis : null,

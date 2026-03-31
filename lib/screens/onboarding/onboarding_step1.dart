@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/breed_search_field.dart';
 import 'package:pet_circle/widgets/labeled_text_field.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
@@ -66,22 +67,22 @@ class _OnboardingStep1State extends State<OnboardingStep1>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.tellUsAboutYourPet, style: AppTextStyles.heading3),
-          const SizedBox(height: AppSpacing.md),
+          Text(l10n.tellUsAboutYourPet, style: AppSemanticTextStyles.headingLg),
+          const SizedBox(height: AppSpacingTokens.md),
           LabeledTextField(
             label: l10n.petName,
             hintText: 'e.g., Max',
             controller: _nameController,
             onChanged: widget.onNameChanged,
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacingTokens.md),
           BreedSearchField(
             label: l10n.breed,
             initialValue: widget.initialBreed,
             onChanged: widget.onBreedChanged,
             maxHeight: 160,
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacingTokens.md),
           LabeledTextField(
             label: l10n.ageYears,
             hintText: 'e.g., 8',
@@ -89,7 +90,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
             controller: _ageController,
             onChanged: widget.onAgeChanged,
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacingTokens.md),
           LabeledTextField(
             label: l10n.photoUrl,
             hintText: 'https://...',

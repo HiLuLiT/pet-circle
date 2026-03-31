@@ -7,7 +7,9 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/theme/app_assets.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -146,7 +148,7 @@ class _AuthScreenState extends State<AuthScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.passwordResetSent(email)),
-          backgroundColor: AppColorsTheme.of(context).lightBlue,
+          backgroundColor: AppSemanticColors.of(context).info,
         ),
       );
     } else {
@@ -157,7 +159,7 @@ class _AuthScreenState extends State<AuthScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final isAppleAvailable = !kIsWeb &&
         (defaultTargetPlatform == TargetPlatform.iOS ||
             defaultTargetPlatform == TargetPlatform.macOS);
@@ -166,10 +168,10 @@ class _AuthScreenState extends State<AuthScreen> {
         : null;
 
     return Scaffold(
-      backgroundColor: c.white,
+      backgroundColor: c.primaryLightest,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacingTokens.lg),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
@@ -180,9 +182,9 @@ class _AuthScreenState extends State<AuthScreen> {
               // Logo and header
               Center(
                 child: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(AppSpacingTokens.sm),
                   decoration: BoxDecoration(
-                    color: c.pink,
+                    color: c.primaryLight,
                     shape: BoxShape.circle,
                   ),
                   child: SvgPicture.asset(
@@ -192,19 +194,19 @@ class _AuthScreenState extends State<AuthScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacingTokens.lg),
               Text(
                 _isSignUp ? l10n.createAccount : 'Welcome Back',
-                style: AppTextStyles.heading1.copyWith(color: c.chocolate),
+                style: AppSemanticTextStyles.title2.copyWith(color: c.textPrimary),
                 textAlign: TextAlign.center,
               ),
               if (roleLabel != null) ...[
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacingTokens.sm),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.md, vertical: AppSpacingTokens.sm),
                 decoration: BoxDecoration(
-                  color: c.pink.withValues(alpha: 0.3),
-                  borderRadius: const BorderRadius.all(AppRadii.large),
+                  color: c.primaryLight.withValues(alpha: 0.3),
+                  borderRadius: AppRadiiTokens.borderRadiusLg,
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -215,37 +217,37 @@ class _AuthScreenState extends State<AuthScreen> {
                           ? Icons.medical_services_outlined
                           : Icons.pets,
                       size: 18,
-                      color: c.chocolate,
+                      color: c.textPrimary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacingTokens.sm),
                     Text(
                       l10n.signingUpAs(roleLabel),
-                      style: AppTextStyles.body.copyWith(color: c.chocolate),
+                      style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                     ),
                   ],
                 ),
               ),
               ],
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacingTokens.xl),
 
               // Error message
               if (_error != null)
                 Container(
-                  margin: const EdgeInsets.only(bottom: 16),
+                  margin: const EdgeInsets.only(bottom: AppSpacingTokens.md),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: c.cherry.withValues(alpha: 0.1),
-                    borderRadius: const BorderRadius.all(AppRadii.small),
-                    border: Border.all(color: c.cherry.withValues(alpha: 0.3)),
+                    color: c.error.withValues(alpha: 0.1),
+                    borderRadius: AppRadiiTokens.borderRadiusSm,
+                    border: Border.all(color: c.error.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.error_outline, color: c.cherry, size: 20),
-                      const SizedBox(width: 8),
+                      Icon(Icons.error_outline, color: c.error, size: 20),
+                      const SizedBox(width: AppSpacingTokens.sm),
                       Expanded(
                         child: Text(
                           _error!,
-                          style: AppTextStyles.body.copyWith(color: c.cherry),
+                          style: AppSemanticTextStyles.body.copyWith(color: c.error),
                         ),
                       ),
                     ],
@@ -270,7 +272,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           return null;
                         },
                       ),
-                    if (_isSignUp) const SizedBox(height: 16),
+                    if (_isSignUp) const SizedBox(height: AppSpacingTokens.md),
                     _buildTextField(
                       controller: _emailController,
                       label: l10n.email,
@@ -287,7 +289,7 @@ class _AuthScreenState extends State<AuthScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacingTokens.md),
                     _buildTextField(
                       controller: _passwordController,
                       label: l10n.password,
@@ -297,7 +299,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                          color: c.chocolate,
+                          color: c.textPrimary,
                         ),
                         onPressed: () =>
                             setState(() => _obscurePassword = !_obscurePassword),
@@ -313,7 +315,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       },
                     ),
                     if (_isSignUp) ...[
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacingTokens.md),
                       _buildTextField(
                         controller: _confirmPasswordController,
                         label: l10n.confirmPassword,
@@ -325,7 +327,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             _obscureConfirmPassword
                                 ? Icons.visibility_off
                                 : Icons.visibility,
-                            color: c.chocolate,
+                            color: c.textPrimary,
                           ),
                           onPressed: () => setState(
                               () => _obscureConfirmPassword = !_obscureConfirmPassword),
@@ -343,46 +345,46 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
 
               if (!_isSignUp) ...[
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacingTokens.sm),
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
                     onPressed: _isLoading ? null : _handleForgotPassword,
                     child: Text(
                       l10n.forgotPassword,
-                      style: AppTextStyles.body.copyWith(color: c.chocolate),
+                      style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                     ),
                   ),
                 ),
               ],
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacingTokens.lg),
 
               // Submit button
               PrimaryButton(
                 label: _isSignUp ? l10n.createAccount : l10n.signIn,
                 onPressed: _isLoading ? null : _handleEmailAuth,
-                backgroundColor: c.chocolate,
+                backgroundColor: c.primary,
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacingTokens.lg),
 
               // Divider
               Row(
                 children: [
-                  Expanded(child: Divider(color: c.chocolate.withValues(alpha: 0.3))),
+                  Expanded(child: Divider(color: c.divider)),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.md),
                     child: Text(
                       l10n.orContinueWith,
-                      style: AppTextStyles.caption.copyWith(color: c.chocolate),
+                      style: AppSemanticTextStyles.caption.copyWith(color: c.textSecondary),
                     ),
                   ),
-                  Expanded(child: Divider(color: c.chocolate.withValues(alpha: 0.3))),
+                  Expanded(child: Divider(color: c.divider)),
                 ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacingTokens.lg),
 
               // Social login buttons
               Row(
@@ -395,7 +397,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ),
                   if (isAppleAvailable) ...[
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppSpacingTokens.md),
                     Expanded(
                       child: _SocialButton(
                         label: l10n.apple,
@@ -407,15 +409,16 @@ class _AuthScreenState extends State<AuthScreen> {
                 ],
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacingTokens.xl),
 
               // Toggle sign in / sign up
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Text(
                     _isSignUp ? l10n.alreadyHaveAccount : l10n.dontHaveAccount,
-                    style: AppTextStyles.body.copyWith(color: c.chocolate),
+                    style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                   ),
                   TextButton(
                     onPressed: _isLoading
@@ -426,8 +429,8 @@ class _AuthScreenState extends State<AuthScreen> {
                             }),
                     child: Text(
                       _isSignUp ? l10n.signIn : l10n.signUp,
-                      style: AppTextStyles.body.copyWith(
-                        color: c.chocolate,
+                      style: AppSemanticTextStyles.body.copyWith(
+                        color: c.primary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -438,9 +441,9 @@ class _AuthScreenState extends State<AuthScreen> {
               // Loading overlay
               if (_isLoading)
                 Container(
-                  margin: const EdgeInsets.only(top: 16),
+                  margin: const EdgeInsets.only(top: AppSpacingTokens.md),
                   child: Center(
-                    child: CircularProgressIndicator(color: c.chocolate),
+                    child: CircularProgressIndicator(color: c.primary),
                   ),
                 ),
             ],
@@ -462,41 +465,41 @@ class _AuthScreenState extends State<AuthScreen> {
     Widget? suffixIcon,
     String? Function(String?)? validator,
   }) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+          style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacingTokens.sm),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
           validator: validator,
-          style: AppTextStyles.body,
+          style: AppSemanticTextStyles.body,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: AppTextStyles.body.copyWith(color: c.chocolate),
-            prefixIcon: Icon(icon, color: c.chocolate, size: 20),
+            hintStyle: AppSemanticTextStyles.body.copyWith(color: c.textTertiary),
+            prefixIcon: Icon(icon, color: c.textSecondary, size: 20),
             suffixIcon: suffixIcon,
             filled: true,
-            fillColor: c.offWhite,
+            fillColor: c.background,
             border: OutlineInputBorder(
-              borderRadius: const BorderRadius.all(AppRadii.small),
+              borderRadius: AppRadiiTokens.borderRadiusLg,
               borderSide: BorderSide.none,
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: const BorderRadius.all(AppRadii.small),
-              borderSide: BorderSide(color: c.chocolate, width: 2),
+              borderRadius: AppRadiiTokens.borderRadiusLg,
+              borderSide: BorderSide(color: c.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: const BorderRadius.all(AppRadii.small),
-              borderSide: BorderSide(color: c.cherry.withValues(alpha: 0.4), width: 1),
+              borderRadius: AppRadiiTokens.borderRadiusLg,
+              borderSide: BorderSide(color: c.error.withValues(alpha: 0.4), width: 1),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.md, vertical: 14),
           ),
         ),
       ],
@@ -517,22 +520,22 @@ class _SocialButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 14),
-        side: BorderSide(color: c.chocolate.withValues(alpha: 0.3)),
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.small)),
+        side: BorderSide(color: c.divider),
+        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: c.chocolate, size: 24),
-          const SizedBox(width: 8),
+          Icon(icon, color: c.textPrimary, size: 24),
+          const SizedBox(width: AppSpacingTokens.sm),
           Text(
             label,
-            style: AppTextStyles.body.copyWith(color: c.chocolate),
+            style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
           ),
         ],
       ),

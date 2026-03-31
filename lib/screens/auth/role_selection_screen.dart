@@ -7,7 +7,9 @@ import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/services/user_service.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
@@ -39,21 +41,21 @@ class RoleSelectionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
 
     return Scaffold(
-      backgroundColor: c.white,
+      backgroundColor: c.surface,
       body: SafeArea(
         child: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.lg),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   l10n.hiUser(userStore.currentUser?.name ?? ''),
-                  style: AppTextStyles.heading2.copyWith(
-                    color: c.chocolate,
+                  style: AppSemanticTextStyles.title3.copyWith(
+                    color: c.textPrimary,
                     letterSpacing: -0.96,
                   ),
                   textAlign: TextAlign.center,
@@ -61,17 +63,17 @@ class RoleSelectionScreen extends StatelessWidget {
                 const SizedBox(height: 93),
                 _RoleButton(
                   label: l10n.imAVeterinarian,
-                  backgroundColor: c.chocolate,
-                  textColor: c.white,
-                  iconColor: c.white,
+                  backgroundColor: c.primary,
+                  textColor: c.onPrimary,
+                  iconColor: c.onPrimary,
                   onTap: () => _handleRoleSelect(context, AppUserRole.vet),
                 ),
                 const SizedBox(height: 12),
                 _RoleButton(
                   label: l10n.imAPetOwner,
-                  backgroundColor: c.pink,
-                  textColor: c.chocolate,
-                  iconColor: c.chocolate,
+                  backgroundColor: c.primaryLight,
+                  textColor: c.textPrimary,
+                  iconColor: c.textPrimary,
                   onTap: () => _handleRoleSelect(context, AppUserRole.owner),
                 ),
               ],
@@ -108,17 +110,17 @@ class _RoleButton extends StatelessWidget {
         style: TextButton.styleFrom(
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
-            borderRadius: const BorderRadius.all(AppRadii.pill),
+            borderRadius: AppRadiiTokens.borderRadiusFull,
           ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.favorite_border, color: iconColor, size: 24),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacingTokens.sm),
             Text(
               label,
-              style: AppTextStyles.body.copyWith(
+              style: AppSemanticTextStyles.body.copyWith(
                 color: textColor,
                 fontSize: 24,
                 fontWeight: FontWeight.w500,

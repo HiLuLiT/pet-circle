@@ -3,7 +3,9 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/user_service.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 enum _VetLookupState { idle, loading, foundVet, notVet, notFound }
@@ -133,25 +135,25 @@ class _OnboardingStep4State extends State<OnboardingStep4>
         ? l10n.invitationSentTo(email, _selectedRole)
         : l10n.pleaseEnterEmailAddress;
 
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
           children: [
             Icon(
               email.isNotEmpty ? Icons.check_circle : Icons.info_outline,
-              color: c.white,
+              color: c.onPrimary,
               size: 20,
             ),
             const SizedBox(width: 12),
             Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: email.isNotEmpty ? c.lightBlue : c.cherry,
+        backgroundColor: email.isNotEmpty ? c.info : c.error,
         behavior: SnackBarBehavior.floating,
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(AppRadii.small)),
-        margin: const EdgeInsets.all(AppSpacing.md),
+        shape: RoundedRectangleBorder(
+            borderRadius: AppRadiiTokens.borderRadiusSm),
+        margin: const EdgeInsets.all(AppSpacingTokens.md),
       ),
     );
 
@@ -169,7 +171,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     super.build(context);
 
     return OnboardingShell(
@@ -183,21 +185,21 @@ class _OnboardingStep4State extends State<OnboardingStep4>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Section A: Invite Your Vet ──
+          // -- Section A: Invite Your Vet --
           _buildVetSection(l10n, c),
 
-          const SizedBox(height: AppSpacing.lg),
-          Divider(color: c.chocolate.withValues(alpha: 0.1)),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacingTokens.lg),
+          Divider(color: c.divider),
+          const SizedBox(height: AppSpacingTokens.lg),
 
-          // ── Section B: Invite Care Circle (existing) ──
+          // -- Section B: Invite Care Circle (existing) --
           _buildCareCircleSection(l10n, c),
         ],
       ),
     );
   }
 
-  Widget _buildVetSection(AppLocalizations l10n, AppColorsTheme c) {
+  Widget _buildVetSection(AppLocalizations l10n, AppSemanticColors c) {
     final canAddMore = _addedVets.length < _maxVets;
 
     return Column(
@@ -205,22 +207,22 @@ class _OnboardingStep4State extends State<OnboardingStep4>
       children: [
         Row(
           children: [
-            Icon(Icons.local_hospital, size: 20, color: c.blue),
-            const SizedBox(width: AppSpacing.sm),
-            Text(l10n.inviteYourVet, style: AppTextStyles.heading3),
+            Icon(Icons.local_hospital, size: 20, color: c.info),
+            const SizedBox(width: AppSpacingTokens.sm),
+            Text(l10n.inviteYourVet, style: AppSemanticTextStyles.headingLg),
           ],
         ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(l10n.inviteYourVetDesc, style: AppTextStyles.body),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacingTokens.sm),
+        Text(l10n.inviteYourVetDesc, style: AppSemanticTextStyles.body),
+        const SizedBox(height: AppSpacingTokens.md),
 
         // Added vets list
         if (_addedVets.isNotEmpty) ...[
           ..._addedVets.map((vet) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm),
                 child: _VetInviteRow(invite: vet),
               )),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacingTokens.sm),
         ],
 
         // Input + lookup (only show when slots remain)
@@ -230,26 +232,26 @@ class _OnboardingStep4State extends State<OnboardingStep4>
             lookupState: _vetLookupState,
             onLookUp: _lookUpVet,
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacingTokens.sm),
 
           // Lookup result feedback
           _buildVetLookupFeedback(l10n, c),
         ] else
           Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
+            padding: const EdgeInsets.all(AppSpacingTokens.sm),
             decoration: BoxDecoration(
-              color: c.lightYellow.withValues(alpha: 0.5),
-              borderRadius: const BorderRadius.all(AppRadii.xs),
+              color: c.warning.withValues(alpha: 0.15),
+              borderRadius: AppRadiiTokens.borderRadiusLg,
             ),
             child: Row(
               children: [
-                Icon(Icons.info_outline, size: 16, color: c.chocolate),
-                const SizedBox(width: AppSpacing.sm),
+                Icon(Icons.info_outline, size: 16, color: c.textSecondary),
+                const SizedBox(width: AppSpacingTokens.sm),
                 Expanded(
                   child: Text(
                     l10n.maxVetsReached,
-                    style: AppTextStyles.caption
-                        .copyWith(color: c.chocolate),
+                    style: AppSemanticTextStyles.caption
+                        .copyWith(color: c.textSecondary),
                   ),
                 ),
               ],
@@ -259,21 +261,21 @@ class _OnboardingStep4State extends State<OnboardingStep4>
     );
   }
 
-  Widget _buildVetLookupFeedback(AppLocalizations l10n, AppColorsTheme c) {
+  Widget _buildVetLookupFeedback(AppLocalizations l10n, AppSemanticColors c) {
     switch (_vetLookupState) {
       case _VetLookupState.idle:
         return const SizedBox.shrink();
 
       case _VetLookupState.loading:
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacingTokens.sm),
           child: Center(
             child: SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
-                color: c.blue,
+                color: c.info,
               ),
             ),
           ),
@@ -281,30 +283,30 @@ class _OnboardingStep4State extends State<OnboardingStep4>
 
       case _VetLookupState.foundVet:
         return Container(
-          margin: const EdgeInsets.only(top: AppSpacing.sm),
-          padding: const EdgeInsets.all(AppSpacing.sm),
+          margin: const EdgeInsets.only(top: AppSpacingTokens.sm),
+          padding: const EdgeInsets.all(AppSpacingTokens.sm),
           decoration: BoxDecoration(
-            color: c.lightBlue.withValues(alpha: 0.15),
-            borderRadius: const BorderRadius.all(AppRadii.xs),
+            color: c.info.withValues(alpha: 0.15),
+            borderRadius: AppRadiiTokens.borderRadiusLg,
           ),
           child: Row(
             children: [
               CircleAvatar(
                 radius: 18,
-                backgroundColor: c.blue.withValues(alpha: 0.2),
-                child: Icon(Icons.verified, size: 18, color: c.blue),
+                backgroundColor: c.info.withValues(alpha: 0.2),
+                child: Icon(Icons.verified, size: 18, color: c.info),
               ),
-              const SizedBox(width: AppSpacing.sm),
+              const SizedBox(width: AppSpacingTokens.sm),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(l10n.vetFound,
-                        style: AppTextStyles.caption
-                            .copyWith(color: c.blue)),
+                        style: AppSemanticTextStyles.caption
+                            .copyWith(color: c.info)),
                     Text(
                       _foundVet?.displayName ?? _vetEmailController.text,
-                      style: AppTextStyles.body
+                      style: AppSemanticTextStyles.body
                           .copyWith(fontWeight: FontWeight.w600),
                     ),
                   ],
@@ -314,17 +316,17 @@ class _OnboardingStep4State extends State<OnboardingStep4>
                 height: 32,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: c.blue,
+                    backgroundColor: c.info,
                     elevation: 0,
                     padding:
-                        const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(AppRadii.pill),
+                        const EdgeInsets.symmetric(horizontal: AppSpacingTokens.md),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppRadiiTokens.borderRadiusFull,
                     ),
                   ),
                   onPressed: _addVet,
                   child: Text(l10n.addAsVet,
-                      style: AppTextStyles.caption.copyWith(color: c.white)),
+                      style: AppSemanticTextStyles.caption.copyWith(color: c.onPrimary)),
                 ),
               ),
             ],
@@ -333,20 +335,20 @@ class _OnboardingStep4State extends State<OnboardingStep4>
 
       case _VetLookupState.notVet:
         return Container(
-          margin: const EdgeInsets.only(top: AppSpacing.sm),
-          padding: const EdgeInsets.all(AppSpacing.sm),
+          margin: const EdgeInsets.only(top: AppSpacingTokens.sm),
+          padding: const EdgeInsets.all(AppSpacingTokens.sm),
           decoration: BoxDecoration(
-            color: c.cherry.withValues(alpha: 0.1),
-            borderRadius: const BorderRadius.all(AppRadii.xs),
+            color: c.error.withValues(alpha: 0.1),
+            borderRadius: AppRadiiTokens.borderRadiusLg,
           ),
           child: Row(
             children: [
-              Icon(Icons.warning_amber_rounded, size: 18, color: c.cherry),
-              const SizedBox(width: AppSpacing.sm),
+              Icon(Icons.warning_amber_rounded, size: 18, color: c.error),
+              const SizedBox(width: AppSpacingTokens.sm),
               Expanded(
                 child: Text(
                   l10n.notAVetAccount,
-                  style: AppTextStyles.caption.copyWith(color: c.cherry),
+                  style: AppSemanticTextStyles.caption.copyWith(color: c.error),
                 ),
               ),
             ],
@@ -355,43 +357,43 @@ class _OnboardingStep4State extends State<OnboardingStep4>
 
       case _VetLookupState.notFound:
         return Container(
-          margin: const EdgeInsets.only(top: AppSpacing.sm),
-          padding: const EdgeInsets.all(AppSpacing.sm),
+          margin: const EdgeInsets.only(top: AppSpacingTokens.sm),
+          padding: const EdgeInsets.all(AppSpacingTokens.sm),
           decoration: BoxDecoration(
-            color: c.lightYellow.withValues(alpha: 0.5),
-            borderRadius: const BorderRadius.all(AppRadii.xs),
+            color: c.warning.withValues(alpha: 0.15),
+            borderRadius: AppRadiiTokens.borderRadiusLg,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  Icon(Icons.info_outline, size: 16, color: c.chocolate),
-                  const SizedBox(width: AppSpacing.sm),
+                  Icon(Icons.info_outline, size: 16, color: c.textSecondary),
+                  const SizedBox(width: AppSpacingTokens.sm),
                   Expanded(
                     child: Text(
                       l10n.vetNotFound,
-                      style: AppTextStyles.caption
-                          .copyWith(color: c.chocolate),
+                      style: AppSemanticTextStyles.caption
+                          .copyWith(color: c.textSecondary),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: AppSpacingTokens.sm),
               SizedBox(
                 height: 32,
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: c.blue,
+                    backgroundColor: c.info,
                     elevation: 0,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(AppRadii.pill),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppRadiiTokens.borderRadiusFull,
                     ),
                   ),
                   onPressed: _addVet,
                   child: Text(l10n.sendVetInvite,
-                      style: AppTextStyles.caption.copyWith(color: c.white)),
+                      style: AppSemanticTextStyles.caption.copyWith(color: c.onPrimary)),
                 ),
               ),
             ],
@@ -400,27 +402,27 @@ class _OnboardingStep4State extends State<OnboardingStep4>
     }
   }
 
-  Widget _buildCareCircleSection(AppLocalizations l10n, AppColorsTheme c) {
+  Widget _buildCareCircleSection(AppLocalizations l10n, AppSemanticColors c) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.inviteYourCareCircle, style: AppTextStyles.heading3),
-        const SizedBox(height: AppSpacing.sm),
-        Text(l10n.inviteCareCircleDescription, style: AppTextStyles.body),
-        const SizedBox(height: AppSpacing.md),
+        Text(l10n.inviteYourCareCircle, style: AppSemanticTextStyles.headingLg),
+        const SizedBox(height: AppSpacingTokens.sm),
+        Text(l10n.inviteCareCircleDescription, style: AppSemanticTextStyles.body),
+        const SizedBox(height: AppSpacingTokens.md),
         if (_invites.isNotEmpty) ...[
           ..._invites.map((invite) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm),
                 child: _InviteRow(invite: invite),
               )),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacingTokens.sm),
         ],
         _InputRow(
           label: l10n.emailAddress,
           hint: 'email@example.com',
           controller: _emailController,
         ),
-        const SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacingTokens.md),
         _SelectRow(
           label: l10n.role,
           value: _selectedRole,
@@ -430,11 +432,11 @@ class _OnboardingStep4State extends State<OnboardingStep4>
         ),
         if (_roleOpen)
           Container(
-            margin: const EdgeInsets.only(top: AppSpacing.sm),
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+            margin: const EdgeInsets.only(top: AppSpacingTokens.sm),
+            padding: const EdgeInsets.symmetric(vertical: AppSpacingTokens.sm),
             decoration: BoxDecoration(
-              color: c.white,
-              borderRadius: const BorderRadius.all(AppRadii.xs),
+              color: c.surface,
+              borderRadius: AppRadiiTokens.borderRadiusLg,
             ),
             child: Column(
               children: _roles.map((role) {
@@ -450,21 +452,21 @@ class _OnboardingStep4State extends State<OnboardingStep4>
                   child: Container(
                     width: double.infinity,
                     margin: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xs,
+                      horizontal: AppSpacingTokens.sm,
+                      vertical: AppSpacingTokens.xs,
                     ),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 12,
-                      vertical: AppSpacing.sm,
+                      vertical: AppSpacingTokens.sm,
                     ),
                     decoration: BoxDecoration(
                       color:
-                          isSelected ? c.lightYellow : Colors.transparent,
-                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                          isSelected ? c.warning.withValues(alpha: 0.2) : Colors.transparent,
+                      borderRadius: AppRadiiTokens.borderRadiusLg,
                     ),
                     child: Text(
                       role,
-                      style: AppTextStyles.body.copyWith(
+                      style: AppSemanticTextStyles.body.copyWith(
                         fontWeight:
                             isSelected ? FontWeight.w600 : FontWeight.w400,
                       ),
@@ -480,21 +482,21 @@ class _OnboardingStep4State extends State<OnboardingStep4>
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: c.blue,
+              backgroundColor: c.info,
               elevation: 0,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(AppRadii.pill),
+              shape: RoundedRectangleBorder(
+                borderRadius: AppRadiiTokens.borderRadiusFull,
               ),
             ),
             onPressed: _addToCareCircle,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.person_add_alt_1, size: 16, color: c.white),
-                const SizedBox(width: AppSpacing.sm),
+                Icon(Icons.person_add_alt_1, size: 16, color: c.onPrimary),
+                const SizedBox(width: AppSpacingTokens.sm),
                 Text(
                   l10n.addToCareCircle,
-                  style: AppTextStyles.body.copyWith(color: c.white),
+                  style: AppSemanticTextStyles.body.copyWith(color: c.onPrimary),
                 ),
               ],
             ),
@@ -527,52 +529,52 @@ class _VetInviteRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: c.lightBlue.withValues(alpha: 0.1),
-        borderRadius: const BorderRadius.all(AppRadii.xs),
+        color: c.info.withValues(alpha: 0.1),
+        borderRadius: AppRadiiTokens.borderRadiusLg,
       ),
       child: Row(
         children: [
-          Icon(Icons.local_hospital, color: c.blue, size: 18),
-          const SizedBox(width: AppSpacing.sm),
+          Icon(Icons.local_hospital, color: c.info, size: 18),
+          const SizedBox(width: AppSpacingTokens.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   invite.vetName ?? invite.email,
-                  style: AppTextStyles.body,
+                  style: AppSemanticTextStyles.body,
                   overflow: TextOverflow.ellipsis,
                 ),
                 if (invite.vetName != null)
                   Text(
                     invite.email,
-                    style: AppTextStyles.caption
-                        .copyWith(color: c.chocolate.withValues(alpha: 0.5)),
+                    style: AppSemanticTextStyles.caption
+                        .copyWith(color: c.textTertiary),
                     overflow: TextOverflow.ellipsis,
                   ),
                 Text(
                   l10n.pending,
-                  style: AppTextStyles.caption
-                      .copyWith(color: c.chocolate.withValues(alpha: 0.5)),
+                  style: AppSemanticTextStyles.caption
+                      .copyWith(color: c.textTertiary),
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm, vertical: AppSpacingTokens.xs),
             decoration: BoxDecoration(
-              color: c.blue.withValues(alpha: 0.15),
-              borderRadius: const BorderRadius.all(AppRadii.xs),
+              color: c.info.withValues(alpha: 0.15),
+              borderRadius: AppRadiiTokens.borderRadiusLg,
             ),
             child: Text(
               l10n.veterinarian,
-              style: AppTextStyles.caption.copyWith(
-                color: c.blue,
+              style: AppSemanticTextStyles.caption.copyWith(
+                color: c.info,
                 fontSize: 10,
               ),
             ),
@@ -596,14 +598,14 @@ class _VetEmailInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(l10n.emailAddress,
-            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
-        const SizedBox(height: AppSpacing.sm),
+            style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: AppSpacingTokens.sm),
         Row(
           children: [
             Expanded(
@@ -615,38 +617,38 @@ class _VetEmailInput extends StatelessWidget {
                   onSubmitted: (_) => onLookUp(),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: c.white,
+                    fillColor: c.surface,
                     hintText: 'vet@clinic.com',
-                    hintStyle: AppTextStyles.body
-                        .copyWith(color: c.chocolate.withValues(alpha: 0.4)),
+                    hintStyle: AppSemanticTextStyles.body
+                        .copyWith(color: c.textTertiary),
                     border: OutlineInputBorder(
-                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                      borderRadius: AppRadiiTokens.borderRadiusLg,
                       borderSide: BorderSide.none,
                     ),
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 12, vertical: 4),
                   ),
-                  style: AppTextStyles.body,
+                  style: AppSemanticTextStyles.body,
                 ),
               ),
             ),
-            const SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: AppSpacingTokens.sm),
             SizedBox(
               height: 36,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: c.blue,
+                  backgroundColor: c.info,
                   elevation: 0,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(AppRadii.xs),
+                      const EdgeInsets.symmetric(horizontal: AppSpacingTokens.md),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: AppRadiiTokens.borderRadiusLg,
                   ),
                 ),
                 onPressed:
                     lookupState == _VetLookupState.loading ? null : onLookUp,
                 child: Text(l10n.lookUpVet,
-                    style: AppTextStyles.caption.copyWith(color: c.white)),
+                    style: AppSemanticTextStyles.caption.copyWith(color: c.onPrimary)),
               ),
             ),
           ],
@@ -663,46 +665,46 @@ class _InviteRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: c.white,
-        borderRadius: const BorderRadius.all(AppRadii.xs),
+        color: c.surface,
+        borderRadius: AppRadiiTokens.borderRadiusLg,
       ),
       child: Row(
         children: [
-          Icon(Icons.mail_outline, color: c.lightBlue, size: 18),
-          const SizedBox(width: AppSpacing.sm),
+          Icon(Icons.mail_outline, color: c.primaryLight, size: 18),
+          const SizedBox(width: AppSpacingTokens.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   invite.name,
-                  style: AppTextStyles.body,
+                  style: AppSemanticTextStyles.body,
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   l10n.pending,
-                  style: AppTextStyles.caption.copyWith(
-                    color: c.chocolate.withValues(alpha: 0.5),
+                  style: AppSemanticTextStyles.caption.copyWith(
+                    color: c.textTertiary,
                   ),
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm, vertical: AppSpacingTokens.xs),
             decoration: BoxDecoration(
-              color: c.lightYellow,
-              borderRadius: const BorderRadius.all(AppRadii.xs),
+              color: c.warning.withValues(alpha: 0.2),
+              borderRadius: AppRadiiTokens.borderRadiusLg,
             ),
             child: Text(
               invite.role,
-              style: AppTextStyles.caption.copyWith(
-                color: c.chocolate,
+              style: AppSemanticTextStyles.caption.copyWith(
+                color: c.textSecondary,
                 fontSize: 10,
               ),
             ),
@@ -726,13 +728,13 @@ class _InputRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
-        const SizedBox(height: AppSpacing.sm),
+            style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: AppSpacingTokens.sm),
         SizedBox(
           height: 36,
           child: TextField(
@@ -740,19 +742,19 @@ class _InputRow extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               filled: true,
-              fillColor: c.white,
+              fillColor: c.surface,
               hintText: hint,
-              hintStyle: AppTextStyles.body.copyWith(
-                color: c.chocolate.withValues(alpha: 0.4),
+              hintStyle: AppSemanticTextStyles.body.copyWith(
+                color: c.textTertiary,
               ),
               border: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(AppRadii.xs),
+                borderRadius: AppRadiiTokens.borderRadiusLg,
                 borderSide: BorderSide.none,
               ),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             ),
-            style: AppTextStyles.body,
+            style: AppSemanticTextStyles.body,
           ),
         ),
       ],
@@ -777,26 +779,26 @@ class _SelectRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
-            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
-        const SizedBox(height: AppSpacing.sm),
+            style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
+        const SizedBox(height: AppSpacingTokens.sm),
         GestureDetector(
           onTap: onTap,
           child: Container(
             height: 36,
             decoration: BoxDecoration(
-              color: c.white,
-              borderRadius: const BorderRadius.all(AppRadii.xs),
+              color: c.surface,
+              borderRadius: AppRadiiTokens.borderRadiusLg,
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(value, style: AppTextStyles.body),
+                Text(value, style: AppSemanticTextStyles.body),
                 RotationTransition(
                   turns: Tween(begin: 0.0, end: 0.5).animate(
                     CurvedAnimation(
@@ -806,7 +808,7 @@ class _SelectRow extends StatelessWidget {
                   ),
                   child: Icon(
                     Icons.keyboard_arrow_down,
-                    color: c.chocolate,
+                    color: c.textPrimary,
                     size: 18,
                   ),
                 ),

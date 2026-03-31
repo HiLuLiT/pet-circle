@@ -7,7 +7,9 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/theme/app_assets.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
@@ -58,7 +60,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     if (!mounted) return;
 
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
 
     setState(() => _isLoading = false);
 
@@ -66,7 +68,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(l10n.verificationEmailSent),
-          backgroundColor: c.lightBlue,
+          backgroundColor: c.info,
         ),
       );
       _startCooldown();
@@ -74,7 +76,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(result.error ?? l10n.failedToSendEmail),
-          backgroundColor: c.cherry,
+          backgroundColor: c.error,
         ),
       );
     }
@@ -106,28 +108,28 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final email = AuthService.currentUser?.email ?? 'your email';
 
     return Scaffold(
-      backgroundColor: c.white,
+      backgroundColor: c.surface,
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacingTokens.lg),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Logo
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacingTokens.md),
                 decoration: BoxDecoration(
-                  color: c.pink.withValues(alpha: 0.2),
+                  color: c.primaryLightest,
                   shape: BoxShape.circle,
                 ),
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: c.pink,
+                    color: c.primaryLight,
                     shape: BoxShape.circle,
                   ),
                   child: SvgPicture.asset(
@@ -137,82 +139,81 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacingTokens.xl),
 
               // Email icon
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: c.offWhite,
-                  borderRadius: const BorderRadius.all(AppRadii.large),
+                  color: c.background,
+                  borderRadius: AppRadiiTokens.borderRadiusLg,
                 ),
                 child: Icon(
                   Icons.mark_email_unread_outlined,
                   size: 64,
-                  color: c.chocolate,
+                  color: c.textPrimary,
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacingTokens.xl),
 
               Text(
                 l10n.verifyYourEmail,
-                style: AppTextStyles.heading1.copyWith(color: c.chocolate),
+                style: AppSemanticTextStyles.title2.copyWith(color: c.textPrimary),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacingTokens.md),
 
               Text(
                 l10n.verificationLinkSentTo,
-                style: AppTextStyles.body.copyWith(color: c.chocolate),
+                style: AppSemanticTextStyles.body.copyWith(color: c.textSecondary),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacingTokens.xs),
               Text(
                 email,
-                style: AppTextStyles.body.copyWith(
-                  color: c.chocolate,
+                style: AppSemanticTextStyles.body.copyWith(
+                  color: c.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacingTokens.sm),
               Text(
                 l10n.clickLinkToVerify,
-                style: AppTextStyles.body.copyWith(color: c.chocolate),
+                style: AppSemanticTextStyles.body.copyWith(color: c.textSecondary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 40),
 
               // Resend button
               if (_isLoading)
-                CircularProgressIndicator(color: c.chocolate)
+                CircularProgressIndicator(color: c.primary)
               else
                 PrimaryButton(
                   label: _canResend
                       ? l10n.resendVerificationEmail
                       : l10n.resendInSeconds(_resendCooldown),
                   onPressed: _canResend ? _resendEmail : null,
-                  backgroundColor:
-                      _canResend ? c.chocolate : c.chocolate,
+                  backgroundColor: c.primary,
                 ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacingTokens.md),
 
               PrimaryButton(
                 label: l10n.iveVerifiedMyEmail,
                 onPressed: _checkVerification,
-                backgroundColor: c.lightBlue,
+                backgroundColor: c.info,
                 icon: Icons.check_circle_outline,
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacingTokens.xl),
 
               // Sign out link
               TextButton(
                 onPressed: _signOut,
                 child: Text(
                   l10n.useDifferentAccount,
-                  style: AppTextStyles.body.copyWith(color: c.chocolate),
+                  style: AppSemanticTextStyles.body.copyWith(color: c.textSecondary),
                 ),
               ),
             ],

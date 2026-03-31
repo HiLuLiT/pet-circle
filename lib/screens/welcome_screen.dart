@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_assets.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -12,10 +14,10 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
 
     return Scaffold(
-      backgroundColor: c.pink,
+      backgroundColor: c.primaryLightest,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -43,8 +45,8 @@ class WelcomeScreen extends StatelessWidget {
                     children: [
                       _PrimaryPillButton(
                         label: l10n.signUp,
-                        textColor: c.white,
-                        backgroundColor: c.chocolate,
+                        textColor: c.onPrimary,
+                        backgroundColor: c.primary,
                         onTap: () => context.push(AppRoutes.roleSelection),
                       ),
                       const SizedBox(height: 12),
@@ -89,12 +91,12 @@ class _PrimaryPillButton extends StatelessWidget {
           style: TextButton.styleFrom(
             backgroundColor: backgroundColor,
             shape: RoundedRectangleBorder(
-              borderRadius: const BorderRadius.all(AppRadii.pill),
+              borderRadius: AppRadiiTokens.borderRadiusFull,
             ),
           ),
           child: Text(
             label,
-            style: AppTextStyles.body.copyWith(
+            style: AppSemanticTextStyles.body.copyWith(
               color: textColor,
               fontSize: 24,
               fontWeight: FontWeight.w500,
@@ -114,7 +116,7 @@ class _SignInButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 360),
       child: SizedBox(
@@ -123,20 +125,20 @@ class _SignInButton extends StatelessWidget {
         child: TextButton(
           onPressed: onTap,
           style: TextButton.styleFrom(
-            backgroundColor: c.white,
+            backgroundColor: c.surface,
             shape: RoundedRectangleBorder(
-              borderRadius: const BorderRadius.all(AppRadii.pill),
+              borderRadius: AppRadiiTokens.borderRadiusFull,
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.login, size: 18, color: AppColorsTheme.of(context).chocolate),
-              const SizedBox(width: 8),
+              Icon(Icons.login, size: 18, color: c.textPrimary),
+              const SizedBox(width: AppSpacingTokens.sm),
               Text(
                 AppLocalizations.of(context)!.signIn,
-                style: AppTextStyles.body.copyWith(
-                  color: c.chocolate,
+                style: AppSemanticTextStyles.body.copyWith(
+                  color: c.textPrimary,
                   fontSize: 16,
                   letterSpacing: -0.32,
                 ),

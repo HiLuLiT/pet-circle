@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep2 extends StatefulWidget {
@@ -61,7 +63,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     super.build(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
@@ -73,26 +75,26 @@ class _OnboardingStep2State extends State<OnboardingStep2>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.medicalInformation, style: AppTextStyles.heading3),
-          const SizedBox(height: AppSpacing.sm),
+          Text(l10n.medicalInformation, style: AppSemanticTextStyles.headingLg),
+          const SizedBox(height: AppSpacingTokens.sm),
           Text(
             l10n.medicalInfoDescription,
-            style: AppTextStyles.body,
+            style: AppSemanticTextStyles.body,
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacingTokens.md),
           Text(
             l10n.diagnosisOptional,
-            style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
+            style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w700),
           ),
-          const SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacingTokens.sm),
           GestureDetector(
             onTap: _toggleDropdown,
             child: Container(
               height: 36,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: c.white,
-                borderRadius: const BorderRadius.all(AppRadii.xs),
+                color: c.surface,
+                borderRadius: AppRadiiTokens.borderRadiusLg,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,10 +102,10 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                   Expanded(
                     child: Text(
                       _selectedDiagnosis ?? l10n.selectDiagnosis,
-                      style: AppTextStyles.body.copyWith(
+                      style: AppSemanticTextStyles.body.copyWith(
                         color: _selectedDiagnosis == null
-                            ? c.chocolate.withValues(alpha: 0.5)
-                            : c.chocolate,
+                            ? c.textTertiary
+                            : c.textPrimary,
                       ),
                     ),
                   ),
@@ -116,7 +118,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                     ),
                     child: Icon(
                       Icons.keyboard_arrow_down,
-                      color: c.chocolate,
+                      color: c.textPrimary,
                       size: 18,
                     ),
                   ),
@@ -126,11 +128,11 @@ class _OnboardingStep2State extends State<OnboardingStep2>
           ),
           if (_isOpen)
             Container(
-              margin: const EdgeInsets.only(top: 8),
-              padding: const EdgeInsets.symmetric(vertical: 8),
+              margin: const EdgeInsets.only(top: AppSpacingTokens.sm),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacingTokens.sm),
               decoration: BoxDecoration(
-                color: c.white,
-                borderRadius: const BorderRadius.all(AppRadii.xs),
+                color: c.surface,
+                borderRadius: AppRadiiTokens.borderRadiusLg,
               ),
               child: Column(
                 children: _diagnoses.map((diagnosis) {
@@ -147,21 +149,21 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                     child: Container(
                       width: double.infinity,
                       margin: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
+                        horizontal: AppSpacingTokens.sm,
+                        vertical: AppSpacingTokens.xs,
                       ),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
-                        vertical: 8,
+                        vertical: AppSpacingTokens.sm,
                       ),
                       decoration: BoxDecoration(
                         color:
-                            isSelected ? c.lightYellow : Colors.transparent,
-                        borderRadius: const BorderRadius.all(AppRadii.xs),
+                            isSelected ? c.warning.withValues(alpha: 0.2) : Colors.transparent,
+                        borderRadius: AppRadiiTokens.borderRadiusLg,
                       ),
                       child: Text(
                         diagnosis,
-                        style: AppTextStyles.body.copyWith(
+                        style: AppSemanticTextStyles.body.copyWith(
                           fontWeight:
                               isSelected ? FontWeight.w600 : FontWeight.w400,
                         ),
@@ -171,24 +173,24 @@ class _OnboardingStep2State extends State<OnboardingStep2>
                 }).toList(),
               ),
             ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacingTokens.md),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacingTokens.md),
             decoration: BoxDecoration(
-              color: c.white,
-              borderRadius: const BorderRadius.all(AppRadii.xs),
+              color: c.surface,
+              borderRadius: AppRadiiTokens.borderRadiusLg,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   l10n.note,
-                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
+                  style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w700),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacingTokens.xs),
                 Text(
                   l10n.diagnosisNote,
-                  style: AppTextStyles.body,
+                  style: AppSemanticTextStyles.body,
                 ),
               ],
             ),

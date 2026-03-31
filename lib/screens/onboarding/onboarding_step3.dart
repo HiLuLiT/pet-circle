@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep3 extends StatefulWidget {
@@ -48,7 +50,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
   Widget build(BuildContext context) {
     super.build(context);
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
       stepLabel: l10n.onboardingStep(3, 4),
@@ -59,13 +61,13 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.targetRespiratoryRate, style: AppTextStyles.heading3),
-          const SizedBox(height: AppSpacing.sm),
+          Text(l10n.targetRespiratoryRate, style: AppSemanticTextStyles.headingLg),
+          const SizedBox(height: AppSpacingTokens.sm),
           Text(
             l10n.targetRateDescription,
-            style: AppTextStyles.body,
+            style: AppSemanticTextStyles.body,
           ),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacingTokens.md),
           _TargetOption(
             title: l10n.normalRangeLabel,
             subtitle: l10n.standardRateDescription,
@@ -95,12 +97,12 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
           // Custom rate input field
           if (_selected == 'custom')
             Padding(
-              padding: const EdgeInsets.only(top: AppSpacing.md),
+              padding: const EdgeInsets.only(top: AppSpacingTokens.md),
               child: Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacingTokens.md),
                 decoration: BoxDecoration(
-                  color: c.white,
-                  borderRadius: const BorderRadius.all(AppRadii.small),
+                  color: c.surface,
+                  borderRadius: AppRadiiTokens.borderRadiusSm,
                 ),
                 child: Row(
                   children: [
@@ -118,20 +120,20 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
                         },
                         decoration: InputDecoration(
                           filled: true,
-                          fillColor: c.lightYellow,
+                          fillColor: c.warning.withValues(alpha: 0.2),
                           hintText: l10n.enterBpm,
-                          hintStyle: AppTextStyles.body
-                              .copyWith(color: c.chocolate),
+                          hintStyle: AppSemanticTextStyles.body
+                              .copyWith(color: c.textTertiary),
                           border: OutlineInputBorder(
-                            borderRadius: const BorderRadius.all(AppRadii.xs),
+                            borderRadius: AppRadiiTokens.borderRadiusLg,
                             borderSide: BorderSide.none,
                           ),
                           contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
+                            horizontal: AppSpacingTokens.md,
                             vertical: 14,
                           ),
                         ),
-                        style: AppTextStyles.body.copyWith(
+                        style: AppSemanticTextStyles.body.copyWith(
                           fontWeight: FontWeight.w600,
                           fontSize: 18,
                         ),
@@ -140,9 +142,9 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
                     const SizedBox(width: 12),
                     Text(
                       l10n.bpm,
-                      style: AppTextStyles.body.copyWith(
+                      style: AppSemanticTextStyles.body.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: c.chocolate,
+                        color: c.textPrimary,
                       ),
                     ),
                   ],
@@ -170,15 +172,15 @@ class _TargetOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return InkWell(
       onTap: onTap,
-      borderRadius: const BorderRadius.all(AppRadii.small),
+      borderRadius: AppRadiiTokens.borderRadiusSm,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: AppSpacingTokens.md),
         decoration: BoxDecoration(
-          color: c.white,
-          borderRadius: const BorderRadius.all(AppRadii.small),
+          color: c.surface,
+          borderRadius: AppRadiiTokens.borderRadiusSm,
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,12 +190,12 @@ class _TargetOption extends StatelessWidget {
               height: 16,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: c.white,
+                color: c.surface,
                 boxShadow: [
                   BoxShadow(
-                    color: c.black.withValues(alpha: 0.1),
+                    color: c.onSurface.withValues(alpha: 0.1),
                     blurRadius: 10,
-                    offset: Offset(0, 1),
+                    offset: const Offset(0, 1),
                   ),
                 ],
               ),
@@ -203,14 +205,14 @@ class _TargetOption extends StatelessWidget {
                         width: 8,
                         height: 8,
                         decoration: BoxDecoration(
-                          color: c.blue,
+                          color: c.info,
                           shape: BoxShape.circle,
                         ),
                       ),
                     )
                   : null,
             ),
-            const SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: AppSpacingTokens.sm),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,14 +220,14 @@ class _TargetOption extends StatelessWidget {
                   Text(
                     title,
                     style:
-                        AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+                        AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600),
                   ),
                   if (subtitle != null) ...[
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacingTokens.xs),
                     Text(
                       subtitle!,
                       style:
-                          AppTextStyles.caption.copyWith(color: c.chocolate),
+                          AppSemanticTextStyles.caption.copyWith(color: c.textSecondary),
                     ),
                   ],
                 ],
