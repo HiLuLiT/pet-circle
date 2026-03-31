@@ -14,7 +14,9 @@ import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 import 'package:pet_circle/screens/settings/settings_content.dart';
 
@@ -25,13 +27,13 @@ import 'package:pet_circle/screens/settings/settings_content.dart';
 mixin SettingsDialogsMixin on State<SettingsContent> {
   void showSignOutDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
-        title: Text(l10n.signOut, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
-        content: Text(l10n.signOutConfirmation, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
+        title: Text(l10n.signOut, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+        content: Text(l10n.signOutConfirmation, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -43,8 +45,8 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
               if (widget.onClose != null) widget.onClose!();
               context.go(AppRoutes.welcome);
             },
-            style: TextButton.styleFrom(backgroundColor: c.cherry),
-            child: Text(l10n.signOut, style: TextStyle(color: c.white)),
+            style: TextButton.styleFrom(backgroundColor: c.error),
+            child: Text(l10n.signOut, style: TextStyle(color: c.background)),
           ),
         ],
       ),
@@ -53,7 +55,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
 
   void showEditProfileDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final user = userStore.currentUser;
     final nameCtrl = TextEditingController(text: user?.name ?? '');
     final photoCtrl = TextEditingController(text: user?.avatarUrl ?? '');
@@ -67,21 +69,21 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: c.white,
-            borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+            color: c.background,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.editProfile, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+              Text(l10n.editProfile, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
               const SizedBox(height: 16),
               TextField(
                 controller: nameCtrl,
                 decoration: InputDecoration(
                   labelText: l10n.displayName,
-                  filled: true, fillColor: c.offWhite,
-                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
+                  filled: true, fillColor: c.surface,
+                  border: OutlineInputBorder(borderRadius: AppRadiiTokens.borderRadiusSm, borderSide: BorderSide.none),
                 ),
               ),
               const SizedBox(height: 12),
@@ -89,8 +91,8 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                 controller: photoCtrl,
                 decoration: InputDecoration(
                   labelText: l10n.profilePhoto,
-                  filled: true, fillColor: c.offWhite,
-                  border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
+                  filled: true, fillColor: c.surface,
+                  border: OutlineInputBorder(borderRadius: AppRadiiTokens.borderRadiusSm, borderSide: BorderSide.none),
                 ),
               ),
               const SizedBox(height: 16),
@@ -116,8 +118,8 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                         SnackBar(content: Text(l10n.profileUpdated)),
                       );
                     },
-                    style: TextButton.styleFrom(backgroundColor: c.lightBlue),
-                    child: Text(l10n.save, style: TextStyle(color: c.chocolate)),
+                    style: TextButton.styleFrom(backgroundColor: c.primaryLight),
+                    child: Text(l10n.save, style: TextStyle(color: c.textPrimary)),
                   ),
                 ],
               ),
@@ -130,13 +132,13 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
 
   void confirmRemoveMember(BuildContext context, String petName, String memberName) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
-        title: Text(l10n.removeMember, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
-        content: Text(l10n.removeMemberConfirmation(memberName), style: AppTextStyles.body),
+        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
+        title: Text(l10n.removeMember, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+        content: Text(l10n.removeMemberConfirmation(memberName), style: AppSemanticTextStyles.body),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           TextButton(
@@ -148,8 +150,8 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                 SnackBar(content: Text(l10n.memberRemoved)),
               );
             },
-            style: TextButton.styleFrom(backgroundColor: c.cherry),
-            child: Text(l10n.removeMember, style: TextStyle(color: c.white)),
+            style: TextButton.styleFrom(backgroundColor: c.error),
+            child: Text(l10n.removeMember, style: TextStyle(color: c.background)),
           ),
         ],
       ),
@@ -158,7 +160,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
 
   void showInviteDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final emailController = TextEditingController();
     String selectedRole = 'Member';
     final roles = ['Admin', 'Member', 'Viewer'];
@@ -173,14 +175,14 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: c.white,
-              borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+              color: c.background,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.invite, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+                Text(l10n.invite, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
                 const SizedBox(height: 16),
                 TextField(
                   controller: emailController,
@@ -188,28 +190,28 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   decoration: InputDecoration(
                     hintText: l10n.enterEmailAddress,
                     filled: true,
-                    fillColor: c.offWhite,
+                    fillColor: c.surface,
                     border: OutlineInputBorder(
-                      borderRadius: const BorderRadius.all(AppRadii.small),
+                      borderRadius: AppRadiiTokens.borderRadiusSm,
                       borderSide: BorderSide.none,
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(l10n.role, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
-                const SizedBox(height: AppSpacing.sm),
+                Text(l10n.role, style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(height: AppSpacingTokens.sm),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: BoxDecoration(
-                    color: c.offWhite,
-                    borderRadius: const BorderRadius.all(AppRadii.small),
+                    color: c.surface,
+                    borderRadius: AppRadiiTokens.borderRadiusSm,
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: selectedRole,
                       isExpanded: true,
-                      dropdownColor: c.white,
-                      style: AppTextStyles.body.copyWith(color: c.chocolate),
+                      dropdownColor: c.background,
+                      style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                       items: roles
                           .map((r) => DropdownMenuItem(value: r, child: Text(r)))
                           .toList(),
@@ -275,10 +277,10 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                           );
                         }
                       },
-                      style: TextButton.styleFrom(backgroundColor: c.lightBlue),
+                      style: TextButton.styleFrom(backgroundColor: c.primaryLight),
                       child: isSending
-                          ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: c.chocolate))
-                          : Text(l10n.sendInvite, style: TextStyle(color: c.chocolate)),
+                          ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: c.textPrimary))
+                          : Text(l10n.sendInvite, style: TextStyle(color: c.textPrimary)),
                     ),
                   ],
                 ),
@@ -292,15 +294,15 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
 
   void showExportDataDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
-        title: Text(l10n.exportAllData, style: AppTextStyles.heading3),
+        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
+        title: Text(l10n.exportAllData, style: AppSemanticTextStyles.headingLg),
         content: Text(
           l10n.exportAllDataConfirmation,
-          style: AppTextStyles.body.copyWith(color: c.chocolate),
+          style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
         ),
         actions: [
           TextButton(
@@ -311,11 +313,11 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
             onPressed: () {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.exportStarted), backgroundColor: c.lightBlue),
+                SnackBar(content: Text(l10n.exportStarted), backgroundColor: c.primaryLight),
               );
             },
-            style: TextButton.styleFrom(backgroundColor: c.lightBlue),
-            child: Text(l10n.exportAllData, style: TextStyle(color: c.chocolate)),
+            style: TextButton.styleFrom(backgroundColor: c.primaryLight),
+            child: Text(l10n.exportAllData, style: TextStyle(color: c.textPrimary)),
           ),
         ],
       ),
@@ -324,7 +326,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
 
   void showShareWithVetDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final emailController = TextEditingController();
 
     // 0 = idle, 1 = looking up, 2 = found vet, 3 = not a vet, 4 = not found, 5 = sending, 6 = error
@@ -340,10 +342,10 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
         builder: (ctx, setSheetState) => Padding(
           padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacingTokens.lg),
             decoration: BoxDecoration(
-              color: c.white,
-              borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+              color: c.background,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -351,15 +353,15 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.local_hospital, size: 20, color: c.blue),
-                    const SizedBox(width: AppSpacing.sm),
+                    Icon(Icons.local_hospital, size: 20, color: c.primary),
+                    const SizedBox(width: AppSpacingTokens.sm),
                     Text(l10n.inviteYourVet,
-                        style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+                        style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
                   ],
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(l10n.inviteYourVetDesc, style: AppTextStyles.body),
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacingTokens.sm),
+                Text(l10n.inviteYourVetDesc, style: AppSemanticTextStyles.body),
+                const SizedBox(height: AppSpacingTokens.md),
 
                 Row(
                   children: [
@@ -370,23 +372,23 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                         decoration: InputDecoration(
                           hintText: 'vet@clinic.com',
                           filled: true,
-                          fillColor: c.offWhite,
+                          fillColor: c.surface,
                           border: OutlineInputBorder(
-                            borderRadius: const BorderRadius.all(AppRadii.small),
+                            borderRadius: AppRadiiTokens.borderRadiusSm,
                             borderSide: BorderSide.none,
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: AppSpacing.sm),
+                    const SizedBox(width: AppSpacingTokens.sm),
                     SizedBox(
                       height: 48,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: c.blue,
+                          backgroundColor: c.primary,
                           elevation: 0,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(AppRadii.small),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: AppRadiiTokens.borderRadiusSm,
                           ),
                         ),
                         onPressed: state == 1 ? null : () async {
@@ -411,72 +413,72 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                           });
                         },
                         child: Text(l10n.lookUpVet,
-                            style: AppTextStyles.caption.copyWith(color: c.white)),
+                            style: AppSemanticTextStyles.caption.copyWith(color: c.background)),
                       ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: AppSpacing.sm),
+                const SizedBox(height: AppSpacingTokens.sm),
 
                 // Lookup feedback
                 if (state == 1)
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacingTokens.sm),
                       child: SizedBox(
                         width: 20, height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: c.blue),
+                        child: CircularProgressIndicator(strokeWidth: 2, color: c.primary),
                       ),
                     ),
                   ),
 
                 if (state == 2) ...[
                   Container(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    padding: const EdgeInsets.all(AppSpacingTokens.sm),
                     decoration: BoxDecoration(
-                      color: c.lightBlue.withValues(alpha: 0.15),
-                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                      color: c.primaryLight.withValues(alpha: 0.15),
+                      borderRadius: AppRadiiTokens.borderRadiusSm,
                     ),
                     child: Row(
                       children: [
                         CircleAvatar(
                           radius: 18,
-                          backgroundColor: c.blue.withValues(alpha: 0.2),
-                          child: Icon(Icons.verified, size: 18, color: c.blue),
+                          backgroundColor: c.primary.withValues(alpha: 0.2),
+                          child: Icon(Icons.verified, size: 18, color: c.primary),
                         ),
-                        const SizedBox(width: AppSpacing.sm),
+                        const SizedBox(width: AppSpacingTokens.sm),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(l10n.vetFound,
-                                  style: AppTextStyles.caption.copyWith(color: c.blue)),
+                                  style: AppSemanticTextStyles.caption.copyWith(color: c.primary)),
                               Text(foundVet?.displayName ?? emailController.text,
-                                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+                                  style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
                             ],
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacingTokens.sm),
                 ],
 
                 if (state == 3)
                   Container(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    padding: const EdgeInsets.all(AppSpacingTokens.sm),
                     decoration: BoxDecoration(
-                      color: c.cherry.withValues(alpha: 0.1),
-                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                      color: c.error.withValues(alpha: 0.1),
+                      borderRadius: AppRadiiTokens.borderRadiusSm,
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.warning_amber_rounded, size: 18, color: c.cherry),
-                        const SizedBox(width: AppSpacing.sm),
+                        Icon(Icons.warning_amber_rounded, size: 18, color: c.error),
+                        const SizedBox(width: AppSpacingTokens.sm),
                         Expanded(
                           child: Text(l10n.notAVetAccount,
-                              style: AppTextStyles.caption.copyWith(color: c.cherry)),
+                              style: AppSemanticTextStyles.caption.copyWith(color: c.error)),
                         ),
                       ],
                     ),
@@ -484,18 +486,18 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
 
                 if (state == 4)
                   Container(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    padding: const EdgeInsets.all(AppSpacingTokens.sm),
                     decoration: BoxDecoration(
-                      color: c.lightYellow.withValues(alpha: 0.5),
-                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                      color: c.warning.withValues(alpha: 0.5),
+                      borderRadius: AppRadiiTokens.borderRadiusSm,
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.info_outline, size: 16, color: c.chocolate),
-                        const SizedBox(width: AppSpacing.sm),
+                        Icon(Icons.info_outline, size: 16, color: c.textPrimary),
+                        const SizedBox(width: AppSpacingTokens.sm),
                         Expanded(
                           child: Text(l10n.vetNotFound,
-                              style: AppTextStyles.caption.copyWith(color: c.chocolate)),
+                              style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary)),
                         ),
                       ],
                     ),
@@ -503,24 +505,24 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
 
                 if (state == 6 && errorMessage != null)
                   Container(
-                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    padding: const EdgeInsets.all(AppSpacingTokens.sm),
                     decoration: BoxDecoration(
-                      color: c.cherry.withValues(alpha: 0.1),
-                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                      color: c.error.withValues(alpha: 0.1),
+                      borderRadius: AppRadiiTokens.borderRadiusSm,
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.error_outline, size: 18, color: c.cherry),
-                        const SizedBox(width: AppSpacing.sm),
+                        Icon(Icons.error_outline, size: 18, color: c.error),
+                        const SizedBox(width: AppSpacingTokens.sm),
                         Expanded(
                           child: Text(errorMessage!,
-                              style: AppTextStyles.caption.copyWith(color: c.cherry)),
+                              style: AppSemanticTextStyles.caption.copyWith(color: c.error)),
                         ),
                       ],
                     ),
                   ),
 
-                const SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacingTokens.md),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -529,7 +531,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                       onPressed: () => Navigator.pop(ctx),
                       child: Text(l10n.cancel),
                     ),
-                    const SizedBox(width: AppSpacing.sm),
+                    const SizedBox(width: AppSpacingTokens.sm),
                     if (state == 2 || state == 4)
                       TextButton(
                         onPressed: state == 5 ? null : () async {
@@ -598,14 +600,14 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                             );
                           }
                         },
-                        style: TextButton.styleFrom(backgroundColor: c.blue),
+                        style: TextButton.styleFrom(backgroundColor: c.primary),
                         child: state == 5
                             ? SizedBox(
                                 width: 16, height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: c.white))
+                                child: CircularProgressIndicator(strokeWidth: 2, color: c.background))
                             : Text(
                                 state == 2 ? l10n.addAsVet : l10n.sendVetInvite,
-                                style: TextStyle(color: c.white)),
+                                style: TextStyle(color: c.background)),
                       ),
                   ],
                 ),
@@ -627,24 +629,24 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        final c = AppColorsTheme.of(context);
+        final c = AppSemanticColors.of(context);
         return Padding(
           padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: c.white,
-              borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+              color: c.background,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.configureAlertThresholds, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+                Text(l10n.configureAlertThresholds, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
                 const SizedBox(height: 8),
-                Text(l10n.configureAlertThresholdsDesc, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+                Text(l10n.configureAlertThresholdsDesc, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
                 const SizedBox(height: 24),
-                Text(l10n.normalThresholdBpm, style: AppTextStyles.body.copyWith(color: c.chocolate, fontWeight: FontWeight.w600)),
+                Text(l10n.normalThresholdBpm, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: normalController,
@@ -652,15 +654,15 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   decoration: InputDecoration(
                     hintText: 'e.g., 30',
                     filled: true,
-                    fillColor: c.offWhite,
+                    fillColor: c.surface,
                     border: OutlineInputBorder(
-                      borderRadius: const BorderRadius.all(AppRadii.small),
+                      borderRadius: AppRadiiTokens.borderRadiusSm,
                       borderSide: BorderSide.none,
                     ),
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(l10n.alertThresholdBpm, style: AppTextStyles.body.copyWith(color: c.chocolate, fontWeight: FontWeight.w600)),
+                Text(l10n.alertThresholdBpm, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
                 TextField(
                   controller: alertController,
@@ -668,9 +670,9 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   decoration: InputDecoration(
                     hintText: 'e.g., 40',
                     filled: true,
-                    fillColor: c.offWhite,
+                    fillColor: c.surface,
                     border: OutlineInputBorder(
-                      borderRadius: const BorderRadius.all(AppRadii.small),
+                      borderRadius: AppRadiiTokens.borderRadiusSm,
                       borderSide: BorderSide.none,
                     ),
                   ),
@@ -681,7 +683,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   children: [
                     TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text(l10n.cancel, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+                      child: Text(l10n.cancel, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
                     ),
                     const SizedBox(width: 12),
                     TextButton(
@@ -700,11 +702,11 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                         );
                       },
                       style: TextButton.styleFrom(
-                        backgroundColor: c.lightBlue,
-                        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.small)),
+                        backgroundColor: c.primaryLight,
+                        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusSm),
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       ),
-                      child: Text(l10n.save, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+                      child: Text(l10n.save, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
                     ),
                   ],
                 ),
@@ -721,18 +723,18 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
     showDialog(
       context: context,
       builder: (context) {
-        final c = AppColorsTheme.of(context);
+        final c = AppSemanticColors.of(context);
         return AlertDialog(
-          backgroundColor: c.white,
-          shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
-          title: Text(title, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+          backgroundColor: c.background,
+          shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
+          title: Text(title, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
           content: SingleChildScrollView(
-            child: Text(content, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+            child: Text(content, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+              child: Text(l10n.close, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
             ),
           ],
         );

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class InfoTile extends StatelessWidget {
   const InfoTile({
@@ -19,12 +21,12 @@ class InfoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: c.offWhite,
-        borderRadius: const BorderRadius.all(AppRadii.small),
+        color: c.surface,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
       ),
       child: Row(
         children: [
@@ -32,7 +34,7 @@ class InfoTile extends StatelessWidget {
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: iconColor.withValues(alpha: 0.15),
-              borderRadius: const BorderRadius.all(AppRadii.small),
+              borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
             ),
             child: Icon(icon, color: iconColor, size: 22),
           ),
@@ -43,10 +45,10 @@ class InfoTile extends StatelessWidget {
               children: [
                 Text(
                   value,
-                  style: AppTextStyles.heading3.copyWith(color: c.chocolate),
+                  style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(label, style: AppTextStyles.caption),
+                Text(label, style: AppSemanticTextStyles.caption),
               ],
             ),
           ),
@@ -63,7 +65,7 @@ class NoteCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -82,17 +84,17 @@ class NoteCard extends StatelessWidget {
                   children: [
                     Text(
                       note.authorName,
-                      style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+                      style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(width: 8),
                     Text(
                       note.timeAgo,
-                      style: AppTextStyles.caption.copyWith(color: c.chocolate),
+                      style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(note.content, style: AppTextStyles.body),
+                Text(note.content, style: AppSemanticTextStyles.body),
               ],
             ),
           ),
@@ -109,7 +111,7 @@ class MemberTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
@@ -125,11 +127,11 @@ class MemberTile extends StatelessWidget {
               children: [
                 Text(
                   member.name,
-                  style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w500),
+                  style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w500),
                 ),
                 Text(
                   member.roleLabel,
-                  style: AppTextStyles.caption.copyWith(color: c.chocolate),
+                  style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
                 ),
               ],
             ),
@@ -148,14 +150,14 @@ class RoleBadge extends StatelessWidget {
   final String label;
 
   Color _color(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     switch (role) {
       case CareCircleRole.admin:
-        return c.chocolate;
+        return c.textPrimary;
       case CareCircleRole.member:
-        return c.lightBlue;
+        return c.primaryLight;
       case CareCircleRole.viewer:
-        return c.blue;
+        return c.primary;
     }
   }
 
@@ -166,11 +168,11 @@ class RoleBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: const BorderRadius.all(AppRadii.small),
+        borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
       ),
       child: Text(
         label,
-        style: AppTextStyles.caption.copyWith(
+        style: AppSemanticTextStyles.caption.copyWith(
           color: color,
           fontWeight: FontWeight.w500,
         ),

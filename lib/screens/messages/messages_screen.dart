@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/app_notification.dart' as notif;
@@ -21,14 +23,14 @@ class NotificationsDrawer extends StatelessWidget {
         minChildSize: 0.4,
         maxChildSize: 1.0,
         builder: (context, scrollController) {
-          final c = AppColorsTheme.of(context);
+          final c = AppSemanticColors.of(context);
           final l10n = AppLocalizations.of(context)!;
           final notifications = notificationStore.all;
 
           return ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
             child: Container(
-              color: c.white,
+              color: c.surface,
               child: SingleChildScrollView(
                 controller: scrollController,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
@@ -44,8 +46,8 @@ class NotificationsDrawer extends StatelessWidget {
                             children: [
                               Text(
                                 l10n.notifications,
-                                style: AppTextStyles.heading2.copyWith(
-                                  color: c.chocolate,
+                                style: AppSemanticTextStyles.title3.copyWith(
+                                  color: c.textPrimary,
                                   letterSpacing: -0.96,
                                 ),
                               ),
@@ -54,7 +56,7 @@ class NotificationsDrawer extends StatelessWidget {
                                 l10n.unreadNotifications(
                                   notificationStore.unreadCount,
                                 ),
-                                style: AppTextStyles.body.copyWith(color: c.chocolate),
+                                style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                               ),
                             ],
                           ),
@@ -66,13 +68,13 @@ class NotificationsDrawer extends StatelessWidget {
                             width: 36,
                             height: 36,
                             decoration: BoxDecoration(
-                              color: c.offWhite,
+                              color: c.background,
                               shape: BoxShape.circle,
-                              border: Border.all(color: c.white, width: 2),
+                              border: Border.all(color: c.surface, width: 2),
                             ),
                             child: Icon(
                               Icons.keyboard_arrow_down,
-                              color: c.chocolate,
+                              color: c.textPrimary,
                               size: 24,
                             ),
                           ),
@@ -106,7 +108,7 @@ class MessagesScreen extends StatelessWidget {
       listenable: notificationStore,
       builder: (context, _) {
         final l10n = AppLocalizations.of(context)!;
-        final c = AppColorsTheme.of(context);
+        final c = AppSemanticColors.of(context);
         final notifications = notificationStore.all;
 
         final content = SafeArea(
@@ -118,16 +120,16 @@ class MessagesScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 Text(
                   l10n.notifications,
-                  style: AppTextStyles.heading2.copyWith(
-                    color: c.chocolate,
+                  style: AppSemanticTextStyles.title3.copyWith(
+                    color: c.textPrimary,
                     letterSpacing: -0.96,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   l10n.unreadNotifications(notificationStore.unreadCount),
-                  style: AppTextStyles.body.copyWith(
-                    color: c.chocolate,
+                  style: AppSemanticTextStyles.body.copyWith(
+                    color: c.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -141,11 +143,11 @@ class MessagesScreen extends StatelessWidget {
         );
 
         if (!showScaffold) {
-          return Container(color: c.white, child: content);
+          return Container(color: c.surface, child: content);
         }
 
         return Scaffold(
-          backgroundColor: c.white,
+          backgroundColor: c.surface,
           body: content,
         );
       },
@@ -175,14 +177,14 @@ class _AppNotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     final iconColor = switch (notification.type) {
-      notif.NotificationType.medication => c.blue,
-      notif.NotificationType.measurement => c.cherry,
-      notif.NotificationType.careCircle => c.lightBlue,
-      notif.NotificationType.report => c.cherry,
+      notif.NotificationType.medication => c.primary,
+      notif.NotificationType.measurement => c.error,
+      notif.NotificationType.careCircle => c.primaryLight,
+      notif.NotificationType.report => c.error,
     };
 
     return GestureDetector(
@@ -202,10 +204,10 @@ class _AppNotificationCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: notification.isRead ? c.white : c.offWhite,
-          borderRadius: const BorderRadius.all(AppRadii.small),
+          color: notification.isRead ? c.surface : c.background,
+          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
           border: Border.all(
-            color: notification.isRead ? c.offWhite : c.pink.withAlpha(80),
+            color: notification.isRead ? c.background : c.primaryLight.withAlpha(80),
           ),
         ),
         child: Row(
@@ -231,8 +233,8 @@ class _AppNotificationCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           notification.title,
-                          style: AppTextStyles.body.copyWith(
-                            color: c.chocolate,
+                          style: AppSemanticTextStyles.body.copyWith(
+                            color: c.textPrimary,
                             fontWeight: notification.isRead ? FontWeight.w400 : FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -243,7 +245,7 @@ class _AppNotificationCard extends StatelessWidget {
                           width: 8,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: c.blue,
+                            color: c.primary,
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -252,8 +254,8 @@ class _AppNotificationCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     notification.body,
-                    style: AppTextStyles.caption.copyWith(
-                      color: c.chocolate,
+                    style: AppSemanticTextStyles.caption.copyWith(
+                      color: c.textPrimary,
                       fontSize: 12,
                       height: 1.4,
                     ),
@@ -261,8 +263,8 @@ class _AppNotificationCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Text(
                     notification.timeAgo,
-                    style: AppTextStyles.caption.copyWith(
-                      color: c.chocolate,
+                    style: AppSemanticTextStyles.caption.copyWith(
+                      color: c.textPrimary,
                       fontSize: 11,
                     ),
                   ),

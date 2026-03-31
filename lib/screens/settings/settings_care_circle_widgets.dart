@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 import 'package:pet_circle/screens/settings/settings_widgets.dart'
     show settingsInviteAsset, settingsTrashAsset, settingsConfigureAsset;
@@ -14,14 +16,14 @@ class InviteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: c.lightBlue,
-          borderRadius: const BorderRadius.all(AppRadii.xs),
+          color: c.primaryLight,
+          borderRadius: AppRadiiTokens.borderRadiusSm,
         ),
         child: Row(
           children: [
@@ -29,8 +31,8 @@ class InviteButton extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               l10n.invite,
-              style: AppTextStyles.body.copyWith(
-                color: c.chocolate,
+              style: AppSemanticTextStyles.body.copyWith(
+                color: c.textPrimary,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 letterSpacing: -0.15,
@@ -63,12 +65,12 @@ class CareCircleItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: c.white,
-        borderRadius: const BorderRadius.all(AppRadii.small),
+        color: c.background,
+        borderRadius: AppRadiiTokens.borderRadiusSm,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -79,8 +81,8 @@ class CareCircleItem extends StatelessWidget {
               children: [
                 Text(
                   email,
-                  style: AppTextStyles.body.copyWith(
-                    color: c.chocolate,
+                  style: AppSemanticTextStyles.body.copyWith(
+                    color: c.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.31,
@@ -92,15 +94,15 @@ class CareCircleItem extends StatelessWidget {
                     _Badge(
                       label: roleLabel,
                       backgroundColor: roleColor,
-                      textColor: roleColor == c.lightYellow
-                          ? c.chocolate
-                          : c.white,
+                      textColor: roleColor == c.warning
+                          ? c.textPrimary
+                          : c.background,
                     ),
                     const SizedBox(width: 4),
                     _Badge(
                       label: statusLabel,
                       backgroundColor: statusColor,
-                      textColor: c.chocolate,
+                      textColor: c.textPrimary,
                     ),
                   ],
                 ),
@@ -113,8 +115,8 @@ class CareCircleItem extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: c.white,
-                borderRadius: const BorderRadius.all(AppRadii.small),
+                color: c.background,
+                borderRadius: AppRadiiTokens.borderRadiusSm,
               ),
               child: Center(
                 child: SvgPicture.asset(
@@ -148,11 +150,11 @@ class _Badge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: const BorderRadius.all(AppRadii.small),
+        borderRadius: AppRadiiTokens.borderRadiusSm,
       ),
       child: Text(
         label,
-        style: AppTextStyles.caption.copyWith(
+        style: AppSemanticTextStyles.caption.copyWith(
           color: textColor,
           fontSize: 12,
           fontWeight: FontWeight.w600,
@@ -170,12 +172,12 @@ class ConfigureRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: c.white,
-        borderRadius: const BorderRadius.all(AppRadii.small),
+        color: c.background,
+        borderRadius: AppRadiiTokens.borderRadiusSm,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -186,8 +188,8 @@ class ConfigureRow extends StatelessWidget {
               children: [
                 Text(
                   l10n.alertThresholds,
-                  style: AppTextStyles.body.copyWith(
-                    color: c.chocolate,
+                  style: AppSemanticTextStyles.body.copyWith(
+                    color: c.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.31,
@@ -196,8 +198,8 @@ class ConfigureRow extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   l10n.customizeBpmRanges,
-                  style: AppTextStyles.caption.copyWith(
-                    color: c.chocolate,
+                  style: AppSemanticTextStyles.caption.copyWith(
+                    color: c.textPrimary,
                     fontSize: 12,
                   ),
                 ),
@@ -209,8 +211,8 @@ class ConfigureRow extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: c.lightBlue,
-                borderRadius: const BorderRadius.all(AppRadii.xs),
+                color: c.primaryLight,
+                borderRadius: AppRadiiTokens.borderRadiusSm,
               ),
               child: Row(
                 children: [
@@ -219,8 +221,8 @@ class ConfigureRow extends StatelessWidget {
                   const SizedBox(width: 6),
                   Text(
                     l10n.configure,
-                    style: AppTextStyles.body.copyWith(
-                      color: c.chocolate,
+                    style: AppSemanticTextStyles.body.copyWith(
+                      color: c.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),

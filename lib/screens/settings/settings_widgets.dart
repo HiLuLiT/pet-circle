@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show appLocale;
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
 
 const settingsShareAsset = 'assets/figma/settings_share.svg';
@@ -30,11 +32,11 @@ class SettingsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: c.offWhite,
-        borderRadius: const BorderRadius.all(AppRadii.medium),
+        color: c.surface,
+        borderRadius: AppRadiiTokens.borderRadiusLg,
       ),
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -50,16 +52,16 @@ class SettingsCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: AppTextStyles.heading3.copyWith(
-                        color: c.chocolate,
+                      style: AppSemanticTextStyles.headingLg.copyWith(
+                        color: c.textPrimary,
                         letterSpacing: -0.54,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: AppTextStyles.body.copyWith(
-                        color: c.chocolate,
+                      style: AppSemanticTextStyles.body.copyWith(
+                        color: c.textPrimary,
                         fontSize: 14,
                         letterSpacing: -0.15,
                       ),
@@ -99,12 +101,12 @@ class SettingsToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: c.white,
-        borderRadius: const BorderRadius.all(AppRadii.small),
+        color: c.background,
+        borderRadius: AppRadiiTokens.borderRadiusSm,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -122,8 +124,8 @@ class SettingsToggleRow extends StatelessWidget {
                     children: [
                       Text(
                         label,
-                        style: AppTextStyles.body.copyWith(
-                          color: c.chocolate,
+                        style: AppSemanticTextStyles.body.copyWith(
+                          color: c.textPrimary,
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.31,
@@ -133,8 +135,8 @@ class SettingsToggleRow extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           description!,
-                          style: AppTextStyles.caption.copyWith(
-                            color: c.chocolate,
+                          style: AppSemanticTextStyles.caption.copyWith(
+                            color: c.textPrimary,
                             fontSize: 12,
                             height: 1.3,
                           ),
@@ -162,7 +164,7 @@ class LanguageRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final currentLocale = Localizations.localeOf(context);
     final isHebrew = currentLocale.languageCode == 'he';
     final currentLanguageName = isHebrew ? l10n.hebrew : l10n.english;
@@ -172,8 +174,8 @@ class LanguageRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: c.white,
-          borderRadius: const BorderRadius.all(AppRadii.medium),
+          color: c.background,
+          borderRadius: AppRadiiTokens.borderRadiusLg,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -184,8 +186,8 @@ class LanguageRow extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(
                   l10n.language,
-                  style: AppTextStyles.body.copyWith(
-                    color: c.chocolate,
+                  style: AppSemanticTextStyles.body.copyWith(
+                    color: c.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                     letterSpacing: -0.31,
@@ -196,15 +198,15 @@ class LanguageRow extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: c.pink,
-                borderRadius: const BorderRadius.all(AppRadii.xs),
+                color: c.primaryLight,
+                borderRadius: AppRadiiTokens.borderRadiusSm,
               ),
               child: Row(
                 children: [
                   Text(
                     currentLanguageName,
-                    style: AppTextStyles.body.copyWith(
-                      color: c.chocolate,
+                    style: AppSemanticTextStyles.body.copyWith(
+                      color: c.textPrimary,
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
@@ -224,7 +226,7 @@ class LanguageRow extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        final c = AppColorsTheme.of(context);
+        final c = AppSemanticColors.of(context);
         return SafeArea(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -232,7 +234,7 @@ class LanguageRow extends StatelessWidget {
               ListTile(
                 title: Text(l10n.english),
                 trailing: Localizations.localeOf(context).languageCode == 'en'
-                    ? Icon(Icons.check, color: c.chocolate)
+                    ? Icon(Icons.check, color: c.textPrimary)
                     : null,
                 onTap: () {
                   appLocale.value = const Locale('en');
@@ -242,7 +244,7 @@ class LanguageRow extends StatelessWidget {
               ListTile(
                 title: Text(l10n.hebrew),
                 trailing: Localizations.localeOf(context).languageCode == 'he'
-                    ? Icon(Icons.check, color: c.chocolate)
+                    ? Icon(Icons.check, color: c.textPrimary)
                     : null,
                 onTap: () {
                   appLocale.value = const Locale('he');
@@ -273,14 +275,14 @@ class ActionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: onTap == null ? c.white.withValues(alpha: 0.7) : c.white,
-          borderRadius: const BorderRadius.all(AppRadii.small),
+          color: onTap == null ? c.background.withValues(alpha: 0.7) : c.background,
+          borderRadius: AppRadiiTokens.borderRadiusSm,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -294,10 +296,10 @@ class ActionRow extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: AppTextStyles.body.copyWith(
+                      style: AppSemanticTextStyles.body.copyWith(
                         color: onTap == null
-                            ? c.chocolate.withValues(alpha: 0.5)
-                            : c.chocolate,
+                            ? c.textPrimary.withValues(alpha: 0.5)
+                            : c.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.31,
@@ -306,10 +308,10 @@ class ActionRow extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       description,
-                      style: AppTextStyles.caption.copyWith(
+                      style: AppSemanticTextStyles.caption.copyWith(
                         color: onTap == null
-                            ? c.chocolate.withValues(alpha: 0.5)
-                            : c.chocolate,
+                            ? c.textPrimary.withValues(alpha: 0.5)
+                            : c.textPrimary,
                         fontSize: 12,
                       ),
                     ),
@@ -332,21 +334,21 @@ class SimpleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: c.white,
-          borderRadius: const BorderRadius.all(AppRadii.small),
+          color: c.background,
+          borderRadius: AppRadiiTokens.borderRadiusSm,
         ),
         child: Row(
           children: [
             Text(
               label,
-              style: AppTextStyles.body.copyWith(
-                color: c.chocolate,
+              style: AppSemanticTextStyles.body.copyWith(
+                color: c.textPrimary,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
                 letterSpacing: -0.31,

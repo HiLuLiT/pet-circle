@@ -6,7 +6,9 @@ import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 import 'package:pet_circle/screens/settings/settings_widgets.dart';
 import 'package:pet_circle/screens/settings/settings_care_circle_widgets.dart';
@@ -43,9 +45,9 @@ class _SettingsContentState extends State<SettingsContent>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
-      color: c.white,
+      color: c.background,
       child: ListenableBuilder(
         listenable: petStore,
         builder: (context, _) {
@@ -70,16 +72,16 @@ class _SettingsContentState extends State<SettingsContent>
                     children: [
                       Text(
                         l10n.settings,
-                        style: AppTextStyles.heading2.copyWith(
-                          color: c.chocolate,
+                        style: AppSemanticTextStyles.title3.copyWith(
+                          color: c.textPrimary,
                           letterSpacing: -0.96,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         l10n.managePreferences,
-                        style: AppTextStyles.body.copyWith(
-                          color: c.chocolate,
+                        style: AppSemanticTextStyles.body.copyWith(
+                          color: c.textPrimary,
                           fontSize: 14,
                           letterSpacing: -0.15,
                         ),
@@ -95,13 +97,13 @@ class _SettingsContentState extends State<SettingsContent>
                       width: 36,
                       height: 36,
                       decoration: BoxDecoration(
-                        color: c.offWhite,
+                        color: c.surface,
                         shape: BoxShape.circle,
-                        border: Border.all(color: c.white, width: 2),
+                        border: Border.all(color: c.background, width: 2),
                       ),
                       child: Icon(
                         Icons.keyboard_arrow_down,
-                        color: c.chocolate,
+                        color: c.textPrimary,
                         size: 24,
                       ),
                     ),
@@ -145,11 +147,11 @@ class _SettingsContentState extends State<SettingsContent>
                       : null,
                   child: Builder(builder: (context) {
                     if (activePet == null) {
-                      return Text(l10n.noPetsYet, style: AppTextStyles.body);
+                      return Text(l10n.noPetsYet, style: AppSemanticTextStyles.body);
                     }
                     final members = activePet.careCircle;
                     if (members.isEmpty) {
-                      return Text(l10n.noCareCircleMembers, style: AppTextStyles.body);
+                      return Text(l10n.noCareCircleMembers, style: AppSemanticTextStyles.body);
                     }
                     return Column(
                       children: members.map((member) {
@@ -160,9 +162,9 @@ class _SettingsContentState extends State<SettingsContent>
                           child: CareCircleItem(
                             email: member.name,
                             roleLabel: member.roleLabel,
-                            roleColor: isViewer ? c.blue : isAdmin ? c.chocolate : c.lightYellow,
+                            roleColor: isViewer ? c.primary : isAdmin ? c.textPrimary : c.warning,
                             statusLabel: l10n.active,
-                            statusColor: c.pink,
+                            statusColor: c.primaryLight,
                             onRemove: canManageActivePet
                                 ? () => confirmRemoveMember(context, activePet.name, member.name)
                                 : null,
@@ -227,13 +229,13 @@ class _SettingsContentState extends State<SettingsContent>
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: c.cherry,
-                              borderRadius: const BorderRadius.all(AppRadii.sm),
+                              color: c.error,
+                              borderRadius: AppRadiiTokens.borderRadiusMd,
                             ),
                             child: Text(
                               l10n.comingSoon,
-                              style: AppTextStyles.caption.copyWith(
-                                color: c.white,
+                              style: AppSemanticTextStyles.caption.copyWith(
+                                color: c.background,
                                 fontSize: 10,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -315,18 +317,18 @@ class _SettingsContentState extends State<SettingsContent>
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: c.cherry.withValues(alpha: 0.08),
-                    borderRadius: const BorderRadius.all(AppRadii.medium),
+                    color: c.error.withValues(alpha: 0.08),
+                    borderRadius: AppRadiiTokens.borderRadiusLg,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.logout, size: 18, color: c.cherry),
+                      Icon(Icons.logout, size: 18, color: c.error),
                       const SizedBox(width: 8),
                       Text(
                         l10n.signOut,
-                        style: AppTextStyles.body.copyWith(
-                          color: c.cherry,
+                        style: AppSemanticTextStyles.body.copyWith(
+                          color: c.error,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

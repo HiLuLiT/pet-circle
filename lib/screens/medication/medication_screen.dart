@@ -4,7 +4,9 @@ import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
 
 import 'add_medication_sheet.dart';
@@ -32,7 +34,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
 
   Future<void> _exportMedicationLog() async {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final petId = petStore.activePet?.id ?? '';
     final petName = petStore.activePet?.name ?? l10n.petName;
     final meds = medicationStore.getMedications(petId);
@@ -72,23 +74,23 @@ class _MedicationScreenState extends State<MedicationScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: const BorderRadius.all(AppRadii.medium)),
-        title: Text(l10n.exportMedicationLog, style: AppTextStyles.heading3),
+            borderRadius: BorderRadius.circular(AppRadiiTokens.lg)),
+        title: Text(l10n.exportMedicationLog, style: AppSemanticTextStyles.headingLg),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(l10n.csvPreview, style: AppTextStyles.body),
-              const SizedBox(height: AppSpacing.sm + 4),
+              Text(l10n.csvPreview, style: AppSemanticTextStyles.body),
+              const SizedBox(height: AppSpacingTokens.sm + 4),
               Container(
-                padding: const EdgeInsets.all(AppSpacing.sm + 4),
+                padding: const EdgeInsets.all(AppSpacingTokens.sm + 4),
                 decoration: BoxDecoration(
-                  color: c.offWhite,
-                  borderRadius: const BorderRadius.all(AppRadii.sm),
+                  color: c.background,
+                  borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                 ),
                 child: Text(csvData,
-                    style: AppTextStyles.caption
+                    style: AppSemanticTextStyles.caption
                         .copyWith(fontFamily: 'monospace', fontSize: 10)),
               ),
             ],
@@ -98,7 +100,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text(l10n.close,
-                style: AppTextStyles.body.copyWith(color: c.chocolate)),
+                style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
           ),
           TextButton(
             onPressed: () async {
@@ -118,12 +120,12 @@ class _MedicationScreenState extends State<MedicationScreen> {
               }
             },
             style: TextButton.styleFrom(
-              backgroundColor: c.lightBlue,
+              backgroundColor: c.primaryLight,
               shape: RoundedRectangleBorder(
-                  borderRadius: const BorderRadius.all(AppRadii.small)),
+                  borderRadius: BorderRadius.circular(AppRadiiTokens.sm)),
             ),
             child: Text(l10n.downloadCsv,
-                style: AppTextStyles.body.copyWith(color: c.chocolate)),
+                style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
           ),
         ],
       ),
@@ -132,7 +134,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final content = ListenableBuilder(
       listenable: Listenable.merge([medicationStore, petStore, userStore]),
       builder: (context, _) {
@@ -144,16 +146,16 @@ class _MedicationScreenState extends State<MedicationScreen> {
         return SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacingTokens.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacingTokens.md),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(l10n.medicationManagement,
-                          style: AppTextStyles.heading2),
+                          style: AppSemanticTextStyles.title3),
                       SizedBox(
                         height: 32,
                         child: TextButton.icon(
@@ -161,35 +163,35 @@ class _MedicationScreenState extends State<MedicationScreen> {
                               ? _openMedicationSheet
                               : null,
                           style: TextButton.styleFrom(
-                            backgroundColor: c.lightBlue,
+                            backgroundColor: c.primaryLight,
                             disabledBackgroundColor:
-                                c.lightBlue.withValues(alpha: 0.5),
+                                c.primaryLight.withValues(alpha: 0.5),
                             shape: RoundedRectangleBorder(
                               borderRadius:
-                                  const BorderRadius.all(AppRadii.full),
+                                  BorderRadius.circular(AppRadiiTokens.full),
                             ),
                           ),
-                          icon: Icon(Icons.add, color: c.chocolate, size: 16),
+                          icon: Icon(Icons.add, color: c.textPrimary, size: 16),
                           label: Text(
                             l10n.addMedication,
-                            style: AppTextStyles.caption
-                                .copyWith(color: c.chocolate),
+                            style: AppSemanticTextStyles.caption
+                                .copyWith(color: c.textPrimary),
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacingTokens.sm),
                   Text(
                     '$petName • $count ${l10n.activeTreatments.toLowerCase()}',
-                    style: AppTextStyles.body,
+                    style: AppSemanticTextStyles.body,
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacingTokens.lg),
                   _ActiveMedicationsList(
                     onEdit:
                         access.canManageMedication ? _openMedicationSheet : null,
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacingTokens.lg),
                   _SectionCard(
                     child: Column(
                       children: [
@@ -197,39 +199,39 @@ class _MedicationScreenState extends State<MedicationScreen> {
                           width: 64,
                           height: 64,
                           decoration: BoxDecoration(
-                              color: c.white, shape: BoxShape.circle),
-                          child: Icon(Icons.info_outline, color: c.blue),
+                              color: c.surface, shape: BoxShape.circle),
+                          child: Icon(Icons.info_outline, color: c.primary),
                         ),
-                        const SizedBox(height: AppSpacing.sm + 4),
+                        const SizedBox(height: AppSpacingTokens.sm + 4),
                         Text(
                           l10n.clinicalRecordInformation,
-                          style: AppTextStyles.heading3,
+                          style: AppSemanticTextStyles.headingLg,
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: AppSpacing.xs),
+                        const SizedBox(height: AppSpacingTokens.xs),
                         Text(
                           l10n.clinicalRecordDisclaimer,
-                          style: AppTextStyles.body,
+                          style: AppSemanticTextStyles.body,
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: AppSpacing.lg),
+                        const SizedBox(height: AppSpacingTokens.lg),
                         SizedBox(
                           height: 40,
                           child: TextButton.icon(
                             onPressed: _exportMedicationLog,
                             style: TextButton.styleFrom(
-                              backgroundColor: c.lightBlue,
+                              backgroundColor: c.primaryLight,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                    const BorderRadius.all(AppRadii.full),
+                                    BorderRadius.circular(AppRadiiTokens.full),
                               ),
                             ),
                             icon: Icon(Icons.file_download,
-                                color: c.chocolate, size: 16),
+                                color: c.textPrimary, size: 16),
                             label: Text(
                               l10n.exportMedicationLog,
-                              style: AppTextStyles.body
-                                  .copyWith(color: c.chocolate),
+                              style: AppSemanticTextStyles.body
+                                  .copyWith(color: c.textPrimary),
                             ),
                           ),
                         ),
@@ -245,9 +247,9 @@ class _MedicationScreenState extends State<MedicationScreen> {
     );
 
     if (!widget.showScaffold) {
-      return Container(color: c.white, child: content);
+      return Container(color: c.surface, child: content);
     }
-    return Scaffold(backgroundColor: c.white, body: content);
+    return Scaffold(backgroundColor: c.surface, body: content);
   }
 }
 
@@ -258,7 +260,7 @@ class _ActiveMedicationsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final petId = petStore.activePet?.id ?? '';
     final petName = petStore.activePet?.name ?? l10n.petName;
@@ -272,16 +274,16 @@ class _ActiveMedicationsList extends StatelessWidget {
               width: 64,
               height: 64,
               decoration:
-                  BoxDecoration(color: c.white, shape: BoxShape.circle),
-              child: Icon(Icons.medication, color: c.chocolate),
+                  BoxDecoration(color: c.surface, shape: BoxShape.circle),
+              child: Icon(Icons.medication, color: c.textPrimary),
             ),
-            const SizedBox(height: AppSpacing.sm + 4),
+            const SizedBox(height: AppSpacingTokens.sm + 4),
             Text(l10n.noMedicationsRecorded,
-                style: AppTextStyles.heading3, textAlign: TextAlign.center),
-            const SizedBox(height: AppSpacing.xs),
+                style: AppSemanticTextStyles.headingLg, textAlign: TextAlign.center),
+            const SizedBox(height: AppSpacingTokens.xs),
             Text(
               l10n.keepTrackOfMedications(petName),
-              style: AppTextStyles.body,
+              style: AppSemanticTextStyles.body,
               textAlign: TextAlign.center,
             ),
           ],
@@ -293,14 +295,14 @@ class _ActiveMedicationsList extends StatelessWidget {
       children: meds.map((med) {
         final dateStr = '${med.startDate.month}/${med.startDate.day}';
         return Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.sm + 4),
+          padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm + 4),
           child: GestureDetector(
             onTap: () => onEdit?.call(med),
             child: Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.all(AppSpacingTokens.md),
               decoration: BoxDecoration(
-                color: c.offWhite,
-                borderRadius: const BorderRadius.all(AppRadii.small),
+                color: c.background,
+                borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
               ),
               child: Row(
                 children: [
@@ -309,25 +311,25 @@ class _ActiveMedicationsList extends StatelessWidget {
                     height: 40,
                     decoration: BoxDecoration(
                       color: med.isActive
-                          ? c.lightBlue.withValues(alpha: 0.2)
-                          : c.offWhite,
-                      borderRadius: const BorderRadius.all(AppRadii.small),
+                          ? c.primaryLight.withValues(alpha: 0.2)
+                          : c.background,
+                      borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                     ),
                     child:
-                        Icon(Icons.medication, color: c.chocolate, size: 20),
+                        Icon(Icons.medication, color: c.textPrimary, size: 20),
                   ),
-                  const SizedBox(width: AppSpacing.sm + 4),
+                  const SizedBox(width: AppSpacingTokens.sm + 4),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(med.name,
-                            style: AppTextStyles.body.copyWith(
+                            style: AppSemanticTextStyles.body.copyWith(
                                 fontWeight: FontWeight.w600,
-                                color: c.chocolate)),
+                                color: c.textPrimary)),
                         Text('${med.dosage} • ${med.frequency}',
-                            style: AppTextStyles.caption
-                                .copyWith(color: c.chocolate)),
+                            style: AppSemanticTextStyles.caption
+                                .copyWith(color: c.textPrimary)),
                       ],
                     ),
                   ),
@@ -336,26 +338,26 @@ class _ActiveMedicationsList extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.sm, vertical: 2),
+                            horizontal: AppSpacingTokens.sm, vertical: 2),
                         decoration: BoxDecoration(
                           color: med.isActive
-                              ? c.lightBlue.withValues(alpha: 0.2)
-                              : c.offWhite,
+                              ? c.primaryLight.withValues(alpha: 0.2)
+                              : c.background,
                           borderRadius:
-                              const BorderRadius.all(AppRadii.full),
+                              BorderRadius.circular(AppRadiiTokens.full),
                         ),
                         child: Text(
                           med.isActive ? l10n.active : l10n.done,
-                          style: AppTextStyles.caption.copyWith(
+                          style: AppSemanticTextStyles.caption.copyWith(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: c.chocolate),
+                              color: c.textPrimary),
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.xs),
+                      const SizedBox(height: AppSpacingTokens.xs),
                       Text(dateStr,
-                          style: AppTextStyles.caption
-                              .copyWith(color: c.chocolate)),
+                          style: AppSemanticTextStyles.caption
+                              .copyWith(color: c.textPrimary)),
                     ],
                   ),
                 ],
@@ -375,13 +377,13 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacingTokens.lg),
       decoration: BoxDecoration(
-        color: c.offWhite,
-        borderRadius: const BorderRadius.all(AppRadii.medium),
+        color: c.background,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
       ),
       child: child,
     );

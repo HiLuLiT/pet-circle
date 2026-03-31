@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/models/app_user.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 
 import 'package:pet_circle/screens/settings/settings_content.dart';
@@ -25,7 +26,7 @@ class SettingsDrawer extends StatelessWidget {
       maxChildSize: 1.0,
       builder: (context, scrollController) {
         return ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
           child: SettingsContent(
             role: role,
             scrollController: scrollController,
@@ -45,9 +46,9 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Scaffold(
-      backgroundColor: c.white,
+      backgroundColor: c.background,
       body: SafeArea(
         child: SettingsContent(role: role),
       ),

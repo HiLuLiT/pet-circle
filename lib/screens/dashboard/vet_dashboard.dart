@@ -11,7 +11,9 @@ import 'package:pet_circle/services/invitation_service.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
@@ -110,18 +112,18 @@ class _VetDashboardState extends State<VetDashboard> {
     return ListenableBuilder(
       listenable: Listenable.merge([petStore, measurementStore]),
       builder: (context, _) {
-        final c = AppColorsTheme.of(context);
+        final c = AppSemanticColors.of(context);
         final pets = petStore.allClinicPets;
         final l10n = AppLocalizations.of(context)!;
 
         if (petStore.isLoading) {
           final loader = Center(
-            child: CircularProgressIndicator(color: c.chocolate),
+            child: CircularProgressIndicator(color: c.textPrimary),
           );
           if (!widget.showScaffold) {
-            return Container(color: c.white, child: loader);
+            return Container(color: c.background, child: loader);
           }
-          return Scaffold(backgroundColor: c.white, body: loader);
+          return Scaffold(backgroundColor: c.background, body: loader);
         }
 
         final normalCount = pets.where((p) => p.statusLabel == 'Normal').length;
@@ -129,7 +131,7 @@ class _VetDashboardState extends State<VetDashboard> {
 
         final content = SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacingTokens.lg),
             child: SingleChildScrollView(
               child: Center(
                 child: ConstrainedBox(
@@ -137,7 +139,7 @@ class _VetDashboardState extends State<VetDashboard> {
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacingTokens.md),
                   if (_pendingInvitations.isNotEmpty) ...[
                     _PendingRequestsSection(
                       invitations: _pendingInvitations,
@@ -145,17 +147,17 @@ class _VetDashboardState extends State<VetDashboard> {
                       onAccept: _acceptInvitation,
                       onDecline: _declineInvitation,
                     ),
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacingTokens.lg),
                   ],
                   Text(
                     l10n.clinicOverview,
-                    style: AppTextStyles.heading2.copyWith(color: c.chocolate),
+                    style: AppSemanticTextStyles.title3.copyWith(color: c.textPrimary),
                   ),
                   Text(
                     l10n.patientsInYourCare(pets.length),
-                    style: AppTextStyles.bodyMuted,
+                    style: AppSemanticTextStyles.bodyMuted,
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacingTokens.lg),
                   _ResponsiveGrid(
                     maxCrossAxisCount: 3,
                     minItemWidth: 280,
@@ -170,26 +172,26 @@ class _VetDashboardState extends State<VetDashboard> {
                         )
                         .toList(),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacingTokens.lg),
                   _ResponsiveGrid(
                     maxCrossAxisCount: 3,
                     minItemWidth: 280,
                     childAspectRatio: 3.3,
                     children: [
                       _SummaryCard(
-                        iconColor: c.lightBlue.withValues(alpha: 0.15),
+                        iconColor: c.primaryLight.withValues(alpha: 0.15),
                         icon: Icons.check_circle_outline,
                         value: '$normalCount',
                         label: l10n.normalStatus,
                       ),
                       _SummaryCard(
-                        iconColor: c.cherry.withValues(alpha: 0.15),
+                        iconColor: c.error.withValues(alpha: 0.15),
                         icon: Icons.warning_amber_outlined,
                         value: '$elevatedCount',
                         label: l10n.needAttention,
                       ),
                       _SummaryCard(
-                        iconColor: c.lightBlue.withValues(alpha: 0.1),
+                        iconColor: c.primaryLight.withValues(alpha: 0.1),
                         icon: Icons.bar_chart,
                         value: '${measurementStore.thisWeekCount}',
                         label: l10n.measurementsThisWeek,
@@ -205,11 +207,11 @@ class _VetDashboardState extends State<VetDashboard> {
         );
 
         if (!widget.showScaffold) {
-          return Container(color: c.white, child: content);
+          return Container(color: c.background, child: content);
         }
 
         return Scaffold(
-          backgroundColor: c.white,
+          backgroundColor: c.background,
           body: content,
         );
       },
@@ -234,7 +236,7 @@ class _PendingRequestsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     return Column(
@@ -243,22 +245,22 @@ class _PendingRequestsSection extends StatelessWidget {
         Row(
           children: [
             Icon(Icons.notification_important_outlined,
-                size: 20, color: c.cherry),
-            const SizedBox(width: AppSpacing.sm),
+                size: 20, color: c.error),
+            const SizedBox(width: AppSpacingTokens.sm),
             Text(
               l10n.pendingRequests,
-              style: AppTextStyles.heading3.copyWith(color: c.chocolate),
+              style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
             ),
           ],
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacingTokens.sm),
         ...invitations.map((inv) {
           final isProcessing = processingTokens.contains(inv.id);
           return Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+            padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm),
             child: NeumorphicCard(
-              radius: const BorderRadius.all(AppRadii.medium),
-              padding: const EdgeInsets.all(AppSpacing.md),
+              radius: BorderRadius.circular(AppRadiiTokens.md),
+              padding: const EdgeInsets.all(AppSpacingTokens.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -268,27 +270,27 @@ class _PendingRequestsSection extends StatelessWidget {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: c.lightBlue.withValues(alpha: 0.15),
+                          color: c.primaryLight.withValues(alpha: 0.15),
                           borderRadius:
-                              const BorderRadius.all(AppRadii.large),
+                              BorderRadius.circular(AppRadiiTokens.lg),
                         ),
-                        child: Icon(Icons.pets, size: 20, color: c.blue),
+                        child: Icon(Icons.pets, size: 20, color: c.primary),
                       ),
-                      const SizedBox(width: AppSpacing.sm),
+                      const SizedBox(width: AppSpacingTokens.sm),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               inv.petName,
-                              style: AppTextStyles.body.copyWith(
+                              style: AppSemanticTextStyles.body.copyWith(
                                   fontWeight: FontWeight.w600,
-                                  color: c.chocolate),
+                                  color: c.textPrimary),
                             ),
                             Text(
                               l10n.petAssociationRequest(
                                   inv.invitedByName, inv.petName),
-                              style: AppTextStyles.caption,
+                              style: AppSemanticTextStyles.caption,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -297,7 +299,7 @@ class _PendingRequestsSection extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacingTokens.sm),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -305,21 +307,21 @@ class _PendingRequestsSection extends StatelessWidget {
                         onPressed:
                             isProcessing ? null : () => onDecline(inv),
                         child: Text(l10n.declineRequest,
-                            style: AppTextStyles.caption
-                                .copyWith(color: c.cherry)),
+                            style: AppSemanticTextStyles.caption
+                                .copyWith(color: c.error)),
                       ),
-                      const SizedBox(width: AppSpacing.sm),
+                      const SizedBox(width: AppSpacingTokens.sm),
                       SizedBox(
                         height: 32,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: c.blue,
+                            backgroundColor: c.primary,
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.md),
-                            shape: const RoundedRectangleBorder(
+                                horizontal: AppSpacingTokens.md),
+                            shape: RoundedRectangleBorder(
                               borderRadius:
-                                  BorderRadius.all(AppRadii.pill),
+                                  AppRadiiTokens.borderRadiusFull,
                             ),
                           ),
                           onPressed:
@@ -329,11 +331,11 @@ class _PendingRequestsSection extends StatelessWidget {
                                   width: 16,
                                   height: 16,
                                   child: CircularProgressIndicator(
-                                      strokeWidth: 2, color: c.white),
+                                      strokeWidth: 2, color: c.background),
                                 )
                               : Text(l10n.acceptRequest,
-                                  style: AppTextStyles.caption
-                                      .copyWith(color: c.white)),
+                                  style: AppSemanticTextStyles.caption
+                                      .copyWith(color: c.background)),
                         ),
                       ),
                     ],
@@ -358,7 +360,7 @@ class _PetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final latestFromStore = measurementStore.latestForPet(data.id ?? '');
     final latest = latestFromStore ?? data.latestMeasurement;
@@ -366,7 +368,7 @@ class _PetCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: NeumorphicCard(
-        radius: const BorderRadius.all(AppRadii.medium),
+        radius: BorderRadius.circular(AppRadiiTokens.md),
         child: Column(
           children: [
             Stack(
@@ -379,14 +381,14 @@ class _PetCard extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        c.lightBlue.withValues(alpha: 0.2),
+                        c.primaryLight.withValues(alpha: 0.2),
                         Colors.transparent,
                       ],
                     ),
                   ),
                   child: ClipRRect(
                     borderRadius:
-                        const BorderRadius.vertical(top: AppRadii.medium),
+                        BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.md)),
                     child: DogPhoto(endpoint: data.imageUrl),
                   ),
                 ),
@@ -405,18 +407,18 @@ class _PetCard extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: c.chocolate.withValues(alpha: 0.9),
-                      borderRadius: const BorderRadius.all(AppRadii.sm),
+                      color: c.textPrimary.withValues(alpha: 0.9),
+                      borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.visibility, size: 12, color: c.white),
+                        Icon(Icons.visibility, size: 12, color: c.background),
                         const SizedBox(width: 4),
                         Text(
                           l10n.viewOnly,
-                          style: AppTextStyles.caption.copyWith(
-                            color: c.white,
+                          style: AppSemanticTextStyles.caption.copyWith(
+                            color: c.background,
                             fontSize: 10,
                           ),
                         ),
@@ -434,10 +436,10 @@ class _PetCard extends StatelessWidget {
                   Text(
                     data.name,
                     style:
-                        AppTextStyles.heading3.copyWith(color: c.chocolate),
+                        AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
                   ),
                   const SizedBox(height: 4),
-                  Text(data.breedAndAge, style: AppTextStyles.bodyMuted),
+                  Text(data.breedAndAge, style: AppSemanticTextStyles.bodyMuted),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -446,10 +448,10 @@ class _PetCard extends StatelessWidget {
                         children: [
                           NeumorphicCard(
                             inner: true,
-                            color: c.offWhite,
+                            color: c.surface,
                             padding: const EdgeInsets.all(10),
                             child: Icon(Icons.favorite_border,
-                                size: 18, color: c.chocolate),
+                                size: 18, color: c.textPrimary),
                           ),
                           const SizedBox(width: 10),
                           Column(
@@ -457,24 +459,24 @@ class _PetCard extends StatelessWidget {
                             children: [
                               Text(
                                 hasMeasurement ? '${latest.bpm}' : '--',
-                                style: AppTextStyles.heading3
-                                    .copyWith(color: c.chocolate),
+                                style: AppSemanticTextStyles.headingLg
+                                    .copyWith(color: c.textPrimary),
                               ),
                               Text(l10n.bpm,
-                                  style: AppTextStyles.caption),
+                                  style: AppSemanticTextStyles.caption),
                             ],
                           ),
                         ],
                       ),
                       Text(
                         hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
-                        style: AppTextStyles.caption,
+                        style: AppSemanticTextStyles.caption,
                       ),
                     ],
                   ),
                   const SizedBox(height: 14),
                   Divider(
-                      color: c.lightBlue.withValues(alpha: 0.15),
+                      color: c.primaryLight.withValues(alpha: 0.15),
                       height: 1),
                   const SizedBox(height: 10),
                   Row(
@@ -483,17 +485,17 @@ class _PetCard extends StatelessWidget {
                       Row(
                         children: [
                           Icon(Icons.person_outline,
-                              size: 14, color: c.chocolate),
+                              size: 14, color: c.textPrimary),
                           const SizedBox(width: 6),
                           Text(
                             l10n.ownerLabel(_getOwnerName(
                                 data.careCircle, l10n.unknown)),
-                            style: AppTextStyles.caption,
+                            style: AppSemanticTextStyles.caption,
                           ),
                         ],
                       ),
                       Icon(Icons.chevron_right,
-                          size: 18, color: c.chocolate),
+                          size: 18, color: c.textPrimary),
                     ],
                   ),
                 ],
@@ -529,10 +531,10 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return NeumorphicCard(
-      radius: const BorderRadius.all(AppRadii.medium),
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      radius: BorderRadius.circular(AppRadiiTokens.md),
+      padding: const EdgeInsets.all(AppSpacingTokens.lg),
       child: Row(
         children: [
           Container(
@@ -540,13 +542,13 @@ class _SummaryCard extends StatelessWidget {
             width: 48,
             decoration: BoxDecoration(
               color: iconColor,
-              borderRadius: const BorderRadius.all(AppRadii.large),
+              borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
             ),
             child: Center(
-              child: Icon(icon, size: 24, color: c.chocolate),
+              child: Icon(icon, size: 24, color: c.textPrimary),
             ),
           ),
-          const SizedBox(width: AppSpacing.md),
+          const SizedBox(width: AppSpacingTokens.md),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -554,9 +556,9 @@ class _SummaryCard extends StatelessWidget {
               Text(
                 value,
                 style:
-                    AppTextStyles.heading3.copyWith(color: c.chocolate),
+                    AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
               ),
-              Text(label, style: AppTextStyles.bodyMuted),
+              Text(label, style: AppSemanticTextStyles.bodyMuted),
             ],
           ),
         ],

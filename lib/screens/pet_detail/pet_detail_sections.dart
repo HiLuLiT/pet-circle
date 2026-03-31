@@ -9,7 +9,9 @@ import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
 
 class PetInfoSection extends StatelessWidget {
@@ -20,19 +22,19 @@ class PetInfoSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final latestFromStore = measurementStore.latestForPet(pet.id ?? '');
     final latest = latestFromStore ?? pet.latestMeasurement;
     final hasMeasurement = latest.bpm > 0;
     return NeumorphicCard(
-      radius: const BorderRadius.all(AppRadii.medium),
+      radius: BorderRadius.circular(AppRadiiTokens.md),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.latestReading,
-            style: AppTextStyles.heading3.copyWith(color: c.chocolate),
+            style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
           ),
           const SizedBox(height: 16),
           Row(
@@ -40,7 +42,7 @@ class PetInfoSection extends StatelessWidget {
               Expanded(
                 child: InfoTile(
                   icon: Icons.favorite,
-                  iconColor: c.pink,
+                  iconColor: c.primaryLight,
                   value: hasMeasurement ? '${latest.bpm}' : '--',
                   label: l10n.bpm,
                 ),
@@ -49,7 +51,7 @@ class PetInfoSection extends StatelessWidget {
               Expanded(
                 child: InfoTile(
                   icon: Icons.access_time,
-                  iconColor: c.lightBlue,
+                  iconColor: c.primaryLight,
                   value: hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
                   label: l10n.lastMeasured,
                 ),
@@ -70,14 +72,14 @@ class PetMeasurementHistory extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final storeMeasurements = measurementStore.getMeasurements(pet.id ?? '');
     final List<Measurement> measurements = storeMeasurements.isNotEmpty
         ? storeMeasurements
         : (pet.latestMeasurement.bpm > 0 ? [pet.latestMeasurement] : <Measurement>[]);
 
     return NeumorphicCard(
-      radius: const BorderRadius.all(AppRadii.medium),
+      radius: BorderRadius.circular(AppRadiiTokens.md),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +89,7 @@ class PetMeasurementHistory extends StatelessWidget {
             children: [
               Text(
                 l10n.measurementHistory,
-                style: AppTextStyles.heading3.copyWith(color: c.chocolate),
+                style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
               ),
               TextButton.icon(
                 onPressed: () {
@@ -96,7 +98,7 @@ class PetMeasurementHistory extends StatelessWidget {
                 },
                 icon: const Icon(Icons.show_chart, size: 18),
                 label: Text(l10n.viewGraph),
-                style: TextButton.styleFrom(foregroundColor: c.lightBlue),
+                style: TextButton.styleFrom(foregroundColor: c.primaryLight),
               ),
             ],
           ),
@@ -117,9 +119,9 @@ class PetMeasurementHistory extends StatelessWidget {
                       children: [
                         Text(
                           '${m.bpm}',
-                          style: AppTextStyles.caption.copyWith(
+                          style: AppSemanticTextStyles.caption.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: isElevated ? c.cherry : c.lightBlue,
+                            color: isElevated ? c.error : c.primaryLight,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -127,11 +129,11 @@ class PetMeasurementHistory extends StatelessWidget {
                           height: height.clamp(20, 60),
                           decoration: BoxDecoration(
                             color: isElevated
-                                ? c.cherry.withValues(alpha: 0.3)
-                                : c.lightBlue.withValues(alpha: 0.3),
-                            borderRadius: const BorderRadius.all(AppRadii.xs),
+                                ? c.error.withValues(alpha: 0.3)
+                                : c.primaryLight.withValues(alpha: 0.3),
+                            borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                             border: Border.all(
-                              color: isElevated ? c.cherry : c.lightBlue,
+                              color: isElevated ? c.error : c.primaryLight,
                               width: 2,
                             ),
                           ),
@@ -150,7 +152,7 @@ class PetMeasurementHistory extends StatelessWidget {
               return Expanded(
                 child: Text(
                   m.timeAgo.replaceAll(' ago', ''),
-                  style: AppTextStyles.caption.copyWith(fontSize: 9),
+                  style: AppSemanticTextStyles.caption.copyWith(fontSize: 9),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -178,22 +180,22 @@ class PetClinicalNotes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final access = petStore.accessForPet(pet);
     final notes = noteStore.getNotes(pet.id ?? '');
     return NeumorphicCard(
-      radius: const BorderRadius.all(AppRadii.medium),
+      radius: BorderRadius.circular(AppRadiiTokens.md),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.note_alt_outlined, color: c.chocolate),
+              Icon(Icons.note_alt_outlined, color: c.textPrimary),
               const SizedBox(width: 8),
               Text(
                 l10n.clinicalNotes,
-                style: AppTextStyles.heading3.copyWith(color: c.chocolate),
+                style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
               ),
             ],
           ),
@@ -202,8 +204,8 @@ class PetClinicalNotes extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: c.offWhite,
-              borderRadius: const BorderRadius.all(AppRadii.small),
+              color: c.surface,
+              borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
             ),
             child: Column(
               children: [
@@ -213,11 +215,11 @@ class PetClinicalNotes extends StatelessWidget {
                   readOnly: !access.canAddNotes,
                   decoration: InputDecoration(
                     hintText: l10n.addClinicalNoteHint,
-                    hintStyle: AppTextStyles.body.copyWith(color: c.chocolate),
+                    hintStyle: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                     border: InputBorder.none,
                     isDense: true,
                   ),
-                  style: AppTextStyles.body,
+                  style: AppSemanticTextStyles.body,
                 ),
                 const SizedBox(height: 8),
                 Align(
@@ -227,11 +229,11 @@ class PetClinicalNotes extends StatelessWidget {
                     icon: const Icon(Icons.add, size: 18),
                     label: Text(l10n.addNote),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: c.chocolate,
-                      foregroundColor: c.white,
+                      backgroundColor: c.textPrimary,
+                      foregroundColor: c.background,
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       shape: RoundedRectangleBorder(
-                        borderRadius: const BorderRadius.all(AppRadii.large),
+                        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
                       ),
                     ),
                   ),
@@ -253,12 +255,12 @@ class PetClinicalNotes extends StatelessWidget {
                   Icon(
                     Icons.notes,
                     size: 40,
-                    color: c.chocolate.withValues(alpha: 0.5),
+                    color: c.textPrimary.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     l10n.noClinicalNotesYet,
-                    style: AppTextStyles.body.copyWith(color: c.chocolate),
+                    style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                   ),
                 ],
               ),
@@ -278,20 +280,20 @@ class PetCareCircle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return NeumorphicCard(
-      radius: const BorderRadius.all(AppRadii.medium),
+      radius: BorderRadius.circular(AppRadiiTokens.md),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.group, color: c.chocolate),
+              Icon(Icons.group, color: c.textPrimary),
               const SizedBox(width: 8),
               Text(
                 l10n.careCircle,
-                style: AppTextStyles.heading3.copyWith(color: c.chocolate),
+                style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
               ),
             ],
           ),

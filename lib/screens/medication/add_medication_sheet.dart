@@ -7,7 +7,9 @@ import 'package:pet_circle/services/reminder_service.dart';
 import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 import 'medication_form_widgets.dart';
 
@@ -188,20 +190,20 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Container(
         decoration: BoxDecoration(
-          color: c.white,
-          borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+          color: c.surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
         ),
         child: SafeArea(
           top: false,
           child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xl),
+                AppSpacingTokens.lg, AppSpacingTokens.lg, AppSpacingTokens.lg, AppSpacingTokens.xl),
             child: Form(
               key: _formKey,
               child: Column(
@@ -214,7 +216,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                       icon: const Icon(Icons.close),
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacingTokens.sm),
                   Center(
                     child: Column(
                       children: [
@@ -222,22 +224,22 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                           _isEditing
                               ? l10n.editMedication
                               : l10n.addNewMedication,
-                          style: AppTextStyles.heading2,
+                          style: AppSemanticTextStyles.title3,
                         ),
-                        const SizedBox(height: AppSpacing.sm),
+                        const SizedBox(height: AppSpacingTokens.sm),
                         Text(
                           _isEditing
                               ? l10n.updateMedicationDescription(
                                   petStore.activePet?.name ?? l10n.petName)
                               : l10n.addMedicationDescription(
                                   petStore.activePet?.name ?? l10n.petName),
-                          style: AppTextStyles.body,
+                          style: AppSemanticTextStyles.body,
                           textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacingTokens.lg),
                   ValidatedFormField(
                     label: l10n.medicationNameRequired,
                     hint: 'e.g., Pimobendan',
@@ -246,7 +248,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                         ? l10n.fieldRequired
                         : null,
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacingTokens.md),
                   ValidatedFormField(
                     label: l10n.dosageRequired,
                     hint: 'e.g., 5mg',
@@ -255,14 +257,14 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                         ? l10n.fieldRequired
                         : null,
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacingTokens.md),
                   DropdownField(
                     label: l10n.frequencyRequired,
                     value: _frequency,
                     onChanged: (value) =>
                         setState(() => _frequency = value ?? _frequency),
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacingTokens.md),
                   Row(
                     children: [
                       Expanded(
@@ -275,7 +277,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                               : null,
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.md),
+                      const SizedBox(width: AppSpacingTokens.md),
                       Expanded(
                         child: DatePickerField(
                           label: l10n.endDateOptional,
@@ -285,57 +287,57 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacingTokens.md),
                   ValidatedFormField(
                     label: l10n.prescribedBy,
                     hint: 'e.g., Dr. Smith, DVM',
                     controller: _prescribedByController,
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacingTokens.md),
                   ValidatedFormField(
                     label: l10n.purposeCondition,
                     hint: 'e.g., Congestive Heart Failure',
                     controller: _purposeController,
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacingTokens.md),
                   ValidatedTextArea(
                     label: l10n.additionalNotes,
                     hint:
                         'Any special instructions, side effects to monitor, or additional information...',
                     controller: _notesController,
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacingTokens.md),
                   ReminderCard(
                     enabled: _remindersEnabled,
                     onChanged: (v) =>
                         setState(() => _remindersEnabled = v),
                   ),
-                  const SizedBox(height: AppSpacing.md),
+                  const SizedBox(height: AppSpacingTokens.md),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
                         style: TextButton.styleFrom(
-                          backgroundColor: c.offWhite,
+                          backgroundColor: c.background,
                           shape: RoundedRectangleBorder(
                               borderRadius:
-                                  const BorderRadius.all(AppRadii.full)),
+                                  BorderRadius.circular(AppRadiiTokens.full)),
                         ),
                         child: Text(l10n.cancel),
                       ),
-                      const SizedBox(width: AppSpacing.sm),
+                      const SizedBox(width: AppSpacingTokens.sm),
                       TextButton(
                         onPressed: _save,
                         style: TextButton.styleFrom(
-                          backgroundColor: c.blue,
+                          backgroundColor: c.primary,
                           shape: RoundedRectangleBorder(
                               borderRadius:
-                                  const BorderRadius.all(AppRadii.full)),
+                                  BorderRadius.circular(AppRadiiTokens.full)),
                         ),
                         child: Text(
                           _isEditing ? l10n.save : l10n.addMedication,
-                          style: TextStyle(color: c.white),
+                          style: TextStyle(color: c.surface),
                         ),
                       ),
                     ],

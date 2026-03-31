@@ -16,7 +16,8 @@ import 'package:pet_circle/screens/medication/medication_screen.dart'
 import 'package:pet_circle/screens/messages/messages_screen.dart'
     show NotificationsDrawer;
 import 'package:pet_circle/screens/trends/trends_screen.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
@@ -63,13 +64,13 @@ class _MainShellState extends State<MainShell> {
   }
 
   void _showPetSwitcher() {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final pets = petStore.ownerPets;
     if (pets.length <= 1) return;
 
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: c.white,
+      backgroundColor: c.background,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
@@ -82,7 +83,7 @@ class _MainShellState extends State<MainShell> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: c.offWhite,
+                color: c.surface,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -101,8 +102,8 @@ class _MainShellState extends State<MainShell> {
                 ),
                 title: Text(
                   pet.name,
-                  style: AppTextStyles.body.copyWith(
-                    color: c.chocolate,
+                  style: AppSemanticTextStyles.body.copyWith(
+                    color: c.textPrimary,
                     fontWeight:
                         isSelected ? FontWeight.w700 : FontWeight.w400,
                   ),
@@ -110,10 +111,10 @@ class _MainShellState extends State<MainShell> {
                 subtitle: Text(
                   pet.breedAndAge,
                   style:
-                      AppTextStyles.caption.copyWith(color: c.chocolate),
+                      AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
                 ),
                 trailing: isSelected
-                    ? Icon(Icons.check_circle, color: c.lightBlue)
+                    ? Icon(Icons.check_circle, color: c.primaryLight)
                     : null,
                 onTap: () {
                   petStore.setActivePetIndex(i);
@@ -130,7 +131,7 @@ class _MainShellState extends State<MainShell> {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final user = userStore.currentUser;
     final pet = petStore.activePet;
     final screenWidth = MediaQuery.sizeOf(context).width;
@@ -186,7 +187,7 @@ class _MainShellState extends State<MainShell> {
 
     if (!isWide) {
       return Scaffold(
-        backgroundColor: c.white,
+        backgroundColor: c.background,
         body: SafeArea(child: body),
         bottomNavigationBar: BottomNavBar(
           selectedIndex: _selectedIndex,
@@ -197,13 +198,13 @@ class _MainShellState extends State<MainShell> {
 
     // Tablet / Desktop: NavigationRail in a Row
     return Scaffold(
-      backgroundColor: c.white,
+      backgroundColor: c.background,
       body: SafeArea(
         child: Row(
           children: [
             _buildNavigationRail(context, c, screenWidth),
             // Vertical divider between rail and content
-            VerticalDivider(thickness: 1, width: 1, color: c.chocolate),
+            VerticalDivider(thickness: 1, width: 1, color: c.textPrimary),
             Expanded(child: body),
           ],
         ),
@@ -213,7 +214,7 @@ class _MainShellState extends State<MainShell> {
 
   Widget _buildNavigationRail(
     BuildContext context,
-    AppColorsTheme c,
+    AppSemanticColors c,
     double screenWidth,
   ) {
     final l10n = AppLocalizations.of(context)!;
@@ -247,29 +248,29 @@ class _MainShellState extends State<MainShell> {
       data: Theme.of(context).copyWith(
         navigationRailTheme: NavigationRailThemeData(
           selectedLabelTextStyle:
-              AppTextStyles.caption.copyWith(color: c.chocolate),
-          unselectedLabelTextStyle: AppTextStyles.caption
-              .copyWith(color: c.chocolate.withValues(alpha: 0.5)),
+              AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
+          unselectedLabelTextStyle: AppSemanticTextStyles.caption
+              .copyWith(color: c.textPrimary.withValues(alpha: 0.5)),
         ),
       ),
       child: NavigationRail(
       selectedIndex: _selectedIndex,
       onDestinationSelected: _onDestinationSelected,
-      backgroundColor: c.white,
+      backgroundColor: c.background,
       labelType: showLabels
           ? NavigationRailLabelType.all
           : NavigationRailLabelType.none,
-      indicatorColor: c.offWhite,
-      selectedIconTheme: IconThemeData(color: c.chocolate),
-      unselectedIconTheme: IconThemeData(color: c.chocolate, opacity: 0.3),
+      indicatorColor: c.surface,
+      selectedIconTheme: IconThemeData(color: c.textPrimary),
+      unselectedIconTheme: IconThemeData(color: c.textPrimary, opacity: 0.3),
       destinations: List.generate(5, (i) {
         return NavigationRailDestination(
           icon: Opacity(
             opacity: 0.3,
-            child: Icon(icons[i], size: 28, color: c.chocolate),
+            child: Icon(icons[i], size: 28, color: c.textPrimary),
           ),
           selectedIcon:
-              Icon(activeIcons[i], size: 28, color: c.chocolate),
+              Icon(activeIcons[i], size: 28, color: c.textPrimary),
           label: Text(labels[i]),
         );
       }),

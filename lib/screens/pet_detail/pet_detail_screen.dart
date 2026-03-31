@@ -8,7 +8,9 @@ import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/breed_search_field.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
@@ -40,7 +42,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
 
   void _showEditSheet() {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final nameCtrl = TextEditingController(text: _pet.name);
     final imageCtrl = TextEditingController(text: _pet.imageUrl);
     String selectedBreed = _pet.breedAndAge;
@@ -55,7 +57,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
           constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: c.white,
+            color: c.background,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           ),
           child: SingleChildScrollView(
@@ -63,14 +65,14 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.editPet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+                Text(l10n.editPet, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
                 const SizedBox(height: 16),
                 TextField(
                   controller: nameCtrl,
                   decoration: InputDecoration(
                     labelText: l10n.petName,
-                    filled: true, fillColor: c.offWhite,
-                    border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
+                    filled: true, fillColor: c.surface,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.sm), borderSide: BorderSide.none),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -85,8 +87,8 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   controller: imageCtrl,
                   decoration: InputDecoration(
                     labelText: l10n.photoUrl,
-                    filled: true, fillColor: c.offWhite,
-                    border: OutlineInputBorder(borderRadius: const BorderRadius.all(AppRadii.small), borderSide: BorderSide.none),
+                    filled: true, fillColor: c.surface,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.sm), borderSide: BorderSide.none),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -118,8 +120,8 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                           SnackBar(content: Text(l10n.petUpdated)),
                         );
                       },
-                      style: TextButton.styleFrom(backgroundColor: c.lightBlue),
-                      child: Text(l10n.save, style: TextStyle(color: c.chocolate)),
+                      style: TextButton.styleFrom(backgroundColor: c.primaryLight),
+                      child: Text(l10n.save, style: TextStyle(color: c.textPrimary)),
                     ),
                   ],
                 ),
@@ -152,20 +154,20 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     _noteController.clear();
 
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(l10n.clinicalNoteAdded),
-        backgroundColor: c.lightBlue,
+        backgroundColor: c.primaryLight,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Scaffold(
-      backgroundColor: c.white,
+      backgroundColor: c.background,
       body: ListenableBuilder(
         listenable: Listenable.merge([noteStore, measurementStore, petStore]),
         builder: (context, _) => CustomScrollView(
@@ -197,20 +199,20 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   }
 
   Widget _buildAppBar() {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final access = petStore.accessForPet(_pet);
     return SliverAppBar(
       expandedHeight: 280,
       pinned: true,
-      backgroundColor: c.chocolate,
+      backgroundColor: c.textPrimary,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: c.white),
+        icon: Icon(Icons.arrow_back, color: c.background),
         onPressed: () => context.pop(),
       ),
       actions: [
         if (access.canEditPet)
           IconButton(
-            icon: Icon(Icons.edit, color: c.white),
+            icon: Icon(Icons.edit, color: c.background),
             onPressed: _showEditSheet,
           ),
       ],
@@ -226,7 +228,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    c.chocolate.withValues(alpha: 0.8),
+                    c.textPrimary.withValues(alpha: 0.8),
                   ],
                 ),
               ),
@@ -249,12 +251,12 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   const SizedBox(height: 8),
                   Text(
                     _pet.name,
-                    style: AppTextStyles.heading1.copyWith(color: c.white),
+                    style: AppSemanticTextStyles.title2.copyWith(color: c.background),
                   ),
                   Text(
                     _pet.breedAndAge,
-                    style: AppTextStyles.body.copyWith(
-                      color: c.white.withValues(alpha: 0.8),
+                    style: AppSemanticTextStyles.body.copyWith(
+                      color: c.background.withValues(alpha: 0.8),
                     ),
                   ),
                 ],

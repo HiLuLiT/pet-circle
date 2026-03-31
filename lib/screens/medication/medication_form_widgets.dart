@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
 
 class ValidatedFormField extends StatelessWidget {
@@ -19,30 +21,30 @@ class ValidatedFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
             style:
-                AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
-        const SizedBox(height: AppSpacing.sm),
+                AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+        const SizedBox(height: AppSpacingTokens.sm),
         TextFormField(
           controller: controller,
           validator: validator,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             filled: true,
-            fillColor: c.offWhite,
+            fillColor: c.background,
             hintText: hint,
-            hintStyle: AppTextStyles.body
-                .copyWith(color: c.chocolate.withValues(alpha: 0.3)),
+            hintStyle: AppSemanticTextStyles.body
+                .copyWith(color: c.textPrimary.withValues(alpha: 0.3)),
             border: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(AppRadii.xs),
+                borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                 borderSide: BorderSide.none),
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm + 4, vertical: AppSpacing.xs),
-            errorStyle: AppTextStyles.caption.copyWith(color: c.cherry),
+                horizontal: AppSpacingTokens.sm + 4, vertical: AppSpacingTokens.xs),
+            errorStyle: AppSemanticTextStyles.caption.copyWith(color: c.error),
           ),
         ),
       ],
@@ -66,15 +68,15 @@ class DatePickerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
             style:
-                AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
-        const SizedBox(height: AppSpacing.sm),
+                AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+        const SizedBox(height: AppSpacingTokens.sm),
         TextFormField(
           controller: controller,
           readOnly: true,
@@ -83,18 +85,18 @@ class DatePickerField extends StatelessWidget {
           autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             filled: true,
-            fillColor: c.offWhite,
+            fillColor: c.background,
             hintText: l10n.dateFormatHint,
-            hintStyle: AppTextStyles.body
-                .copyWith(color: c.chocolate.withValues(alpha: 0.3)),
+            hintStyle: AppSemanticTextStyles.body
+                .copyWith(color: c.textPrimary.withValues(alpha: 0.3)),
             suffixIcon: Icon(Icons.calendar_today,
-                size: 18, color: c.chocolate.withValues(alpha: 0.5)),
+                size: 18, color: c.textPrimary.withValues(alpha: 0.5)),
             border: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(AppRadii.xs),
+                borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                 borderSide: BorderSide.none),
             contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm + 4, vertical: AppSpacing.xs),
-            errorStyle: AppTextStyles.caption.copyWith(color: c.cherry),
+                horizontal: AppSpacingTokens.sm + 4, vertical: AppSpacingTokens.xs),
+            errorStyle: AppSemanticTextStyles.caption.copyWith(color: c.error),
           ),
         ),
       ],
@@ -116,21 +118,21 @@ class DropdownField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
             style:
-                AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
-        const SizedBox(height: AppSpacing.sm),
+                AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+        const SizedBox(height: AppSpacingTokens.sm),
         Container(
           height: 36,
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm + 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 4),
           decoration: BoxDecoration(
-              color: c.offWhite,
-              borderRadius: const BorderRadius.all(AppRadii.xs)),
+              color: c.background,
+              borderRadius: BorderRadius.circular(AppRadiiTokens.sm)),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: value,
@@ -167,28 +169,28 @@ class ValidatedTextArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label,
             style:
-                AppTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
-        const SizedBox(height: AppSpacing.sm),
+                AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+        const SizedBox(height: AppSpacingTokens.sm),
         TextFormField(
           controller: controller,
           maxLines: 3,
           decoration: InputDecoration(
             filled: true,
-            fillColor: c.offWhite,
+            fillColor: c.background,
             hintText: hint,
-            hintStyle: AppTextStyles.body
-                .copyWith(color: c.chocolate.withValues(alpha: 0.3)),
+            hintStyle: AppSemanticTextStyles.body
+                .copyWith(color: c.textPrimary.withValues(alpha: 0.3)),
             border: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(AppRadii.xs),
+                borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                 borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.all(AppSpacing.sm + 4),
-            errorStyle: AppTextStyles.caption.copyWith(color: c.cherry),
+            contentPadding: const EdgeInsets.all(AppSpacingTokens.sm + 4),
+            errorStyle: AppSemanticTextStyles.caption.copyWith(color: c.error),
           ),
         ),
       ],
@@ -209,27 +211,27 @@ class ReminderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md, vertical: AppSpacing.sm + 4),
+          horizontal: AppSpacingTokens.md, vertical: AppSpacingTokens.sm + 4),
       decoration: BoxDecoration(
-          color: c.pink,
-          borderRadius: const BorderRadius.all(AppRadii.small)),
+          color: c.primaryLight,
+          borderRadius: BorderRadius.circular(AppRadiiTokens.sm)),
       child: Row(
         children: [
-          Icon(Icons.notifications_none, color: c.chocolate, size: 20),
-          const SizedBox(width: AppSpacing.sm),
+          Icon(Icons.notifications_none, color: c.textPrimary, size: 20),
+          const SizedBox(width: AppSpacingTokens.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.medicationReminders,
-                    style: AppTextStyles.body
+                    style: AppSemanticTextStyles.body
                         .copyWith(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 1),
                 Text(l10n.medicationRemindersDesc,
-                    style: AppTextStyles.caption),
+                    style: AppSemanticTextStyles.caption),
               ],
             ),
           ),

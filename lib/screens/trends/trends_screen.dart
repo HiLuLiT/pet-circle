@@ -7,7 +7,9 @@ import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -41,7 +43,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
 
   void _showExportDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final petId = petStore.activePet?.id ?? '';
     final petName = petStore.activePet?.name ?? l10n.petName;
     final measurements = measurementStore.getMeasurements(petId);
@@ -51,22 +53,22 @@ class _TrendsScreenState extends State<TrendsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
-        title: Text(l10n.exportLabel, style: AppTextStyles.heading3),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.lg)),
+        title: Text(l10n.exportLabel, style: AppSemanticTextStyles.headingLg),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(l10n.csvPreview, style: AppTextStyles.body),
+              Text(l10n.csvPreview, style: AppSemanticTextStyles.body),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: c.offWhite,
-                  borderRadius: const BorderRadius.all(AppRadii.sm),
+                  color: c.background,
+                  borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                 ),
-                child: Text(csvData, style: AppTextStyles.caption.copyWith(fontFamily: 'monospace', fontSize: 10)),
+                child: Text(csvData, style: AppSemanticTextStyles.caption.copyWith(fontFamily: 'monospace', fontSize: 10)),
               ),
             ],
           ),
@@ -74,7 +76,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.close, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+            child: Text(l10n.close, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
           ),
           TextButton(
             onPressed: () async {
@@ -95,10 +97,10 @@ class _TrendsScreenState extends State<TrendsScreen> {
               }
             },
             style: TextButton.styleFrom(
-              backgroundColor: c.lightBlue,
-              shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.small)),
+              backgroundColor: c.primaryLight,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.sm)),
             ),
-            child: Text(l10n.downloadCsv, style: AppTextStyles.body.copyWith(color: c.chocolate)),
+            child: Text(l10n.downloadCsv, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
           ),
         ],
       ),
@@ -107,14 +109,14 @@ class _TrendsScreenState extends State<TrendsScreen> {
 
   void _confirmDelete(BuildContext context, String petId, Measurement m) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final dateStr = '${m.recordedAt.month}/${m.recordedAt.day}';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
-        title: Text(l10n.deleteMeasurement, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
-        content: Text(l10n.deleteMeasurementConfirmation(m.bpm, dateStr), style: AppTextStyles.body),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.lg)),
+        title: Text(l10n.deleteMeasurement, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+        content: Text(l10n.deleteMeasurementConfirmation(m.bpm, dateStr), style: AppSemanticTextStyles.body),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           TextButton(
@@ -125,8 +127,8 @@ class _TrendsScreenState extends State<TrendsScreen> {
                 SnackBar(content: Text(l10n.measurementDeleted)),
               );
             },
-            style: TextButton.styleFrom(backgroundColor: c.cherry),
-            child: Text(l10n.deleteMeasurement, style: TextStyle(color: c.white)),
+            style: TextButton.styleFrom(backgroundColor: c.error),
+            child: Text(l10n.deleteMeasurement, style: TextStyle(color: c.surface)),
           ),
         ],
       ),
@@ -139,7 +141,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
       listenable: Listenable.merge([measurementStore, petStore, userStore]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context)!;
-        final c = AppColorsTheme.of(context);
+        final c = AppSemanticColors.of(context);
         final access = petStore.accessForActivePet();
         final periodOptions = [
           l10n.last24Hours,
@@ -159,20 +161,20 @@ class _TrendsScreenState extends State<TrendsScreen> {
         final content = SafeArea(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacingTokens.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-              const SizedBox(height: AppSpacing.md),
-              Text(l10n.healthTrends, style: AppTextStyles.heading2),
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: AppSpacingTokens.md),
+              Text(l10n.healthTrends, style: AppSemanticTextStyles.title3),
+              const SizedBox(height: AppSpacingTokens.sm),
               Text(
                 filtered.length < allMeasurements.length
                     ? '$petName • ${filtered.length} of ${allMeasurements.length} recordings in this period'
                     : '$petName • ${allMeasurements.length} recordings',
-                style: AppTextStyles.body,
+                style: AppSemanticTextStyles.body,
               ),
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacingTokens.md),
               Wrap(
                 spacing: 8,
                 runSpacing: 12,
@@ -181,14 +183,14 @@ class _TrendsScreenState extends State<TrendsScreen> {
                     height: 40,
                     padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                      color: c.offWhite,
-                      borderRadius: const BorderRadius.all(AppRadii.xs),
+                      color: c.background,
+                      borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
                         value: _selectedPeriod,
                         icon: const Icon(Icons.keyboard_arrow_down, size: 16),
-                        style: AppTextStyles.body,
+                        style: AppSemanticTextStyles.body,
                         items: periodOptions
                             .map((option) => DropdownMenuItem(value: option, child: Text(option)))
                             .toList(),
@@ -204,46 +206,46 @@ class _TrendsScreenState extends State<TrendsScreen> {
                       height: 40,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: c.lightBlue,
-                        borderRadius: const BorderRadius.all(AppRadii.xs),
+                        color: c.primaryLight,
+                        borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.file_download, size: 16, color: c.chocolate),
+                          Icon(Icons.file_download, size: 16, color: c.textPrimary),
                           const SizedBox(width: 8),
-                          Text(l10n.exportLabel, style: AppTextStyles.body),
+                          Text(l10n.exportLabel, style: AppSemanticTextStyles.body),
                         ],
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacingTokens.lg),
               _StatGrid(filtered: filtered),
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacingTokens.lg),
               _SectionCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(l10n.srrOverTime, style: AppTextStyles.heading3),
-                    const SizedBox(height: AppSpacing.md),
+                    Text(l10n.srrOverTime, style: AppSemanticTextStyles.headingLg),
+                    const SizedBox(height: AppSpacingTokens.md),
                     _BadgeRow(),
-                    const SizedBox(height: AppSpacing.sm),
+                    const SizedBox(height: AppSpacingTokens.sm),
                     _BadgeRowSecond(),
-                    const SizedBox(height: AppSpacing.md),
+                    const SizedBox(height: AppSpacingTokens.md),
                     _SrrChart(measurements: filtered),
                   ],
                 ),
               ),
               if (filtered.isNotEmpty) ...[
-                const SizedBox(height: AppSpacing.lg),
-                Text(l10n.measurementHistory, style: AppTextStyles.heading3),
-                const SizedBox(height: AppSpacing.sm + 4),
+                const SizedBox(height: AppSpacingTokens.lg),
+                Text(l10n.measurementHistory, style: AppSemanticTextStyles.headingLg),
+                const SizedBox(height: AppSpacingTokens.sm + 4),
                 ...filtered.map((m) {
                   final dateStr = '${m.recordedAt.month}/${m.recordedAt.day} ${m.recordedAt.hour}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
                   final status = settingsStore.classifyStatus(m.bpm);
-                  final statusColor = status == 'Normal' ? c.lightBlue : status == 'Elevated' ? c.lightYellow : c.cherry;
+                  final statusColor = status == 'Normal' ? c.primaryLight : status == 'Elevated' ? c.warning : c.error;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Dismissible(
@@ -255,10 +257,10 @@ class _TrendsScreenState extends State<TrendsScreen> {
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 20),
                         decoration: BoxDecoration(
-                          color: c.cherry,
-                          borderRadius: const BorderRadius.all(AppRadii.small),
+                          color: c.error,
+                          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                         ),
-                        child: Icon(Icons.delete, color: c.white),
+                        child: Icon(Icons.delete, color: c.surface),
                       ),
                       confirmDismiss: (_) async {
                         if (!access.canDeleteMeasurements) return false;
@@ -268,8 +270,8 @@ class _TrendsScreenState extends State<TrendsScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: c.offWhite,
-                          borderRadius: const BorderRadius.all(AppRadii.small),
+                          color: c.background,
+                          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                         ),
                         child: Row(
                           children: [
@@ -282,8 +284,8 @@ class _TrendsScreenState extends State<TrendsScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('${m.bpm} BPM', style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: c.chocolate)),
-                                  Text(dateStr, style: AppTextStyles.caption.copyWith(color: c.chocolate)),
+                                  Text('${m.bpm} BPM', style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: c.textPrimary)),
+                                  Text(dateStr, style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary)),
                                 ],
                               ),
                             ),
@@ -291,9 +293,9 @@ class _TrendsScreenState extends State<TrendsScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
                                 color: statusColor.withValues(alpha: 0.2),
-                                borderRadius: const BorderRadius.all(AppRadii.full),
+                                borderRadius: BorderRadius.circular(AppRadiiTokens.full),
                               ),
-                              child: Text(status, style: AppTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: c.chocolate)),
+                              child: Text(status, style: AppSemanticTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: c.textPrimary)),
                             ),
                           ],
                         ),
@@ -309,9 +311,9 @@ class _TrendsScreenState extends State<TrendsScreen> {
         );
 
         if (!widget.showScaffold) {
-          return Container(color: c.white, child: content);
+          return Container(color: c.surface, child: content);
         }
-        return Scaffold(backgroundColor: c.white, body: content);
+        return Scaffold(backgroundColor: c.surface, body: content);
       },
     );
   }
@@ -380,12 +382,12 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacingTokens.lg),
       decoration: BoxDecoration(
-        color: c.offWhite,
-        borderRadius: const BorderRadius.all(AppRadii.medium),
+        color: c.background,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
       ),
       child: child,
     );
@@ -397,11 +399,11 @@ class _BadgeRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Row(children: [
-      _LegendBadge(color: c.lightBlue, label: 'Normal (<30)'),
+      _LegendBadge(color: c.primaryLight, label: 'Normal (<30)'),
       const SizedBox(width: 8),
-      _LegendBadge(color: c.lightYellow, label: 'Elevated (30-40)'),
+      _LegendBadge(color: c.warning, label: 'Elevated (30-40)'),
     ]);
   }
 }
@@ -411,8 +413,8 @@ class _BadgeRowSecond extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    return _LegendBadge(color: c.cherry, label: 'Alert (>40)');
+    final c = AppSemanticColors.of(context);
+    return _LegendBadge(color: c.error, label: 'Alert (>40)');
   }
 }
 
@@ -424,19 +426,19 @@ class _LegendBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: c.white,
-        borderRadius: const BorderRadius.all(AppRadii.full),
+        color: c.surface,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.full),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
           const SizedBox(width: 4),
-          Text(label, style: AppTextStyles.caption.copyWith(color: c.chocolate)),
+          Text(label, style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary)),
         ],
       ),
     );
@@ -452,23 +454,23 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Expanded(
       child: Container(
         height: 109,
-        padding: const EdgeInsets.all(AppSpacing.sm + 4),
+        padding: const EdgeInsets.all(AppSpacingTokens.sm + 4),
         decoration: BoxDecoration(
-          color: c.white,
-          borderRadius: const BorderRadius.all(AppRadii.small),
+          color: c.surface,
+          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: AppTextStyles.caption),
-            const SizedBox(height: AppSpacing.xs),
-            Text(value, style: AppTextStyles.heading2.copyWith(fontSize: 24)),
+            Text(title, style: AppSemanticTextStyles.caption),
+            const SizedBox(height: AppSpacingTokens.xs),
+            Text(value, style: AppSemanticTextStyles.title3.copyWith(fontSize: 24)),
             const Spacer(),
-            Text(footnote, style: AppTextStyles.caption),
+            Text(footnote, style: AppSemanticTextStyles.caption),
           ],
         ),
       ),
@@ -484,7 +486,7 @@ class _StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final normal = measurements.where((m) => m.bpm < settingsStore.elevatedThreshold).length;
     final elevated = measurements.where((m) => m.bpm >= settingsStore.elevatedThreshold && m.bpm < settingsStore.criticalThreshold).length;
     final critical = measurements.where((m) => m.bpm >= settingsStore.criticalThreshold).length;
@@ -493,20 +495,20 @@ class _StatusCard extends StatelessWidget {
         height: 109,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: c.white,
-          borderRadius: const BorderRadius.all(AppRadii.small),
+          color: c.surface,
+          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(l10n.status, style: AppTextStyles.caption.copyWith(fontSize: 12)),
+            Text(l10n.status, style: AppSemanticTextStyles.caption.copyWith(fontSize: 12)),
             const SizedBox(height: 16),
             Row(children: [
-              _StatusPill(value: '$normal', color: c.lightBlue),
+              _StatusPill(value: '$normal', color: c.primaryLight),
               const SizedBox(width: 8),
-              _StatusPill(value: '$elevated', color: c.lightYellow),
+              _StatusPill(value: '$elevated', color: c.warning),
               const SizedBox(width: 8),
-              _StatusPill(value: '$critical', color: c.cherry, muted: critical == 0),
+              _StatusPill(value: '$critical', color: c.error, muted: critical == 0),
             ]),
           ],
         ),
@@ -525,13 +527,13 @@ class _StatusPill extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Text(value, style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: color)),
+      Text(value, style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: color)),
       const SizedBox(height: 4),
       Container(
         width: 27, height: 2,
         decoration: BoxDecoration(
           color: muted ? color.withValues(alpha: 0.4) : color,
-          borderRadius: const BorderRadius.all(AppRadii.xs),
+          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
         ),
       ),
     ]);
@@ -545,7 +547,7 @@ class _SrrChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     if (measurements.isEmpty) {
@@ -554,19 +556,19 @@ class _SrrChart extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: c.white,
-          borderRadius: const BorderRadius.all(AppRadii.small),
+          color: c.surface,
+          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.show_chart, size: 48, color: c.chocolate.withValues(alpha: 0.2)),
+            Icon(Icons.show_chart, size: 48, color: c.textPrimary.withValues(alpha: 0.2)),
             const SizedBox(height: 12),
-            Text(l10n.noMeasurementsYet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+            Text(l10n.noMeasurementsYet, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
             const SizedBox(height: 8),
             Text(
               l10n.noMeasurementsDescription,
-              style: AppTextStyles.body.copyWith(color: c.chocolate),
+              style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
               textAlign: TextAlign.center,
             ),
           ],
@@ -589,18 +591,18 @@ class _SrrChart extends StatelessWidget {
     final maxBpm = spots.isEmpty ? 50.0 : spots.map((s) => s.y).reduce((a, b) => a > b ? a : b);
     final maxY = max(50.0, maxBpm + 10.0);
 
-    final chocolateColor = c.chocolate;
-    final offWhiteColor = c.offWhite;
-    final blueColor = c.blue;
-    final whiteColor = c.white;
+    final textPrimaryColor = c.textPrimary;
+    final backgroundColor = c.background;
+    final primaryColor = c.primary;
+    final surfaceColor = c.surface;
 
     return Container(
       height: 280,
       width: double.infinity,
       padding: const EdgeInsets.only(top: 12, right: 12, bottom: 4, left: 4),
       decoration: BoxDecoration(
-        color: whiteColor,
-        borderRadius: const BorderRadius.all(AppRadii.small),
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
       ),
       child: LineChart(
         LineChartData(
@@ -615,12 +617,12 @@ class _SrrChart extends StatelessWidget {
             horizontalInterval: 10,
             verticalInterval: labelStep.toDouble(),
             getDrawingHorizontalLine: (_) => FlLine(
-              color: offWhiteColor,
+              color: backgroundColor,
               strokeWidth: 0.5,
               dashArray: [3, 3],
             ),
             getDrawingVerticalLine: (_) => FlLine(
-              color: offWhiteColor,
+              color: backgroundColor,
               strokeWidth: 0.5,
               dashArray: [3, 3],
             ),
@@ -628,8 +630,8 @@ class _SrrChart extends StatelessWidget {
           borderData: FlBorderData(
             show: true,
             border: Border(
-              bottom: BorderSide(color: chocolateColor, width: 1),
-              left: BorderSide(color: chocolateColor, width: 1),
+              bottom: BorderSide(color: textPrimaryColor, width: 1),
+              left: BorderSide(color: textPrimaryColor, width: 1),
               top: BorderSide.none,
               right: BorderSide.none,
             ),
@@ -646,8 +648,8 @@ class _SrrChart extends StatelessWidget {
                     axisSide: meta.axisSide,
                     child: Text(
                       value.toInt().toString(),
-                      style: AppTextStyles.caption.copyWith(
-                        color: chocolateColor,
+                      style: AppSemanticTextStyles.caption.copyWith(
+                        color: textPrimaryColor,
                         fontSize: 10,
                       ),
                     ),
@@ -670,8 +672,8 @@ class _SrrChart extends StatelessWidget {
                     axisSide: meta.axisSide,
                     child: Text(
                       labels[index],
-                      style: AppTextStyles.caption.copyWith(
-                        color: chocolateColor,
+                      style: AppSemanticTextStyles.caption.copyWith(
+                        color: textPrimaryColor,
                         fontSize: 10,
                       ),
                     ),
@@ -686,30 +688,30 @@ class _SrrChart extends StatelessWidget {
             horizontalLines: [
               HorizontalLine(
                 y: settingsStore.elevatedThreshold.toDouble(),
-                color: chocolateColor,
+                color: textPrimaryColor,
                 strokeWidth: 1,
                 dashArray: [4, 4],
                 label: HorizontalLineLabel(
                   show: true,
                   alignment: Alignment.topRight,
                   labelResolver: (_) => 'Normal Threshold (${settingsStore.elevatedThreshold} BPM)',
-                  style: AppTextStyles.caption.copyWith(
-                    color: chocolateColor,
+                  style: AppSemanticTextStyles.caption.copyWith(
+                    color: textPrimaryColor,
                     fontSize: 9,
                   ),
                 ),
               ),
               HorizontalLine(
                 y: settingsStore.criticalThreshold.toDouble(),
-                color: chocolateColor,
+                color: textPrimaryColor,
                 strokeWidth: 1,
                 dashArray: [4, 4],
                 label: HorizontalLineLabel(
                   show: true,
                   alignment: Alignment.topRight,
                   labelResolver: (_) => 'Alert Threshold (${settingsStore.criticalThreshold} BPM)',
-                  style: AppTextStyles.caption.copyWith(
-                    color: chocolateColor,
+                  style: AppSemanticTextStyles.caption.copyWith(
+                    color: textPrimaryColor,
                     fontSize: 9,
                   ),
                 ),
@@ -720,15 +722,15 @@ class _SrrChart extends StatelessWidget {
             LineChartBarData(
               spots: spots,
               isCurved: false,
-              color: blueColor,
+              color: primaryColor,
               barWidth: 2,
               dotData: FlDotData(
                 show: true,
                 getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
                   radius: 4,
-                  color: blueColor,
+                  color: primaryColor,
                   strokeWidth: 2,
-                  strokeColor: whiteColor,
+                  strokeColor: surfaceColor,
                 ),
               ),
               belowBarData: BarAreaData(
@@ -737,8 +739,8 @@ class _SrrChart extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    blueColor.withValues(alpha: 0.25),
-                    blueColor.withValues(alpha: 0.0),
+                    primaryColor.withValues(alpha: 0.25),
+                    primaryColor.withValues(alpha: 0.0),
                   ],
                 ),
               ),

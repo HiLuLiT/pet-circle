@@ -5,7 +5,7 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/services/invitation_service.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 
 /// Screen shown when the user navigates to `/invite?token=XYZ`.
 ///
@@ -84,21 +84,21 @@ class _InviteScreenState extends State<InviteScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     if (_isProcessing) {
       return Scaffold(
-        backgroundColor: c.white,
+        backgroundColor: c.surface,
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(color: c.chocolate),
+              CircularProgressIndicator(color: c.textPrimary),
               const SizedBox(height: 16),
               Text(
                 l10n.processingInvitation,
-                style: TextStyle(color: c.chocolate),
+                style: TextStyle(color: c.textPrimary),
               ),
             ],
           ),
@@ -108,19 +108,19 @@ class _InviteScreenState extends State<InviteScreen> {
 
     // Error state — show message and a button to continue.
     return Scaffold(
-      backgroundColor: c.white,
+      backgroundColor: c.surface,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.error_outline, color: c.chocolate, size: 48),
+              Icon(Icons.error_outline, color: c.textPrimary, size: 48),
               const SizedBox(height: 16),
               Text(
                 _errorText(l10n, _errorCode),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: c.chocolate),
+                style: TextStyle(fontSize: 16, color: c.textPrimary),
               ),
               const SizedBox(height: 24),
               ElevatedButton(

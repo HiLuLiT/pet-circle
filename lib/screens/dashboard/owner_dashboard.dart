@@ -8,7 +8,9 @@ import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet_access.dart';
 import 'package:pet_circle/models/pet.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
@@ -25,13 +27,13 @@ class OwnerDashboard extends StatelessWidget {
 
   void _confirmDeletePet(BuildContext context, Pet pet) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.medium)),
-        title: Text(l10n.deletePet, style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
-        content: Text(l10n.deletePetConfirmation(pet.name), style: AppTextStyles.body),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.md)),
+        title: Text(l10n.deletePet, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+        content: Text(l10n.deletePetConfirmation(pet.name), style: AppSemanticTextStyles.body),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           TextButton(
@@ -42,8 +44,8 @@ class OwnerDashboard extends StatelessWidget {
                 SnackBar(content: Text(l10n.petDeleted)),
               );
             },
-            style: TextButton.styleFrom(backgroundColor: c.cherry),
-            child: Text(l10n.deletePet, style: TextStyle(color: c.white)),
+            style: TextButton.styleFrom(backgroundColor: c.error),
+            child: Text(l10n.deletePet, style: TextStyle(color: c.background)),
           ),
         ],
       ),
@@ -59,16 +61,16 @@ class OwnerDashboard extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final pets = petStore.ownerPets;
     final l10n = AppLocalizations.of(context)!;
 
     if (petStore.isLoading) {
       final loader = Center(
-        child: CircularProgressIndicator(color: c.chocolate),
+        child: CircularProgressIndicator(color: c.textPrimary),
       );
-      if (!showScaffold) return Container(color: c.white, child: loader);
-      return Scaffold(backgroundColor: c.white, body: loader);
+      if (!showScaffold) return Container(color: c.background, child: loader);
+      return Scaffold(backgroundColor: c.background, body: loader);
     }
 
     if (pets.isEmpty) {
@@ -79,16 +81,16 @@ class OwnerDashboard extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.pets, size: 64, color: c.chocolate.withValues(alpha: 0.3)),
+                Icon(Icons.pets, size: 64, color: c.textPrimary.withValues(alpha: 0.3)),
                 const SizedBox(height: 16),
                 Text(
                   l10n.noPetsYet,
-                  style: AppTextStyles.heading2.copyWith(color: c.chocolate),
+                  style: AppSemanticTextStyles.title3.copyWith(color: c.textPrimary),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   l10n.addYourFirstPet,
-                  style: AppTextStyles.body.copyWith(color: c.chocolate),
+                  style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -97,13 +99,13 @@ class OwnerDashboard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     decoration: BoxDecoration(
-                      color: c.lightBlue,
-                      borderRadius: const BorderRadius.all(AppRadii.full),
+                      color: c.primaryLight,
+                      borderRadius: AppRadiiTokens.borderRadiusFull,
                     ),
                     child: Text(
                       l10n.getStarted,
-                      style: AppTextStyles.body.copyWith(
-                        color: c.chocolate,
+                      style: AppSemanticTextStyles.body.copyWith(
+                        color: c.textPrimary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -116,9 +118,9 @@ class OwnerDashboard extends StatelessWidget {
       );
 
       if (!showScaffold) {
-        return Container(color: c.white, child: emptyContent);
+        return Container(color: c.background, child: emptyContent);
       }
-      return Scaffold(backgroundColor: c.white, body: emptyContent);
+      return Scaffold(backgroundColor: c.background, body: emptyContent);
     }
 
     final petCards = pets.map(
@@ -159,8 +161,8 @@ class OwnerDashboard extends StatelessWidget {
                   const SizedBox(height: 24),
                   Text(
                     l10n.myPets,
-                    style: AppTextStyles.heading2.copyWith(
-                      color: c.chocolate,
+                    style: AppSemanticTextStyles.title3.copyWith(
+                      color: c.textPrimary,
                       letterSpacing: -0.96,
                     ),
                   ),
@@ -195,10 +197,10 @@ class OwnerDashboard extends StatelessWidget {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       decoration: BoxDecoration(
-                        color: c.offWhite,
-                        borderRadius: const BorderRadius.all(AppRadii.medium),
+                        color: c.surface,
+                        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
                         border: Border.all(
-                          color: c.chocolate.withValues(alpha: 0.15),
+                          color: c.textPrimary.withValues(alpha: 0.15),
                           width: 1.5,
                           strokeAlign: BorderSide.strokeAlignInside,
                         ),
@@ -206,12 +208,12 @@ class OwnerDashboard extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.add, size: 20, color: c.chocolate),
+                          Icon(Icons.add, size: 20, color: c.textPrimary),
                           const SizedBox(width: 8),
                           Text(
                             l10n.addPet,
-                            style: AppTextStyles.body.copyWith(
-                              color: c.chocolate,
+                            style: AppSemanticTextStyles.body.copyWith(
+                              color: c.textPrimary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -229,11 +231,11 @@ class OwnerDashboard extends StatelessWidget {
     );
 
     if (!showScaffold) {
-      return Container(color: c.white, child: content);
+      return Container(color: c.background, child: content);
     }
 
     return Scaffold(
-      backgroundColor: c.white,
+      backgroundColor: c.background,
       body: content,
     );
   }
@@ -256,7 +258,7 @@ class _PetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final latestFromStore = measurementStore.latestForPet(data.id ?? '');
     final latest = latestFromStore ?? data.latestMeasurement;
@@ -264,15 +266,15 @@ class _PetCard extends StatelessWidget {
     return GestureDetector(
       onLongPress: onLongPress,
       child: ClipRRect(
-      borderRadius: const BorderRadius.all(AppRadii.medium),
+      borderRadius: BorderRadius.circular(AppRadiiTokens.md),
       child: Container(
-        color: c.offWhite,
+        color: c.surface,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Pet image
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.md)),
               child: SizedBox(
                 height: 216,
                 width: double.infinity,
@@ -290,8 +292,8 @@ class _PetCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           data.name,
-                          style: AppTextStyles.heading2.copyWith(
-                            color: c.chocolate,
+                          style: AppSemanticTextStyles.title3.copyWith(
+                            color: c.textPrimary,
                             letterSpacing: -0.96,
                           ),
                         ),
@@ -301,14 +303,14 @@ class _PetCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: access.role == CareCircleRole.member
-                                ? c.lightBlue.withValues(alpha: 0.12)
-                                : c.blue.withValues(alpha: 0.12),
-                            borderRadius: const BorderRadius.all(AppRadii.small),
+                                ? c.primaryLight.withValues(alpha: 0.12)
+                                : c.primary.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                           ),
                           child: Text(
                             access.role.name[0].toUpperCase() + access.role.name.substring(1),
-                            style: AppTextStyles.caption.copyWith(
-                              color: access.role == CareCircleRole.member ? c.lightBlue : c.blue,
+                            style: AppSemanticTextStyles.caption.copyWith(
+                              color: access.role == CareCircleRole.member ? c.primaryLight : c.primary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -318,8 +320,8 @@ class _PetCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     data.breedAndAge,
-                    style: AppTextStyles.body.copyWith(
-                      color: c.chocolate,
+                    style: AppSemanticTextStyles.body.copyWith(
+                      color: c.textPrimary,
                       fontSize: 14,
                       letterSpacing: -0.28,
                     ),
@@ -336,7 +338,7 @@ class _PetCard extends StatelessWidget {
                             width: 44,
                             height: 44,
                             decoration: BoxDecoration(
-                              color: c.white,
+                              color: c.background,
                               shape: BoxShape.circle,
                             ),
                             child: Center(
@@ -353,16 +355,16 @@ class _PetCard extends StatelessWidget {
                             children: [
                               Text(
                                 hasMeasurement ? '${latest.bpm}' : '--',
-                                style: AppTextStyles.heading2.copyWith(
-                                  color: c.chocolate,
+                                style: AppSemanticTextStyles.title3.copyWith(
+                                  color: c.textPrimary,
                                   fontSize: 24,
                                   height: 1.2,
                                 ),
                               ),
                               Text(
                                 l10n.bpm,
-                                style: AppTextStyles.caption.copyWith(
-                                  color: c.chocolate,
+                                style: AppSemanticTextStyles.caption.copyWith(
+                                  color: c.textPrimary,
                                   fontSize: 12,
                                 ),
                               ),
@@ -372,8 +374,8 @@ class _PetCard extends StatelessWidget {
                       ),
                       Text(
                         hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
-                        style: AppTextStyles.caption.copyWith(
-                          color: c.chocolate,
+                        style: AppSemanticTextStyles.caption.copyWith(
+                          color: c.textPrimary,
                           fontSize: 12,
                         ),
                       ),
@@ -383,7 +385,7 @@ class _PetCard extends StatelessWidget {
                   // Care Circle divider
                   Container(
                     height: 1,
-                    color: c.chocolate,
+                    color: c.textPrimary,
                   ),
                   const SizedBox(height: 17),
                   // Care Circle row
@@ -400,8 +402,8 @@ class _PetCard extends StatelessWidget {
                           const SizedBox(width: 4),
                           Text(
                             l10n.careCircle,
-                            style: AppTextStyles.caption.copyWith(
-                              color: c.chocolate,
+                            style: AppSemanticTextStyles.caption.copyWith(
+                              color: c.textPrimary,
                               fontSize: 12,
                             ),
                           ),
@@ -414,7 +416,7 @@ class _PetCard extends StatelessWidget {
                   // Buttons divider
                   Container(
                     height: 1,
-                    color: c.chocolate,
+                    color: c.textPrimary,
                   ),
                   const SizedBox(height: 17),
                   // Action buttons
@@ -467,15 +469,15 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
         height: 40,
         decoration: BoxDecoration(
-          color: isPrimary ? c.pink : c.white,
-          borderRadius: const BorderRadius.all(AppRadii.full),
+          color: isPrimary ? c.primaryLight : c.background,
+          borderRadius: AppRadiiTokens.borderRadiusFull,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -488,8 +490,8 @@ class _ActionButton extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               label,
-              style: AppTextStyles.body.copyWith(
-                color: c.chocolate,
+              style: AppSemanticTextStyles.body.copyWith(
+                color: c.textPrimary,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
                 letterSpacing: -0.28,
@@ -509,7 +511,7 @@ class _AvatarStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     const double avatarSize = 31;
     const double overlap = 12;
 
@@ -526,7 +528,7 @@ class _AvatarStack extends StatelessWidget {
                 height: avatarSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  border: Border.all(color: c.white, width: 2),
+                  border: Border.all(color: c.background, width: 2),
                 ),
                 child: ClipOval(
                   child: Image.network(avatars[i].avatarUrl, fit: BoxFit.cover),
@@ -538,4 +540,3 @@ class _AvatarStack extends StatelessWidget {
     );
   }
 }
-

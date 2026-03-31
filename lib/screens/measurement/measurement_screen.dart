@@ -8,7 +8,9 @@ import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class MeasurementScreen extends StatefulWidget {
   const MeasurementScreen({super.key, this.showScaffold = true});
@@ -28,27 +30,27 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
     return ListenableBuilder(
       listenable: Listenable.merge([petStore, userStore]),
       builder: (context, _) {
-        final c = AppColorsTheme.of(context);
+        final c = AppSemanticColors.of(context);
         final l10n = AppLocalizations.of(context)!;
         final access = petStore.accessForActivePet();
 
         if (!access.canMeasure) {
           final noPermissionContent = Center(
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.xl),
+              padding: const EdgeInsets.all(AppSpacingTokens.xl),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.lock_outline, size: 48, color: c.chocolate.withValues(alpha: 0.3)),
-                  const SizedBox(height: AppSpacing.md),
+                  Icon(Icons.lock_outline, size: 48, color: c.textPrimary.withValues(alpha: 0.3)),
+                  const SizedBox(height: AppSpacingTokens.md),
                   Text(
                     l10n.viewer,
-                    style: AppTextStyles.heading3.copyWith(color: c.chocolate),
+                    style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
                   ),
-                  const SizedBox(height: AppSpacing.sm),
+                  const SizedBox(height: AppSpacingTokens.sm),
                   Text(
                     l10n.viewerMeasurementRestriction,
-                    style: AppTextStyles.body.copyWith(color: c.chocolate),
+                    style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -57,9 +59,9 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
           );
 
           if (!widget.showScaffold) {
-            return Container(color: c.white, child: noPermissionContent);
+            return Container(color: c.surface, child: noPermissionContent);
           }
-          return Scaffold(backgroundColor: c.white, body: noPermissionContent);
+          return Scaffold(backgroundColor: c.surface, body: noPermissionContent);
         }
 
         final content = SafeArea(
@@ -87,11 +89,11 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         );
 
         if (!widget.showScaffold) {
-          return Container(color: c.white, child: content);
+          return Container(color: c.surface, child: content);
         }
 
         return Scaffold(
-          backgroundColor: c.white,
+          backgroundColor: c.surface,
           body: content,
         );
       },
@@ -110,13 +112,13 @@ class _TabSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: c.offWhite,
-        borderRadius: const BorderRadius.all(AppRadii.large),
+        color: c.background,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
       ),
       child: Row(
         children: [
@@ -153,7 +155,7 @@ class _TabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -161,21 +163,21 @@ class _TabButton extends StatelessWidget {
           height: 29,
           padding: const EdgeInsets.symmetric(vertical: 6),
           decoration: BoxDecoration(
-            color: selected ? c.white : Colors.transparent,
-            borderRadius: const BorderRadius.all(AppRadii.large),
+            color: selected ? c.surface : Colors.transparent,
+            borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon,
                   size: 16,
-                  color: c.chocolate),
+                  color: c.textPrimary),
               const SizedBox(width: 6),
               Text(
                 label,
-                style: AppTextStyles.caption.copyWith(
+                style: AppSemanticTextStyles.caption.copyWith(
                   fontWeight: FontWeight.w500,
-                  color: c.chocolate,
+                  color: c.textPrimary,
                 ),
               ),
             ],
@@ -258,22 +260,22 @@ class _ManualModeState extends State<_ManualMode>
 
   void _stopTimer() {
     _timer?.cancel();
-    
+
     // Calculate BPM: (taps / duration) * 60
     final bpm = (_tapCount / widget.selectedDuration * 60).round();
-    
+
     setState(() => _isRunning = false);
 
     final l10n = AppLocalizations.of(context)!;
-    
+
     // Show result
     showDialog(
       context: context,
       builder: (context) {
-        final c = AppColorsTheme.of(context);
+        final c = AppSemanticColors.of(context);
         return Dialog(
-          backgroundColor: c.white,
-          shape: RoundedRectangleBorder(borderRadius: const BorderRadius.all(AppRadii.large)),
+          backgroundColor: c.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.lg)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
             child: Column(
@@ -282,11 +284,11 @@ class _ManualModeState extends State<_ManualMode>
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.favorite, color: c.pink),
+                    Icon(Icons.favorite, color: c.primaryLight),
                     const SizedBox(width: 8),
                     Text(
                       l10n.measurementComplete,
-                      style: AppTextStyles.heading3.copyWith(color: c.chocolate),
+                      style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
                     ),
                   ],
                 ),
@@ -296,17 +298,17 @@ class _ManualModeState extends State<_ManualMode>
                   style: TextStyle(
                     fontSize: 64,
                     fontWeight: FontWeight.bold,
-                    color: c.chocolate,
+                    color: c.textPrimary,
                   ),
                 ),
                 Text(
                   l10n.breathsPerMinute,
-                  style: AppTextStyles.body.copyWith(color: c.chocolate),
+                  style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                 ),
                 const SizedBox(height: 16),
                 Text(
                   l10n.breathCountMessage(_tapCount, widget.selectedDuration),
-                  style: AppTextStyles.caption.copyWith(color: c.chocolate),
+                  style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 24),
@@ -324,13 +326,13 @@ class _ManualModeState extends State<_ManualMode>
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         decoration: BoxDecoration(
-                          color: c.offWhite,
-                          borderRadius: const BorderRadius.all(AppRadii.full),
+                          color: c.background,
+                          borderRadius: BorderRadius.circular(AppRadiiTokens.full),
                         ),
                         child: Text(
                           l10n.measureAgain,
-                          style: AppTextStyles.body.copyWith(
-                            color: c.chocolate,
+                          style: AppSemanticTextStyles.body.copyWith(
+                            color: c.textPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -375,20 +377,20 @@ class _ManualModeState extends State<_ManualMode>
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(l10n.measurementSavedBpm(bpm)),
-                            backgroundColor: c.lightBlue,
+                            backgroundColor: c.primaryLight,
                           ),
                         );
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         decoration: BoxDecoration(
-                          color: c.lightBlue,
-                          borderRadius: const BorderRadius.all(AppRadii.full),
+                          color: c.primaryLight,
+                          borderRadius: BorderRadius.circular(AppRadiiTokens.full),
                         ),
                         child: Text(
                           l10n.addToGraph,
-                          style: AppTextStyles.body.copyWith(
-                            color: c.chocolate,
+                          style: AppSemanticTextStyles.body.copyWith(
+                            color: c.textPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -429,7 +431,7 @@ class _ManualModeState extends State<_ManualMode>
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final progress = widget.selectedDuration == 0
         ? 0.0
@@ -441,17 +443,17 @@ class _ManualModeState extends State<_ManualMode>
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: c.offWhite,
-            borderRadius: const BorderRadius.all(AppRadii.medium),
+            color: c.background,
+            borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 l10n.timerDuration,
-                style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+                style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600),
               ),
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacingTokens.md),
               Row(
                 children: [
                   _DurationChip(
@@ -476,12 +478,12 @@ class _ManualModeState extends State<_ManualMode>
             ],
           ),
         ),
-        const SizedBox(height: AppSpacing.lg),
+        const SizedBox(height: AppSpacingTokens.lg),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
           decoration: BoxDecoration(
-            color: c.offWhite,
-            borderRadius: const BorderRadius.all(AppRadii.medium),
+            color: c.background,
+            borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
           ),
           child: Column(
             children: [
@@ -490,7 +492,7 @@ class _ManualModeState extends State<_ManualMode>
                 style: TextStyle(
                   fontSize: 44,
                   fontWeight: FontWeight.w500,
-                  color: c.chocolate,
+                  color: c.textPrimary,
                   height: 1.2,
                 ),
               ),
@@ -504,8 +506,8 @@ class _ManualModeState extends State<_ManualMode>
                       Container(
                         height: 8,
                         decoration: BoxDecoration(
-                          color: c.chocolate.withValues(alpha: 0.08),
-                          borderRadius: const BorderRadius.all(AppRadii.pill),
+                          color: c.textPrimary.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(AppRadiiTokens.full),
                         ),
                       ),
                       AnimatedContainer(
@@ -513,8 +515,8 @@ class _ManualModeState extends State<_ManualMode>
                         height: 8,
                         width: width * progress,
                         decoration: BoxDecoration(
-                          color: c.lightBlue,
-                          borderRadius: const BorderRadius.all(AppRadii.pill),
+                          color: c.primaryLight,
+                          borderRadius: BorderRadius.circular(AppRadiiTokens.full),
                         ),
                       ),
                     ],
@@ -534,7 +536,7 @@ class _ManualModeState extends State<_ManualMode>
                     width: 206,
                     height: 206,
                     decoration: BoxDecoration(
-                      color: c.white,
+                      color: c.surface,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
@@ -552,14 +554,14 @@ class _ManualModeState extends State<_ManualMode>
                           style: TextStyle(
                             fontSize: 80,
                             fontWeight: FontWeight.w500,
-                            color: c.chocolate,
+                            color: c.textPrimary,
                             height: 1.0,
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           _isRunning ? l10n.tapToStop : l10n.tapToBegin,
-                          style: AppTextStyles.body.copyWith(
+                          style: AppSemanticTextStyles.body.copyWith(
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -573,11 +575,11 @@ class _ManualModeState extends State<_ManualMode>
                   padding: const EdgeInsets.only(top: 12),
                   child: TextButton.icon(
                     onPressed: _resetTimer,
-                    icon: Icon(Icons.refresh, size: 18, color: c.cherry),
+                    icon: Icon(Icons.refresh, size: 18, color: c.error),
                     label: Text(
                       l10n.reset,
-                      style: AppTextStyles.body.copyWith(
-                        color: c.cherry,
+                      style: AppSemanticTextStyles.body.copyWith(
+                        color: c.error,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -604,7 +606,7 @@ class _DurationChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -612,14 +614,14 @@ class _DurationChip extends StatelessWidget {
           height: 60,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: selected ? c.lightBlue : c.white,
-            borderRadius: const BorderRadius.all(AppRadii.small),
+            color: selected ? c.primaryLight : c.surface,
+            borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
           ),
           child: Text(
             label,
-            style: AppTextStyles.body.copyWith(
+            style: AppSemanticTextStyles.body.copyWith(
               fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-              color: c.chocolate,
+              color: c.textPrimary,
             ),
           ),
         ),
@@ -633,27 +635,27 @@ class _VisionMode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: c.offWhite,
-        borderRadius: const BorderRadius.all(AppRadii.medium),
+        color: c.background,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.visionRRMode, style: AppTextStyles.heading3),
-          const SizedBox(height: AppSpacing.sm),
+          Text(l10n.visionRRMode, style: AppSemanticTextStyles.headingLg),
+          const SizedBox(height: AppSpacingTokens.sm),
           Text(
             l10n.visionRRModeDescription,
-            style: AppTextStyles.body,
+            style: AppSemanticTextStyles.body,
           ),
-          const SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacingTokens.lg),
           Expanded(
             child: Center(
-              child: Icon(Icons.videocam, size: 64, color: c.chocolate),
+              child: Icon(Icons.videocam, size: 64, color: c.textPrimary),
             ),
           ),
         ],
@@ -661,4 +663,3 @@ class _VisionMode extends StatelessWidget {
     );
   }
 }
-

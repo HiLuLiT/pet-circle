@@ -7,7 +7,9 @@ import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_assets.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
@@ -21,12 +23,12 @@ class CareCircleDashboard extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([petStore, measurementStore]),
       builder: (context, _) {
-        final c = AppColorsTheme.of(context);
+        final c = AppSemanticColors.of(context);
         final pets = petStore.allClinicPets;
         final l10n = AppLocalizations.of(context)!;
 
         return Container(
-          color: c.white,
+          color: c.background,
           child: SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -47,28 +49,28 @@ class CareCircleDashboard extends StatelessWidget {
                           )
                           .toList(),
                     ),
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacingTokens.lg),
                     _ResponsiveGrid(
                       maxCrossAxisCount: 3,
                       minItemWidth: 280,
                       childAspectRatio: 3.3,
                       children: [
                         _SummaryCard(
-                          iconColor: c.lightBlue.withValues(alpha: 0.15),
+                          iconColor: c.primaryLight.withValues(alpha: 0.15),
                           iconUrl: AppAssets.statusOkIcon,
                           value:
                               '${pets.where((p) => p.statusLabel == 'Normal').length}',
                           label: l10n.normalStatus,
                         ),
                         _SummaryCard(
-                          iconColor: c.cherry.withValues(alpha: 0.15),
+                          iconColor: c.error.withValues(alpha: 0.15),
                           iconUrl: AppAssets.attentionIcon,
                           value:
                               '${pets.where((p) => p.statusLabel != 'Normal').length}',
                           label: l10n.needAttention,
                         ),
                         _SummaryCard(
-                          iconColor: c.lightBlue.withValues(alpha: 0.1),
+                          iconColor: c.primaryLight.withValues(alpha: 0.1),
                           iconUrl: AppAssets.chartIcon,
                           value: '${measurementStore.thisWeekCount}',
                           label: l10n.measurementsThisWeek,
@@ -94,7 +96,7 @@ class _PetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final latestFromStore = measurementStore.latestForPet(data.id ?? '');
     final latest = latestFromStore ?? data.latestMeasurement;
@@ -102,7 +104,7 @@ class _PetCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: NeumorphicCard(
-        radius: const BorderRadius.all(AppRadii.medium),
+        radius: BorderRadius.circular(AppRadiiTokens.md),
         child: Column(
         children: [
           Stack(
@@ -114,11 +116,11 @@ class _PetCard extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [c.lightBlue.withValues(alpha: 0.2), Colors.transparent],
+                    colors: [c.primaryLight.withValues(alpha: 0.2), Colors.transparent],
                   ),
                 ),
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: AppRadii.medium),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.md)),
                   child: DogPhoto(endpoint: data.imageUrl),
                 ),
               ),
@@ -138,9 +140,9 @@ class _PetCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(data.name,
-                    style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
+                    style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
                 const SizedBox(height: 4),
-                Text(data.breedAndAge, style: AppTextStyles.bodyMuted),
+                Text(data.breedAndAge, style: AppSemanticTextStyles.bodyMuted),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -149,38 +151,38 @@ class _PetCard extends StatelessWidget {
                       children: [
                         NeumorphicCard(
                           inner: true,
-                          color: c.offWhite,
+                          color: c.surface,
                           padding: const EdgeInsets.all(12),
                           child: Icon(Icons.favorite_border,
-                              size: 20, color: c.chocolate),
+                              size: 20, color: c.textPrimary),
                         ),
                         const SizedBox(width: 12),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(hasMeasurement ? '${latest.bpm}' : '--',
-                                style: AppTextStyles.heading3
-                                    .copyWith(color: c.chocolate)),
-                            Text(l10n.bpm, style: AppTextStyles.caption),
+                                style: AppSemanticTextStyles.headingLg
+                                    .copyWith(color: c.textPrimary)),
+                            Text(l10n.bpm, style: AppSemanticTextStyles.caption),
                           ],
                         ),
                       ],
                     ),
                     Text(hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
-                        style: AppTextStyles.caption),
+                        style: AppSemanticTextStyles.caption),
                   ],
                 ),
                 const SizedBox(height: 16),
-                Divider(color: c.lightBlue.withValues(alpha: 0.15), height: 1),
+                Divider(color: c.primaryLight.withValues(alpha: 0.15), height: 1),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.group, size: 12, color: c.chocolate),
+                        Icon(Icons.group, size: 12, color: c.textPrimary),
                         const SizedBox(width: 6),
-                        Text(l10n.careCircle, style: AppTextStyles.caption),
+                        Text(l10n.careCircle, style: AppSemanticTextStyles.caption),
                       ],
                     ),
                     _AvatarStack(avatars: data.careCircle),
@@ -203,7 +205,7 @@ class _AvatarStack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return SizedBox(
       height: 32,
       width: 32 + (avatars.length - 1) * 24,
@@ -217,14 +219,14 @@ class _AvatarStack extends StatelessWidget {
                 height: 32,
                 padding: const EdgeInsets.all(2),
                 decoration: BoxDecoration(
-                  color: c.white,
+                  color: c.background,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: i == 0 ? c.lightBlue : c.offWhite,
+                    color: i == 0 ? c.primaryLight : c.surface,
                     width: 2,
                   ),
                   boxShadow: i == 0
-                      ? [BoxShadow(color: c.lightBlue.withValues(alpha: 0.3), blurRadius: 0)]
+                      ? [BoxShadow(color: c.primaryLight.withValues(alpha: 0.3), blurRadius: 0)]
                       : null,
                 ),
                 child: ClipOval(
@@ -253,9 +255,9 @@ class _SummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return NeumorphicCard(
-      radius: const BorderRadius.all(AppRadii.medium),
+      radius: BorderRadius.circular(AppRadiiTokens.md),
       padding: const EdgeInsets.all(24),
       child: Row(
         children: [
@@ -264,13 +266,13 @@ class _SummaryCard extends StatelessWidget {
             width: 48,
             decoration: BoxDecoration(
               color: iconColor,
-              borderRadius: const BorderRadius.all(AppRadii.large),
+              borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
             ),
             child: Center(
               child: Icon(
                 _summaryIcon(iconUrl),
                 size: 24,
-                color: c.chocolate,
+                color: c.textPrimary,
               ),
             ),
           ),
@@ -279,8 +281,8 @@ class _SummaryCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(value,
-                  style: AppTextStyles.heading3.copyWith(color: c.chocolate)),
-              Text(label, style: AppTextStyles.bodyMuted),
+                  style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+              Text(label, style: AppSemanticTextStyles.bodyMuted),
             ],
           ),
         ],
