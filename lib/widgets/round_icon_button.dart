@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class RoundIconButton extends StatelessWidget {
   const RoundIconButton({
@@ -19,12 +20,11 @@ class RoundIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: const BorderRadius.all(AppRadii.pill),
+        borderRadius: AppRadiiTokens.borderRadiusFull,
         child: Container(
           height: size,
           width: size,
@@ -33,7 +33,7 @@ class RoundIconButton extends StatelessWidget {
           ),
           child: Container(
             decoration: BoxDecoration(
-              color: backgroundColor ?? c.offWhite,
+              color: backgroundColor ?? AppPrimitives.skyLight,
               shape: BoxShape.circle,
             ),
             child: Center(

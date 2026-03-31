@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class AppImage extends StatelessWidget {
   const AppImage.asset(
@@ -42,16 +43,15 @@ class _Fallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: c.offWhite,
-        borderRadius: const BorderRadius.all(AppRadii.small),
+        color: AppPrimitives.skyLightest,
+        borderRadius: AppRadiiTokens.borderRadiusLg,
       ),
       alignment: Alignment.center,
-      child: Icon(icon, color: c.chocolate, size: 20),
+      child: Icon(icon, color: AppPrimitives.skyDark, size: 20),
     );
   }
 }

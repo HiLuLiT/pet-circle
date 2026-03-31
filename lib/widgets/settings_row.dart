@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class SettingsRow extends StatelessWidget {
   const SettingsRow({
@@ -20,21 +22,21 @@ class SettingsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacingTokens.md),
         decoration: BoxDecoration(
-          color: c.white,
-          borderRadius: const BorderRadius.all(AppRadii.small),
+          color: c.surface,
+          borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
         ),
         child: Row(
           children: [
             if (iconAsset != null) ...[
               SvgPicture.asset(iconAsset!, width: 16, height: 16),
-              const SizedBox(width: AppSpacing.sm),
+              const SizedBox(width: AppSpacingTokens.sm),
             ],
             Expanded(
               child: Column(
@@ -42,16 +44,18 @@ class SettingsRow extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppTextStyles.body.copyWith(
-                      color: c.chocolate,
+                    style: AppSemanticTextStyles.body.copyWith(
+                      color: c.textPrimary,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   if (description != null) ...[
-                    const SizedBox(height: AppSpacing.xs),
+                    const SizedBox(height: AppSpacingTokens.xs),
                     Text(
                       description!,
-                      style: AppTextStyles.caption.copyWith(color: c.chocolate),
+                      style: AppSemanticTextStyles.bodySm.copyWith(
+                        color: c.textSecondary,
+                      ),
                     ),
                   ],
                 ],

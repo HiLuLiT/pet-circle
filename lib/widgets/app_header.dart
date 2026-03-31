@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/user_avatar.dart';
 
@@ -27,7 +30,7 @@ class AppHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -44,10 +47,13 @@ class AppHeader extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             onTap: onPetSelectorTap,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacingTokens.sm,
+                vertical: AppSpacingTokens.xs,
+              ),
               decoration: BoxDecoration(
-                color: c.offWhite,
-                borderRadius: const BorderRadius.all(AppRadii.large),
+                color: c.background,
+                borderRadius: BorderRadius.circular(AppSpacingTokens.lg),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -67,15 +73,18 @@ class AppHeader extends StatelessWidget {
                     const SizedBox(width: 6),
                   Text(
                     petName!,
-                    style: AppTextStyles.body.copyWith(
-                      color: c.chocolate,
-                      fontSize: 14,
+                    style: AppSemanticTextStyles.bodySm.copyWith(
+                      color: AppPrimitives.inkDarkest,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   if (onPetSelectorTap != null) ...[
-                    const SizedBox(width: 4),
-                    Icon(Icons.keyboard_arrow_down, size: 16, color: c.chocolate),
+                    const SizedBox(width: AppSpacingTokens.xs),
+                    Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 16,
+                      color: AppPrimitives.inkDarkest,
+                    ),
                   ],
                 ],
               ),
@@ -89,13 +98,12 @@ class AppHeader extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: c.offWhite,
+              color: AppPrimitives.skyLight,
               shape: BoxShape.circle,
-              border: Border.all(color: c.white, width: 2),
             ),
             child: Icon(
               Icons.notifications_none,
-              color: c.chocolate,
+              color: AppPrimitives.inkDarkest,
               size: 20,
             ),
           ),

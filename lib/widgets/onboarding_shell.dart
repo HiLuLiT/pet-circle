@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class OnboardingShell extends StatelessWidget {
   const OnboardingShell({
@@ -26,26 +29,26 @@ class OnboardingShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: c.white,
+      backgroundColor: c.surface,
       body: SafeArea(
         child: Center(
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 24),
-            padding: const EdgeInsets.all(32),
+            margin: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.lg),
+            padding: const EdgeInsets.all(AppSpacingTokens.xl),
             decoration: BoxDecoration(
-              color: c.offWhite,
-              borderRadius: const BorderRadius.all(AppRadii.medium),
+              color: c.background,
+              borderRadius: BorderRadius.circular(AppSpacingTokens.md),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 _Header(stepLabel: stepLabel, progress: progress, title: title),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacingTokens.xl),
                 Flexible(child: child),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacingTokens.lg),
                 Row(
                   children: [
                     if (onBack != null)
@@ -55,19 +58,21 @@ class OnboardingShell extends StatelessWidget {
                           child: TextButton(
                             onPressed: isNextLoading ? null : onBack,
                             style: TextButton.styleFrom(
-                              backgroundColor: c.white,
-                              disabledBackgroundColor: c.white.withValues(alpha: 0.6),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(AppRadii.full),
+                              backgroundColor: c.surface,
+                              disabledBackgroundColor:
+                                  c.surface.withValues(alpha: 0.6),
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(AppSpacingTokens.xl),
                               ),
                             ),
                             child: Text(
                               l10n.back,
-                              style: AppTextStyles.body.copyWith(
+                              style: AppSemanticTextStyles.button.copyWith(
                                 color: isNextLoading
-                                    ? c.chocolate.withValues(alpha: 0.4)
-                                    : c.chocolate,
-                                fontWeight: FontWeight.w600,
+                                    ? AppPrimitives.inkDarkest
+                                        .withValues(alpha: 0.4)
+                                    : AppPrimitives.inkDarkest,
                               ),
                             ),
                           ),
@@ -82,10 +87,11 @@ class OnboardingShell extends StatelessWidget {
                           child: TextButton(
                             onPressed: isNextLoading ? null : onNext,
                             style: TextButton.styleFrom(
-                              backgroundColor: c.chocolate,
-                              disabledBackgroundColor: c.chocolate,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.all(AppRadii.full),
+                              backgroundColor: c.primary,
+                              disabledBackgroundColor: c.primary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(AppSpacingTokens.xl),
                               ),
                             ),
                             child: isNextLoading
@@ -94,14 +100,14 @@ class OnboardingShell extends StatelessWidget {
                                     height: 20,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: c.white,
+                                      color: c.onPrimary,
                                     ),
                                   )
                                 : Text(
                                     nextLabel ?? l10n.done,
-                                    style: AppTextStyles.body.copyWith(
-                                        color: c.white,
-                                        fontWeight: FontWeight.w600),
+                                    style: AppSemanticTextStyles.button.copyWith(
+                                      color: c.onPrimary,
+                                    ),
                                   ),
                           ),
                         ),
@@ -130,28 +136,33 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Column(
       children: [
         Row(
           children: [
             Expanded(
-              child: Text(title, style: AppTextStyles.heading2),
+              child: Text(title, style: AppSemanticTextStyles.title2),
             ),
-            Text(stepLabel, style: AppTextStyles.body),
+            Text(
+              stepLabel,
+              style: AppSemanticTextStyles.caption.copyWith(
+                color: c.textSecondary,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 12),
         ClipRRect(
-          borderRadius: const BorderRadius.all(AppRadii.pill),
+          borderRadius: BorderRadius.circular(1000),
           child: Container(
             height: 8,
-            color: c.chocolate.withValues(alpha: 0.08),
+            color: c.divider,
             child: Align(
               alignment: AlignmentDirectional.centerStart,
               child: FractionallySizedBox(
                 widthFactor: progress,
-                child: Container(color: c.pink),
+                child: Container(color: c.primary),
               ),
             ),
           ),
@@ -160,4 +171,3 @@ class _Header extends StatelessWidget {
     );
   }
 }
-

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class TogglePill extends StatelessWidget {
   const TogglePill({super.key, required this.isOn});
@@ -8,22 +10,22 @@ class TogglePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
       width: 75,
       height: 36,
       padding: const EdgeInsets.all(2),
       decoration: BoxDecoration(
-        color: isOn ? c.chocolate : c.chocolate.withValues(alpha: 0.2),
-        borderRadius: const BorderRadius.all(AppRadii.pill),
+        color: isOn ? c.primary : c.disabled,
+        borderRadius: AppRadiiTokens.borderRadiusFull,
       ),
       child: Align(
         alignment: isOn ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
           width: 31,
           height: 31,
-          decoration: BoxDecoration(
-            color: c.white,
+          decoration: const BoxDecoration(
+            color: AppPrimitives.skyWhite,
             shape: BoxShape.circle,
           ),
         ),

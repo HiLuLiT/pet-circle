@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/shadows.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
 
-const _homeIconAsset = 'assets/figma/nav_home.svg';
-const _heartbeatIconAsset = 'assets/figma/nav_heartbeat.svg';
-const _heartIconAsset = 'assets/figma/nav_heart.svg';
-
+/// Bottom navigation bar with 5 tabs: Home, Trends, Diary, Mesure, Medicine.
+///
+/// Migrated from v1 (4 tabs with SVG icons + opacity) to v2 design system
+/// using Material icons, semantic colors, and shadow tokens.
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({
     super.key,
@@ -16,109 +19,99 @@ class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final void Function(int) onTap;
 
+  static const _tabs = [
+    _TabDef(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home'),
+    _TabDef(
+        icon: Icons.show_chart_outlined,
+        activeIcon: Icons.show_chart,
+        label: 'Trends'),
+    _TabDef(
+        icon: Icons.menu_book_outlined,
+        activeIcon: Icons.menu_book,
+        label: 'Diary'),
+    _TabDef(
+        icon: Icons.monitor_heart_outlined,
+        activeIcon: Icons.monitor_heart,
+        label: 'Mesure'),
+    _TabDef(
+        icon: Icons.medication_outlined,
+        activeIcon: Icons.medication,
+        label: 'Medicine'),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: c.white,
-        border: Border(
-          top: BorderSide(color: c.chocolate, width: 1),
-        ),
+        color: AppPrimitives.skyWhite,
+        boxShadow: AppShadowTokens.small,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Semantics(
-            label: 'Home',
-            button: true,
-            child: _NavItem(
-              iconAsset: _homeIconAsset,
-              isSelected: selectedIndex == 0,
-              onTap: () => onTap(0),
-            ),
-          ),
-          Semantics(
-            label: 'Trends',
-            button: true,
-            child: _NavItem(
-              iconAsset: _heartbeatIconAsset,
-              isSelected: selectedIndex == 1,
-              onTap: () => onTap(1),
-            ),
-          ),
-          Semantics(
-            label: 'Pets',
-            button: true,
-            child: _NavItem(
-              iconAsset: _heartIconAsset,
-              isSelected: selectedIndex == 2,
-              onTap: () => onTap(2),
-            ),
-          ),
-          Semantics(
-            label: 'Medications',
-            button: true,
-            child: _NavItemIcon(
-              icon: Icons.medication_outlined,
-              isSelected: selectedIndex == 3,
-              onTap: () => onTap(3),
-            ),
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacingTokens.lg,
+        vertical: AppSpacingTokens.sm,
+      ),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: List.generate(_tabs.length, (i) {
+            final tab = _tabs[i];
+            final isActive = selectedIndex == i;
+            return Expanded(
+              child: Semantics(
+                label: tab.label,
+                button: true,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onTap(i),
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: AppSpacingTokens.xs),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isActive ? tab.activeIcon : tab.icon,
+                          size: 24,
+                          color: isActive
+                              ? c.primary
+                              : AppPrimitives.inkLight,
+                        ),
+                        const SizedBox(height: AppSpacingTokens.xs),
+                        Text(
+                          tab.label,
+                          style: AppSemanticTextStyles.caption.copyWith(
+                            color: isActive
+                                ? c.primary
+                                : AppPrimitives.inkLight,
+                            fontWeight: isActive
+                                ? FontWeight.w700
+                                : FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
       ),
     );
   }
 }
 
-class _NavItemIcon extends StatelessWidget {
-  const _NavItemIcon({
+@immutable
+class _TabDef {
+  const _TabDef({
     required this.icon,
-    required this.isSelected,
-    required this.onTap,
+    required this.activeIcon,
+    required this.label,
   });
 
   final IconData icon;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Opacity(
-        opacity: isSelected ? 1 : 0.3,
-        child: Icon(icon, size: 36, color: c.chocolate),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.iconAsset,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final String iconAsset;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Opacity(
-        opacity: isSelected ? 1 : 0.3,
-        child: SvgPicture.asset(
-          iconAsset,
-          width: 36,
-          height: 36,
-        ),
-      ),
-    );
-  }
+  final IconData activeIcon;
+  final String label;
 }

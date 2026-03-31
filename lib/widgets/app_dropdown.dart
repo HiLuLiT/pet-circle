@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class AppDropdown extends StatelessWidget {
   const AppDropdown({
@@ -19,23 +22,23 @@ class AppDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
+          style: AppSemanticTextStyles.labelSm,
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacingTokens.sm),
         GestureDetector(
           onTap: onTap,
           child: Container(
             height: 36,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: c.white,
-              borderRadius: const BorderRadius.all(AppRadii.xs),
+              color: AppPrimitives.skyLighter,
+              borderRadius: AppRadiiTokens.borderRadiusLg,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -43,10 +46,10 @@ class AppDropdown extends StatelessWidget {
                 Expanded(
                   child: Text(
                     value ?? '',
-                    style: AppTextStyles.body.copyWith(
+                    style: AppSemanticTextStyles.body.copyWith(
                       color: value == null
-                          ? c.chocolate.withValues(alpha: 0.3)
-                          : c.chocolate,
+                          ? AppPrimitives.skyDark
+                          : c.textPrimary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -61,14 +64,14 @@ class AppDropdown extends StatelessWidget {
                     ),
                     child: Icon(
                       Icons.keyboard_arrow_down,
-                      color: c.chocolate,
+                      color: c.textSecondary,
                       size: 18,
                     ),
                   )
                 else
                   Icon(
                     Icons.keyboard_arrow_down,
-                    color: c.chocolate,
+                    color: c.textSecondary,
                     size: 18,
                   ),
               ],

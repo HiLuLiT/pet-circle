@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class LabeledTextField extends StatelessWidget {
   const LabeledTextField({
@@ -19,15 +22,15 @@ class LabeledTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w700),
+          style: AppSemanticTextStyles.labelSm,
         ),
-        const SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacingTokens.sm),
         SizedBox(
           height: 36,
           child: TextField(
@@ -36,19 +39,21 @@ class LabeledTextField extends StatelessWidget {
             keyboardType: keyboardType,
             decoration: InputDecoration(
               filled: true,
-              fillColor: c.white,
+              fillColor: AppPrimitives.skyLighter,
               hintText: hintText,
-              hintStyle: AppTextStyles.body.copyWith(
-                color: c.chocolate.withValues(alpha: 0.3),
+              hintStyle: AppSemanticTextStyles.body.copyWith(
+                color: AppPrimitives.skyDark,
               ),
               border: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(AppRadii.xs),
+                borderRadius: AppRadiiTokens.borderRadiusLg,
                 borderSide: BorderSide.none,
               ),
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             ),
-            style: AppTextStyles.body,
+            style: AppSemanticTextStyles.body.copyWith(
+              color: c.textPrimary,
+            ),
           ),
         ),
       ],

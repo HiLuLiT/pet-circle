@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 
 class DogPhoto extends StatefulWidget {
   const DogPhoto({
@@ -18,13 +18,13 @@ class DogPhoto extends StatefulWidget {
 class _DogPhotoState extends State<DogPhoto> {
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final source = widget.endpoint.trim();
     if (source.isEmpty) {
       return Container(
-        color: c.offWhite,
+        color: c.surface,
         alignment: Alignment.center,
-        child: Icon(Icons.pets, color: c.chocolate),
+        child: Icon(Icons.pets, color: c.textTertiary),
       );
     }
 

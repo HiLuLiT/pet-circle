@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 enum PrimaryButtonVariant { filled, outlined }
 
@@ -11,7 +13,7 @@ class PrimaryButton extends StatelessWidget {
     this.backgroundColor,
     this.textStyle,
     this.minHeight = 58,
-    this.borderRadius = 172,
+    this.borderRadius = 48,
     this.icon,
     this.variant = PrimaryButtonVariant.filled,
   });
@@ -27,11 +29,11 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     final isFilled = variant == PrimaryButtonVariant.filled;
-    final bg = backgroundColor ?? (isFilled ? c.chocolate : c.white);
-    final fg = isFilled ? c.white : c.chocolate;
-    final style = textStyle ?? AppTextStyles.button.copyWith(color: fg);
+    final bg = backgroundColor ?? (isFilled ? c.primary : c.surface);
+    final fg = isFilled ? c.onPrimary : c.primary;
+    final style = textStyle ?? AppSemanticTextStyles.button.copyWith(color: fg);
 
     return ConstrainedBox(
       constraints: BoxConstraints(minHeight: minHeight),
@@ -43,7 +45,7 @@ class PrimaryButton extends StatelessWidget {
             elevation: 0,
             side: isFilled
                 ? BorderSide.none
-                : BorderSide(color: c.chocolate.withValues(alpha: 0.15)),
+                : BorderSide(color: c.primary.withValues(alpha: 0.15)),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(borderRadius),
             ),
@@ -54,7 +56,7 @@ class PrimaryButton extends StatelessWidget {
             children: [
               if (icon != null) ...[
                 Icon(icon, color: style.color ?? fg, size: 22),
-                const SizedBox(width: 10),
+                const SizedBox(width: AppSpacingTokens.sm + 2),
               ],
               Text(label, style: style),
             ],

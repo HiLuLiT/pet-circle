@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
@@ -10,6 +9,7 @@ import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/screens/settings/settings_screen.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
+import 'package:pet_circle/screens/diary/diary_screen.dart';
 import 'package:pet_circle/screens/measurement/measurement_screen.dart';
 import 'package:pet_circle/screens/medication/medication_screen.dart'
     show MedicationScreen;
@@ -21,13 +21,6 @@ import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
-
-/// Icon assets shared between BottomNavBar and NavigationRail.
-const _navIconAssets = [
-  'assets/figma/nav_home.svg',
-  'assets/figma/nav_heartbeat.svg',
-  'assets/figma/nav_heart.svg',
-];
 
 class MainShell extends StatefulWidget {
   const MainShell({
@@ -182,6 +175,7 @@ class _MainShellState extends State<MainShell> {
             children: [
               homeScreen,
               const TrendsScreen(showScaffold: false),
+              const DiaryScreen(showScaffold: false),
               const MeasurementScreen(showScaffold: false),
               const MedicationScreen(showScaffold: false),
             ],
@@ -228,8 +222,25 @@ class _MainShellState extends State<MainShell> {
     final labels = [
       l10n.navHome,
       l10n.navTrends,
+      'Diary',
       l10n.navMeasure,
       l10n.navMedication,
+    ];
+
+    final icons = <IconData>[
+      Icons.home_outlined,
+      Icons.show_chart_outlined,
+      Icons.menu_book_outlined,
+      Icons.monitor_heart_outlined,
+      Icons.medication_outlined,
+    ];
+
+    final activeIcons = <IconData>[
+      Icons.home,
+      Icons.show_chart,
+      Icons.menu_book,
+      Icons.monitor_heart,
+      Icons.medication,
     ];
 
     return Theme(
@@ -251,36 +262,15 @@ class _MainShellState extends State<MainShell> {
       indicatorColor: c.offWhite,
       selectedIconTheme: IconThemeData(color: c.chocolate),
       unselectedIconTheme: IconThemeData(color: c.chocolate, opacity: 0.3),
-      destinations: List.generate(4, (i) {
-        final label = labels[i];
-        // First 3 items use SVG assets, 4th uses a Material icon.
-        if (i < _navIconAssets.length) {
-          return NavigationRailDestination(
-            icon: Opacity(
-              opacity: 0.3,
-              child: SvgPicture.asset(
-                _navIconAssets[i],
-                width: 28,
-                height: 28,
-              ),
-            ),
-            selectedIcon: SvgPicture.asset(
-              _navIconAssets[i],
-              width: 28,
-              height: 28,
-            ),
-            label: Text(label),
-          );
-        }
-        // Medication icon (Material)
+      destinations: List.generate(5, (i) {
         return NavigationRailDestination(
           icon: Opacity(
             opacity: 0.3,
-            child: Icon(Icons.medication_outlined, size: 28, color: c.chocolate),
+            child: Icon(icons[i], size: 28, color: c.chocolate),
           ),
           selectedIcon:
-              Icon(Icons.medication_outlined, size: 28, color: c.chocolate),
-          label: Text(label),
+              Icon(activeIcons[i], size: 28, color: c.chocolate),
+          label: Text(labels[i]),
         );
       }),
     ),

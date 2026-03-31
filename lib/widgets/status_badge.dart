@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class StatusBadge extends StatelessWidget {
   const StatusBadge({
@@ -13,21 +15,22 @@ class StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacingTokens.sm,
+        vertical: 2,
+      ),
       decoration: BoxDecoration(
         color: color,
-        borderRadius: const BorderRadius.all(AppRadii.small),
-        boxShadow: [
-          BoxShadow(
-            color: c.black.withValues(alpha: 0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        borderRadius: AppRadiiTokens.borderRadiusFull,
       ),
-      child: Text(label, style: AppTextStyles.badge),
+      child: Text(
+        label,
+        style: AppSemanticTextStyles.labelSm.copyWith(
+          color: c.onPrimary,
+        ),
+      ),
     );
   }
 }

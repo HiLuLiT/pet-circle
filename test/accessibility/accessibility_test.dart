@@ -53,8 +53,10 @@ void main() {
       await tester.pumpWidget(buildNav());
       await tester.pump();
 
+      // The Semantics widget wraps the Column that contains both
+      // the Icon and Text, so its merged label includes "Home".
       expect(
-        find.bySemanticsLabel('Home'),
+        find.bySemanticsLabel(RegExp('Home')),
         findsOneWidget,
         reason: 'Home tab must expose a "Home" semantics label',
       );
@@ -65,43 +67,55 @@ void main() {
       await tester.pump();
 
       expect(
-        find.bySemanticsLabel('Trends'),
+        find.bySemanticsLabel(RegExp('Trends')),
         findsOneWidget,
         reason: 'Trends tab must expose a "Trends" semantics label',
       );
     });
 
-    testWidgets('Pets nav item has semantic label "Pets"', (tester) async {
+    testWidgets('Diary nav item has semantic label "Diary"', (tester) async {
       await tester.pumpWidget(buildNav());
       await tester.pump();
 
       expect(
-        find.bySemanticsLabel('Pets'),
+        find.bySemanticsLabel(RegExp('Diary')),
         findsOneWidget,
-        reason: 'Pets tab must expose a "Pets" semantics label',
+        reason: 'Diary tab must expose a "Diary" semantics label',
       );
     });
 
-    testWidgets('Medications nav item has semantic label "Medications"',
+    testWidgets('Mesure nav item has semantic label "Mesure"',
         (tester) async {
       await tester.pumpWidget(buildNav());
       await tester.pump();
 
       expect(
-        find.bySemanticsLabel('Medications'),
+        find.bySemanticsLabel(RegExp('Mesure')),
         findsOneWidget,
-        reason: 'Medications tab must expose a "Medications" semantics label',
+        reason: 'Mesure tab must expose a "Mesure" semantics label',
       );
     });
 
-    testWidgets('all four semantic labels present simultaneously',
+    testWidgets('Medicine nav item has semantic label "Medicine"',
+        (tester) async {
+      await tester.pumpWidget(buildNav());
+      await tester.pump();
+
+      expect(
+        find.bySemanticsLabel(RegExp('Medicine')),
+        findsOneWidget,
+        reason: 'Medicine tab must expose a "Medicine" semantics label',
+      );
+    });
+
+    testWidgets('all five semantic labels present simultaneously',
         (tester) async {
       await tester.pumpWidget(buildNav(selectedIndex: 2));
       await tester.pump();
 
-      for (final label in ['Home', 'Trends', 'Pets', 'Medications']) {
+      for (final label in ['Home', 'Trends', 'Diary', 'Mesure', 'Medicine']) {
         expect(
-          find.bySemanticsLabel(label),
+          find.bySemanticsLabel(RegExp(label)),
           findsOneWidget,
           reason: 'Expected semantic label "$label" to be present',
         );

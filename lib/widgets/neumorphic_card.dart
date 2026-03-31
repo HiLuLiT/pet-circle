@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/tokens/shadows.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class NeumorphicCard extends StatelessWidget {
   const NeumorphicCard({
@@ -21,15 +23,15 @@ class NeumorphicCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
-    final cardRadius = radius ?? const BorderRadius.all(AppRadii.medium);
+    final c = AppSemanticColors.of(context);
+    final cardRadius = radius ?? AppRadiiTokens.borderRadiusLg;
     return Container(
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: color ?? c.white,
+        color: color ?? c.surface,
         borderRadius: cardRadius,
-        boxShadow: inner ? AppShadows.neumorphicInner : AppShadows.neumorphicOuter,
+        boxShadow: inner ? AppShadowTokens.small : AppShadowTokens.small,
       ),
       child: child,
     );
