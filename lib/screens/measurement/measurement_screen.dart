@@ -7,6 +7,7 @@ import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 class MeasurementScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: petStore,
+      listenable: Listenable.merge([petStore, userStore]),
       builder: (context, _) {
         final c = AppColorsTheme.of(context);
         final l10n = AppLocalizations.of(context)!;
@@ -342,7 +343,10 @@ class _ManualModeState extends State<_ManualMode>
                         _isSaving = true;
                         final petId = petStore.activePet?.id ?? '';
                         final petName = petStore.activePet?.name ?? l10n.petName;
-                        if (petId.isEmpty) return;
+                        if (petId.isEmpty) {
+                          setState(() => _isSaving = false);
+                          return;
+                        }
 
                         measurementStore.addMeasurement(
                           petId,
@@ -364,6 +368,7 @@ class _ManualModeState extends State<_ManualMode>
 
                         Navigator.pop(context);
                         setState(() {
+                          _isSaving = false;
                           _remainingSeconds = widget.selectedDuration;
                           _tapCount = 0;
                         });

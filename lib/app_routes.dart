@@ -1,4 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
@@ -15,7 +16,9 @@ import 'package:pet_circle/screens/onboarding/onboarding_flow.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_screen.dart';
 import 'package:pet_circle/screens/welcome_screen.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
+import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 
 /// Named path constants for use with context.go() / context.push().
 class AppRoutes {
@@ -45,13 +48,72 @@ AppUserRole parseRole(String? roleStr) {
   return AppUserRole.owner;
 }
 
+/// Routes that are exempt from the auth-gate redirect (they handle their own
+/// auth logic or are public).
+const _publicPaths = {'/', '/auth-gate', '/auth', '/role-selection', '/verify-email', '/welcome', '/invite'};
+
+/// Stashed route the user was trying to reach before being bounced to auth-gate.
+/// Consumed once by [AuthGate] after successful authentication.
+String? _pendingDeepRoute;
+
+/// Read and clear the pending deep route (consumed once).
+String? consumePendingDeepRoute() {
+  final route = _pendingDeepRoute;
+  _pendingDeepRoute = null;
+  return route;
+}
+
 /// Build the application [GoRouter].
 GoRouter buildRouter() {
+  // On native platforms there is no URL bar, so always start at the auth gate.
+  // On web, the redirect guard handles bouncing to auth-gate when needed, and
+  // GoRouter picks up the browser URL automatically via its default '/' initial
+  // location — the redirect will stash the deep route before bouncing.
+  final initialLoc = kIsWeb
+      ? '/'
+      : (kEnableFirebase ? AppRoutes.authGate : AppRoutes.welcome);
+
   return GoRouter(
-    initialLocation: kEnableFirebase ? AppRoutes.authGate : AppRoutes.welcome,
+    initialLocation: initialLoc,
     observers: kEnableFirebase
         ? [FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance)]
         : [],
+    // Re-evaluate redirects whenever auth state changes (e.g. loading → authenticated).
+    refreshListenable: kEnableFirebase ? authProvider : null,
+    redirect: (context, state) {
+      if (!kEnableFirebase) return null;
+      final path = state.uri.path;
+      final authState = authProvider.routeState;
+
+      // --- Auth-gate exit: when auth resolves, leave auth-gate. ---
+      if (path == '/auth-gate' && authState == AuthRouteState.authenticated) {
+        // Invitation acceptance is async — let AuthGate handle it.
+        if (deepLinkService.pendingInvitationToken != null) return null;
+
+        // Seed stores before leaving.
+        final appUser = authProvider.appUser!;
+        userStore.seedFromAppUser(appUser);
+        if (petStore.currentSubscribedUid != appUser.uid) {
+          petStore.subscribeForUser(appUser.uid);
+          notificationStore.subscribeForUser(appUser.uid);
+        }
+        // Restore the URL the user was on before the bounce, or go to default.
+        return consumePendingDeepRoute() ?? AppRoutes.shell(appUser.role);
+      }
+
+      // Public paths handle their own auth logic.
+      if (_publicPaths.contains(path)) return null;
+
+      // --- Protected route guard ---
+      if (authState == AuthRouteState.loading ||
+          authState != AuthRouteState.authenticated) {
+        // Stash the intended destination (only overwrite with a non-auth-gate path).
+        _pendingDeepRoute ??= state.uri.toString();
+        return AppRoutes.authGate;
+      }
+
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/',

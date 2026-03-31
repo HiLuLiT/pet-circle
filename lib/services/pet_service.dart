@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
 import 'package:pet_circle/models/measurement.dart';
@@ -86,8 +87,17 @@ class PetService {
     return _measurementsRef(petId)
         .orderBy('recordedAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Measurement.fromFirestore(doc)).toList());
+        .map((snapshot) {
+          final measurements = <Measurement>[];
+          for (final doc in snapshot.docs) {
+            try {
+              measurements.add(Measurement.fromFirestore(doc));
+            } catch (e) {
+              debugPrint('Skipping malformed measurement ${doc.id}: $e');
+            }
+          }
+          return measurements;
+        });
   }
 
   static Future<void> deleteMeasurement(String petId, String measurementId) async {

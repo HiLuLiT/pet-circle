@@ -3,6 +3,7 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
 
@@ -133,7 +134,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     final content = ListenableBuilder(
-      listenable: Listenable.merge([medicationStore, petStore]),
+      listenable: Listenable.merge([medicationStore, petStore, userStore]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context)!;
         final access = petStore.accessForActivePet();

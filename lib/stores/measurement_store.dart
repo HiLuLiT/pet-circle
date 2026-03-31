@@ -9,6 +9,7 @@ final measurementStore = MeasurementStore();
 class MeasurementStore extends ChangeNotifier {
   Map<String, List<Measurement>> _measurements = {};
   final Map<String, StreamSubscription<List<Measurement>>> _subscriptions = {};
+  bool _hasPendingWrite = false;
 
   void seed(Map<String, List<Measurement>> initial) {
     _measurements = {
@@ -30,6 +31,7 @@ class MeasurementStore extends ChangeNotifier {
   Future<void> addMeasurement(String petId, Measurement measurement) async {
     _measurements.putIfAbsent(petId, () => []);
     _measurements[petId]!.insert(0, measurement);
+    _hasPendingWrite = true;
     notifyListeners();
 
     if (kEnableFirebase) {
@@ -39,7 +41,11 @@ class MeasurementStore extends ChangeNotifier {
         _measurements[petId]?.remove(measurement);
         notifyListeners();
         rethrow;
+      } finally {
+        _hasPendingWrite = false;
       }
+    } else {
+      _hasPendingWrite = false;
     }
   }
 
@@ -79,6 +85,10 @@ class MeasurementStore extends ChangeNotifier {
     for (final id in newIds.difference(currentIds)) {
       _subscriptions[id] = PetService.streamMeasurements(id).listen((list) {
         _measurements[id] = list;
+        debugPrint('[MeasurementStore] Pet $id: ${list.length} measurements');
+        for (final m in list) {
+          debugPrint('  - ${m.id}: ${m.bpm} BPM @ ${m.recordedAt}');
+        }
         notifyListeners();
       });
     }

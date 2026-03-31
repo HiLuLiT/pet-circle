@@ -5,7 +5,9 @@ import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/services/user_service.dart';
 import 'package:pet_circle/stores/notification_store.dart';
+import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 
 enum AuthRouteState {
   loading,
@@ -53,6 +55,7 @@ class AuthProvider extends ChangeNotifier {
     if (user == null) {
       _appUser = null;
       _isLoading = false;
+      petStore.cancelSubscription();
       notificationStore.cancelSubscription();
       notificationStore.reset();
       settingsStore.reset();
@@ -67,6 +70,7 @@ class AuthProvider extends ChangeNotifier {
     _userSubscription = UserService.streamUser(user.uid).listen((appUser) {
       _appUser = appUser;
       if (appUser != null) {
+        userStore.seedFromAppUser(appUser);
         settingsStore.seedFromAppUser(appUser);
       } else {
         settingsStore.reset();

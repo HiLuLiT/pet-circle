@@ -42,9 +42,16 @@ class Measurement {
     return Measurement(
       id: doc.id,
       bpm: data['bpm'] ?? 0,
-      recordedAt: (data['recordedAt'] as Timestamp).toDate(),
+      recordedAt: _parseDateTime(data['recordedAt']),
       recordedBy: data['recordedBy'],
     );
+  }
+
+  static DateTime _parseDateTime(dynamic value) {
+    if (value is Timestamp) return value.toDate();
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    if (value is String) return DateTime.tryParse(value) ?? DateTime.now();
+    return DateTime.now();
   }
 
   Measurement copyWith({

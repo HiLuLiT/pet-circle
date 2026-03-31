@@ -18,11 +18,14 @@ class PetStore extends ChangeNotifier {
   List<Pet> _clinicPets = [];
   int _activePetIndex = 0;
   StreamSubscription<List<Pet>>? _petsSubscription;
+  String? _subscribedUid;
   bool _isLoading = false;
 
   List<Pet> get ownerPets => List.unmodifiable(_ownerPets);
   List<Pet> get allClinicPets => List.unmodifiable(_clinicPets);
   bool get isLoading => _isLoading;
+  /// The UID currently subscribed to, or null if no subscription is active.
+  String? get currentSubscribedUid => _subscribedUid;
   int get activePetIndex => _activePetIndex.clamp(0, _ownerPets.isEmpty ? 0 : _ownerPets.length - 1);
 
   Pet? get activePet => _ownerPets.isEmpty ? null : _ownerPets[activePetIndex];
@@ -56,6 +59,7 @@ class PetStore extends ChangeNotifier {
   /// Pets where the user is in the careCircle appear in ownerPets.
   void subscribeForUser(String uid) {
     _petsSubscription?.cancel();
+    _subscribedUid = uid;
     _isLoading = true;
     notifyListeners();
     _petsSubscription = PetService.streamPetsForUser(uid).listen((pets) {
@@ -85,6 +89,7 @@ class PetStore extends ChangeNotifier {
   void cancelSubscription() {
     _petsSubscription?.cancel();
     _petsSubscription = null;
+    _subscribedUid = null;
     measurementStore.cancelSubscriptions();
     noteStore.cancelSubscriptions();
     medicationStore.cancelSubscriptions();

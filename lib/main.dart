@@ -42,9 +42,11 @@ void main() async {
   // Wire up global Flutter / platform error handlers before anything else.
   AppErrorHandler.instance.init();
 
-  // Disable runtime font fetching so Inter is only loaded from bundled assets.
-  // Falls back gracefully to the system font when the TTF is not bundled.
-  GoogleFonts.config.allowRuntimeFetching = false;
+  // On mobile/desktop, disable runtime fetching — Inter is bundled in assets.
+  // On web, allow runtime fetching since bundled font assets aren't available.
+  if (!kIsWeb) {
+    GoogleFonts.config.allowRuntimeFetching = false;
+  }
 
   if (kEnableFirebase) {
     await Firebase.initializeApp(

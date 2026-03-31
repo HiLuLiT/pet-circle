@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
@@ -49,8 +52,21 @@ class _MainShellState extends State<MainShell> {
     _selectedIndex = widget.initialIndex;
   }
 
+  @override
+  void didUpdateWidget(covariant MainShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialIndex != oldWidget.initialIndex) {
+      _selectedIndex = widget.initialIndex;
+    }
+  }
+
   void _onDestinationSelected(int index) {
-    setState(() => _selectedIndex = index);
+    if (kIsWeb) {
+      // Update the browser URL so the tab state is reflected in the address bar.
+      context.go(AppRoutes.shell(widget.role, tab: index));
+    } else {
+      setState(() => _selectedIndex = index);
+    }
   }
 
   void _showPetSwitcher() {

@@ -188,22 +188,15 @@ class _AppNotificationCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         notificationStore.markRead(notification.id);
-        final scaffold = ScaffoldMessenger.of(context);
         switch (notification.type) {
           case notif.NotificationType.medication:
-            scaffold.showSnackBar(
-              SnackBar(content: Text(l10n.medicationLogged), backgroundColor: c.lightBlue),
-            );
+            context.go(AppRoutes.shell(userStore.role, tab: 3));
           case notif.NotificationType.measurement:
             context.go(AppRoutes.shell(userStore.role, tab: 1));
           case notif.NotificationType.careCircle:
-            scaffold.showSnackBar(
-              SnackBar(content: Text(l10n.careCircleUpdated), backgroundColor: c.lightBlue),
-            );
+            context.go(AppRoutes.shell(userStore.role, tab: 0));
           case notif.NotificationType.report:
-            scaffold.showSnackBar(
-              SnackBar(content: Text(l10n.reportOpened), backgroundColor: c.lightBlue),
-            );
+            context.go(AppRoutes.shell(userStore.role, tab: 1));
         }
       },
       child: Container(

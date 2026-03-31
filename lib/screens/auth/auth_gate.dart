@@ -117,6 +117,13 @@ class _AuthGateState extends State<AuthGate> {
       return;
     }
 
+    // If the user was trying to reach a specific route before auth, go there.
+    final pendingRoute = consumePendingDeepRoute();
+    if (pendingRoute != null) {
+      context.go(pendingRoute);
+      return;
+    }
+
     context.go(AppRoutes.shell(appUser.role));
   }
 

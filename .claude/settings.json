@@ -1,0 +1,14 @@
+{
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true
+  },
+  "hooks": {
+    "PostToolUse": [{
+      "matcher": "Write|Edit",
+      "hooks": [{
+        "type": "command",
+        "command": "f=$(jq -r '.tool_input.file_path // empty'); [[ \"$f\" == *.dart ]] && cd /Users/hilabb/repos/pet-circle && flutter analyze --no-pub 2>/dev/null || true"
+      }]
+    }]
+  }
+}

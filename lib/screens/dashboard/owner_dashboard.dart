@@ -53,7 +53,7 @@ class OwnerDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: petStore,
+      listenable: Listenable.merge([petStore, measurementStore]),
       builder: (context, _) => _buildContent(context),
     );
   }
@@ -469,6 +469,7 @@ class _ActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppColorsTheme.of(context);
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
         height: 40,

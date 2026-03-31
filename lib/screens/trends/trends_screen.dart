@@ -5,6 +5,7 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
@@ -135,7 +136,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([measurementStore, petStore]),
+      listenable: Listenable.merge([measurementStore, petStore, userStore]),
       builder: (context, _) {
         final l10n = AppLocalizations.of(context)!;
         final c = AppColorsTheme.of(context);
@@ -148,8 +149,8 @@ class _TrendsScreenState extends State<TrendsScreen> {
           l10n.last90Days,
           l10n.customRange,
         ];
-        _selectedPeriod ??= l10n.last7Days;
 
+        _selectedPeriod ??= l10n.last7Days;
         final petName = petStore.activePet?.name ?? l10n.petName;
         final petId = petStore.activePet?.id ?? '';
         final allMeasurements = measurementStore.getMeasurements(petId);
@@ -165,7 +166,12 @@ class _TrendsScreenState extends State<TrendsScreen> {
               const SizedBox(height: AppSpacing.md),
               Text(l10n.healthTrends, style: AppTextStyles.heading2),
               const SizedBox(height: AppSpacing.sm),
-              Text('$petName • ${allMeasurements.length} recordings', style: AppTextStyles.body),
+              Text(
+                filtered.length < allMeasurements.length
+                    ? '$petName • ${filtered.length} of ${allMeasurements.length} recordings in this period'
+                    : '$petName • ${allMeasurements.length} recordings',
+                style: AppTextStyles.body,
+              ),
               const SizedBox(height: AppSpacing.md),
               Wrap(
                 spacing: 8,
