@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Figma Design Tokens — all 9 primitive colors from the Figma variables.
@@ -290,7 +291,7 @@ ThemeData buildAppTheme() {
         borderSide: BorderSide.none,
       ),
     ),
-    extensions: const [AppColorsTheme.light],
+    extensions: const [AppColorsTheme.light, AppSemanticColors.light],
   );
 }
 
@@ -324,6 +325,6 @@ ThemeData buildDarkTheme() {
         borderSide: BorderSide.none,
       ),
     ),
-    extensions: const [AppColorsTheme.dark],
+    extensions: const [AppColorsTheme.dark, AppSemanticColors.dark],
   );
 }
