@@ -30,6 +30,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get signInWithApple => 'כניסה עם Apple';
 
   @override
+  String get appleSignInNotAvailableOnWeb =>
+      'כניסה עם Apple זמינה באפליקציית iOS';
+
+  @override
   String hiUser(String name) {
     return 'היי $name!';
   }

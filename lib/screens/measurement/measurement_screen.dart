@@ -313,85 +313,90 @@ class _ManualModeState extends State<_ManualMode>
                 ),
                 const SizedBox(height: 24),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                        setState(() {
-                          _remainingSeconds = widget.selectedDuration;
-                          _tapCount = 0;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: c.background,
-                          borderRadius: BorderRadius.circular(AppRadiiTokens.full),
-                        ),
-                        child: Text(
-                          l10n.measureAgain,
-                          style: AppSemanticTextStyles.body.copyWith(
-                            color: c.textPrimary,
-                            fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                          setState(() {
+                            _remainingSeconds = widget.selectedDuration;
+                            _tapCount = 0;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: c.background,
+                            borderRadius: BorderRadius.circular(AppRadiiTokens.full),
+                          ),
+                          child: Text(
+                            l10n.measureAgain,
+                            textAlign: TextAlign.center,
+                            style: AppSemanticTextStyles.body.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    GestureDetector(
-                      onTap: () {
-                        if (_isSaving) return;
-                        _isSaving = true;
-                        final petId = petStore.activePet?.id ?? '';
-                        final petName = petStore.activePet?.name ?? l10n.petName;
-                        if (petId.isEmpty) {
-                          setState(() => _isSaving = false);
-                          return;
-                        }
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          if (_isSaving) return;
+                          _isSaving = true;
+                          final petId = petStore.activePet?.id ?? '';
+                          final petName = petStore.activePet?.name ?? l10n.petName;
+                          if (petId.isEmpty) {
+                            setState(() => _isSaving = false);
+                            return;
+                          }
 
-                        measurementStore.addMeasurement(
-                          petId,
-                          Measurement(
-                            bpm: bpm,
-                            recordedAt: DateTime.now(),
-                          ),
-                        );
-                        notificationStore.addNotification(
-                          AppNotification(
-                            id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
-                            title: l10n.measurementComplete,
-                            body: l10n.measurementSavedBpm(bpm),
-                            type: NotificationType.measurement,
-                            createdAt: DateTime.now(),
-                            petName: petName,
-                          ),
-                        );
+                          measurementStore.addMeasurement(
+                            petId,
+                            Measurement(
+                              bpm: bpm,
+                              recordedAt: DateTime.now(),
+                            ),
+                          );
+                          notificationStore.addNotification(
+                            AppNotification(
+                              id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
+                              title: l10n.measurementComplete,
+                              body: l10n.measurementSavedBpm(bpm),
+                              type: NotificationType.measurement,
+                              createdAt: DateTime.now(),
+                              petName: petName,
+                            ),
+                          );
 
-                        Navigator.pop(context);
-                        setState(() {
-                          _isSaving = false;
-                          _remainingSeconds = widget.selectedDuration;
-                          _tapCount = 0;
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.measurementSavedBpm(bpm)),
-                            backgroundColor: c.primaryLight,
+                          Navigator.pop(context);
+                          setState(() {
+                            _isSaving = false;
+                            _remainingSeconds = widget.selectedDuration;
+                            _tapCount = 0;
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.measurementSavedBpm(bpm)),
+                              backgroundColor: c.primaryLight,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            color: c.primaryLight,
+                            borderRadius: BorderRadius.circular(AppRadiiTokens.full),
                           ),
-                        );
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: c.primaryLight,
-                          borderRadius: BorderRadius.circular(AppRadiiTokens.full),
-                        ),
-                        child: Text(
-                          l10n.addToGraph,
-                          style: AppSemanticTextStyles.body.copyWith(
-                            color: c.textPrimary,
-                            fontWeight: FontWeight.w600,
+                          child: Text(
+                            l10n.addToGraph,
+                            textAlign: TextAlign.center,
+                            style: AppSemanticTextStyles.body.copyWith(
+                              color: c.textPrimary,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
@@ -437,7 +442,8 @@ class _ManualModeState extends State<_ManualMode>
         ? 0.0
         : (_remainingSeconds / widget.selectedDuration).clamp(0.0, 1.0);
 
-    return Column(
+    return SingleChildScrollView(
+      child: Column(
       children: [
         // Timer Duration selector
         Container(
@@ -589,6 +595,7 @@ class _ManualModeState extends State<_ManualMode>
           ),
         ),
       ],
+    ),
     );
   }
 }

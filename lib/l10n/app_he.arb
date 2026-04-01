@@ -7,6 +7,7 @@
   "signInWithGoogle": "כניסה עם גוגל",
   "signInWithEmail": "כניסה עם אימייל",
   "signInWithApple": "כניסה עם Apple",
+  "appleSignInNotAvailableOnWeb": "כניסה עם Apple זמינה באפליקציית iOS",
   "hiUser": "היי {name}!",
   "@hiUser": { "placeholders": { "name": { "type": "String" } } },
   "chooseYourRole": "בחר/י את התפקיד שלך",

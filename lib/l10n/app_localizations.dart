@@ -140,6 +140,12 @@ abstract class AppLocalizations {
   /// **'Sign in with Apple'**
   String get signInWithApple;
 
+  /// No description provided for @appleSignInNotAvailableOnWeb.
+  ///
+  /// In en, this message translates to:
+  /// **'Apple Sign-In is available on the iOS app'**
+  String get appleSignInNotAvailableOnWeb;
+
   /// No description provided for @hiUser.
   ///
   /// In en, this message translates to:

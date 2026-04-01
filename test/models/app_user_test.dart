@@ -206,12 +206,26 @@ void main() {
       expect(user.hasCompletedOnboarding, isTrue);
     });
 
-    test('fromFirestore defaults hasCompletedOnboarding to false when missing', () {
-      // Mock DocumentSnapshot without hasCompletedOnboarding
+    test('fromFirestore defaults hasCompletedOnboarding to true when field missing (existing user migration)', () {
+      // Mock DocumentSnapshot without hasCompletedOnboarding — existing user
       final mockDoc = _MockDocumentSnapshot({
         'uid': 'u-1',
         'email': 'test@example.com',
         'role': 'owner',
+      });
+
+      final user = AppUser.fromFirestore(mockDoc);
+
+      // Existing users without the field are treated as already onboarded
+      expect(user.hasCompletedOnboarding, isTrue);
+    });
+
+    test('fromFirestore reads hasCompletedOnboarding as false when explicitly set', () {
+      final mockDoc = _MockDocumentSnapshot({
+        'uid': 'u-1',
+        'email': 'test@example.com',
+        'role': 'owner',
+        'hasCompletedOnboarding': false,
       });
 
       final user = AppUser.fromFirestore(mockDoc);

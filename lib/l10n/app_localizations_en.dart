@@ -30,6 +30,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signInWithApple => 'Sign in with Apple';
 
   @override
+  String get appleSignInNotAvailableOnWeb =>
+      'Apple Sign-In is available on the iOS app';
+
+  @override
   String hiUser(String name) {
     return 'Hi $name!';
   }

@@ -132,8 +132,6 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    final user = userStore.currentUser;
-    final pet = petStore.activePet;
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isWide = screenWidth >= kTabletBreakpoint;
 
@@ -141,74 +139,82 @@ class _MainShellState extends State<MainShell> {
         ? const VetDashboard(showScaffold: false)
         : const OwnerDashboard(showScaffold: false);
 
-    final body = Column(
-      children: [
-        // -- Persistent header --
-        Padding(
-          padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-          child: AppHeader(
-            userName: user?.name ?? '',
-            userImageUrl: user?.avatarUrl ?? '',
-            petName: _selectedIndex == 0 ? null : pet?.name,
-            petImageUrl: _selectedIndex == 0 ? null : pet?.imageUrl,
-            onPetSelectorTap:
-                _selectedIndex == 0 || petStore.ownerPets.length <= 1
-                    ? null
-                    : _showPetSwitcher,
-            onAvatarTap: () => showModalBottomSheet<void>(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (_) => SettingsDrawer(role: widget.role),
-            ),
-            onNotificationTap: () => showModalBottomSheet<void>(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (_) => const NotificationsDrawer(),
-            ),
-          ),
-        ),
-        // -- Tab content --
-        Expanded(
-          child: IndexedStack(
-            index: _selectedIndex,
-            children: [
-              homeScreen,
-              const TrendsScreen(showScaffold: false),
-              const DiaryScreen(showScaffold: false),
-              const MeasurementScreen(showScaffold: false),
-              const MedicationScreen(showScaffold: false),
-            ],
-          ),
-        ),
-      ],
-    );
+    return ListenableBuilder(
+      listenable: Listenable.merge([petStore, userStore]),
+      builder: (context, _) {
+        final user = userStore.currentUser;
+        final pet = petStore.activePet;
 
-    if (!isWide) {
-      return Scaffold(
-        backgroundColor: c.background,
-        body: SafeArea(child: body),
-        bottomNavigationBar: BottomNavBar(
-          selectedIndex: _selectedIndex,
-          onTap: _onDestinationSelected,
-        ),
-      );
-    }
-
-    // Tablet / Desktop: NavigationRail in a Row
-    return Scaffold(
-      backgroundColor: c.background,
-      body: SafeArea(
-        child: Row(
+        final body = Column(
           children: [
-            _buildNavigationRail(context, c, screenWidth),
-            // Vertical divider between rail and content
-            VerticalDivider(thickness: 1, width: 1, color: c.textPrimary),
-            Expanded(child: body),
+            // -- Persistent header --
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: AppHeader(
+                userName: user?.name ?? '',
+                userImageUrl: user?.avatarUrl ?? '',
+                petName: _selectedIndex == 0 ? null : pet?.name,
+                petImageUrl: _selectedIndex == 0 ? null : pet?.imageUrl,
+                onPetSelectorTap:
+                    _selectedIndex == 0 || petStore.ownerPets.length <= 1
+                        ? null
+                        : _showPetSwitcher,
+                onAvatarTap: () => showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => SettingsDrawer(role: widget.role),
+                ),
+                onNotificationTap: () => showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => const NotificationsDrawer(),
+                ),
+              ),
+            ),
+            // -- Tab content --
+            Expanded(
+              child: IndexedStack(
+                index: _selectedIndex,
+                children: [
+                  homeScreen,
+                  const TrendsScreen(showScaffold: false),
+                  const DiaryScreen(showScaffold: false),
+                  const MeasurementScreen(showScaffold: false),
+                  const MedicationScreen(showScaffold: false),
+                ],
+              ),
+            ),
           ],
-        ),
-      ),
+        );
+
+        if (!isWide) {
+          return Scaffold(
+            backgroundColor: c.background,
+            body: SafeArea(child: body),
+            bottomNavigationBar: BottomNavBar(
+              selectedIndex: _selectedIndex,
+              onTap: _onDestinationSelected,
+            ),
+          );
+        }
+
+        // Tablet / Desktop: NavigationRail in a Row
+        return Scaffold(
+          backgroundColor: c.background,
+          body: SafeArea(
+            child: Row(
+              children: [
+                _buildNavigationRail(context, c, screenWidth),
+                // Vertical divider between rail and content
+                VerticalDivider(thickness: 1, width: 1, color: c.textPrimary),
+                Expanded(child: body),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

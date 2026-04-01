@@ -152,10 +152,12 @@ class _MedicationScreenState extends State<MedicationScreen> {
                 children: [
                   const SizedBox(height: AppSpacingTokens.md),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(l10n.medicationManagement,
-                          style: AppSemanticTextStyles.title3),
+                      Expanded(
+                        child: Text(l10n.medicationManagement,
+                            style: AppSemanticTextStyles.title3),
+                      ),
+                      const SizedBox(width: AppSpacingTokens.sm),
                       SizedBox(
                         height: 32,
                         child: TextButton.icon(

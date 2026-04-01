@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -27,6 +26,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   Future<void> _handleAppleSignIn() async {
     if (!kEnableFirebase) return;
+
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.appleSignInNotAvailableOnWeb)),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -81,95 +87,95 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     return Scaffold(
       backgroundColor: c.primaryLightest,
       body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return Stack(
-              children: [
-                // Illustration layer — behind everything, clipped to screen
-                _WelcomeIllustration(
-                  screenWidth: constraints.maxWidth,
-                  screenHeight: constraints.maxHeight,
-                ),
-
-                // Foreground content
-                Column(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 430),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Stack(
                   children: [
-                    const SizedBox(height: AppSpacingTokens.xl),
-
-                    // "Pet Circle" subtitle
-                    Text(
-                      l10n.appTitle,
-                      style: AppSemanticTextStyles.headingMd.copyWith(
-                        color: c.textSecondary,
-                      ),
+                    // Illustration layer — behind everything, clipped to screen
+                    _WelcomeIllustration(
+                      screenWidth: constraints.maxWidth,
+                      screenHeight: constraints.maxHeight,
                     ),
 
-                    const SizedBox(height: AppSpacingTokens.md),
+                    // Foreground content
+                    Column(
+                      children: [
+                        const SizedBox(height: AppSpacingTokens.xl),
 
-                    // Main title
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacingTokens.xl,
-                      ),
-                      child: Text(
-                        l10n.welcomeTagline,
-                        style: AppSemanticTextStyles.title2,
-                        textAlign: TextAlign.center,
-                      ),
+                        // "Pet Circle" subtitle
+                        Text(
+                          l10n.appTitle,
+                          style: AppSemanticTextStyles.headingMd.copyWith(
+                            color: c.textSecondary,
+                          ),
+                        ),
+
+                        const SizedBox(height: AppSpacingTokens.md),
+
+                        // Main title
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacingTokens.xl,
+                          ),
+                          child: Text(
+                            l10n.welcomeTagline,
+                            style: AppSemanticTextStyles.title2,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+
+                        const Spacer(),
+
+                        // Buttons at the bottom
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacingTokens.xl,
+                          ),
+                          child: Column(
+                            children: [
+                              PrimaryButton(
+                                label: l10n.signUp,
+                                backgroundColor:
+                                    AppSemanticColors.of(context).surface,
+                                foregroundColor:
+                                    AppSemanticColors.of(context).textPrimary,
+                                onPressed: () =>
+                                    context.push(AppRoutes.roleSelection),
+                              ),
+                              const SizedBox(height: AppSpacingTokens.md),
+                              _GoogleSignInButton(
+                                label: l10n.signInWithGoogle,
+                                onTap: _isLoading ? null : _handleGoogleSignIn,
+                              ),
+                                  const SizedBox(height: AppSpacingTokens.sm),
+                              _AppleSignInButton(
+                                label: l10n.signInWithApple,
+                                onTap: _isLoading ? null : _handleAppleSignIn,
+                              ),
+                              const SizedBox(height: AppSpacingTokens.md),
+                              PrimaryButton(
+                                label: l10n.signIn,
+                                variant: PrimaryButtonVariant.outlined,
+                                onPressed: _isLoading
+                                    ? null
+                                    : () => context
+                                        .push('${AppRoutes.auth}?signIn=true'),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 40),
+                      ],
                     ),
-
-                    const Spacer(),
-
-                    // Buttons at the bottom
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacingTokens.xl,
-                      ),
-                      child: Column(
-                        children: [
-                          PrimaryButton(
-                            label: l10n.signUp,
-                            backgroundColor:
-                                AppSemanticColors.of(context).surface,
-                            foregroundColor:
-                                AppSemanticColors.of(context).textPrimary,
-                            onPressed: () =>
-                                context.push(AppRoutes.roleSelection),
-                          ),
-                          const SizedBox(height: AppSpacingTokens.md),
-                          _GoogleSignInButton(
-                            label: l10n.signInWithGoogle,
-                            onTap: _isLoading ? null : _handleGoogleSignIn,
-                          ),
-                          if (!kIsWeb &&
-                              (defaultTargetPlatform == TargetPlatform.iOS ||
-                                  defaultTargetPlatform ==
-                                      TargetPlatform.macOS)) ...[
-                            const SizedBox(height: AppSpacingTokens.sm),
-                            _AppleSignInButton(
-                              label: l10n.signInWithApple,
-                              onTap: _isLoading ? null : _handleAppleSignIn,
-                            ),
-                          ],
-                          const SizedBox(height: AppSpacingTokens.md),
-                          PrimaryButton(
-                            label: l10n.signIn,
-                            variant: PrimaryButtonVariant.outlined,
-                            onPressed: _isLoading
-                                ? null
-                                : () => context
-                                    .push('${AppRoutes.auth}?signIn=true'),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 40),
                   ],
-                ),
-              ],
-            );
-          },
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

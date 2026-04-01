@@ -36,7 +36,9 @@ class OnboardingShell extends StatelessWidget {
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Center(
-          child: Container(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 430),
+            child: Container(
             margin: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.lg),
             padding: const EdgeInsets.all(AppSpacingTokens.xl),
             decoration: BoxDecoration(
@@ -66,7 +68,7 @@ class OnboardingShell extends StatelessWidget {
                         ),
                       ),
                     if (onBack != null && (onNext != null || isNextLoading))
-                      const SizedBox(width: AppSpacingTokens.md - 4),
+                      const SizedBox(width: AppSpacingTokens.sm),
                     if (onNext != null || isNextLoading)
                       Expanded(
                         child: isNextLoading
@@ -91,6 +93,7 @@ class OnboardingShell extends StatelessWidget {
                 ),
               ],
             ),
+          ),
           ),
         ),
       ),

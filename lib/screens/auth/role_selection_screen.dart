@@ -55,7 +55,9 @@ class RoleSelectionScreen extends StatelessWidget {
       backgroundColor: c.surface,
       body: SafeArea(
         child: Center(
-          child: Padding(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 430),
+            child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.lg),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -86,6 +88,7 @@ class RoleSelectionScreen extends StatelessWidget {
                 ),
               ],
             ),
+          ),
           ),
         ),
       ),

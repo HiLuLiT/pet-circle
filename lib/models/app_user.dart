@@ -42,7 +42,9 @@ class AppUser {
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       petIds: List<String>.from(data['petIds'] ?? []),
       settings: UserSettings.fromMap(settingsData),
-      hasCompletedOnboarding: data['hasCompletedOnboarding'] == true,
+      hasCompletedOnboarding: data.containsKey('hasCompletedOnboarding')
+          ? data['hasCompletedOnboarding'] == true
+          : true, // existing users without this field are already onboarded
     );
   }
 
