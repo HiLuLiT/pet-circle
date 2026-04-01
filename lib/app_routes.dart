@@ -50,7 +50,7 @@ AppUserRole parseRole(String? roleStr) {
 
 /// Routes that are exempt from the auth-gate redirect (they handle their own
 /// auth logic or are public).
-const _publicPaths = {'/', '/auth-gate', '/auth', '/role-selection', '/verify-email', '/welcome', '/invite'};
+const _publicPaths = {'/', '/auth-gate', '/auth', '/role-selection', '/verify-email', '/welcome', '/invite', '/onboarding'};
 
 /// Stashed route the user was trying to reach before being bounced to auth-gate.
 /// Consumed once by [AuthGate] after successful authentication.
@@ -99,6 +99,11 @@ GoRouter buildRouter() {
         }
         // Restore the URL the user was on before the bounce, or go to default.
         return consumePendingDeepRoute() ?? AppRoutes.shell(appUser.role);
+      }
+
+      // Exit auth-gate for needsOnboarding
+      if (path == '/auth-gate' && authState == AuthRouteState.needsOnboarding) {
+        return AppRoutes.onboarding;
       }
 
       // Public paths handle their own auth logic.

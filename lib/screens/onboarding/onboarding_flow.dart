@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/providers/auth_provider.dart';
+import 'package:pet_circle/services/user_service.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/models/measurement.dart';
@@ -95,6 +97,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             type: InvitationType.vet,
           );
         }
+      }
+
+      // Mark onboarding as complete
+      if (kEnableFirebase) {
+        await UserService.updateOnboardingStatus(userStore.currentUserUid!, true);
+        await authProvider.refresh();
       }
 
       if (!mounted) return;
