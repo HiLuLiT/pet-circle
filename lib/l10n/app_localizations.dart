@@ -104,6 +104,12 @@ abstract class AppLocalizations {
   /// **'Pet Circle'**
   String get appTitle;
 
+  /// No description provided for @welcomeTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'A smarter way to care for your pet.'**
+  String get welcomeTagline;
+
   /// No description provided for @signUp.
   ///
   /// In en, this message translates to:
@@ -121,6 +127,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign in with Google'**
   String get signInWithGoogle;
+
+  /// No description provided for @signInWithEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with email'**
+  String get signInWithEmail;
 
   /// No description provided for @hiUser.
   ///
@@ -1537,6 +1549,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Pet'**
   String get addPet;
+
+  /// No description provided for @addAnotherPet.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another pet'**
+  String get addAnotherPet;
 
   /// No description provided for @selectPet.
   ///

@@ -20,6 +20,7 @@ class PetStore extends ChangeNotifier {
   StreamSubscription<List<Pet>>? _petsSubscription;
   String? _subscribedUid;
   bool _isLoading = false;
+  final Set<String> _pendingDeletes = {};
 
   List<Pet> get ownerPets => List.unmodifiable(_ownerPets);
   List<Pet> get allClinicPets => List.unmodifiable(_clinicPets);
@@ -63,9 +64,14 @@ class PetStore extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     _petsSubscription = PetService.streamPetsForUser(uid).listen((pets) {
+      // Filter out pets that are pending deletion to avoid race conditions
+      // where the stream re-emits before Firestore processes the delete.
+      final filtered = _pendingDeletes.isEmpty
+          ? pets
+          : pets.where((p) => p.id == null || !_pendingDeletes.contains(p.id)).toList();
       final previousActivePetId = activePet?.id;
-      _ownerPets = pets;
-      _clinicPets = pets;
+      _ownerPets = filtered;
+      _clinicPets = filtered;
       if (previousActivePetId != null) {
         final newIndex =
             _ownerPets.indexWhere((pet) => pet.id == previousActivePetId);
@@ -191,20 +197,26 @@ class PetStore extends ChangeNotifier {
 
   Future<void> removePetWithFirestore(String name) async {
     final pet = getPetByName(name);
+    final petId = pet?.id;
     final ownerIdx = _ownerPets.indexWhere((p) => p.name == name);
     final clinicIdx = _clinicPets.indexWhere((p) => p.name == name);
+
+    // Mark as pending delete so the stream listener filters it out.
+    if (petId != null) _pendingDeletes.add(petId);
+
     final removedOwner = ownerIdx != -1 ? _ownerPets.removeAt(ownerIdx) : null;
     final removedClinic = clinicIdx != -1 ? _clinicPets.removeAt(clinicIdx) : null;
     if (removedOwner != null || removedClinic != null) notifyListeners();
 
-    if (kEnableFirebase && pet?.id != null) {
+    if (kEnableFirebase && petId != null) {
       try {
         final uid = userStore.currentUserUid;
-        await PetService.deletePet(pet!.id!);
+        await PetService.deletePet(petId);
         if (uid != null) {
-          await UserService.removePetFromUser(uid, pet.id!);
+          await UserService.removePetFromUser(uid, petId);
         }
       } catch (e) {
+        _pendingDeletes.remove(petId);
         if (removedOwner != null) {
           _ownerPets.insert(ownerIdx.clamp(0, _ownerPets.length), removedOwner);
         }
@@ -215,6 +227,8 @@ class PetStore extends ChangeNotifier {
         rethrow;
       }
     }
+    // Clear pending delete after Firestore has processed it.
+    if (petId != null) _pendingDeletes.remove(petId);
   }
 
   void removePet(String name) {

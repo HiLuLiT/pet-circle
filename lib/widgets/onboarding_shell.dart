@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 
 class OnboardingShell extends StatelessWidget {
   const OnboardingShell({
@@ -33,6 +33,7 @@ class OnboardingShell extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: c.surface,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Center(
           child: Container(
@@ -47,70 +48,44 @@ class OnboardingShell extends StatelessWidget {
               children: [
                 _Header(stepLabel: stepLabel, progress: progress, title: title),
                 const SizedBox(height: AppSpacingTokens.xl),
-                Flexible(child: child),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: child,
+                  ),
+                ),
                 const SizedBox(height: AppSpacingTokens.lg),
                 Row(
                   children: [
                     if (onBack != null)
                       Expanded(
-                        child: SizedBox(
-                          height: 48,
-                          child: TextButton(
-                            onPressed: isNextLoading ? null : onBack,
-                            style: TextButton.styleFrom(
-                              backgroundColor: c.surface,
-                              disabledBackgroundColor:
-                                  c.surface.withValues(alpha: 0.6),
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(AppSpacingTokens.xl),
-                              ),
-                            ),
-                            child: Text(
-                              l10n.back,
-                              style: AppSemanticTextStyles.button.copyWith(
-                                color: isNextLoading
-                                    ? AppPrimitives.inkDarkest
-                                        .withValues(alpha: 0.4)
-                                    : AppPrimitives.inkDarkest,
-                              ),
-                            ),
-                          ),
+                        child: PrimaryButton(
+                          label: l10n.back,
+                          backgroundColor: c.surface,
+                          foregroundColor: c.textPrimary,
+                          onPressed: isNextLoading ? null : onBack,
                         ),
                       ),
                     if (onBack != null && (onNext != null || isNextLoading))
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacingTokens.md - 4),
                     if (onNext != null || isNextLoading)
                       Expanded(
-                        child: SizedBox(
-                          height: 48,
-                          child: TextButton(
-                            onPressed: isNextLoading ? null : onNext,
-                            style: TextButton.styleFrom(
-                              backgroundColor: c.primary,
-                              disabledBackgroundColor: c.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(AppSpacingTokens.xl),
-                              ),
-                            ),
-                            child: isNextLoading
-                                ? SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: c.onPrimary,
-                                    ),
-                                  )
-                                : Text(
-                                    nextLabel ?? l10n.done,
-                                    style: AppSemanticTextStyles.button.copyWith(
-                                      color: c.onPrimary,
-                                    ),
+                        child: isNextLoading
+                            ? PrimaryButton(
+                                label: '',
+                                onPressed: null,
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: c.onPrimary,
                                   ),
-                          ),
-                        ),
+                                ),
+                              )
+                            : PrimaryButton(
+                                label: nextLabel ?? l10n.done,
+                                onPressed: onNext,
+                              ),
                       ),
                   ],
                 ),

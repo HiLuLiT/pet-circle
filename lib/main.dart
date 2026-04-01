@@ -42,11 +42,9 @@ void main() async {
   // Wire up global Flutter / platform error handlers before anything else.
   AppErrorHandler.instance.init();
 
-  // On mobile/desktop, disable runtime fetching — Inter is bundled in assets.
-  // On web, allow runtime fetching since bundled font assets aren't available.
-  if (!kIsWeb) {
-    GoogleFonts.config.allowRuntimeFetching = false;
-  }
+  // Allow runtime fetching so google_fonts can download Instrument Sans.
+  // TODO: bundle static Instrument Sans font files to avoid network dependency.
+  GoogleFonts.config.allowRuntimeFetching = true;
 
   if (kEnableFirebase) {
     await Firebase.initializeApp(

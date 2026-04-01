@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Pet Circle';
 
   @override
+  String get welcomeTagline => 'A smarter way to care for your pet.';
+
+  @override
   String get signUp => 'Sign up';
 
   @override
@@ -19,6 +22,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signInWithGoogle => 'Sign in with Google';
+
+  @override
+  String get signInWithEmail => 'Sign in with email';
 
   @override
   String hiUser(String name) {
@@ -768,6 +774,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addPet => 'Add Pet';
+
+  @override
+  String get addAnotherPet => 'Add another pet';
 
   @override
   String get selectPet => 'Select Pet';

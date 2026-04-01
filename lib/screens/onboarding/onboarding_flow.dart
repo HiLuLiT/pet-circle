@@ -46,60 +46,68 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     if (_isSubmitting) return;
     setState(() => _isSubmitting = true);
 
-    final breedAge = _breedAndAge.isNotEmpty ? _breedAndAge : 'Unknown breed';
+    try {
+      final breedAge = _breedAndAge.isNotEmpty ? _breedAndAge : 'Unknown breed';
 
-    final ownerMember = CareCircleMember(
-      uid: userStore.currentUserUid,
-      name: userStore.currentUserDisplayName ?? '',
-      avatarUrl: userStore.currentUserAvatarUrl ??
-          'https://ui-avatars.com/api/?name=${Uri.encodeComponent(userStore.currentUserDisplayName ?? '')}&background=E8B4B8&color=5B2C3F',
-      role: CareCircleRole.admin,
-    );
+      final ownerMember = CareCircleMember(
+        uid: userStore.currentUserUid,
+        name: userStore.currentUserDisplayName ?? '',
+        avatarUrl: userStore.currentUserAvatarUrl ??
+            'https://ui-avatars.com/api/?name=${Uri.encodeComponent(userStore.currentUserDisplayName ?? '')}&background=E8B4B8&color=5B2C3F',
+        role: CareCircleRole.admin,
+      );
 
-    final petName = _petName.isNotEmpty ? _petName : 'New Pet';
-    final pet = Pet(
-      name: petName,
-      breedAndAge: '$breedAge${_age.isNotEmpty ? " • $_age" : ""}',
-      imageUrl: AppAssets.petPlaceholder,
-      statusLabel: 'Normal',
-      statusColorHex: AppPrimitives.blueLight.toARGB32(),
-      latestMeasurement: Measurement(bpm: 0, recordedAt: DateTime.now(), recordedAtLabel: 'No measurements yet'),
-      careCircle: [ownerMember],
-      diagnosis: _diagnosis.isNotEmpty ? _diagnosis : null,
-      ownerId: kEnableFirebase ? userStore.currentUserUid : null,
-    );
+      final petName = _petName.isNotEmpty ? _petName : 'New Pet';
+      final pet = Pet(
+        name: petName,
+        breedAndAge: '$breedAge${_age.isNotEmpty ? " • $_age" : ""}',
+        imageUrl: AppAssets.petPlaceholder,
+        statusLabel: 'Normal',
+        statusColorHex: AppPrimitives.blueLight.toARGB32(),
+        latestMeasurement: Measurement(bpm: 0, recordedAt: DateTime.now(), recordedAtLabel: 'No measurements yet'),
+        careCircle: [ownerMember],
+        diagnosis: _diagnosis.isNotEmpty ? _diagnosis : null,
+        ownerId: kEnableFirebase ? userStore.currentUserUid : null,
+      );
 
-    final createdPet = await petStore.createPetWithFirestore(pet);
-    await settingsStore.updateThresholds(elevated: _targetRate);
+      final createdPet = await petStore.createPetWithFirestore(pet);
+      await settingsStore.updateThresholds(elevated: _targetRate);
 
-    if (kEnableFirebase && createdPet.id != null) {
-      for (final inv in _careCircleInvites) {
-        await InvitationService.createInvitation(
-          petId: createdPet.id!,
-          petName: petName,
-          invitedEmail: inv.email,
-          role: CareCirclePermissions.fromString(inv.role.toLowerCase()),
-          invitedByUid: userStore.currentUserUid ?? '',
-          invitedByName: userStore.currentUserDisplayName ?? '',
-        );
+      if (kEnableFirebase && createdPet.id != null) {
+        for (final inv in _careCircleInvites) {
+          await InvitationService.createInvitation(
+            petId: createdPet.id!,
+            petName: petName,
+            invitedEmail: inv.email,
+            role: CareCirclePermissions.fromString(inv.role.toLowerCase()),
+            invitedByUid: userStore.currentUserUid ?? '',
+            invitedByName: userStore.currentUserDisplayName ?? '',
+          );
+        }
+        for (final vet in _vetInvites) {
+          await InvitationService.createInvitation(
+            petId: createdPet.id!,
+            petName: petName,
+            invitedEmail: vet.email,
+            role: CareCircleRole.viewer,
+            invitedByUid: userStore.currentUserUid ?? '',
+            invitedByName: userStore.currentUserDisplayName ?? '',
+            type: InvitationType.vet,
+          );
+        }
       }
-      for (final vet in _vetInvites) {
-        await InvitationService.createInvitation(
-          petId: createdPet.id!,
-          petName: petName,
-          invitedEmail: vet.email,
-          role: CareCircleRole.viewer,
-          invitedByUid: userStore.currentUserUid ?? '',
-          invitedByName: userStore.currentUserDisplayName ?? '',
-          type: InvitationType.vet,
-        );
-      }
+
+      if (!mounted) return;
+
+      final role = userStore.role;
+      context.go(AppRoutes.shell(role));
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to create pet: $e')),
+      );
     }
-
-    if (!mounted) return;
-
-    final role = userStore.role;
-    context.go(AppRoutes.shell(role));
   }
 
   void _goTo(int index) {

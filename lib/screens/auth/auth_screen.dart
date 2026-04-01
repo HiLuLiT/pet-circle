@@ -196,7 +196,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               const SizedBox(height: AppSpacingTokens.lg),
               Text(
-                _isSignUp ? l10n.createAccount : 'Welcome Back',
+                _isSignUp ? l10n.createAccount : l10n.welcomeBack,
                 style: AppSemanticTextStyles.title2.copyWith(color: c.textPrimary),
                 textAlign: TextAlign.center,
               ),

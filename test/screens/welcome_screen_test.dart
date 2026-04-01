@@ -31,6 +31,23 @@ void main() {
       expect(find.byType(WelcomeScreen), findsOneWidget);
     });
 
+    testWidgets('displays Pet Circle subtitle', (tester) async {
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Pet Circle'), findsOneWidget);
+    });
+
+    testWidgets('displays welcome tagline', (tester) async {
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('A smarter way to care for your pet.'),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('displays sign-up button', (tester) async {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
@@ -38,11 +55,11 @@ void main() {
       expect(find.text('Sign up'), findsOneWidget);
     });
 
-    testWidgets('displays sign-in button', (tester) async {
+    testWidgets('displays sign-in with Google button', (tester) async {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Sign In'), findsOneWidget);
+      expect(find.text('Sign in with Google'), findsOneWidget);
     });
 
     testWidgets('sign-up button is a TextButton and enabled', (tester) async {
@@ -57,16 +74,25 @@ void main() {
           reason: 'Sign-up button should be tappable (onPressed != null)');
     });
 
-    testWidgets('sign-in button is a TextButton and enabled', (tester) async {
+    testWidgets('Google sign-in button is a TextButton and enabled',
+        (tester) async {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      final signInButton = find.widgetWithText(TextButton, 'Sign In');
-      expect(signInButton, findsOneWidget);
+      final googleButton =
+          find.widgetWithText(TextButton, 'Sign in with Google');
+      expect(googleButton, findsOneWidget);
 
-      final button = tester.widget<TextButton>(signInButton);
+      final button = tester.widget<TextButton>(googleButton);
       expect(button.onPressed, isNotNull,
-          reason: 'Sign-in button should be tappable (onPressed != null)');
+          reason: 'Google sign-in button should be tappable');
+    });
+
+    testWidgets('displays sign-in with email link', (tester) async {
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Sign in with email'), findsOneWidget);
     });
 
     testWidgets('has primaryLightest background scaffold', (tester) async {
@@ -74,7 +100,6 @@ void main() {
       await tester.pumpAndSettle();
 
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      // After design system migration, welcome screen uses primaryLightest
       expect(scaffold.backgroundColor, isNotNull);
     });
   });

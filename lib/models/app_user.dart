@@ -13,6 +13,7 @@ class AppUser {
     this.createdAt,
     this.petIds = const [],
     this.settings = const UserSettings(),
+    this.hasCompletedOnboarding = false,
   });
 
   final String uid;
@@ -23,6 +24,7 @@ class AppUser {
   final DateTime? createdAt;
   final List<String> petIds;
   final UserSettings settings;
+  final bool hasCompletedOnboarding;
 
   bool get isVet => role == AppUserRole.vet;
   bool get isOwner => role == AppUserRole.owner;
@@ -40,6 +42,7 @@ class AppUser {
       createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
       petIds: List<String>.from(data['petIds'] ?? []),
       settings: UserSettings.fromMap(settingsData),
+      hasCompletedOnboarding: data['hasCompletedOnboarding'] == true,
     );
   }
 
@@ -52,6 +55,7 @@ class AppUser {
       'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
       'petIds': petIds,
       'settings': settings.toMap(),
+      'hasCompletedOnboarding': hasCompletedOnboarding,
     };
   }
 
@@ -64,6 +68,7 @@ class AppUser {
     DateTime? createdAt,
     List<String>? petIds,
     UserSettings? settings,
+    bool? hasCompletedOnboarding,
   }) {
     return AppUser(
       uid: uid ?? this.uid,
@@ -74,6 +79,7 @@ class AppUser {
       createdAt: createdAt ?? this.createdAt,
       petIds: petIds ?? this.petIds,
       settings: settings ?? this.settings,
+      hasCompletedOnboarding: hasCompletedOnboarding ?? this.hasCompletedOnboarding,
     );
   }
 }

@@ -1,15 +1,52 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  bool _isLoading = false;
+
+  Future<void> _handleGoogleSignIn() async {
+    if (!kEnableFirebase) return;
+
+    setState(() => _isLoading = true);
+
+    final result = await AuthService.signInWithGoogle();
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (result.success) {
+      if (result.isNewUser) {
+        // New user needs to pick a role before we create their profile
+        context.go(AppRoutes.roleSelection);
+      } else {
+        // Existing user — go straight to app
+        context.go(AppRoutes.authGate);
+      }
+    } else if (result.error != null && result.error != 'Sign in cancelled') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.error!)),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,132 +56,190 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: c.primaryLightest,
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: Column(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Stack(
               children: [
-                Expanded(
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 400),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 248,
-                        child: SvgPicture.asset(
-                          AppAssets.welcomeGraphic,
-                          fit: BoxFit.contain,
-                        ),
+                // Illustration layer — behind everything, clipped to screen
+                _WelcomeIllustration(
+                  screenWidth: constraints.maxWidth,
+                  screenHeight: constraints.maxHeight,
+                ),
+
+                // Foreground content
+                Column(
+                  children: [
+                    const SizedBox(height: AppSpacingTokens.xl),
+
+                    // "Pet Circle" subtitle
+                    Text(
+                      l10n.appTitle,
+                      style: AppSemanticTextStyles.headingMd.copyWith(
+                        color: c.textSecondary,
                       ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 40),
-                  child: Column(
-                    children: [
-                      _PrimaryPillButton(
-                        label: l10n.signUp,
-                        textColor: c.onPrimary,
-                        backgroundColor: c.primary,
-                        onTap: () => context.push(AppRoutes.roleSelection),
+
+                    const SizedBox(height: AppSpacingTokens.md),
+
+                    // Main title
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacingTokens.xl,
                       ),
-                      const SizedBox(height: 12),
-                      _SignInButton(
-                        onTap: () =>
-                            context.push('${AppRoutes.auth}?signIn=true'),
+                      child: Text(
+                        l10n.welcomeTagline,
+                        style: AppSemanticTextStyles.title2,
+                        textAlign: TextAlign.center,
                       ),
-                    ],
-                  ),
+                    ),
+
+                    const Spacer(),
+
+                    // Buttons at the bottom
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacingTokens.xl,
+                      ),
+                      child: Column(
+                        children: [
+                          PrimaryButton(
+                            label: l10n.signUp,
+                            backgroundColor:
+                                AppSemanticColors.of(context).surface,
+                            foregroundColor:
+                                AppSemanticColors.of(context).textPrimary,
+                            onPressed: () =>
+                                context.push(AppRoutes.roleSelection),
+                          ),
+                          const SizedBox(height: AppSpacingTokens.md),
+                          _GoogleSignInButton(
+                            label: l10n.signInWithGoogle,
+                            onTap: _isLoading ? null : _handleGoogleSignIn,
+                          ),
+                          const SizedBox(height: AppSpacingTokens.md),
+                          // Email sign-in link for returning users
+                          TextButton(
+                            onPressed: _isLoading
+                                ? null
+                                : () => context
+                                    .push('${AppRoutes.auth}?signIn=true'),
+                            child: Text(
+                              l10n.signInWithEmail,
+                              style:
+                                  AppSemanticTextStyles.body.copyWith(
+                                color: c.textSecondary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 40),
+                  ],
                 ),
               ],
-            ),
-          ),
+            );
+          },
         ),
       ),
     );
   }
 }
 
-class _PrimaryPillButton extends StatelessWidget {
-  const _PrimaryPillButton({
-    required this.label,
-    required this.textColor,
-    required this.backgroundColor,
-    required this.onTap,
+/// Cat + dog illustration positioned to match the Figma layout.
+///
+/// Figma frame: 393 × 852.
+/// Cat (Layer_1): left -24, top 164, 311 × 380.
+/// Dog (Group 220): rotated -12.48 deg, offset right and overlapping cat.
+class _WelcomeIllustration extends StatelessWidget {
+  const _WelcomeIllustration({
+    required this.screenWidth,
+    required this.screenHeight,
   });
 
-  final String label;
-  final Color textColor;
-  final Color backgroundColor;
-  final VoidCallback onTap;
+  final double screenWidth;
+  final double screenHeight;
 
   @override
   Widget build(BuildContext context) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 360),
-      child: SizedBox(
-        width: double.infinity,
-        height: 58,
-        child: TextButton(
-          onPressed: onTap,
-          style: TextButton.styleFrom(
-            backgroundColor: backgroundColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppRadiiTokens.borderRadiusFull,
+    // Scale proportionally from the Figma frame (393 wide).
+    final scale = screenWidth / 393;
+    // Vertical offset scaled from Figma (top: 164 out of 852).
+    final topOffset = screenHeight * 0.19;
+
+    return Positioned.fill(
+      child: ClipRect(
+        child: Stack(
+          children: [
+            // Cat — extends past left edge
+            Positioned(
+              left: -24 * scale,
+              top: topOffset,
+              width: 311 * scale,
+              height: 380 * scale,
+              child: SvgPicture.asset(
+                AppAssets.welcomeCat,
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-          child: Text(
-            label,
-            style: AppSemanticTextStyles.body.copyWith(
-              color: textColor,
-              fontSize: 24,
-              fontWeight: FontWeight.w500,
-              letterSpacing: -0.48,
+            // Dog — overlapping, rotated -12.48 degrees
+            Positioned(
+              left: screenWidth * 0.15,
+              top: topOffset + 16 * scale,
+              width: 365 * scale,
+              height: 418 * scale,
+              child: Transform.rotate(
+                angle: -12.48 * math.pi / 180,
+                child: SvgPicture.asset(
+                  AppAssets.welcomeDog,
+                  fit: BoxFit.contain,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _SignInButton extends StatelessWidget {
-  const _SignInButton({required this.onTap});
+/// "Sign in with Google" row — Figma: Google icon + label, no background.
+class _GoogleSignInButton extends StatelessWidget {
+  const _GoogleSignInButton({required this.label, required this.onTap});
 
-  final VoidCallback onTap;
+  final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 360),
-      child: SizedBox(
-        width: double.infinity,
-        height: 58,
-        child: TextButton(
-          onPressed: onTap,
-          style: TextButton.styleFrom(
-            backgroundColor: c.surface,
-            shape: RoundedRectangleBorder(
-              borderRadius: AppRadiiTokens.borderRadiusFull,
+    return SizedBox(
+      height: 48,
+      child: TextButton(
+        onPressed: onTap,
+        style: TextButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: AppRadiiTokens.borderRadiusXl,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              AppAssets.googleLogo,
+              width: 24,
+              height: 24,
             ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.login, size: 18, color: c.textPrimary),
-              const SizedBox(width: AppSpacingTokens.sm),
-              Text(
-                AppLocalizations.of(context)!.signIn,
-                style: AppSemanticTextStyles.body.copyWith(
-                  color: c.textPrimary,
-                  fontSize: 16,
-                  letterSpacing: -0.32,
-                ),
+            const SizedBox(width: AppSpacingTokens.sm),
+            Text(
+              label,
+              style: AppSemanticTextStyles.button.copyWith(
+                color: c.textPrimary,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

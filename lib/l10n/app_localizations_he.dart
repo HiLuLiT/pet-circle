@@ -12,6 +12,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get appTitle => 'מעגל חיות מחמד';
 
   @override
+  String get welcomeTagline => 'דרך חכמה יותר לטפל בחיית המחמד שלך.';
+
+  @override
   String get signUp => 'הרשמה';
 
   @override
@@ -19,6 +22,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get signInWithGoogle => 'כניסה עם גוגל';
+
+  @override
+  String get signInWithEmail => 'כניסה עם אימייל';
 
   @override
   String hiUser(String name) {
@@ -766,6 +772,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get addPet => 'הוספת חיית מחמד';
+
+  @override
+  String get addAnotherPet => 'הוספת חיית מחמד נוספת';
 
   @override
   String get selectPet => 'בחר חיית מחמד';

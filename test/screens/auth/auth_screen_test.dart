@@ -41,7 +41,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AuthScreen), findsOneWidget);
-      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(find.text('Welcome back,'), findsOneWidget);
     });
 
     testWidgets('shows email and password fields', (tester) async {
@@ -85,7 +85,7 @@ void main() {
       await tester.tap(find.text('Sign In'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(find.text('Welcome back,'), findsOneWidget);
     });
   });
 }

@@ -76,7 +76,7 @@ void main() {
       );
       await tester.pump();
 
-      expect(find.text('Add Pet'), findsOneWidget);
+      expect(find.text('Add another pet'), findsOneWidget);
     });
 
     testWidgets('shows empty state when no pets', (tester) async {

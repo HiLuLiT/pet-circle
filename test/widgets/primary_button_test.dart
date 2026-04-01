@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 
 import '../helpers/test_app.dart';
@@ -26,7 +27,7 @@ void main() {
         ),
       ));
       expect(find.text('Save'), findsOneWidget);
-      expect(find.byType(ElevatedButton), findsOneWidget);
+      expect(find.byType(TextButton), findsOneWidget);
     });
 
     testWidgets('outlined variant renders label text', (tester) async {
@@ -38,7 +39,7 @@ void main() {
         ),
       ));
       expect(find.text('Cancel'), findsOneWidget);
-      expect(find.byType(ElevatedButton), findsOneWidget);
+      expect(find.byType(TextButton), findsOneWidget);
     });
 
     // ── State tests ─────────────────────────────────────────────────────────
@@ -50,10 +51,10 @@ void main() {
       ));
 
       final button =
-          tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+          tester.widget<TextButton>(find.byType(TextButton));
       expect(button.onPressed, isNull);
 
-      await tester.tap(find.byType(ElevatedButton));
+      await tester.tap(find.byType(TextButton));
       await tester.pump();
       expect(tapped, isFalse);
     });
@@ -66,18 +67,6 @@ void main() {
       expect(find.text('Add'), findsOneWidget);
     });
 
-    testWidgets('uses ConstrainedBox with specified minHeight',
-        (tester) async {
-      await tester.pumpWidget(testApp(
-        PrimaryButton(label: 'Tall', minHeight: 80, onPressed: () {}),
-      ));
-
-      final boxes = tester
-          .widgetList<ConstrainedBox>(find.byType(ConstrainedBox))
-          .where((cb) => cb.constraints.minHeight == 80.0);
-      expect(boxes.isNotEmpty, isTrue);
-    });
-
     testWidgets('full width via SizedBox width: infinity', (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(label: 'Wide', onPressed: () {}),
@@ -86,6 +75,16 @@ void main() {
       final sizedBoxes = tester.widgetList<SizedBox>(find.byType(SizedBox));
       final fullWidth = sizedBoxes.where((sb) => sb.width == double.infinity);
       expect(fullWidth.isNotEmpty, isTrue);
+    });
+
+    testWidgets('non-fullWidth does not use SizedBox infinity', (tester) async {
+      await tester.pumpWidget(testApp(
+        PrimaryButton(label: 'Compact', fullWidth: false, onPressed: () {}),
+      ));
+
+      final sizedBoxes = tester.widgetList<SizedBox>(find.byType(SizedBox));
+      final fullWidth = sizedBoxes.where((sb) => sb.width == double.infinity);
+      expect(fullWidth.isEmpty, isTrue);
     });
 
     // ── Interaction test ────────────────────────────────────────────────────
@@ -117,7 +116,7 @@ void main() {
       ));
 
       final button =
-          tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+          tester.widget<TextButton>(find.byType(TextButton));
       final shape = button.style?.shape?.resolve({}) as RoundedRectangleBorder;
       expect(
         shape.borderRadius,
@@ -136,7 +135,7 @@ void main() {
       ));
 
       final button =
-          tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+          tester.widget<TextButton>(find.byType(TextButton));
       final bgColor = button.style?.backgroundColor?.resolve({});
       expect(bgColor, AppSemanticColors.light.primary);
 
@@ -144,7 +143,7 @@ void main() {
       expect(text.style?.color, AppSemanticColors.light.onPrimary);
     });
 
-    testWidgets('outlined variant uses primary for border color',
+    testWidgets('outlined variant uses primary border at full opacity',
         (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(
@@ -155,11 +154,87 @@ void main() {
       ));
 
       final button =
-          tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+          tester.widget<TextButton>(find.byType(TextButton));
       final side = button.style?.side?.resolve({});
       expect(side, isNotNull);
-      // Border uses primary with alpha
-      expect(side!.color.a, closeTo(0.15, 0.01));
+      expect(side!.color, AppSemanticColors.light.primary);
+    });
+
+    // ── Figma padding spec: px-32 py-16 ─────────────────────────────────────
+    testWidgets('uses Figma button padding (horizontal 32, vertical 16)',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        PrimaryButton(label: 'Padded', onPressed: () {}),
+      ));
+
+      final button =
+          tester.widget<TextButton>(find.byType(TextButton));
+      final padding = button.style?.padding?.resolve({}) as EdgeInsets;
+      expect(padding.left, AppSpacingTokens.xl); // 32
+      expect(padding.right, AppSpacingTokens.xl); // 32
+      expect(padding.top, AppSpacingTokens.md); // 16
+      expect(padding.bottom, AppSpacingTokens.md); // 16
+    });
+
+    // ── Custom foreground color ─────────────────────────────────────────────
+    testWidgets('foregroundColor overrides default text + border color',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        PrimaryButton(
+          label: 'Custom',
+          variant: PrimaryButtonVariant.outlined,
+          foregroundColor: Colors.red,
+          onPressed: () {},
+        ),
+      ));
+
+      final text = tester.widget<Text>(find.text('Custom'));
+      expect(text.style?.color, Colors.red);
+
+      final button = tester.widget<TextButton>(find.byType(TextButton));
+      final side = button.style?.side?.resolve({});
+      expect(side!.color, Colors.red);
+    });
+
+    // ── Trailing icon ───────────────────────────────────────────────────────
+    testWidgets('renders trailing icon when provided', (tester) async {
+      await tester.pumpWidget(testApp(
+        PrimaryButton(
+          label: 'Add',
+          variant: PrimaryButtonVariant.outlined,
+          fullWidth: false,
+          trailingIcon: const Icon(Icons.add_circle_outline, size: 16),
+          onPressed: () {},
+        ),
+      ));
+
+      expect(find.text('Add'), findsOneWidget);
+      expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
+    });
+
+    // ── Figma shrink-0 compliance (no Flutter default inflation) ────────────
+    testWidgets('minimumSize is zero and tapTargetSize is shrinkWrap',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        PrimaryButton(label: 'Compact', fullWidth: false, onPressed: () {}),
+      ));
+
+      final button = tester.widget<TextButton>(find.byType(TextButton));
+      final minSize = button.style?.minimumSize?.resolve({});
+      expect(minSize, Size.zero);
+      expect(button.style?.tapTargetSize, MaterialTapTargetSize.shrinkWrap);
+    });
+
+    // ── Child override ──────────────────────────────────────────────────────
+    testWidgets('child overrides label content', (tester) async {
+      await tester.pumpWidget(testApp(
+        PrimaryButton(
+          child: const Text('Custom Child'),
+          onPressed: () {},
+        ),
+      ));
+
+      expect(find.text('Custom Child'), findsOneWidget);
     });
   });
 }

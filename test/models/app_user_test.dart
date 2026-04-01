@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/user_settings.dart';
@@ -151,5 +152,86 @@ void main() {
       expect(user.photoUrl, isNull);
       expect(user.createdAt, isNull);
     });
+
+    test('hasCompletedOnboarding defaults to false', () {
+      final user = AppUser(
+        uid: 'u-1',
+        email: 'test@example.com',
+        role: AppUserRole.owner,
+      );
+
+      expect(user.hasCompletedOnboarding, isFalse);
+    });
   });
+
+  group('AppUser hasCompletedOnboarding', () {
+    test('copyWith updates hasCompletedOnboarding', () {
+      final user = AppUser(
+        uid: 'u-1',
+        email: 'test@example.com',
+        role: AppUserRole.owner,
+        hasCompletedOnboarding: false,
+      );
+
+      final updated = user.copyWith(hasCompletedOnboarding: true);
+
+      expect(updated.hasCompletedOnboarding, isTrue);
+      expect(user.hasCompletedOnboarding, isFalse);
+    });
+
+    test('toFirestore includes hasCompletedOnboarding', () {
+      final user = AppUser(
+        uid: 'u-1',
+        email: 'test@example.com',
+        role: AppUserRole.owner,
+        hasCompletedOnboarding: true,
+      );
+
+      final data = user.toFirestore();
+
+      expect(data, containsPair('hasCompletedOnboarding', true));
+    });
+
+    test('fromFirestore reads hasCompletedOnboarding', () {
+      // Mock DocumentSnapshot with hasCompletedOnboarding = true
+      final mockDoc = _MockDocumentSnapshot({
+        'uid': 'u-1',
+        'email': 'test@example.com',
+        'role': 'owner',
+        'hasCompletedOnboarding': true,
+      });
+
+      final user = AppUser.fromFirestore(mockDoc);
+
+      expect(user.hasCompletedOnboarding, isTrue);
+    });
+
+    test('fromFirestore defaults hasCompletedOnboarding to false when missing', () {
+      // Mock DocumentSnapshot without hasCompletedOnboarding
+      final mockDoc = _MockDocumentSnapshot({
+        'uid': 'u-1',
+        'email': 'test@example.com',
+        'role': 'owner',
+      });
+
+      final user = AppUser.fromFirestore(mockDoc);
+
+      expect(user.hasCompletedOnboarding, isFalse);
+    });
+  });
+}
+
+class _MockDocumentSnapshot implements DocumentSnapshot {
+  _MockDocumentSnapshot(this._data);
+
+  final Map<String, dynamic> _data;
+
+  @override
+  String get id => _data['uid'] ?? '';
+
+  @override
+  Object? data() => _data;
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
 }
