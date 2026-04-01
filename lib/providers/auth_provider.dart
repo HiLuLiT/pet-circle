@@ -14,6 +14,7 @@ enum AuthRouteState {
   unauthenticated,
   needsEmailVerification,
   needsRole,
+  needsOnboarding,
   authenticated,
 }
 
@@ -38,6 +39,7 @@ class AuthProvider extends ChangeNotifier {
     if (_firebaseUser == null) return AuthRouteState.unauthenticated;
     if (!isEmailVerified) return AuthRouteState.needsEmailVerification;
     if (_appUser == null) return AuthRouteState.needsRole;
+    if (!_appUser!.hasCompletedOnboarding) return AuthRouteState.needsOnboarding;
     return AuthRouteState.authenticated;
   }
 
