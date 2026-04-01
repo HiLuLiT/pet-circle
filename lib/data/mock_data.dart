@@ -4,7 +4,7 @@ import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/models/user.dart';
 import 'package:pet_circle/theme/app_assets.dart';
-import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
 
 class MockData {
   // ── Users ──────────────────────────────────────────────────────────────────
@@ -106,7 +106,7 @@ class MockData {
     breedAndAge: 'Cavalier King Charles • 5 years old',
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
-    statusColorHex: AppColors.lightBlue.toARGB32(),
+    statusColorHex: AppPrimitives.blueBase.toARGB32(),
     latestMeasurement: Measurement(bpm: 22, recordedAt: DateTime.now().subtract(const Duration(hours: 2)), recordedAtLabel: '2 hours ago'),
     careCircle: [hilaOwner, drSmithVet, sarahMember],
   );
@@ -117,7 +117,7 @@ class MockData {
     breedAndAge: 'Golden Retriever • 8 years old',
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Elevated',
-    statusColorHex: AppColors.cherry.toARGB32(),
+    statusColorHex: AppPrimitives.redBase.toARGB32(),
     latestMeasurement: Measurement(bpm: 32, recordedAt: DateTime.now().subtract(const Duration(minutes: 30)), recordedAtLabel: '30 min ago'),
     careCircle: [maxOwner, drSmithVet],
   );
@@ -128,7 +128,7 @@ class MockData {
     breedAndAge: 'Labrador • 6 years old',
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
-    statusColorHex: AppColors.lightBlue.toARGB32(),
+    statusColorHex: AppPrimitives.blueBase.toARGB32(),
     latestMeasurement: Measurement(bpm: 24, recordedAt: DateTime.now().subtract(const Duration(hours: 1)), recordedAtLabel: '1 hour ago'),
     careCircle: [lunaOwner, drSmithVet],
   );
@@ -139,7 +139,7 @@ class MockData {
     breedAndAge: 'German Shepherd • 10 years old',
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
-    statusColorHex: AppColors.lightBlue.toARGB32(),
+    statusColorHex: AppPrimitives.blueBase.toARGB32(),
     latestMeasurement: Measurement(bpm: 18, recordedAt: DateTime.now().subtract(const Duration(days: 1)), recordedAtLabel: '1 day ago'),
     careCircle: [rockyOwner, drSmithVet],
   );
