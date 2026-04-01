@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +24,29 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   bool _isLoading = false;
+
+  Future<void> _handleAppleSignIn() async {
+    if (!kEnableFirebase) return;
+
+    setState(() => _isLoading = true);
+
+    final result = await AuthService.signInWithApple();
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (result.success) {
+      if (result.isNewUser) {
+        context.go(AppRoutes.roleSelection);
+      } else {
+        context.go(AppRoutes.authGate);
+      }
+    } else if (result.error != null && result.error != 'Sign in cancelled') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.error!)),
+      );
+    }
+  }
 
   Future<void> _handleGoogleSignIn() async {
     if (!kEnableFirebase) return;
@@ -116,20 +141,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             label: l10n.signInWithGoogle,
                             onTap: _isLoading ? null : _handleGoogleSignIn,
                           ),
+                          if (!kIsWeb &&
+                              (defaultTargetPlatform == TargetPlatform.iOS ||
+                                  defaultTargetPlatform ==
+                                      TargetPlatform.macOS)) ...[
+                            const SizedBox(height: AppSpacingTokens.sm),
+                            _AppleSignInButton(
+                              label: l10n.signInWithApple,
+                              onTap: _isLoading ? null : _handleAppleSignIn,
+                            ),
+                          ],
                           const SizedBox(height: AppSpacingTokens.md),
-                          // Email sign-in link for returning users
-                          TextButton(
+                          PrimaryButton(
+                            label: l10n.signIn,
+                            variant: PrimaryButtonVariant.outlined,
                             onPressed: _isLoading
                                 ? null
                                 : () => context
                                     .push('${AppRoutes.auth}?signIn=true'),
-                            child: Text(
-                              l10n.signInWithEmail,
-                              style:
-                                  AppSemanticTextStyles.body.copyWith(
-                                color: c.textSecondary,
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -195,6 +224,44 @@ class _WelcomeIllustration extends StatelessWidget {
                   AppAssets.welcomeDog,
                   fit: BoxFit.contain,
                 ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Sign in with Apple" row — Apple icon + label, no background.
+class _AppleSignInButton extends StatelessWidget {
+  const _AppleSignInButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppSemanticColors.of(context);
+    return SizedBox(
+      height: 48,
+      child: TextButton(
+        onPressed: onTap,
+        style: TextButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: AppRadiiTokens.borderRadiusXl,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.apple, color: c.textPrimary, size: 24),
+            const SizedBox(width: AppSpacingTokens.sm),
+            Text(
+              label,
+              style: AppSemanticTextStyles.button.copyWith(
+                color: c.textPrimary,
               ),
             ),
           ],

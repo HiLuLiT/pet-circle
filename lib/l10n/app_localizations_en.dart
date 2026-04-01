@@ -27,9 +27,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signInWithEmail => 'Sign in with email';
 
   @override
+  String get signInWithApple => 'Sign in with Apple';
+
+  @override
   String hiUser(String name) {
     return 'Hi $name!';
   }
+
+  @override
+  String get chooseYourRole => 'Choose your role';
 
   @override
   String get imAVeterinarian => 'I\'m a veterinarian';

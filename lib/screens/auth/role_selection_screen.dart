@@ -43,6 +43,14 @@ class RoleSelectionScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final c = AppSemanticColors.of(context);
 
+    // Try Firebase displayName first (for Google/Apple social auth users),
+    // then userStore name, fallback to generic greeting
+    final name = authProvider.firebaseUser?.displayName ??
+        userStore.currentUser?.name;
+    final greeting = (name != null && name.isNotEmpty)
+        ? l10n.hiUser(name)
+        : l10n.chooseYourRole;
+
     return Scaffold(
       backgroundColor: c.surface,
       body: SafeArea(
@@ -53,7 +61,7 @@ class RoleSelectionScreen extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  l10n.hiUser(userStore.currentUser?.name ?? ''),
+                  greeting,
                   style: AppSemanticTextStyles.title3.copyWith(
                     color: c.textPrimary,
                     letterSpacing: -0.96,

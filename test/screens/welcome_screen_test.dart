@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show TargetPlatform;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -88,11 +89,19 @@ void main() {
           reason: 'Google sign-in button should be tappable');
     });
 
-    testWidgets('displays sign-in with email link', (tester) async {
+    testWidgets('displays prominent Sign In button', (tester) async {
       await tester.pumpWidget(_buildApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Sign in with email'), findsOneWidget);
+      expect(find.text('Sign In'), findsOneWidget);
+    });
+
+    testWidgets('displays sign-in with Apple button on iOS', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      await tester.pumpWidget(_buildApp());
+      await tester.pumpAndSettle();
+      expect(find.text('Sign in with Apple'), findsOneWidget);
+      debugDefaultTargetPlatformOverride = null;
     });
 
     testWidgets('has primaryLightest background scaffold', (tester) async {

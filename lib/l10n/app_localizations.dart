@@ -134,11 +134,23 @@ abstract class AppLocalizations {
   /// **'Sign in with email'**
   String get signInWithEmail;
 
+  /// No description provided for @signInWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with Apple'**
+  String get signInWithApple;
+
   /// No description provided for @hiUser.
   ///
   /// In en, this message translates to:
   /// **'Hi {name}!'**
   String hiUser(String name);
+
+  /// No description provided for @chooseYourRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your role'**
+  String get chooseYourRole;
 
   /// No description provided for @imAVeterinarian.
   ///
