@@ -98,57 +98,55 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
           if (_selected == 'custom')
             Padding(
               padding: const EdgeInsets.only(top: AppSpacingTokens.md),
-              child: Container(
-                padding: const EdgeInsets.all(AppSpacingTokens.md),
-                decoration: BoxDecoration(
-                  color: c.surface,
-                  borderRadius: AppRadiiTokens.borderRadiusSm,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _customController,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(3),
-                        ],
-                        onChanged: (value) {
-                          final rate = int.tryParse(value);
-                          if (rate != null) widget.onTargetRateChanged?.call(rate);
-                        },
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: c.warning.withValues(alpha: 0.2),
-                          hintText: l10n.enterBpm,
-                          hintStyle: AppSemanticTextStyles.body
-                              .copyWith(color: c.textTertiary),
-                          border: OutlineInputBorder(
-                            borderRadius: AppRadiiTokens.borderRadiusLg,
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacingTokens.md,
-                            vertical: 14,
-                          ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _customController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(3),
+                      ],
+                      onChanged: (value) {
+                        final rate = int.tryParse(value);
+                        if (rate != null) widget.onTargetRateChanged?.call(rate);
+                      },
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: c.background,
+                        hintText: l10n.enterBpm,
+                        hintStyle: AppSemanticTextStyles.body
+                            .copyWith(color: c.textTertiary),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: AppRadiiTokens.borderRadiusLg,
+                          borderSide: BorderSide(color: c.divider),
                         ),
-                        style: AppSemanticTextStyles.body.copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: AppRadiiTokens.borderRadiusLg,
+                          borderSide: BorderSide(color: c.primary, width: 2),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacingTokens.md,
+                          vertical: 14,
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      l10n.bpm,
                       style: AppSemanticTextStyles.body.copyWith(
                         fontWeight: FontWeight.w600,
+                        fontSize: 18,
                         color: c.textPrimary,
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: AppSpacingTokens.sm),
+                  Text(
+                    l10n.bpm,
+                    style: AppSemanticTextStyles.body.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: c.textPrimary,
+                    ),
+                  ),
+                ],
               ),
             ),
         ],
@@ -175,39 +173,41 @@ class _TargetOption extends StatelessWidget {
     final c = AppSemanticColors.of(context);
     return InkWell(
       onTap: onTap,
-      borderRadius: AppRadiiTokens.borderRadiusSm,
+      borderRadius: AppRadiiTokens.borderRadiusLg,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: AppSpacingTokens.md),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacingTokens.md,
+          vertical: AppSpacingTokens.md,
+        ),
         decoration: BoxDecoration(
-          color: c.surface,
-          borderRadius: AppRadiiTokens.borderRadiusSm,
+          color: selected ? c.primaryLightest : c.surface,
+          borderRadius: AppRadiiTokens.borderRadiusLg,
+          border: Border.all(
+            color: selected ? c.primary : c.divider,
+            width: selected ? 2 : 1,
+          ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 16,
-              height: 16,
+              width: 20,
+              height: 20,
+              margin: const EdgeInsets.only(top: 2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: c.surface,
-                boxShadow: [
-                  BoxShadow(
-                    color: c.onSurface.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
+                color: selected ? c.primary : c.surface,
+                border: Border.all(
+                  color: selected ? c.primary : c.divider,
+                  width: 2,
+                ),
               ),
               child: selected
-                  ? Center(
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: c.info,
-                          shape: BoxShape.circle,
-                        ),
+                  ? const Center(
+                      child: Icon(
+                        Icons.check,
+                        size: 14,
+                        color: Colors.white,
                       ),
                     )
                   : null,
@@ -219,15 +219,18 @@ class _TargetOption extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style:
-                        AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+                    style: AppSemanticTextStyles.body.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: c.textPrimary,
+                    ),
                   ),
                   if (subtitle != null) ...[
                     const SizedBox(height: AppSpacingTokens.xs),
                     Text(
                       subtitle!,
-                      style:
-                          AppSemanticTextStyles.caption.copyWith(color: c.textSecondary),
+                      style: AppSemanticTextStyles.caption.copyWith(
+                        color: c.textSecondary,
+                      ),
                     ),
                   ],
                 ],
