@@ -7,7 +7,7 @@
       "namespace": "android_app",
       "package_name": "com.example.pet_circle",
       "sha256_cert_fingerprints": [
-        "TODO:REPLACE_WITH_SHA256_FROM_keytool_-list_-v_-keystore_~/.android/debug.keystore_-alias_androiddebugkey_-storepass_android"
+        "C4:1E:0E:FC:1C:E5:FF:13:F0:A8:3C:61:00:82:47:67:F7:E1:EF:4A:3D:E0:87:F0:87:60:54:21:59:71:40:75"
       ]
     }
   }
