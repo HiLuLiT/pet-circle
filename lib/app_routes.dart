@@ -17,6 +17,7 @@ import 'package:pet_circle/screens/main_shell.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_flow.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_screen.dart';
 import 'package:pet_circle/screens/welcome_screen.dart';
+import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
@@ -87,6 +88,17 @@ GoRouter buildRouter() {
     redirect: (context, state) {
       if (!kEnableFirebase) return null;
       final path = state.uri.path;
+
+      // On web, detect Firebase email sign-in links regardless of path.
+      // This covers edge cases where the link URL lands on '/' or another
+      // path instead of '/auth/callback'.
+      if (kIsWeb && path != '/auth/callback') {
+        final fullUrl = state.uri.toString();
+        if (AuthService.isSignInLink(fullUrl)) {
+          return '/auth/callback';
+        }
+      }
+
       final authState = authProvider.routeState;
 
       // --- Auth-gate exit: when auth resolves, leave auth-gate. ---

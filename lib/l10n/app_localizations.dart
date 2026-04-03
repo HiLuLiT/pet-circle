@@ -2125,6 +2125,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter your full name'**
   String get enterYourFullName;
+
+  /// No description provided for @signingYouIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Signing you in…'**
+  String get signingYouIn;
+
+  /// No description provided for @invalidSignInLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid sign-in link.'**
+  String get invalidSignInLink;
+
+  /// No description provided for @noPendingEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending email found. Please try signing in again.'**
+  String get noPendingEmail;
+
+  /// No description provided for @signInFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in failed. Please try again.'**
+  String get signInFailed;
+
+  /// No description provided for @enterEmailToComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the email address you used to request the sign-in link.'**
+  String get enterEmailToComplete;
+
+  /// No description provided for @completeSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete sign-in'**
+  String get completeSignIn;
 }
 
 class _AppLocalizationsDelegate

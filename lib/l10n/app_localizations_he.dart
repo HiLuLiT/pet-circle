@@ -1096,4 +1096,23 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enterYourFullName => 'הכנס את שמך המלא';
+
+  @override
+  String get signingYouIn => 'מחבר אותך…';
+
+  @override
+  String get invalidSignInLink => 'קישור כניסה לא תקין.';
+
+  @override
+  String get noPendingEmail => 'לא נמצא אימייל ממתין. נסה להתחבר שוב.';
+
+  @override
+  String get signInFailed => 'הכניסה נכשלה. נסה שוב.';
+
+  @override
+  String get enterEmailToComplete =>
+      'הזן את כתובת האימייל שבה השתמשת לבקשת קישור הכניסה.';
+
+  @override
+  String get completeSignIn => 'השלם כניסה';
 }

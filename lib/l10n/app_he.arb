@@ -374,5 +374,11 @@
   "or": "או",
   "linkExpired": "תוקף הקישור פג. בקש קישור חדש.",
   "linkInvalid": "הקישור אינו תקף או שכבר נעשה בו שימוש.",
-  "enterYourFullName": "הכנס את שמך המלא"
+  "enterYourFullName": "הכנס את שמך המלא",
+  "signingYouIn": "מחבר אותך…",
+  "invalidSignInLink": "קישור כניסה לא תקין.",
+  "noPendingEmail": "לא נמצא אימייל ממתין. נסה להתחבר שוב.",
+  "signInFailed": "הכניסה נכשלה. נסה שוב.",
+  "enterEmailToComplete": "הזן את כתובת האימייל שבה השתמשת לבקשת קישור הכניסה.",
+  "completeSignIn": "השלם כניסה"
 }

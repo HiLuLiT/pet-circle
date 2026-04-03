@@ -1104,4 +1104,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterYourFullName => 'Enter your full name';
+
+  @override
+  String get signingYouIn => 'Signing you in…';
+
+  @override
+  String get invalidSignInLink => 'Invalid sign-in link.';
+
+  @override
+  String get noPendingEmail =>
+      'No pending email found. Please try signing in again.';
+
+  @override
+  String get signInFailed => 'Sign-in failed. Please try again.';
+
+  @override
+  String get enterEmailToComplete =>
+      'Enter the email address you used to request the sign-in link.';
+
+  @override
+  String get completeSignIn => 'Complete sign-in';
 }
