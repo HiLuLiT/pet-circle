@@ -16,12 +16,16 @@ void main() {
       expect(AppRoutes.roleSelection, '/role-selection');
     });
 
-    test('auth route is /auth', () {
-      expect(AppRoutes.auth, '/auth');
+    test('signup route is /signup', () {
+      expect(AppRoutes.signup, '/signup');
     });
 
-    test('verifyEmail route is /verify-email', () {
-      expect(AppRoutes.verifyEmail, '/verify-email');
+    test('login route is /login', () {
+      expect(AppRoutes.login, '/login');
+    });
+
+    test('checkEmail route is /check-email', () {
+      expect(AppRoutes.checkEmail, '/check-email');
     });
 
     test('onboarding route is /onboarding', () {

@@ -1043,4 +1043,57 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get continueButton => 'המשך';
+
+  @override
+  String get sendEmailLink => 'שלח קישור באימייל';
+
+  @override
+  String get checkYourEmail => 'בדוק את האימייל שלך';
+
+  @override
+  String get weSentSignInLinkTo => 'שלחנו קישור כניסה אל';
+
+  @override
+  String get clickLinkToSignIn => 'לחץ על הקישור באימייל כדי להיכנס.';
+
+  @override
+  String get checkSpamFolder => 'לא מוצא את האימייל? בדוק בתיקיית הספאם.';
+
+  @override
+  String get resendLink => 'שלח מחדש';
+
+  @override
+  String resendLinkInSeconds(int seconds) {
+    return 'שלח מחדש בעוד $seconds שניות';
+  }
+
+  @override
+  String get useDifferentEmail => 'שימוש באימייל אחר';
+
+  @override
+  String get pleaseEnterYourDetails => 'הזן את הפרטים שלך כדי ליצור חשבון.';
+
+  @override
+  String get enterDetailsToLogin => 'הזן את הפרטים שלך כדי להתחבר.';
+
+  @override
+  String get login => 'התחברות';
+
+  @override
+  String get continueWithGoogle => 'המשך עם גוגל';
+
+  @override
+  String get continueWithApple => 'המשך עם Apple';
+
+  @override
+  String get or => 'או';
+
+  @override
+  String get linkExpired => 'תוקף הקישור פג. בקש קישור חדש.';
+
+  @override
+  String get linkInvalid => 'הקישור אינו תקף או שכבר נעשה בו שימוש.';
+
+  @override
+  String get enterYourFullName => 'הכנס את שמך המלא';
 }

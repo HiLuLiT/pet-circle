@@ -93,8 +93,6 @@ class _AuthGateState extends State<AuthGate> {
       switch (state) {
         case AuthRouteState.unauthenticated:
           context.go(AppRoutes.welcome);
-        case AuthRouteState.needsEmailVerification:
-          context.go(AppRoutes.verifyEmail);
         case AuthRouteState.needsRole:
           context.go(AppRoutes.roleSelection);
         case AuthRouteState.needsOnboarding:

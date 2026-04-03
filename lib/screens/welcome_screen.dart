@@ -143,7 +143,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 foregroundColor:
                                     AppSemanticColors.of(context).textPrimary,
                                 onPressed: () =>
-                                    context.push(AppRoutes.roleSelection),
+                                    context.push(AppRoutes.signup),
                               ),
                               const SizedBox(height: AppSpacingTokens.md),
                               _GoogleSignInButton(
@@ -162,7 +162,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 onPressed: _isLoading
                                     ? null
                                     : () => context
-                                        .push('${AppRoutes.auth}?signIn=true'),
+                                        .push(AppRoutes.login),
                               ),
                             ],
                           ),

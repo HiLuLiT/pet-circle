@@ -2023,6 +2023,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue'**
   String get continueButton;
+
+  /// No description provided for @sendEmailLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Send email link'**
+  String get sendEmailLink;
+
+  /// No description provided for @checkYourEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email'**
+  String get checkYourEmail;
+
+  /// No description provided for @weSentSignInLinkTo.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent a sign-in link to'**
+  String get weSentSignInLinkTo;
+
+  /// No description provided for @clickLinkToSignIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Click the link in the email to sign in.'**
+  String get clickLinkToSignIn;
+
+  /// No description provided for @checkSpamFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Can\'t find the email? Check your spam folder.'**
+  String get checkSpamFolder;
+
+  /// No description provided for @resendLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend link'**
+  String get resendLink;
+
+  /// No description provided for @resendLinkInSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend in {seconds}s'**
+  String resendLinkInSeconds(int seconds);
+
+  /// No description provided for @useDifferentEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a different email'**
+  String get useDifferentEmail;
+
+  /// No description provided for @pleaseEnterYourDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your details to create an account.'**
+  String get pleaseEnterYourDetails;
+
+  /// No description provided for @enterDetailsToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your details to login.'**
+  String get enterDetailsToLogin;
+
+  /// No description provided for @login.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// No description provided for @continueWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get continueWithApple;
+
+  /// No description provided for @or.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
+  String get or;
+
+  /// No description provided for @linkExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This link has expired. Please request a new one.'**
+  String get linkExpired;
+
+  /// No description provided for @linkInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This link is invalid or has already been used.'**
+  String get linkInvalid;
+
+  /// No description provided for @enterYourFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your full name'**
+  String get enterYourFullName;
 }
 
 class _AppLocalizationsDelegate

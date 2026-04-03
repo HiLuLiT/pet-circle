@@ -12,7 +12,6 @@ import 'package:pet_circle/stores/user_store.dart';
 enum AuthRouteState {
   loading,
   unauthenticated,
-  needsEmailVerification,
   needsRole,
   needsOnboarding,
   authenticated,
@@ -31,13 +30,11 @@ class AuthProvider extends ChangeNotifier {
   AppUser? get appUser => _appUser;
   bool get isLoading => _isLoading;
   bool get isAuthenticated => _firebaseUser != null;
-  bool get isEmailVerified => _firebaseUser?.emailVerified ?? false;
   bool get hasUserProfile => _appUser != null;
 
   AuthRouteState get routeState {
     if (_isLoading) return AuthRouteState.loading;
     if (_firebaseUser == null) return AuthRouteState.unauthenticated;
-    if (!isEmailVerified) return AuthRouteState.needsEmailVerification;
     if (_appUser == null) return AuthRouteState.needsRole;
     if (!_appUser!.hasCompletedOnboarding) return AuthRouteState.needsOnboarding;
     return AuthRouteState.authenticated;

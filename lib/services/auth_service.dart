@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/user_service.dart';
 
@@ -29,48 +30,95 @@ class AuthService {
   /// Auth state stream
   static Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  /// Check if email is verified
-  static bool get isEmailVerified => currentUser?.emailVerified ?? false;
-
   // ─────────────────────────────────────────────────────────────────────────────
-  // EMAIL / PASSWORD AUTH
+  // PENDING AUTH STORAGE (SharedPreferences)
   // ─────────────────────────────────────────────────────────────────────────────
 
-  /// Sign up with email and password
-  static Future<AuthResult> signUpWithEmail({
+  static const _kPendingEmail = 'pending_auth_email';
+  static const _kPendingName = 'pending_auth_name';
+  static const _kPendingIsSignup = 'pending_auth_is_signup';
+
+  /// Save pending auth data before sending the email link.
+  static Future<void> savePendingAuth({
     required String email,
-    required String password,
-    required AppUserRole role,
-    String? displayName,
+    String? name,
+    required bool isSignup,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_kPendingEmail, email);
+    if (name != null) {
+      await prefs.setString(_kPendingName, name);
+    } else {
+      await prefs.remove(_kPendingName);
+    }
+    await prefs.setBool(_kPendingIsSignup, isSignup);
+  }
+
+  /// Retrieve pending auth data.
+  static Future<({String? email, String? name, bool isSignup})> getPendingAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    return (
+      email: prefs.getString(_kPendingEmail),
+      name: prefs.getString(_kPendingName),
+      isSignup: prefs.getBool(_kPendingIsSignup) ?? false,
+    );
+  }
+
+  /// Clear pending auth data after successful sign-in.
+  static Future<void> clearPendingAuth() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_kPendingEmail);
+    await prefs.remove(_kPendingName);
+    await prefs.remove(_kPendingIsSignup);
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // EMAIL LINK AUTH
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  /// Send a sign-in link to the given email address.
+  static Future<AuthResult> sendSignInLink({required String email}) async {
+    try {
+      final actionCodeSettings = ActionCodeSettings(
+        url: 'https://pet-circle-app.web.app/auth/callback',
+        handleCodeInApp: true,
+        iOSBundleId: 'com.example.petCircle',
+        androidPackageName: 'com.example.pet_circle',
+        androidInstallApp: true,
+        androidMinimumVersion: '21',
+      );
+      await _auth.sendSignInLinkToEmail(
+        email: email,
+        actionCodeSettings: actionCodeSettings,
+      );
+      return AuthResult(success: true);
+    } on FirebaseAuthException catch (e) {
+      return AuthResult(success: false, error: _getAuthErrorMessage(e.code));
+    } catch (e) {
+      return AuthResult(success: false, error: e.toString());
+    }
+  }
+
+  /// Complete sign-in after the user clicks the email link.
+  static Future<AuthResult> signInWithEmailLink({
+    required String email,
+    required String emailLink,
   }) async {
     try {
-      final credential = await _auth.createUserWithEmailAndPassword(
+      final credential = await _auth.signInWithEmailLink(
         email: email,
-        password: password,
+        emailLink: emailLink,
       );
-
       final user = credential.user;
       if (user == null) {
-        return AuthResult(success: false, error: 'Failed to create account');
+        return AuthResult(success: false, error: 'Failed to sign in');
       }
-
-      // Update display name
-      if (displayName != null) {
-        await user.updateDisplayName(displayName);
-      }
-
-      // Create user document in Firestore
-      await UserService.createUser(
-        uid: user.uid,
-        email: email,
-        role: role,
-        displayName: displayName,
+      final existingUser = await UserService.getUser(user.uid);
+      return AuthResult(
+        success: true,
+        user: user,
+        isNewUser: existingUser == null,
       );
-
-      // Send verification email
-      await user.sendEmailVerification();
-
-      return AuthResult(success: true, user: user, isNewUser: true);
     } on FirebaseAuthException catch (e) {
       return AuthResult(success: false, error: _getAuthErrorMessage(e.code));
     } catch (e) {
@@ -78,45 +126,9 @@ class AuthService {
     }
   }
 
-  /// Sign in with email and password
-  static Future<AuthResult> signInWithEmail({
-    required String email,
-    required String password,
-  }) async {
-    try {
-      final credential = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      return AuthResult(success: true, user: credential.user);
-    } on FirebaseAuthException catch (e) {
-      return AuthResult(success: false, error: _getAuthErrorMessage(e.code));
-    } catch (e) {
-      return AuthResult(success: false, error: e.toString());
-    }
-  }
-
-  /// Send password reset email
-  static Future<AuthResult> sendPasswordResetEmail(String email) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email);
-      return AuthResult(success: true);
-    } on FirebaseAuthException catch (e) {
-      return AuthResult(success: false, error: _getAuthErrorMessage(e.code));
-    } catch (e) {
-      return AuthResult(success: false, error: e.toString());
-    }
-  }
-
-  /// Resend verification email
-  static Future<AuthResult> resendVerificationEmail() async {
-    try {
-      await currentUser?.sendEmailVerification();
-      return AuthResult(success: true);
-    } catch (e) {
-      return AuthResult(success: false, error: e.toString());
-    }
+  /// Check if a URL is a Firebase sign-in email link.
+  static bool isSignInLink(String link) {
+    return _auth.isSignInWithEmailLink(link);
   }
 
   /// Reload user to check email verification status
@@ -268,12 +280,8 @@ class AuthService {
         return 'This email is already registered. Try signing in instead.';
       case 'invalid-email':
         return 'Please enter a valid email address.';
-      case 'weak-password':
-        return 'Password should be at least 6 characters.';
       case 'user-not-found':
         return 'No account found with this email.';
-      case 'wrong-password':
-        return 'Incorrect password. Please try again.';
       case 'user-disabled':
         return 'This account has been disabled.';
       case 'too-many-requests':
@@ -282,6 +290,10 @@ class AuthService {
         return 'This sign-in method is not enabled.';
       case 'invalid-credential':
         return 'Invalid email or password.';
+      case 'expired-action-code':
+        return 'This link has expired. Please request a new one.';
+      case 'invalid-action-code':
+        return 'This link is invalid or has already been used.';
       default:
         return 'An error occurred. Please try again.';
     }

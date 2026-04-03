@@ -6,9 +6,11 @@ import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/screens/auth/auth_gate.dart';
-import 'package:pet_circle/screens/auth/auth_screen.dart';
+import 'package:pet_circle/screens/auth/check_email_screen.dart';
+import 'package:pet_circle/screens/auth/login_screen.dart';
 import 'package:pet_circle/screens/auth/role_selection_screen.dart';
-import 'package:pet_circle/screens/auth/verify_email_screen.dart';
+import 'package:pet_circle/screens/auth/auth_callback_screen.dart';
+import 'package:pet_circle/screens/auth/signup_screen.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
 import 'package:pet_circle/screens/invite/invite_screen.dart';
 import 'package:pet_circle/screens/main_shell.dart';
@@ -25,8 +27,10 @@ class AppRoutes {
   static const welcome = '/';
   static const authGate = '/auth-gate';
   static const roleSelection = '/role-selection';
-  static const auth = '/auth';
-  static const verifyEmail = '/verify-email';
+  static const signup = '/signup';
+  static const login = '/login';
+  static const checkEmail = '/check-email';
+  static const authCallback = '/auth/callback';
   static const onboarding = '/onboarding';
   static const invite = '/invite';
   static const vetDashboard = '/vet-dashboard';
@@ -50,7 +54,7 @@ AppUserRole parseRole(String? roleStr) {
 
 /// Routes that are exempt from the auth-gate redirect (they handle their own
 /// auth logic or are public).
-const _publicPaths = {'/', '/auth-gate', '/auth', '/role-selection', '/verify-email', '/welcome', '/invite', '/onboarding'};
+const _publicPaths = {'/', '/auth-gate', '/signup', '/login', '/check-email', '/auth/callback', '/role-selection', '/welcome', '/invite', '/onboarding'};
 
 /// Stashed route the user was trying to reach before being bounced to auth-gate.
 /// Consumed once by [AuthGate] after successful authentication.
@@ -133,18 +137,27 @@ GoRouter buildRouter() {
         builder: (_, _) => const RoleSelectionScreen(),
       ),
       GoRoute(
-        path: '/auth',
+        path: '/signup',
         builder: (_, state) {
           final roleStr = state.uri.queryParameters['role'];
-          final signIn =
-              state.uri.queryParameters['signIn'] == 'true';
           final role = roleStr != null ? parseRole(roleStr) : null;
-          return AuthScreen(role: role, startWithSignIn: signIn);
+          return SignupScreen(role: role);
         },
       ),
       GoRoute(
-        path: '/verify-email',
-        builder: (_, _) => const VerifyEmailScreen(),
+        path: '/login',
+        builder: (_, _) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/check-email',
+        builder: (_, state) {
+          final email = state.uri.queryParameters['email'] ?? '';
+          return CheckEmailScreen(email: email);
+        },
+      ),
+      GoRoute(
+        path: '/auth/callback',
+        builder: (_, _) => const AuthCallbackScreen(),
       ),
       GoRoute(
         path: '/onboarding',

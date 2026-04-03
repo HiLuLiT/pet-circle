@@ -1049,4 +1049,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get continueButton => 'Continue';
+
+  @override
+  String get sendEmailLink => 'Send email link';
+
+  @override
+  String get checkYourEmail => 'Check your email';
+
+  @override
+  String get weSentSignInLinkTo => 'We sent a sign-in link to';
+
+  @override
+  String get clickLinkToSignIn => 'Click the link in the email to sign in.';
+
+  @override
+  String get checkSpamFolder =>
+      'Can\'t find the email? Check your spam folder.';
+
+  @override
+  String get resendLink => 'Resend link';
+
+  @override
+  String resendLinkInSeconds(int seconds) {
+    return 'Resend in ${seconds}s';
+  }
+
+  @override
+  String get useDifferentEmail => 'Use a different email';
+
+  @override
+  String get pleaseEnterYourDetails =>
+      'Please enter your details to create an account.';
+
+  @override
+  String get enterDetailsToLogin => 'Enter your details to login.';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get continueWithApple => 'Continue with Apple';
+
+  @override
+  String get or => 'OR';
+
+  @override
+  String get linkExpired => 'This link has expired. Please request a new one.';
+
+  @override
+  String get linkInvalid => 'This link is invalid or has already been used.';
+
+  @override
+  String get enterYourFullName => 'Enter your full name';
 }
