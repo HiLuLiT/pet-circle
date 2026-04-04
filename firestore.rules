@@ -205,6 +205,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // IP rate limits — only Cloud Functions (admin SDK) can read/write.
+    match /ip_rate_limits/{docId} {
+      allow read, write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }

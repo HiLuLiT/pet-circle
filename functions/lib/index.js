@@ -36,26 +36,50 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.verifyOTP = exports.sendOTP = void 0;
 const admin = __importStar(require("firebase-admin"));
 const https_1 = require("firebase-functions/v2/https");
+const params_1 = require("firebase-functions/params");
+const resendApiKey = (0, params_1.defineSecret)("RESEND_API_KEY");
 const otp_1 = require("./otp");
 const email_1 = require("./email");
+const rate_limit_1 = require("./rate_limit");
 const config_1 = require("./config");
 admin.initializeApp();
 const db = admin.firestore();
+/** Redact email for safe logging: "hi***@gmail.com" */
+function redactEmail(email) {
+    const [local, domain] = email.split("@");
+    if (!domain)
+        return "***";
+    const visible = local.slice(0, 2);
+    return `${visible}***@${domain}`;
+}
+const ALLOWED_ORIGINS = [
+    /^https:\/\/pet-circle-app\.web\.app$/,
+    /^https:\/\/pet-circle-app\.firebaseapp\.com$/,
+    /^http:\/\/localhost(:\d+)?$/,
+];
 /**
  * Send a 6-digit OTP code to the given email address.
  *
- * Stores the code in Firestore with a TTL and rate-limits to one send
- * per OTP_COOLDOWN_SECONDS per email address.
+ * Protections:
+ * - Per-email cooldown (60s)
+ * - Per-IP rate limit (5 sends/hour)
+ * - CORS restricted to app domains + localhost
  */
-exports.sendOTP = (0, https_1.onCall)(async (request) => {
+exports.sendOTP = (0, https_1.onCall)({ cors: ALLOWED_ORIGINS, invoker: "public", secrets: [resendApiKey] }, async (request) => {
     const { email, name, isSignup } = request.data;
-    if (!email || typeof email !== "string" || !email.includes("@")) {
+    if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         throw new https_1.HttpsError("invalid-argument", "A valid email is required.");
+    }
+    // IP-based rate limiting
+    const clientIp = (0, rate_limit_1.extractClientIp)(request.rawRequest);
+    const ipCheck = await (0, rate_limit_1.checkIpRateLimit)(clientIp, "send", config_1.IP_SEND_LIMIT_PER_HOUR);
+    if (!ipCheck.allowed) {
+        throw new https_1.HttpsError("resource-exhausted", "Too many requests. Please try again later.");
     }
     const normalizedEmail = email.toLowerCase().trim();
     const docRef = db.collection(config_1.OTP_COLLECTION).doc(normalizedEmail);
     const existing = await docRef.get();
-    // Rate-limit: enforce cooldown between sends
+    // Per-email cooldown
     if (existing.exists) {
         const data = existing.data();
         const elapsed = Date.now() - data.createdAt;
@@ -76,6 +100,7 @@ exports.sendOTP = (0, https_1.onCall)(async (request) => {
     });
     const result = await (0, email_1.sendOtpEmail)(normalizedEmail, code);
     if (!result.success) {
+        console.error(`Failed to send OTP to ${redactEmail(normalizedEmail)}: ${result.error}`);
         throw new https_1.HttpsError("internal", "Failed to send verification email.");
     }
     return { success: true };
@@ -83,16 +108,25 @@ exports.sendOTP = (0, https_1.onCall)(async (request) => {
 /**
  * Verify the OTP code and return a Firebase Custom Auth Token.
  *
- * On success, creates the Firebase Auth user if they don't exist,
- * mints a custom token, and cleans up the OTP document.
+ * Protections:
+ * - Per-code attempt limit (5 attempts)
+ * - Per-IP rate limit (15 verifications/hour)
+ * - Code expiry (10 min)
+ * - Single-use enforcement
  */
-exports.verifyOTP = (0, https_1.onCall)(async (request) => {
+exports.verifyOTP = (0, https_1.onCall)({ cors: ALLOWED_ORIGINS, invoker: "public" }, async (request) => {
     const { email, code } = request.data;
     if (!email || typeof email !== "string") {
         throw new https_1.HttpsError("invalid-argument", "Email is required.");
     }
     if (!code || typeof code !== "string" || code.length !== 6) {
         throw new https_1.HttpsError("invalid-argument", "A 6-digit code is required.");
+    }
+    // IP-based rate limiting
+    const clientIp = (0, rate_limit_1.extractClientIp)(request.rawRequest);
+    const ipCheck = await (0, rate_limit_1.checkIpRateLimit)(clientIp, "verify", config_1.IP_VERIFY_LIMIT_PER_HOUR);
+    if (!ipCheck.allowed) {
+        throw new https_1.HttpsError("resource-exhausted", "Too many attempts. Please try again later.");
     }
     const normalizedEmail = email.toLowerCase().trim();
     const docRef = db.collection(config_1.OTP_COLLECTION).doc(normalizedEmail);

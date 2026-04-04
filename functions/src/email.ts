@@ -42,7 +42,7 @@ export async function sendOtpEmail(
   try {
     const client = getResendClient();
     await client.emails.send({
-      from: "Pet Circle <noreply@petcircle.app>",
+      from: "Pet Circle <onboarding@resend.dev>",
       to: [to],
       subject: `${code} is your Pet Circle verification code`,
       html: buildOtpEmailHtml(code),

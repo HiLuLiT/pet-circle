@@ -114,7 +114,9 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
 
     if (result.success && result.token != null) {
       await FirebaseAuth.instance.signInWithCustomToken(result.token!);
-      // AuthProvider will pick up the auth state change and navigate
+      if (!mounted) return;
+      // Navigate to auth gate which handles post-auth routing
+      context.go('/auth-gate');
     } else {
       setState(() {
         _isVerifying = false;
