@@ -199,6 +199,12 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // OTP codes — only Cloud Functions (admin SDK) can read/write.
+    // Client access is denied.
+    match /otp_codes/{email} {
+      allow read, write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
