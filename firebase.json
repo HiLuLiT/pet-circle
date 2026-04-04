@@ -36,12 +36,6 @@
           }
         ]
       }
-    ],
-    "rewrites": [
-      {
-        "source": "/auth/**",
-        "destination": "/index.html"
-      }
     ]
   },
   "functions": [
