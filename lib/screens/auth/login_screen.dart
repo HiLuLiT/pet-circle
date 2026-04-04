@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/services/auth_service.dart';
+import 'package:pet_circle/services/otp_service.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
@@ -42,13 +43,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final email = _emailController.text.trim();
-
-      await AuthService.savePendingAuth(email: email, isSignup: false);
-      await AuthService.sendSignInLink(email: email);
-
+      final result = await OtpService.sendOtp(email: email);
       if (!mounted) return;
-
-      context.go('/check-email?email=${Uri.encodeComponent(email)}');
+      if (result.success) {
+        context.go('/verify-otp?email=${Uri.encodeComponent(email)}&signup=false');
+      } else {
+        setState(() => _error = result.error);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = e.toString());
