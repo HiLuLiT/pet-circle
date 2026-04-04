@@ -76,11 +76,28 @@ class AuthService {
   // EMAIL LINK AUTH
   // ─────────────────────────────────────────────────────────────────────────────
 
+  /// The callback URL where Firebase redirects after the user clicks the
+  /// email link. On web, this must match the origin the app is running on
+  /// (localhost in dev, hosted domain in production). On native, the OS
+  /// intercepts the link via App Links / Universal Links before it reaches
+  /// the browser, so the production URL is always correct.
+  static const _prodCallbackUrl = 'https://pet-circle-app.web.app/auth/callback';
+
+  /// Build the callback URL, using the current origin on web so that
+  /// development (localhost) and production (hosted) both work.
+  static String _buildCallbackUrl() {
+    if (kIsWeb) {
+      final origin = Uri.base.origin; // e.g. http://localhost:12345
+      return '$origin/auth/callback';
+    }
+    return _prodCallbackUrl;
+  }
+
   /// Send a sign-in link to the given email address.
   static Future<AuthResult> sendSignInLink({required String email}) async {
     try {
       final actionCodeSettings = ActionCodeSettings(
-        url: 'https://pet-circle-app.web.app/auth/callback',
+        url: _buildCallbackUrl(),
         handleCodeInApp: true,
         iOSBundleId: 'com.example.petCircle',
         androidPackageName: 'com.example.pet_circle',

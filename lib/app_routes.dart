@@ -91,9 +91,10 @@ GoRouter buildRouter() {
 
       // On web, detect Firebase email sign-in links regardless of path.
       // This covers edge cases where the link URL lands on '/' or another
-      // path instead of '/auth/callback'.
+      // path instead of '/auth/callback'.  Use origin + GoRouter URI to
+      // get the full URL (Uri.base is unreliable due to the <base> tag).
       if (kIsWeb && path != '/auth/callback') {
-        final fullUrl = state.uri.toString();
+        final fullUrl = '${Uri.base.origin}${state.uri}';
         if (AuthService.isSignInLink(fullUrl)) {
           return '/auth/callback';
         }
@@ -169,7 +170,13 @@ GoRouter buildRouter() {
       ),
       GoRoute(
         path: '/auth/callback',
-        builder: (_, _) => const AuthCallbackScreen(),
+        builder: (_, state) {
+          // Construct full URL from origin + GoRouter URI so the Firebase
+          // SDK can detect the sign-in link parameters (oobCode, mode, etc.)
+          // Uri.base on web returns just the base href, not the actual URL.
+          final fullUrl = '${Uri.base.origin}${state.uri}';
+          return AuthCallbackScreen(emailLinkUrl: fullUrl);
+        },
       ),
       GoRoute(
         path: '/onboarding',

@@ -16,14 +16,18 @@ import 'package:pet_circle/widgets/primary_button.dart';
 /// using [AuthService.signInWithEmailLink] and either navigates to the auth gate
 /// on success or shows an error with a retry option.
 ///
-/// If the user clicks the link on a different device (no pending email in
-/// SharedPreferences), an email input field is shown so they can complete
-/// sign-in without losing the link.
+/// [emailLinkUrl] must be the full URL including query parameters. On web,
+/// `Uri.base` only returns the document base URI (affected by the `<base>` tag),
+/// so the GoRoute builder constructs the full URL from `Uri.base.origin` +
+/// `GoRouterState.uri`.
 ///
 /// On native platforms, [DeepLinkService] intercepts the link before GoRouter
 /// sees it, so this screen is only reached on web.
 class AuthCallbackScreen extends StatefulWidget {
-  const AuthCallbackScreen({super.key});
+  const AuthCallbackScreen({super.key, this.emailLinkUrl});
+
+  /// The full URL containing Firebase sign-in parameters (oobCode, mode, etc.).
+  final String? emailLinkUrl;
 
   @override
   State<AuthCallbackScreen> createState() => _AuthCallbackScreenState();
@@ -34,6 +38,7 @@ enum _CallbackState { processing, needsEmail, error }
 class _AuthCallbackScreenState extends State<AuthCallbackScreen> {
   _CallbackState _state = _CallbackState.processing;
   String? _error;
+  String? _linkUrl;
   final _emailController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isSubmitting = false;
@@ -41,6 +46,7 @@ class _AuthCallbackScreenState extends State<AuthCallbackScreen> {
   @override
   void initState() {
     super.initState();
+    _linkUrl = widget.emailLinkUrl;
     _processEmailLink();
   }
 
@@ -57,9 +63,8 @@ class _AuthCallbackScreenState extends State<AuthCallbackScreen> {
       return;
     }
 
-    final currentUrl = Uri.base.toString();
-
-    if (!AuthService.isSignInLink(currentUrl)) {
+    final url = _linkUrl;
+    if (url == null || !AuthService.isSignInLink(url)) {
       setState(() {
         _state = _CallbackState.error;
         _error = null; // will fall back to l10n.invalidSignInLink
@@ -76,7 +81,7 @@ class _AuthCallbackScreenState extends State<AuthCallbackScreen> {
       return;
     }
 
-    await _completeSignIn(email: email, link: currentUrl);
+    await _completeSignIn(email: email, link: url);
   }
 
   Future<void> _submitEmail() async {
@@ -85,9 +90,10 @@ class _AuthCallbackScreenState extends State<AuthCallbackScreen> {
     setState(() => _isSubmitting = true);
 
     final email = _emailController.text.trim();
-    final currentUrl = Uri.base.toString();
+    final url = _linkUrl;
+    if (url == null) return;
 
-    await _completeSignIn(email: email, link: currentUrl);
+    await _completeSignIn(email: email, link: url);
 
     if (mounted && _isSubmitting) {
       setState(() => _isSubmitting = false);
