@@ -155,7 +155,6 @@
   "@resendInSeconds": { "placeholders": { "seconds": { "type": "int" } } },
   "iveVerifiedMyEmail": "I've verified my email",
   "useDifferentAccount": "Use a different account",
-  "verificationEmailSent": "Verification email sent!",
   "failedToSendEmail": "Failed to send email",
 
   "bpm": "BPM",
@@ -357,14 +356,6 @@
   "navMedication": "Medication",
   "processingInvitation": "Processing invitation…",
   "continueButton": "Continue",
-  "sendEmailLink": "Send email link",
-  "checkYourEmail": "Check your email",
-  "weSentSignInLinkTo": "We sent a sign-in link to",
-  "clickLinkToSignIn": "Click the link in the email to sign in.",
-  "checkSpamFolder": "Can't find the email? Check your spam folder.",
-  "resendLink": "Resend link",
-  "resendLinkInSeconds": "Resend in {seconds}s",
-  "@resendLinkInSeconds": { "placeholders": { "seconds": { "type": "int" } } },
   "useDifferentEmail": "Use a different email",
   "pleaseEnterYourDetails": "Please enter your details to create an account.",
   "enterDetailsToLogin": "Enter your details to login.",
@@ -372,13 +363,22 @@
   "continueWithGoogle": "Continue with Google",
   "continueWithApple": "Continue with Apple",
   "or": "OR",
-  "linkExpired": "This link has expired. Please request a new one.",
-  "linkInvalid": "This link is invalid or has already been used.",
   "enterYourFullName": "Enter your full name",
-  "signingYouIn": "Signing you in…",
-  "invalidSignInLink": "Invalid sign-in link.",
   "noPendingEmail": "No pending email found. Please try signing in again.",
   "signInFailed": "Sign-in failed. Please try again.",
-  "enterEmailToComplete": "Enter the email address you used to request the sign-in link.",
-  "completeSignIn": "Complete sign-in"
+  "enterVerificationCode": "Enter verification code",
+  "weSentCodeTo": "We sent a 6-digit code to",
+  "verifyCode": "Verify code",
+  "verificationCodeSent": "A new verification code has been sent",
+  "resendCode": "Resend code",
+  "resendCodeInSeconds": "Resend code in {seconds}s",
+  "@resendCodeInSeconds": {
+    "placeholders": {
+      "seconds": { "type": "int" }
+    }
+  },
+  "codeExpired": "This code has expired. Please request a new one.",
+  "incorrectCode": "Incorrect code. Please try again.",
+  "tooManyAttempts": "Too many failed attempts. Please request a new code.",
+  "sendVerificationCode": "Send verification code"
 }

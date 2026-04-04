@@ -469,9 +469,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get useDifferentAccount => 'שימוש בחשבון אחר';
 
   @override
-  String get verificationEmailSent => 'אימייל אימות נשלח!';
-
-  @override
   String get failedToSendEmail => 'שליחת האימייל נכשלה';
 
   @override
@@ -1045,29 +1042,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get continueButton => 'המשך';
 
   @override
-  String get sendEmailLink => 'שלח קישור באימייל';
-
-  @override
-  String get checkYourEmail => 'בדוק את האימייל שלך';
-
-  @override
-  String get weSentSignInLinkTo => 'שלחנו קישור כניסה אל';
-
-  @override
-  String get clickLinkToSignIn => 'לחץ על הקישור באימייל כדי להיכנס.';
-
-  @override
-  String get checkSpamFolder => 'לא מוצא את האימייל? בדוק בתיקיית הספאם.';
-
-  @override
-  String get resendLink => 'שלח מחדש';
-
-  @override
-  String resendLinkInSeconds(int seconds) {
-    return 'שלח מחדש בעוד $seconds שניות';
-  }
-
-  @override
   String get useDifferentEmail => 'שימוש באימייל אחר';
 
   @override
@@ -1089,19 +1063,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get or => 'או';
 
   @override
-  String get linkExpired => 'תוקף הקישור פג. בקש קישור חדש.';
-
-  @override
-  String get linkInvalid => 'הקישור אינו תקף או שכבר נעשה בו שימוש.';
-
-  @override
   String get enterYourFullName => 'הכנס את שמך המלא';
-
-  @override
-  String get signingYouIn => 'מחבר אותך…';
-
-  @override
-  String get invalidSignInLink => 'קישור כניסה לא תקין.';
 
   @override
   String get noPendingEmail => 'לא נמצא אימייל ממתין. נסה להתחבר שוב.';
@@ -1110,9 +1072,34 @@ class AppLocalizationsHe extends AppLocalizations {
   String get signInFailed => 'הכניסה נכשלה. נסה שוב.';
 
   @override
-  String get enterEmailToComplete =>
-      'הזן את כתובת האימייל שבה השתמשת לבקשת קישור הכניסה.';
+  String get enterVerificationCode => 'הזינו קוד אימות';
 
   @override
-  String get completeSignIn => 'השלם כניסה';
+  String get weSentCodeTo => 'שלחנו קוד בן 6 ספרות אל';
+
+  @override
+  String get verifyCode => 'אימות קוד';
+
+  @override
+  String get verificationCodeSent => 'קוד אימות חדש נשלח';
+
+  @override
+  String get resendCode => 'שלח קוד מחדש';
+
+  @override
+  String resendCodeInSeconds(int seconds) {
+    return 'שלח קוד מחדש בעוד $seconds שניות';
+  }
+
+  @override
+  String get codeExpired => 'הקוד פג תוקף. אנא בקשו קוד חדש.';
+
+  @override
+  String get incorrectCode => 'קוד שגוי. אנא נסו שנית.';
+
+  @override
+  String get tooManyAttempts => 'יותר מדי ניסיונות כושלים. אנא בקשו קוד חדש.';
+
+  @override
+  String get sendVerificationCode => 'שלח קוד אימות';
 }

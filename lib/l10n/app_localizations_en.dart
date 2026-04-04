@@ -471,9 +471,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get useDifferentAccount => 'Use a different account';
 
   @override
-  String get verificationEmailSent => 'Verification email sent!';
-
-  @override
   String get failedToSendEmail => 'Failed to send email';
 
   @override
@@ -1051,30 +1048,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueButton => 'Continue';
 
   @override
-  String get sendEmailLink => 'Send email link';
-
-  @override
-  String get checkYourEmail => 'Check your email';
-
-  @override
-  String get weSentSignInLinkTo => 'We sent a sign-in link to';
-
-  @override
-  String get clickLinkToSignIn => 'Click the link in the email to sign in.';
-
-  @override
-  String get checkSpamFolder =>
-      'Can\'t find the email? Check your spam folder.';
-
-  @override
-  String get resendLink => 'Resend link';
-
-  @override
-  String resendLinkInSeconds(int seconds) {
-    return 'Resend in ${seconds}s';
-  }
-
-  @override
   String get useDifferentEmail => 'Use a different email';
 
   @override
@@ -1097,19 +1070,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get or => 'OR';
 
   @override
-  String get linkExpired => 'This link has expired. Please request a new one.';
-
-  @override
-  String get linkInvalid => 'This link is invalid or has already been used.';
-
-  @override
   String get enterYourFullName => 'Enter your full name';
-
-  @override
-  String get signingYouIn => 'Signing you in…';
-
-  @override
-  String get invalidSignInLink => 'Invalid sign-in link.';
 
   @override
   String get noPendingEmail =>
@@ -1119,9 +1080,35 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signInFailed => 'Sign-in failed. Please try again.';
 
   @override
-  String get enterEmailToComplete =>
-      'Enter the email address you used to request the sign-in link.';
+  String get enterVerificationCode => 'Enter verification code';
 
   @override
-  String get completeSignIn => 'Complete sign-in';
+  String get weSentCodeTo => 'We sent a 6-digit code to';
+
+  @override
+  String get verifyCode => 'Verify code';
+
+  @override
+  String get verificationCodeSent => 'A new verification code has been sent';
+
+  @override
+  String get resendCode => 'Resend code';
+
+  @override
+  String resendCodeInSeconds(int seconds) {
+    return 'Resend code in ${seconds}s';
+  }
+
+  @override
+  String get codeExpired => 'This code has expired. Please request a new one.';
+
+  @override
+  String get incorrectCode => 'Incorrect code. Please try again.';
+
+  @override
+  String get tooManyAttempts =>
+      'Too many failed attempts. Please request a new code.';
+
+  @override
+  String get sendVerificationCode => 'Send verification code';
 }
