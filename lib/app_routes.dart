@@ -6,10 +6,9 @@ import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/screens/auth/auth_gate.dart';
-import 'package:pet_circle/screens/auth/check_email_screen.dart';
 import 'package:pet_circle/screens/auth/login_screen.dart';
 import 'package:pet_circle/screens/auth/role_selection_screen.dart';
-import 'package:pet_circle/screens/auth/auth_callback_screen.dart';
+import 'package:pet_circle/screens/auth/verify_otp_screen.dart';
 import 'package:pet_circle/screens/auth/signup_screen.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
 import 'package:pet_circle/screens/invite/invite_screen.dart';
@@ -17,7 +16,6 @@ import 'package:pet_circle/screens/main_shell.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_flow.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_screen.dart';
 import 'package:pet_circle/screens/welcome_screen.dart';
-import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
@@ -30,8 +28,7 @@ class AppRoutes {
   static const roleSelection = '/role-selection';
   static const signup = '/signup';
   static const login = '/login';
-  static const checkEmail = '/check-email';
-  static const authCallback = '/auth/callback';
+  static const verifyOtp = '/verify-otp';
   static const onboarding = '/onboarding';
   static const invite = '/invite';
   static const vetDashboard = '/vet-dashboard';
@@ -55,7 +52,7 @@ AppUserRole parseRole(String? roleStr) {
 
 /// Routes that are exempt from the auth-gate redirect (they handle their own
 /// auth logic or are public).
-const _publicPaths = {'/', '/auth-gate', '/signup', '/login', '/check-email', '/auth/callback', '/role-selection', '/welcome', '/invite', '/onboarding'};
+const _publicPaths = {'/', '/auth-gate', '/signup', '/login', '/verify-otp', '/role-selection', '/welcome', '/invite', '/onboarding'};
 
 /// Stashed route the user was trying to reach before being bounced to auth-gate.
 /// Consumed once by [AuthGate] after successful authentication.
@@ -88,17 +85,6 @@ GoRouter buildRouter() {
     redirect: (context, state) {
       if (!kEnableFirebase) return null;
       final path = state.uri.path;
-
-      // On web, detect Firebase email sign-in links regardless of path.
-      // This covers edge cases where the link URL lands on '/' or another
-      // path instead of '/auth/callback'.  Use origin + GoRouter URI to
-      // get the full URL (Uri.base is unreliable due to the <base> tag).
-      if (kIsWeb && path != '/auth/callback') {
-        final fullUrl = '${Uri.base.origin}${state.uri}';
-        if (AuthService.isSignInLink(fullUrl)) {
-          return '/auth/callback';
-        }
-      }
 
       final authState = authProvider.routeState;
 
@@ -162,20 +148,16 @@ GoRouter buildRouter() {
         builder: (_, _) => const LoginScreen(),
       ),
       GoRoute(
-        path: '/check-email',
-        builder: (_, state) {
+        path: '/verify-otp',
+        builder: (context, state) {
           final email = state.uri.queryParameters['email'] ?? '';
-          return CheckEmailScreen(email: email);
-        },
-      ),
-      GoRoute(
-        path: '/auth/callback',
-        builder: (_, state) {
-          // Construct full URL from origin + GoRouter URI so the Firebase
-          // SDK can detect the sign-in link parameters (oobCode, mode, etc.)
-          // Uri.base on web returns just the base href, not the actual URL.
-          final fullUrl = '${Uri.base.origin}${state.uri}';
-          return AuthCallbackScreen(emailLinkUrl: fullUrl);
+          final isSignup = state.uri.queryParameters['signup'] == 'true';
+          final name = state.uri.queryParameters['name'];
+          return VerifyOtpScreen(
+            email: Uri.decodeComponent(email),
+            isSignup: isSignup,
+            name: name != null ? Uri.decodeComponent(name) : null,
+          );
         },
       ),
       GoRoute(
