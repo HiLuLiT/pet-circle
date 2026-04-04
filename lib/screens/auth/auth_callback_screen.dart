@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
@@ -47,13 +48,28 @@ class _AuthCallbackScreenState extends State<AuthCallbackScreen> {
   void initState() {
     super.initState();
     _linkUrl = widget.emailLinkUrl;
+    authProvider.addListener(_onAuthStateChanged);
     _processEmailLink();
   }
 
   @override
   void dispose() {
+    authProvider.removeListener(_onAuthStateChanged);
     _emailController.dispose();
     super.dispose();
+  }
+
+  /// Navigate to auth-gate once Firebase auth state propagates.
+  /// This avoids a race condition where context.go('/auth-gate') fires
+  /// before authProvider has received the stream event from signInWithEmailLink.
+  void _onAuthStateChanged() {
+    final state = authProvider.routeState;
+    if (state != AuthRouteState.unauthenticated &&
+        state != AuthRouteState.loading) {
+      if (mounted) {
+        context.go(AppRoutes.authGate);
+      }
+    }
   }
 
   Future<void> _processEmailLink() async {
@@ -122,9 +138,9 @@ class _AuthCallbackScreenState extends State<AuthCallbackScreen> {
 
       await AuthService.clearPendingAuth();
 
-      if (mounted) {
-        context.go(AppRoutes.authGate);
-      }
+      // Don't navigate here — _onAuthStateChanged will pick up the
+      // auth state change and navigate to auth-gate once the Firebase
+      // auth stream has propagated to authProvider.
     } else {
       setState(() {
         _state = _CallbackState.error;
