@@ -80,7 +80,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> refresh() async {
-    await AuthService.reloadUser();
+    await AuthService.currentUser?.reload();
     _firebaseUser = AuthService.currentUser;
     if (_firebaseUser != null) {
       _appUser = await UserService.getUser(_firebaseUser!.uid);

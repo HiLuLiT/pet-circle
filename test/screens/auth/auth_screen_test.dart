@@ -52,7 +52,7 @@ void main() {
       expect(find.text('Password'), findsNothing);
     });
 
-    testWidgets('shows send-email-link CTA', (tester) async {
+    testWidgets('shows send-verification-code CTA', (tester) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -61,7 +61,7 @@ void main() {
       await tester.pumpWidget(_buildSignupApp());
       await tester.pumpAndSettle();
 
-      expect(find.text('Send email link'), findsOneWidget);
+      expect(find.text('Send verification code'), findsOneWidget);
     });
 
     testWidgets('shows social auth options', (tester) async {
@@ -99,7 +99,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap the submit button without filling in fields
-      await tester.tap(find.text('Send email link'));
+      await tester.tap(find.text('Send verification code'));
       await tester.pumpAndSettle();
 
       // Validation error should appear
@@ -118,7 +118,7 @@ void main() {
       // Enter name but not email
       await tester.enterText(find.byType(TextFormField).first, 'Test User');
 
-      await tester.tap(find.text('Send email link'));
+      await tester.tap(find.text('Send verification code'));
       await tester.pumpAndSettle();
 
       expect(find.text('Please enter your email'), findsOneWidget);
@@ -137,7 +137,7 @@ void main() {
       await tester.enterText(find.byType(TextFormField).first, 'Test User');
       await tester.enterText(find.byType(TextFormField).last, 'not-an-email');
 
-      await tester.tap(find.text('Send email link'));
+      await tester.tap(find.text('Send verification code'));
       await tester.pumpAndSettle();
 
       expect(find.text('Please enter a valid email'), findsOneWidget);

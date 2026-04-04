@@ -24,8 +24,8 @@ void main() {
       expect(AppRoutes.login, '/login');
     });
 
-    test('checkEmail route is /check-email', () {
-      expect(AppRoutes.checkEmail, '/check-email');
+    test('verifyOtp route is /verify-otp', () {
+      expect(AppRoutes.verifyOtp, '/verify-otp');
     });
 
     test('onboarding route is /onboarding', () {
