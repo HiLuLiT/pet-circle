@@ -7,6 +7,7 @@ import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/auth_service.dart';
+import 'package:pet_circle/services/otp_service.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
@@ -37,7 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  Future<void> _handleSendEmailLink() async {
+  Future<void> _handleSendOtp() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -49,16 +50,21 @@ class _SignupScreenState extends State<SignupScreen> {
       final email = _emailController.text.trim();
       final name = _nameController.text.trim();
 
-      await AuthService.savePendingAuth(
+      final result = await OtpService.sendOtp(
         email: email,
         name: name,
         isSignup: true,
       );
-      await AuthService.sendSignInLink(email: email);
 
       if (!mounted) return;
 
-      context.go('/check-email?email=${Uri.encodeComponent(email)}');
+      if (result.success) {
+        context.go(
+          '/verify-otp?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}',
+        );
+      } else {
+        setState(() => _error = result.error);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _error = e.toString());
@@ -238,10 +244,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   const SizedBox(height: AppSpacingTokens.lg),
 
-                  // Send email link button
+                  // Send verification code button
                   PrimaryButton(
-                    label: l10n.sendEmailLink,
-                    onPressed: _isLoading ? null : _handleSendEmailLink,
+                    label: l10n.sendVerificationCode,
+                    onPressed: _isLoading ? null : _handleSendOtp,
                     backgroundColor: c.primary,
                   ),
 
