@@ -6,8 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:app_links/app_links.dart'
     if (dart.library.html) 'package:pet_circle/services/deep_link_service_stub.dart';
 
-import 'package:pet_circle/services/auth_service.dart';
-
 final deepLinkService = DeepLinkService();
 
 /// Handles deep links for invitation tokens.
@@ -53,13 +51,6 @@ class DeepLinkService {
 
   /// Handle an incoming URI on native by routing through GoRouter.
   void _handleNativeUri(Uri uri) {
-    final uriString = uri.toString();
-    // Check if this is a Firebase email sign-in link
-    if (AuthService.isSignInLink(uriString)) {
-      _handleEmailSignInLink(uriString);
-      return;
-    }
-
     // Supports both:
     //   petcircle://invite?token=XYZ
     //   https://petcircle.app/invite?token=XYZ
@@ -72,37 +63,6 @@ class DeepLinkService {
       }
     }
     debugPrint('DeepLinkService: ignoring unrecognised URI: $uri');
-  }
-
-  Future<void> _handleEmailSignInLink(String link) async {
-    final pending = await AuthService.getPendingAuth();
-    final email = pending.email;
-    if (email == null) {
-      debugPrint('DeepLinkService: email link received but no pending email');
-      return;
-    }
-
-    final result = await AuthService.signInWithEmailLink(
-      email: email,
-      emailLink: link,
-    );
-
-    if (result.success && result.user != null) {
-      final name = pending.name;
-      final isSignup = pending.isSignup;
-
-      if (result.isNewUser && isSignup && name != null && name.isNotEmpty) {
-        await result.user!.updateDisplayName(name);
-      }
-
-      await AuthService.clearPendingAuth();
-      // Firebase auth state listener in AuthProvider will pick up the change
-      debugPrint('DeepLinkService: email link sign-in successful');
-    } else {
-      debugPrint('DeepLinkService: email link sign-in failed: ${result.error}');
-      // Navigate to login screen so the user can retry
-      _router?.go('/login');
-    }
   }
 
   void dispose() {
