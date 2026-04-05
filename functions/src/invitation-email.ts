@@ -1,16 +1,26 @@
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
-import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import { Resend } from "resend";
 import { invitationEmailHtml, invitationEmailText } from "./email-templates";
 
-const resendApiKey = defineSecret("RESEND_API_KEY");
+// Singleton pattern — matches the working OTP email implementation.
+// Uses process.env (not defineSecret) because that's how the RESEND_API_KEY
+// is configured in the Firebase environment.
+let resendClient: Resend | null = null;
+
+function getResendClient(): Resend {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error("RESEND_API_KEY environment variable is not set");
+    }
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
 
 export const onInvitationCreated = onDocumentCreated(
-  {
-    document: "invitations/{token}",
-    secrets: [resendApiKey],
-  },
+  "invitations/{token}",
   async (event) => {
     const snap = event.data;
     if (!snap) {
@@ -26,19 +36,13 @@ export const onInvitationCreated = onDocumentCreated(
       return;
     }
 
-    const apiKey = resendApiKey.value();
-    if (!apiKey) {
-      logger.error("RESEND_API_KEY secret not set");
-      return;
-    }
-
-    const resend = new Resend(apiKey);
+    const resend = getResendClient();
     const fromEmail = process.env.FROM_EMAIL || "Pet Circle <noreply@petcircle.app>";
     const appUrl = process.env.APP_URL || "https://petcircle.app";
     const inviteLink = `${appUrl}/invite?token=${token}`;
 
     try {
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: fromEmail,
         to: data.invitedEmail,
         subject: `${data.invitedByName} invited you to ${data.petName}'s care circle`,
@@ -54,7 +58,11 @@ export const onInvitationCreated = onDocumentCreated(
         }),
       });
 
-      logger.info("Invitation email sent", { token, to: data.invitedEmail });
+      logger.info("Invitation email sent", {
+        token,
+        to: data.invitedEmail,
+        resendId: result?.data?.id ?? "unknown",
+      });
     } catch (error) {
       logger.error("Failed to send invitation email", { token, error });
     }
