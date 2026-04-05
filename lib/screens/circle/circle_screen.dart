@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/care_circle_member.dart';
@@ -516,7 +515,7 @@ class _InviteSheetState extends State<_InviteSheet> {
         return;
       }
 
-      final token = await InvitationService.createInvitation(
+      await InvitationService.createInvitation(
         petId: pet.id!,
         petName: pet.name,
         invitedEmail: email,
@@ -524,13 +523,12 @@ class _InviteSheetState extends State<_InviteSheet> {
         invitedByName: userStore.currentUserDisplayName ?? '',
       );
 
-      final link = 'https://petcircle.app/invite?token=$token';
-      await Clipboard.setData(ClipboardData(text: link));
-
+      // The Cloud Function will send the email via Resend automatically
+      // when the invitation doc is created in Firestore.
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _successToken = token;
+        _successToken = 'sent';
       });
     } catch (e) {
       debugPrint('[InviteSheet] Send invite failed: $e');

@@ -368,7 +368,7 @@
   "@inviteDescription": { "placeholders": { "petName": { "type": "String" } } },
   "sendInvite": "Send Invite",
   "inviteSent": "Invite Sent!",
-  "inviteLinkCopied": "Invite link copied to clipboard. Share it via email, WhatsApp, or any messaging app.",
+  "inviteLinkCopied": "An invitation email has been sent. They can join the circle by clicking the link in the email.",
   "removeMember": "Remove Member",
   "removeMemberConfirm": "Remove {name} from this circle? They will no longer be able to see this pet's data.",
   "@removeMemberConfirm": { "placeholders": { "name": { "type": "String" } } },

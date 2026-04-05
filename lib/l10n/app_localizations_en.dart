@@ -1079,7 +1079,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get inviteLinkCopied =>
-      'Invite link copied to clipboard. Share it via email, WhatsApp, or any messaging app.';
+      'An invitation email has been sent. They can join the circle by clicking the link in the email.';
 
   @override
   String removeMemberConfirm(String name) {

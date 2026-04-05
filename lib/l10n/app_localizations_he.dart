@@ -1073,7 +1073,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get inviteLinkCopied =>
-      'קישור ההזמנה הועתק. שתף אותו דרך אימייל, וואטסאפ או כל אפליקציית הודעות.';
+      'אימייל הזמנה נשלח. הם יוכלו להצטרף למעגל בלחיצה על הקישור באימייל.';
 
   @override
   String removeMemberConfirm(String name) {

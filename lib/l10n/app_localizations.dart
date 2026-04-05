@@ -2069,7 +2069,7 @@ abstract class AppLocalizations {
   /// No description provided for @inviteLinkCopied.
   ///
   /// In en, this message translates to:
-  /// **'Invite link copied to clipboard. Share it via email, WhatsApp, or any messaging app.'**
+  /// **'An invitation email has been sent. They can join the circle by clicking the link in the email.'**
   String get inviteLinkCopied;
 
   /// No description provided for @removeMemberConfirm.

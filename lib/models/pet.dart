@@ -80,13 +80,19 @@ class Pet {
   }
 
   factory Pet.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    final careCircleData = data['careCircle'] as Map<String, dynamic>? ?? {};
+    final data = Map<String, dynamic>.from(doc.data() as Map);
+    final careCircleRaw = data['careCircle'];
+    final careCircleData = careCircleRaw is Map
+        ? Map<String, dynamic>.from(careCircleRaw)
+        : <String, dynamic>{};
     final careCircle = careCircleData.entries
-        .map((e) => CareCircleMember.fromFirestore(e.key, e.value as Map<String, dynamic>))
+        .map((e) => CareCircleMember.fromFirestore(
+              e.key,
+              e.value is Map ? Map<String, dynamic>.from(e.value as Map) : <String, dynamic>{}))
         .toList();
 
-    final measurementData = data['latestMeasurement'] as Map<String, dynamic>?;
+    final measurementRaw = data['latestMeasurement'];
+    final measurementData = measurementRaw is Map ? Map<String, dynamic>.from(measurementRaw) : null;
     final latestMeasurement = measurementData != null
         ? Measurement(
             bpm: measurementData['bpm'] ?? 0,
@@ -97,11 +103,17 @@ class Pet {
             recordedAt: DateTime.fromMillisecondsSinceEpoch(0),
           );
 
-    final pendingInvitesData =
-        data['pendingInvites'] as Map<String, dynamic>? ?? {};
+    final pendingInvitesRaw = data['pendingInvites'];
+    final pendingInvitesData = pendingInvitesRaw is Map
+        ? Map<String, dynamic>.from(pendingInvitesRaw)
+        : <String, dynamic>{};
     final pendingInvites = pendingInvitesData.entries
-        .map((e) => PendingInvite.fromFirestore(
-              e.key, e.value as Map<String, dynamic>))
+        .map((e) {
+          final value = e.value is Map
+              ? Map<String, dynamic>.from(e.value as Map)
+              : <String, dynamic>{};
+          return PendingInvite.fromFirestore(e.key, value);
+        })
         .where((inv) => inv.expiresAt.isAfter(DateTime.now()))
         .toList();
 
