@@ -497,4 +497,104 @@ void main() {
       );
     });
   });
+
+  group('Pet.toFirestore careCircle key safety', () {
+    test('uses uid as careCircle map key when uid is set', () {
+      final pet = Pet(
+        name: 'Buddy',
+        breedAndAge: 'Lab',
+        imageUrl: '',
+        statusLabel: 'Normal',
+        statusColorHex: 0xFF75ACFF,
+        latestMeasurement: Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+        careCircle: [
+          CareCircleMember(
+            uid: 'firebase-uid-123',
+            name: 'Hila',
+            avatarUrl: '',
+            role: CareCircleRole.owner,
+          ),
+        ],
+      );
+
+      final map = pet.toFirestore();
+      final circle = map['careCircle'] as Map<String, dynamic>;
+
+      expect(circle.containsKey('firebase-uid-123'), isTrue);
+      expect(circle.containsKey('Hila'), isFalse);
+    });
+
+    test('skips members without uid in toFirestore', () {
+      final pet = Pet(
+        name: 'Buddy',
+        breedAndAge: 'Lab',
+        imageUrl: '',
+        statusLabel: 'Normal',
+        statusColorHex: 0xFF75ACFF,
+        latestMeasurement: Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+        careCircle: [
+          CareCircleMember(
+            uid: 'valid-uid',
+            name: 'Owner',
+            avatarUrl: '',
+            role: CareCircleRole.owner,
+          ),
+          CareCircleMember(
+            name: 'tara.varom@gmail.com',
+            avatarUrl: '',
+            role: CareCircleRole.member,
+          ),
+        ],
+      );
+
+      final map = pet.toFirestore();
+      final circle = map['careCircle'] as Map<String, dynamic>;
+
+      expect(circle.length, 1, reason: 'members without uid should be skipped');
+      expect(circle.containsKey('valid-uid'), isTrue);
+      expect(circle.containsKey('tara.varom@gmail.com'), isFalse);
+    });
+
+    test('memberUids only includes members with non-null uid', () {
+      final pet = Pet(
+        name: 'Buddy',
+        breedAndAge: 'Lab',
+        imageUrl: '',
+        statusLabel: 'Normal',
+        statusColorHex: 0xFF75ACFF,
+        latestMeasurement: Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+        careCircle: [
+          CareCircleMember(uid: 'uid-1', name: 'Owner', avatarUrl: '', role: CareCircleRole.owner),
+          CareCircleMember(name: 'no-uid', avatarUrl: '', role: CareCircleRole.member),
+        ],
+      );
+
+      final map = pet.toFirestore();
+      final uids = map['memberUids'] as List;
+
+      expect(uids, ['uid-1']);
+    });
+  });
+
+  group('CareCircleMember.firestoreKey', () {
+    test('returns uid when set', () {
+      final member = CareCircleMember(uid: 'fb-uid', name: 'Hila', avatarUrl: '', role: CareCircleRole.owner);
+      expect(member.firestoreKey, 'fb-uid');
+    });
+
+    test('returns null when uid is null', () {
+      final member = CareCircleMember(name: 'tara@x.com', avatarUrl: '', role: CareCircleRole.member);
+      expect(member.firestoreKey, isNull);
+    });
+
+    test('hasFirestoreKey is true when uid is set', () {
+      final member = CareCircleMember(uid: 'uid', name: 'T', avatarUrl: '', role: CareCircleRole.member);
+      expect(member.hasFirestoreKey, isTrue);
+    });
+
+    test('hasFirestoreKey is false when uid is null', () {
+      final member = CareCircleMember(name: 'T', avatarUrl: '', role: CareCircleRole.member);
+      expect(member.hasFirestoreKey, isFalse);
+    });
+  });
 }

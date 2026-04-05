@@ -50,10 +50,14 @@ class Pet {
   final List<PendingInvite> pendingInvites;
 
   Map<String, dynamic> toFirestore() {
+    // Only serialize members with a valid UID. Members without UIDs
+    // (e.g. mock data) are skipped — using names/emails as Firestore
+    // map keys causes dot-notation corruption when the key contains dots.
     final careCircleMap = <String, dynamic>{};
     for (final member in careCircle) {
-      final key = member.uid ?? member.name;
-      careCircleMap[key] = member.toFirestore();
+      if (member.hasFirestoreKey) {
+        careCircleMap[member.firestoreKey!] = member.toFirestore();
+      }
     }
     return {
       'name': name,
@@ -69,8 +73,8 @@ class Pet {
         'recordedAt': Timestamp.fromDate(latestMeasurement.recordedAt),
       },
       'memberUids': careCircle
-          .where((m) => m.uid != null)
-          .map((m) => m.uid!)
+          .where((m) => m.hasFirestoreKey)
+          .map((m) => m.firestoreKey!)
           .toList(),
     };
   }

@@ -36,6 +36,13 @@ class CareCircleMember {
   final String avatarUrl;
   final CareCircleRole role;
 
+  /// The key to use when storing this member in Firestore's careCircle map.
+  /// Returns null if the member has no UID (e.g. mock data).
+  String? get firestoreKey => uid;
+
+  /// Whether this member has a valid key for Firestore storage.
+  bool get hasFirestoreKey => uid != null;
+
   String get roleLabel {
     switch (role) {
       case CareCircleRole.owner:
