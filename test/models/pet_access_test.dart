@@ -135,4 +135,101 @@ void main() {
       expect(sources.toSet().length, 5);
     });
   });
+
+  group('PetAccess canManageMedication', () {
+    test('owner canManageMedication is true', () {
+      final access = PetAccess(
+        pet: _makePet(),
+        role: CareCircleRole.owner,
+        source: PetAccessSource.ownerId,
+        isOwner: true,
+      );
+
+      expect(access.canManageMedication, isTrue);
+    });
+
+    test('member canManageMedication is true', () {
+      final access = PetAccess(
+        pet: _makePet(),
+        role: CareCircleRole.member,
+        source: PetAccessSource.careCircleUid,
+      );
+
+      expect(access.canManageMedication, isTrue);
+    });
+  });
+
+  group('PetAccess canDeleteMeasurements', () {
+    test('owner canDeleteMeasurements is true', () {
+      final access = PetAccess(
+        pet: _makePet(),
+        role: CareCircleRole.owner,
+        source: PetAccessSource.ownerId,
+        isOwner: true,
+      );
+
+      expect(access.canDeleteMeasurements, isTrue);
+    });
+
+    test('member canDeleteMeasurements is true', () {
+      final access = PetAccess(
+        pet: _makePet(),
+        role: CareCircleRole.member,
+        source: PetAccessSource.careCircleUid,
+      );
+
+      expect(access.canDeleteMeasurements, isTrue);
+    });
+  });
+
+  group('PetAccess.unknown defaults', () {
+    test('unknown defaults to member role not viewer', () {
+      final access = PetAccess.unknown();
+
+      expect(access.role, CareCircleRole.member);
+      // Verify it is specifically member, not some other role
+      expect(access.role, isNot(equals(CareCircleRole.owner)));
+    });
+
+    test('unknown with pet still defaults to member role', () {
+      final access = PetAccess.unknown(_makePet());
+
+      expect(access.role, CareCircleRole.member);
+      expect(access.hasPet, isTrue);
+    });
+  });
+
+  group('PetAccess member role permissions (comprehensive)', () {
+    test('member has canMeasure true', () {
+      final access = PetAccess(
+        pet: _makePet(),
+        role: CareCircleRole.member,
+        source: PetAccessSource.careCircleUid,
+      );
+
+      expect(access.canMeasure, isTrue);
+    });
+
+    test('member has canAddNotes true', () {
+      final access = PetAccess(
+        pet: _makePet(),
+        role: CareCircleRole.member,
+        source: PetAccessSource.careCircleUid,
+      );
+
+      expect(access.canAddNotes, isTrue);
+    });
+
+    test('member cannot edit pet or manage circle or delete pet', () {
+      final access = PetAccess(
+        pet: _makePet(),
+        role: CareCircleRole.member,
+        source: PetAccessSource.careCircleUid,
+      );
+
+      expect(access.canEditPet, isFalse);
+      expect(access.canManageCircle, isFalse);
+      expect(access.canDeletePet, isFalse);
+    });
+  });
 }

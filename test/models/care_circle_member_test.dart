@@ -145,5 +145,116 @@ void main() {
 
       expect(map.containsKey('uid'), isFalse);
     });
+
+    test('toFirestore for member role writes role as member', () {
+      final member = CareCircleMember(
+        uid: 'u-2',
+        name: 'Helper',
+        avatarUrl: 'https://example.com/helper.png',
+        role: CareCircleRole.member,
+      );
+
+      final map = member.toFirestore();
+
+      expect(map['role'], 'member');
+      expect(map['name'], 'Helper');
+      expect(map['avatarUrl'], 'https://example.com/helper.png');
+    });
+  });
+
+  group('CareCircleMember fromFirestore', () {
+    test('fromFirestore with role owner', () {
+      final member = CareCircleMember.fromFirestore('uid-owner', {
+        'name': 'Owner User',
+        'avatarUrl': 'https://example.com/owner.png',
+        'role': 'owner',
+      });
+
+      expect(member.uid, 'uid-owner');
+      expect(member.name, 'Owner User');
+      expect(member.avatarUrl, 'https://example.com/owner.png');
+      expect(member.role, CareCircleRole.owner);
+    });
+
+    test('fromFirestore with role member', () {
+      final member = CareCircleMember.fromFirestore('uid-member', {
+        'name': 'Member User',
+        'avatarUrl': 'https://example.com/member.png',
+        'role': 'member',
+      });
+
+      expect(member.uid, 'uid-member');
+      expect(member.name, 'Member User');
+      expect(member.role, CareCircleRole.member);
+    });
+
+    test('fromFirestore with legacy admin maps to owner', () {
+      final member = CareCircleMember.fromFirestore('uid-admin', {
+        'name': 'Admin User',
+        'avatarUrl': '',
+        'role': 'admin',
+      });
+
+      expect(member.role, CareCircleRole.owner);
+    });
+
+    test('fromFirestore with legacy viewer maps to member', () {
+      final member = CareCircleMember.fromFirestore('uid-viewer', {
+        'name': 'Viewer User',
+        'avatarUrl': '',
+        'role': 'viewer',
+      });
+
+      expect(member.role, CareCircleRole.member);
+    });
+
+    test('fromFirestore with missing role defaults to member', () {
+      final member = CareCircleMember.fromFirestore('uid-norole', {
+        'name': 'No Role User',
+        'avatarUrl': '',
+      });
+
+      expect(member.role, CareCircleRole.member);
+    });
+
+    test('fromFirestore with missing name defaults to empty string', () {
+      final member = CareCircleMember.fromFirestore('uid-noname', {
+        'avatarUrl': 'https://example.com/pic.png',
+        'role': 'member',
+      });
+
+      expect(member.name, '');
+    });
+
+    test('fromFirestore with missing avatarUrl defaults to empty string', () {
+      final member = CareCircleMember.fromFirestore('uid-noavatar', {
+        'name': 'Test',
+        'role': 'owner',
+      });
+
+      expect(member.avatarUrl, '');
+    });
+  });
+
+  group('CareCircleRole member permissions (comprehensive)', () {
+    test('member canMeasure is true', () {
+      expect(CareCircleRole.member.canMeasure, isTrue);
+    });
+
+    test('member canEditPet is false', () {
+      expect(CareCircleRole.member.canEditPet, isFalse);
+    });
+
+    test('member canManageCircle is false', () {
+      expect(CareCircleRole.member.canManageCircle, isFalse);
+    });
+
+    test('member canDeletePet is false', () {
+      expect(CareCircleRole.member.canDeletePet, isFalse);
+    });
+
+    test('member canAddNotes is true', () {
+      expect(CareCircleRole.member.canAddNotes, isTrue);
+    });
   });
 }
