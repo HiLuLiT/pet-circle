@@ -1,22 +1,24 @@
-enum CareCircleRole { admin, member, viewer }
+enum CareCircleRole { owner, member }
 
 extension CareCirclePermissions on CareCircleRole {
-  bool get canMeasure => this == CareCircleRole.admin || this == CareCircleRole.member;
-  bool get canEditPet => this == CareCircleRole.admin;
-  bool get canManageCircle => this == CareCircleRole.admin;
+  bool get canMeasure => true;
+  bool get canEditPet => this == CareCircleRole.owner;
+  bool get canManageCircle => this == CareCircleRole.owner;
   bool get canAddNotes => true;
-  bool get canDeletePet => this == CareCircleRole.admin;
+  bool get canDeletePet => this == CareCircleRole.owner;
 
+  /// Maps legacy Firestore values to the simplified role model.
+  /// 'admin' -> owner, everything else -> member.
   static CareCircleRole fromString(String value) {
     switch (value) {
       case 'admin':
-        return CareCircleRole.admin;
+      case 'owner':
+        return CareCircleRole.owner;
       case 'member':
-        return CareCircleRole.member;
       case 'viewer':
-        return CareCircleRole.viewer;
+        return CareCircleRole.member;
       default:
-        return CareCircleRole.viewer;
+        return CareCircleRole.member;
     }
   }
 }
@@ -36,12 +38,10 @@ class CareCircleMember {
 
   String get roleLabel {
     switch (role) {
-      case CareCircleRole.admin:
-        return 'Admin';
+      case CareCircleRole.owner:
+        return 'Owner';
       case CareCircleRole.member:
         return 'Member';
-      case CareCircleRole.viewer:
-        return 'Viewer';
     }
   }
 
@@ -58,7 +58,7 @@ class CareCircleMember {
       uid: uid,
       name: data['name'] ?? '',
       avatarUrl: data['avatarUrl'] ?? '',
-      role: CareCirclePermissions.fromString(data['role'] ?? 'viewer'),
+      role: CareCirclePermissions.fromString(data['role'] ?? 'member'),
     );
   }
 }

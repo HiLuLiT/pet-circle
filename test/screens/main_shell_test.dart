@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/user.dart';
 import 'package:pet_circle/screens/main_shell.dart';
 import 'package:pet_circle/stores/user_store.dart';
@@ -38,7 +37,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const MainShell(role: AppUserRole.owner)),
+        testApp(const MainShell()),
       );
       await tester.pump();
 
@@ -53,7 +52,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const MainShell(role: AppUserRole.owner)),
+        testApp(const MainShell()),
       );
       await tester.pump();
 
@@ -68,7 +67,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const MainShell(role: AppUserRole.owner)),
+        testApp(const MainShell()),
       );
       await tester.pump();
 
@@ -77,7 +76,7 @@ void main() {
       // findsWidgets to allow duplicates.
       expect(find.text('Home'), findsWidgets);
       expect(find.text('Trends'), findsWidgets);
-      expect(find.text('Diary'), findsWidgets);
+      expect(find.text('Circle'), findsWidgets);
       expect(find.text('Mesure'), findsWidgets);
       expect(find.text('Medicine'), findsWidgets);
     });
@@ -93,7 +92,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const MainShell(role: AppUserRole.vet)),
+        testApp(const MainShell()),
       );
       await tester.pump();
 
@@ -109,7 +108,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const MainShell(role: AppUserRole.owner, initialIndex: 2)),
+        testApp(const MainShell(initialIndex: 2)),
       );
       await tester.pump();
 

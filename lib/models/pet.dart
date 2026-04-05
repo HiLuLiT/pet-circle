@@ -2,6 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/measurement.dart';
 
+class PendingInvite {
+  const PendingInvite({
+    required this.token,
+    required this.invitedEmail,
+    required this.expiresAt,
+  });
+
+  final String token;
+  final String invitedEmail;
+  final DateTime expiresAt;
+
+  factory PendingInvite.fromFirestore(String token, Map<String, dynamic> data) {
+    return PendingInvite(
+      token: token,
+      invitedEmail: (data['invitedEmail'] as String? ?? '').toLowerCase(),
+      expiresAt: (data['expiresAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+    );
+  }
+}
+
 class Pet {
   const Pet({
     this.id,
@@ -14,6 +34,7 @@ class Pet {
     required this.careCircle,
     this.diagnosis,
     this.ownerId,
+    this.pendingInvites = const [],
   });
 
   final String? id;
@@ -26,6 +47,7 @@ class Pet {
   final List<CareCircleMember> careCircle;
   final String? diagnosis;
   final String? ownerId;
+  final List<PendingInvite> pendingInvites;
 
   Map<String, dynamic> toFirestore() {
     final careCircleMap = <String, dynamic>{};
@@ -71,6 +93,14 @@ class Pet {
             recordedAt: DateTime.fromMillisecondsSinceEpoch(0),
           );
 
+    final pendingInvitesData =
+        data['pendingInvites'] as Map<String, dynamic>? ?? {};
+    final pendingInvites = pendingInvitesData.entries
+        .map((e) => PendingInvite.fromFirestore(
+              e.key, e.value as Map<String, dynamic>))
+        .where((inv) => inv.expiresAt.isAfter(DateTime.now()))
+        .toList();
+
     return Pet(
       id: doc.id,
       name: data['name'] ?? '',
@@ -82,6 +112,7 @@ class Pet {
       careCircle: careCircle,
       diagnosis: data['diagnosis'],
       ownerId: data['ownerId'],
+      pendingInvites: pendingInvites,
     );
   }
 
@@ -96,6 +127,7 @@ class Pet {
     List<CareCircleMember>? careCircle,
     String? diagnosis,
     String? ownerId,
+    List<PendingInvite>? pendingInvites,
   }) {
     return Pet(
       id: id ?? this.id,
@@ -108,6 +140,7 @@ class Pet {
       careCircle: careCircle ?? this.careCircle,
       diagnosis: diagnosis ?? this.diagnosis,
       ownerId: ownerId ?? this.ownerId,
+      pendingInvites: pendingInvites ?? this.pendingInvites,
     );
   }
 }

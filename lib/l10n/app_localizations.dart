@@ -1673,7 +1673,7 @@ abstract class AppLocalizations {
   /// No description provided for @removeMember.
   ///
   /// In en, this message translates to:
-  /// **'Remove'**
+  /// **'Remove Member'**
   String get removeMember;
 
   /// No description provided for @memberRemoved.
@@ -2000,6 +2000,12 @@ abstract class AppLocalizations {
   /// **'Trends'**
   String get navTrends;
 
+  /// No description provided for @navCircle.
+  ///
+  /// In en, this message translates to:
+  /// **'Circle'**
+  String get navCircle;
+
   /// No description provided for @navMeasure.
   ///
   /// In en, this message translates to:
@@ -2023,6 +2029,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Continue'**
   String get continueButton;
+
+  /// No description provided for @circleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{petName}\'s Circle'**
+  String circleTitle(String petName);
+
+  /// No description provided for @circleEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re the only one here!'**
+  String get circleEmptyTitle;
+
+  /// No description provided for @circleEmptyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite family or caregivers to help monitor {petName}.'**
+  String circleEmptyDescription(String petName);
+
+  /// No description provided for @inviteToCircle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite to Circle'**
+  String get inviteToCircle;
+
+  /// No description provided for @inviteDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an email to invite someone to {petName}\'s care circle. They\'ll be able to measure, view trends, and add notes.'**
+  String inviteDescription(String petName);
+
+  /// No description provided for @inviteSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Sent!'**
+  String get inviteSent;
+
+  /// No description provided for @inviteLinkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite link copied to clipboard. Share it via email, WhatsApp, or any messaging app.'**
+  String get inviteLinkCopied;
+
+  /// No description provided for @removeMemberConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from this circle? They will no longer be able to see this pet\'s data.'**
+  String removeMemberConfirm(String name);
+
+  /// No description provided for @remove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get remove;
+
+  /// No description provided for @pendingInvites.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Invites'**
+  String get pendingInvites;
+
+  /// No description provided for @pendingInviteExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires {date}'**
+  String pendingInviteExpires(String date);
+
+  /// No description provided for @cancelInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelInvite;
+
+  /// No description provided for @resendInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend'**
+  String get resendInvite;
+
+  /// No description provided for @invitePending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get invitePending;
+
+  /// No description provided for @noMembersYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No members yet'**
+  String get noMembersYet;
 }
 
 class _AppLocalizationsDelegate

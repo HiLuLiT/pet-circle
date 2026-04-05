@@ -28,13 +28,13 @@ class MockData {
   static final hilaOwner = CareCircleMember(
     name: 'Hila',
     avatarUrl: 'https://ui-avatars.com/api/?name=Hila&size=128&rounded=true&background=E8B4B8&color=5B2C3F',
-    role: CareCircleRole.admin,
+    role: CareCircleRole.owner,
   );
 
   static final drSmithVet = CareCircleMember(
     name: 'Dr. Smith',
     avatarUrl: 'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
-    role: CareCircleRole.viewer,
+    role: CareCircleRole.member,
   );
 
   static final sarahMember = CareCircleMember(
@@ -46,19 +46,19 @@ class MockData {
   static final maxOwner = CareCircleMember(
     name: 'John',
     avatarUrl: 'https://ui-avatars.com/api/?name=John&size=128&rounded=true&background=5B9BD5&color=fff',
-    role: CareCircleRole.admin,
+    role: CareCircleRole.owner,
   );
 
   static final lunaOwner = CareCircleMember(
     name: 'Emily',
     avatarUrl: 'https://ui-avatars.com/api/?name=Emily&size=128&rounded=true&background=F39C12&color=fff',
-    role: CareCircleRole.admin,
+    role: CareCircleRole.owner,
   );
 
   static final rockyOwner = CareCircleMember(
     name: 'Mike',
     avatarUrl: 'https://ui-avatars.com/api/?name=Mike&size=128&rounded=true&background=9B59B6&color=fff',
-    role: CareCircleRole.admin,
+    role: CareCircleRole.owner,
   );
 
   // ── Clinical Notes ─────────────────────────────────────────────────────────

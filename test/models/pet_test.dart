@@ -19,7 +19,7 @@ Pet _makePet() {
       CareCircleMember(
         name: 'Hila',
         avatarUrl: 'https://example.com/hila.png',
-        role: CareCircleRole.admin,
+        role: CareCircleRole.owner,
       ),
     ],
     diagnosis: 'MVD Stage B1',
@@ -103,7 +103,7 @@ void main() {
         CareCircleMember(
           name: 'Bob',
           avatarUrl: 'https://example.com/bob.png',
-          role: CareCircleRole.viewer,
+          role: CareCircleRole.member,
         ),
       ];
 

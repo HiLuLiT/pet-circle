@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/screens/settings/settings_content.dart';
 import 'package:pet_circle/screens/settings/settings_screen.dart';
 
@@ -19,7 +18,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const SettingsContent(role: AppUserRole.owner)),
+        testApp(const SettingsContent()),
       );
       await tester.pumpAndSettle();
 
@@ -33,7 +32,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const SettingsContent(role: AppUserRole.owner)),
+        testApp(const SettingsContent()),
       );
       await tester.pumpAndSettle();
 
@@ -49,7 +48,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const SettingsContent(role: AppUserRole.owner)),
+        testApp(const SettingsContent()),
       );
       await tester.pumpAndSettle();
 
@@ -64,7 +63,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const SettingsContent(role: AppUserRole.owner)),
+        testApp(const SettingsContent()),
       );
       await tester.pumpAndSettle();
 
@@ -80,7 +79,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const SettingsContent(role: AppUserRole.owner)),
+        testApp(const SettingsContent()),
       );
       await tester.pumpAndSettle();
 
@@ -97,7 +96,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        testApp(const SettingsDrawer(role: AppUserRole.owner)),
+        testApp(const SettingsDrawer()),
       );
       await tester.pumpAndSettle();
 

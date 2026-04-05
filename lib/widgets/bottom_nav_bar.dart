@@ -26,9 +26,9 @@ class BottomNavBar extends StatelessWidget {
         activeIcon: Icons.show_chart,
         label: 'Trends'),
     _TabDef(
-        icon: Icons.menu_book_outlined,
-        activeIcon: Icons.menu_book,
-        label: 'Diary'),
+        icon: Icons.people_outline,
+        activeIcon: Icons.people,
+        label: 'Circle'),
     _TabDef(
         icon: Icons.monitor_heart_outlined,
         activeIcon: Icons.monitor_heart,

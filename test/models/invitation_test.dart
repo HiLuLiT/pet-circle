@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/invitation.dart';
 
 Invitation _makeInvitation({
@@ -11,7 +10,6 @@ Invitation _makeInvitation({
     petId: 'p-1',
     petName: 'Princess',
     invitedEmail: 'friend@example.com',
-    role: CareCircleRole.member,
     invitedByUid: 'u-1',
     invitedByName: 'Hila',
     createdAt: DateTime(2025, 3, 1),
@@ -29,7 +27,6 @@ void main() {
       expect(invitation.petId, 'p-1');
       expect(invitation.petName, 'Princess');
       expect(invitation.invitedEmail, 'friend@example.com');
-      expect(invitation.role, CareCircleRole.member);
       expect(invitation.invitedByUid, 'u-1');
       expect(invitation.invitedByName, 'Hila');
       expect(invitation.createdAt, DateTime(2025, 3, 1));
@@ -41,7 +38,6 @@ void main() {
         petId: 'p-1',
         petName: 'Buddy',
         invitedEmail: 'test@example.com',
-        role: CareCircleRole.viewer,
         invitedByUid: 'u-1',
         invitedByName: 'Owner',
         createdAt: DateTime(2025, 1, 1),
@@ -51,21 +47,10 @@ void main() {
       expect(invitation.status, InvitationStatus.pending);
     });
 
-    test('type defaults to careCircle', () {
-      final invitation = _makeInvitation();
-      expect(invitation.type, InvitationType.careCircle);
-    });
-
     test('all InvitationStatus values are distinct', () {
       final statuses = InvitationStatus.values;
       expect(statuses.length, 4);
       expect(statuses.toSet().length, 4);
-    });
-
-    test('all InvitationType values are distinct', () {
-      final types = InvitationType.values;
-      expect(types.length, 2);
-      expect(types.toSet().length, 2);
     });
   });
 
@@ -133,7 +118,6 @@ void main() {
       expect(map['invitedByUid'], 'u-1');
       expect(map['invitedByName'], 'Hila');
       expect(map['status'], 'pending');
-      expect(map['type'], 'careCircle');
       expect(map.containsKey('createdAt'), isTrue);
       expect(map.containsKey('expiresAt'), isTrue);
     });
@@ -144,7 +128,6 @@ void main() {
         petId: 'p-1',
         petName: 'Pet',
         invitedEmail: 'Test@Example.COM',
-        role: CareCircleRole.viewer,
         invitedByUid: 'u-1',
         invitedByName: 'Owner',
         createdAt: DateTime(2025, 1, 1),
@@ -160,23 +143,6 @@ void main() {
       final map = invitation.toFirestore();
 
       expect(map.containsKey('id'), isFalse);
-    });
-
-    test('toFirestore serializes vet type correctly', () {
-      final invitation = Invitation(
-        id: 'inv-vet',
-        petId: 'p-1',
-        petName: 'Pet',
-        invitedEmail: 'vet@example.com',
-        role: CareCircleRole.admin,
-        invitedByUid: 'u-1',
-        invitedByName: 'Owner',
-        createdAt: DateTime(2025, 1, 1),
-        expiresAt: DateTime(2025, 2, 1),
-        type: InvitationType.vet,
-      );
-
-      expect(invitation.toFirestore()['type'], 'vet');
     });
   });
 }

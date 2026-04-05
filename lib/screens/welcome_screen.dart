@@ -42,11 +42,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     setState(() => _isLoading = false);
 
     if (result.success) {
-      if (result.isNewUser) {
-        context.go(AppRoutes.roleSelection);
-      } else {
-        context.go(AppRoutes.authGate);
-      }
+      context.go(AppRoutes.authGate);
     } else if (result.error != null && result.error != 'Sign in cancelled') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result.error!)),
@@ -65,13 +61,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     setState(() => _isLoading = false);
 
     if (result.success) {
-      if (result.isNewUser) {
-        // New user needs to pick a role before we create their profile
-        context.go(AppRoutes.roleSelection);
-      } else {
-        // Existing user — go straight to app
-        context.go(AppRoutes.authGate);
-      }
+      context.go(AppRoutes.authGate);
     } else if (result.error != null && result.error != 'Sign in cancelled') {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(result.error!)),
@@ -143,7 +133,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                 foregroundColor:
                                     AppSemanticColors.of(context).textPrimary,
                                 onPressed: () =>
-                                    context.push(AppRoutes.roleSelection),
+                                    context.push(AppRoutes.authGate),
                               ),
                               const SizedBox(height: AppSpacingTokens.md),
                               _GoogleSignInButton(

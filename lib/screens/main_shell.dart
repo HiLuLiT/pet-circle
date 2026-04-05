@@ -5,11 +5,9 @@ import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
-import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/screens/settings/settings_screen.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
-import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
-import 'package:pet_circle/screens/diary/diary_screen.dart';
+import 'package:pet_circle/screens/circle/circle_screen.dart';
 import 'package:pet_circle/screens/measurement/measurement_screen.dart';
 import 'package:pet_circle/screens/medication/medication_screen.dart'
     show MedicationScreen;
@@ -26,11 +24,9 @@ import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 class MainShell extends StatefulWidget {
   const MainShell({
     super.key,
-    required this.role,
     this.initialIndex = 0,
   });
 
-  final AppUserRole role;
   final int initialIndex;
 
   @override
@@ -57,7 +53,7 @@ class _MainShellState extends State<MainShell> {
   void _onDestinationSelected(int index) {
     if (kIsWeb) {
       // Update the browser URL so the tab state is reflected in the address bar.
-      context.go(AppRoutes.shell(widget.role, tab: index));
+      context.go(AppRoutes.shell(tab: index));
     } else {
       setState(() => _selectedIndex = index);
     }
@@ -135,9 +131,7 @@ class _MainShellState extends State<MainShell> {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isWide = screenWidth >= kTabletBreakpoint;
 
-    final homeScreen = widget.role == AppUserRole.vet
-        ? const VetDashboard(showScaffold: false)
-        : const OwnerDashboard(showScaffold: false);
+    const homeScreen = OwnerDashboard(showScaffold: false);
 
     return ListenableBuilder(
       listenable: Listenable.merge([petStore, userStore]),
@@ -163,7 +157,7 @@ class _MainShellState extends State<MainShell> {
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
-                  builder: (_) => SettingsDrawer(role: widget.role),
+                  builder: (_) => const SettingsDrawer(),
                 ),
                 onNotificationTap: () => showModalBottomSheet<void>(
                   context: context,
@@ -180,7 +174,7 @@ class _MainShellState extends State<MainShell> {
                 children: [
                   homeScreen,
                   const TrendsScreen(showScaffold: false),
-                  const DiaryScreen(showScaffold: false),
+                  const CircleScreen(showScaffold: false),
                   const MeasurementScreen(showScaffold: false),
                   const MedicationScreen(showScaffold: false),
                 ],
@@ -229,7 +223,7 @@ class _MainShellState extends State<MainShell> {
     final labels = [
       l10n.navHome,
       l10n.navTrends,
-      'Diary',
+      l10n.navCircle,
       l10n.navMeasure,
       l10n.navMedication,
     ];
@@ -237,7 +231,7 @@ class _MainShellState extends State<MainShell> {
     final icons = <IconData>[
       Icons.home_outlined,
       Icons.show_chart_outlined,
-      Icons.menu_book_outlined,
+      Icons.people_outline,
       Icons.monitor_heart_outlined,
       Icons.medication_outlined,
     ];
@@ -245,7 +239,7 @@ class _MainShellState extends State<MainShell> {
     final activeIcons = <IconData>[
       Icons.home,
       Icons.show_chart,
-      Icons.menu_book,
+      Icons.people,
       Icons.monitor_heart,
       Icons.medication,
     ];

@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
-import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/app_assets.dart';
@@ -43,7 +42,7 @@ class CareCircleDashboard extends StatelessWidget {
                             (pet) => _PetCard(
                               data: pet,
                               onTap: () => context.go(
-                                AppRoutes.shell(userStore.role, tab: 2),
+                                AppRoutes.shell(tab: 2),
                               ),
                             ),
                           )

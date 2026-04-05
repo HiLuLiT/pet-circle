@@ -73,14 +73,14 @@ void main() {
       );
     });
 
-    testWidgets('Diary nav item has semantic label "Diary"', (tester) async {
+    testWidgets('Circle nav item has semantic label "Circle"', (tester) async {
       await tester.pumpWidget(buildNav());
       await tester.pump();
 
       expect(
-        find.bySemanticsLabel(RegExp('Diary')),
+        find.bySemanticsLabel(RegExp('Circle')),
         findsOneWidget,
-        reason: 'Diary tab must expose a "Diary" semantics label',
+        reason: 'Circle tab must expose a "Circle" semantics label',
       );
     });
 
@@ -113,7 +113,7 @@ void main() {
       await tester.pumpWidget(buildNav(selectedIndex: 2));
       await tester.pump();
 
-      for (final label in ['Home', 'Trends', 'Diary', 'Mesure', 'Medicine']) {
+      for (final label in ['Home', 'Trends', 'Circle', 'Mesure', 'Medicine']) {
         expect(
           find.bySemanticsLabel(RegExp(label)),
           findsOneWidget,

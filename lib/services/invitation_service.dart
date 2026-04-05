@@ -8,7 +8,6 @@ class InvitationService {
   static final _invitationsCollection = _firestore.collection('invitations');
   static final _petsCollection = _firestore.collection('pets');
 
-  static const int maxVetsPerPet = 2;
   static const int maxInvitesPerDay = 5;
 
   static String _generateToken() {
@@ -20,22 +19,20 @@ class InvitationService {
   static Map<String, dynamic> _pendingInviteData(Invitation invitation) {
     return {
       'invitedEmail': invitation.invitedEmail.toLowerCase(),
-      'role': invitation.role.name,
-      'type': invitation.type.name,
+      'role': 'member',
       'expiresAt': Timestamp.fromDate(invitation.expiresAt),
       'createdAt': Timestamp.fromDate(invitation.createdAt),
     };
   }
 
   /// Create a new invitation and return the token.
+  /// All invitees join as members — no role selection needed.
   static Future<String> createInvitation({
     required String petId,
     required String petName,
     required String invitedEmail,
-    required CareCircleRole role,
     required String invitedByUid,
     required String invitedByName,
-    InvitationType type = InvitationType.careCircle,
   }) async {
     final token = _generateToken();
     final now = DateTime.now();
@@ -44,12 +41,10 @@ class InvitationService {
       petId: petId,
       petName: petName,
       invitedEmail: invitedEmail.toLowerCase(),
-      role: role,
       invitedByUid: invitedByUid,
       invitedByName: invitedByName,
       createdAt: now,
       expiresAt: now.add(const Duration(days: 7)),
-      type: type,
     );
 
     final batch = _firestore.batch();
@@ -68,7 +63,8 @@ class InvitationService {
     return Invitation.fromFirestore(doc);
   }
 
-  /// Accept an invitation: validate, add user to care circle, mark as accepted.
+  /// Accept an invitation: validate, add user to care circle as member,
+  /// mark as accepted.
   static Future<AcceptResult> acceptInvitation({
     required String token,
     required String uid,
@@ -137,7 +133,7 @@ class InvitationService {
             uid: uid,
             name: displayName,
             avatarUrl: avatarUrl,
-            role: invitation.role,
+            role: CareCircleRole.member,
           ).toFirestore();
         }
 
@@ -189,18 +185,6 @@ class InvitationService {
     return snapshot.docs.isNotEmpty;
   }
 
-  /// Count pending + accepted vet invitations for a given pet.
-  static Future<int> vetCountForPet(String petId) async {
-    final snapshot = await _invitationsCollection
-        .where('petId', isEqualTo: petId)
-        .where('type', isEqualTo: InvitationType.vet.name)
-        .get();
-    return snapshot.docs
-        .map((doc) => Invitation.fromFirestore(doc))
-        .where((inv) => inv.status == InvitationStatus.pending || inv.status == InvitationStatus.accepted)
-        .length;
-  }
-
   /// Count how many invitations a user has sent in the last 24 hours.
   static Future<int> invitesSentToday(String uid) async {
     final cutoff = DateTime.now().subtract(const Duration(hours: 24));
@@ -211,18 +195,15 @@ class InvitationService {
     return snapshot.docs.length;
   }
 
-  /// Validate that a vet invitation can be created. Returns null if valid,
+  /// Validate that an invitation can be created. Returns null if valid,
   /// or an error key string suitable for localisation lookup.
-  static Future<String?> validateVetInvitation({
+  static Future<String?> validateInvitation({
     required String petId,
     required String email,
     required String invitedByUid,
   }) async {
     if (await hasDuplicateInvitation(petId: petId, email: email)) {
-      return 'vetAlreadyInvited';
-    }
-    if (await vetCountForPet(petId) >= maxVetsPerPet) {
-      return 'maxVetsReached';
+      return 'alreadyInvited';
     }
     if (await invitesSentToday(invitedByUid) >= maxInvitesPerDay) {
       return 'dailyInviteLimitReached';

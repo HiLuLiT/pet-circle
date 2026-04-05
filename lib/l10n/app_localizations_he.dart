@@ -842,7 +842,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get profilePhoto => 'כתובת תמונת פרופיל';
 
   @override
-  String get removeMember => 'הסרה';
+  String get removeMember => 'הסר חבר';
 
   @override
   String get memberRemoved => 'חבר הוסר';
@@ -1033,6 +1033,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get navTrends => 'מגמות';
 
   @override
+  String get navCircle => 'מעגל';
+
+  @override
   String get navMeasure => 'מדידה';
 
   @override
@@ -1043,4 +1046,60 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get continueButton => 'המשך';
+
+  @override
+  String circleTitle(String petName) {
+    return 'המעגל של $petName';
+  }
+
+  @override
+  String get circleEmptyTitle => 'אתה לבד כאן!';
+
+  @override
+  String circleEmptyDescription(String petName) {
+    return 'הזמן בני משפחה או מטפלים לעזור לעקוב אחרי $petName.';
+  }
+
+  @override
+  String get inviteToCircle => 'הזמן למעגל';
+
+  @override
+  String inviteDescription(String petName) {
+    return 'הכנס אימייל כדי להזמין מישהו למעגל הטיפול של $petName. הם יוכלו למדוד, לצפות במגמות ולהוסיף הערות.';
+  }
+
+  @override
+  String get inviteSent => 'ההזמנה נשלחה!';
+
+  @override
+  String get inviteLinkCopied =>
+      'קישור ההזמנה הועתק. שתף אותו דרך אימייל, וואטסאפ או כל אפליקציית הודעות.';
+
+  @override
+  String removeMemberConfirm(String name) {
+    return 'להסיר את $name מהמעגל? הם לא יוכלו יותר לראות את הנתונים של חיית המחמד.';
+  }
+
+  @override
+  String get remove => 'הסר';
+
+  @override
+  String get pendingInvites => 'הזמנות ממתינות';
+
+  @override
+  String pendingInviteExpires(String date) {
+    return 'פג תוקף $date';
+  }
+
+  @override
+  String get cancelInvite => 'ביטול';
+
+  @override
+  String get resendInvite => 'שלח שוב';
+
+  @override
+  String get invitePending => 'ממתין';
+
+  @override
+  String get noMembersYet => 'אין חברים עדיין';
 }

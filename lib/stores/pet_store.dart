@@ -254,7 +254,7 @@ class PetStore extends ChangeNotifier {
     if (uid != null && pet.ownerId == uid) {
       return PetAccess(
         pet: pet,
-        role: CareCircleRole.admin,
+        role: CareCircleRole.owner,
         source: PetAccessSource.ownerId,
         isOwner: true,
       );
@@ -317,7 +317,7 @@ class PetStore extends ChangeNotifier {
     if (kEnableFirebase && pet?.id != null) {
       final member = previousCareCircle?.firstWhere(
         (m) => m.name == memberName,
-        orElse: () => CareCircleMember(name: '', avatarUrl: '', role: CareCircleRole.viewer),
+        orElse: () => CareCircleMember(name: '', avatarUrl: '', role: CareCircleRole.member),
       );
       if (member?.uid != null) {
         try {

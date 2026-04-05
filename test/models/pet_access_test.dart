@@ -23,13 +23,13 @@ void main() {
     test('creates with all required fields', () {
       final access = PetAccess(
         pet: _makePet(),
-        role: CareCircleRole.admin,
+        role: CareCircleRole.owner,
         source: PetAccessSource.ownerId,
         isOwner: true,
       );
 
       expect(access.pet, isNotNull);
-      expect(access.role, CareCircleRole.admin);
+      expect(access.role, CareCircleRole.owner);
       expect(access.source, PetAccessSource.ownerId);
       expect(access.isOwner, isTrue);
     });
@@ -47,7 +47,7 @@ void main() {
     test('pet can be null', () {
       final access = PetAccess(
         pet: null,
-        role: CareCircleRole.viewer,
+        role: CareCircleRole.member,
         source: PetAccessSource.unknown,
       );
 
@@ -56,11 +56,11 @@ void main() {
   });
 
   group('PetAccess.unknown factory', () {
-    test('creates with viewer role and unknown source', () {
+    test('creates with member role and unknown source', () {
       final access = PetAccess.unknown();
 
       expect(access.pet, isNull);
-      expect(access.role, CareCircleRole.viewer);
+      expect(access.role, CareCircleRole.member);
       expect(access.source, PetAccessSource.unknown);
       expect(access.isOwner, isFalse);
     });
@@ -71,7 +71,7 @@ void main() {
 
       expect(access.pet, isNotNull);
       expect(access.pet!.name, 'Princess');
-      expect(access.role, CareCircleRole.viewer);
+      expect(access.role, CareCircleRole.member);
       expect(access.source, PetAccessSource.unknown);
     });
   });
@@ -80,7 +80,7 @@ void main() {
     test('hasPet returns true when pet is not null', () {
       final access = PetAccess(
         pet: _makePet(),
-        role: CareCircleRole.admin,
+        role: CareCircleRole.owner,
         source: PetAccessSource.ownerId,
       );
 
@@ -92,39 +92,13 @@ void main() {
 
       expect(access.hasPet, isFalse);
     });
-
-    test('isViewer returns true for viewer role', () {
-      final access = PetAccess(
-        pet: _makePet(),
-        role: CareCircleRole.viewer,
-        source: PetAccessSource.careCircleUid,
-      );
-
-      expect(access.isViewer, isTrue);
-    });
-
-    test('isViewer returns false for non-viewer roles', () {
-      final admin = PetAccess(
-        pet: _makePet(),
-        role: CareCircleRole.admin,
-        source: PetAccessSource.ownerId,
-      );
-      final member = PetAccess(
-        pet: _makePet(),
-        role: CareCircleRole.member,
-        source: PetAccessSource.careCircleUid,
-      );
-
-      expect(admin.isViewer, isFalse);
-      expect(member.isViewer, isFalse);
-    });
   });
 
   group('PetAccess permission delegation', () {
-    test('admin can measure, edit, manage circle, delete, add notes', () {
+    test('owner can measure, edit, manage circle, delete, add notes', () {
       final access = PetAccess(
         pet: _makePet(),
-        role: CareCircleRole.admin,
+        role: CareCircleRole.owner,
         source: PetAccessSource.ownerId,
       );
 
@@ -151,22 +125,6 @@ void main() {
       expect(access.canAddNotes, isTrue);
       expect(access.canManageMedication, isTrue);
       expect(access.canDeleteMeasurements, isTrue);
-    });
-
-    test('viewer can only add notes', () {
-      final access = PetAccess(
-        pet: _makePet(),
-        role: CareCircleRole.viewer,
-        source: PetAccessSource.careCircleEmailFallback,
-      );
-
-      expect(access.canMeasure, isFalse);
-      expect(access.canEditPet, isFalse);
-      expect(access.canManageCircle, isFalse);
-      expect(access.canDeletePet, isFalse);
-      expect(access.canAddNotes, isTrue);
-      expect(access.canManageMedication, isFalse);
-      expect(access.canDeleteMeasurements, isFalse);
     });
   });
 
