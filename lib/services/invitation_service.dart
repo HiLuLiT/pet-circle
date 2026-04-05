@@ -8,7 +8,7 @@ class InvitationService {
   static final _invitationsCollection = _firestore.collection('invitations');
   static final _petsCollection = _firestore.collection('pets');
 
-  static const int maxInvitesPerDay = 5;
+  static const int maxInvitesPerDay = 20;
 
   static String _generateToken() {
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';

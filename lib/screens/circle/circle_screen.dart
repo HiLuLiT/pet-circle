@@ -508,9 +508,15 @@ class _InviteSheetState extends State<_InviteSheet> {
 
       if (validationError != null) {
         if (!mounted) return;
+        final l10n = AppLocalizations.of(context)!;
+        final message = switch (validationError) {
+          'alreadyInvited' => l10n.vetAlreadyInvited,
+          'dailyInviteLimitReached' => l10n.dailyInviteLimitReached,
+          _ => validationError,
+        };
         setState(() {
           _isLoading = false;
-          _error = validationError;
+          _error = message;
         });
         return;
       }
