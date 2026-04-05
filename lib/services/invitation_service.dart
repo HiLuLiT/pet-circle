@@ -172,27 +172,34 @@ class InvitationService {
   }
 
   /// Check if a pending invitation already exists for this pet + email combo.
+  /// Uses a single-field query + client-side filtering to avoid composite indexes.
   static Future<bool> hasDuplicateInvitation({
     required String petId,
     required String email,
   }) async {
+    final normalizedEmail = email.toLowerCase();
     final snapshot = await _invitationsCollection
         .where('petId', isEqualTo: petId)
-        .where('invitedEmail', isEqualTo: email.toLowerCase())
-        .where('status', isEqualTo: InvitationStatus.pending.name)
-        .limit(1)
         .get();
-    return snapshot.docs.isNotEmpty;
+    return snapshot.docs.any((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      return data['invitedEmail'] == normalizedEmail &&
+          data['status'] == InvitationStatus.pending.name;
+    });
   }
 
   /// Count how many invitations a user has sent in the last 24 hours.
+  /// Uses a single-field query + client-side filtering to avoid composite indexes.
   static Future<int> invitesSentToday(String uid) async {
     final cutoff = DateTime.now().subtract(const Duration(hours: 24));
     final snapshot = await _invitationsCollection
         .where('invitedByUid', isEqualTo: uid)
-        .where('createdAt', isGreaterThan: Timestamp.fromDate(cutoff))
         .get();
-    return snapshot.docs.length;
+    return snapshot.docs.where((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      final createdAt = (data['createdAt'] as Timestamp?)?.toDate();
+      return createdAt != null && createdAt.isAfter(cutoff);
+    }).length;
   }
 
   /// Validate that an invitation can be created. Returns null if valid,
