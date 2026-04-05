@@ -202,7 +202,7 @@ class _CircleContent extends StatelessWidget {
       ),
     );
     if (confirmed == true) {
-      await petStore.removeCareCircleMemberWithFirestore(petName, member.name);
+      await petStore.removeCareCircleMemberByUid(petName, member.uid, member.name);
     }
   }
 

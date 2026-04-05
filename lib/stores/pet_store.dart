@@ -308,34 +308,32 @@ class PetStore extends ChangeNotifier {
     return accessForPet(pet).role;
   }
 
+  /// Remove a care circle member. When Firebase is enabled, the Firestore
+  /// stream handles the UI update — no optimistic local removal is needed
+  /// (which would be overwritten by the stream's stale data, causing flicker).
+  Future<void> removeCareCircleMemberByUid(String petName, String? uid, String memberName) async {
+    final pet = getPetByName(petName);
+
+    if (kEnableFirebase && pet?.id != null && uid != null) {
+      await PetService.removeCareCircleMember(pet!.id!, uid);
+      // Firestore stream will update the UI automatically.
+    } else {
+      // Mock mode or missing UID — remove locally.
+      _removeCareCircleMemberLocal(petName, memberName);
+    }
+  }
+
+  @Deprecated('Use removeCareCircleMemberByUid instead')
   Future<void> removeCareCircleMemberWithFirestore(String petName, String memberName) async {
     final pet = getPetByName(petName);
-    final previousCareCircle = pet?.careCircle.toList();
-
-    _removeCareCircleMemberLocal(petName, memberName);
-
     if (kEnableFirebase && pet?.id != null) {
-      final member = previousCareCircle?.firstWhere(
-        (m) => m.name == memberName,
-        orElse: () => CareCircleMember(name: '', avatarUrl: '', role: CareCircleRole.member),
-      );
+      final member = pet!.careCircle.where((m) => m.name == memberName).firstOrNull;
       if (member?.uid != null) {
-        try {
-          await PetService.removeCareCircleMember(pet!.id!, member!.uid!);
-        } catch (e) {
-          if (previousCareCircle != null) {
-            for (final list in [_ownerPets, _clinicPets]) {
-              final idx = list.indexWhere((p) => p.name == petName);
-              if (idx != -1) {
-                list[idx] = list[idx].copyWith(careCircle: previousCareCircle);
-              }
-            }
-            notifyListeners();
-          }
-          rethrow;
-        }
+        await PetService.removeCareCircleMember(pet.id!, member!.uid!);
+        return;
       }
     }
+    _removeCareCircleMemberLocal(petName, memberName);
   }
 
   void removeCareCircleMember(String petName, String memberName) {
