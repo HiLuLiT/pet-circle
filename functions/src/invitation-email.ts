@@ -1,10 +1,16 @@
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import { Resend } from "resend";
 import { invitationEmailHtml, invitationEmailText } from "./email-templates";
 
+const resendApiKey = defineSecret("RESEND_API_KEY");
+
 export const onInvitationCreated = onDocumentCreated(
-  "invitations/{token}",
+  {
+    document: "invitations/{token}",
+    secrets: [resendApiKey],
+  },
   async (event) => {
     const snap = event.data;
     if (!snap) {
@@ -20,9 +26,9 @@ export const onInvitationCreated = onDocumentCreated(
       return;
     }
 
-    const apiKey = process.env.RESEND_API_KEY;
+    const apiKey = resendApiKey.value();
     if (!apiKey) {
-      logger.error("RESEND_API_KEY not configured");
+      logger.error("RESEND_API_KEY secret not set");
       return;
     }
 
