@@ -533,10 +533,11 @@ class _InviteSheetState extends State<_InviteSheet> {
         _successToken = token;
       });
     } catch (e) {
+      debugPrint('[InviteSheet] Send invite failed: $e');
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _error = 'Failed to send invite. Please try again.';
+        _error = 'Failed to send invite: $e';
       });
     }
   }
