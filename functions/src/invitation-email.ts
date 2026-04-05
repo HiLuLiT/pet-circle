@@ -4,8 +4,6 @@ import { Resend } from "resend";
 import { invitationEmailHtml, invitationEmailText } from "./email-templates";
 
 // Singleton pattern — matches the working OTP email implementation.
-// Uses process.env (not defineSecret) because that's how the RESEND_API_KEY
-// is configured in the Firebase environment.
 let resendClient: Resend | null = null;
 
 function getResendClient(): Resend {
@@ -18,6 +16,10 @@ function getResendClient(): Resend {
   }
   return resendClient;
 }
+
+// Use Resend's built-in sender (same as the working OTP email code).
+// Switch to a verified custom domain for production.
+const FROM_EMAIL = "Pet Circle <onboarding@resend.dev>";
 
 export const onInvitationCreated = onDocumentCreated(
   "invitations/{token}",
@@ -37,14 +39,13 @@ export const onInvitationCreated = onDocumentCreated(
     }
 
     const resend = getResendClient();
-    const fromEmail = process.env.FROM_EMAIL || "Pet Circle <noreply@petcircle.app>";
     const appUrl = process.env.APP_URL || "https://petcircle.app";
     const inviteLink = `${appUrl}/invite?token=${token}`;
 
     try {
       const result = await resend.emails.send({
-        from: fromEmail,
-        to: data.invitedEmail,
+        from: FROM_EMAIL,
+        to: [data.invitedEmail],
         subject: `${data.invitedByName} invited you to ${data.petName}'s care circle`,
         html: invitationEmailHtml({
           inviterName: data.invitedByName,
@@ -58,10 +59,20 @@ export const onInvitationCreated = onDocumentCreated(
         }),
       });
 
+      // Resend SDK returns { data, error } — does NOT throw on API errors.
+      if (result.error) {
+        logger.error("Resend API error", {
+          token,
+          to: data.invitedEmail,
+          error: result.error,
+        });
+        return;
+      }
+
       logger.info("Invitation email sent", {
         token,
         to: data.invitedEmail,
-        resendId: result?.data?.id ?? "unknown",
+        resendId: result.data?.id,
       });
     } catch (error) {
       logger.error("Failed to send invitation email", { token, error });
