@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
@@ -202,7 +203,17 @@ class _CircleContent extends StatelessWidget {
       ),
     );
     if (confirmed == true) {
-      await petStore.removeCareCircleMemberByUid(petName, member.uid, member.name);
+      try {
+        debugPrint('[CircleScreen] Removing member: name="${member.name}", uid="${member.uid}", pet="$petName"');
+        await petStore.removeCareCircleMemberByUid(petName, member.uid, member.name);
+        debugPrint('[CircleScreen] Remove succeeded');
+      } catch (e) {
+        debugPrint('[CircleScreen] Remove failed: $e');
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to remove member: $e')),
+        );
+      }
     }
   }
 
