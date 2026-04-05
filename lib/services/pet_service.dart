@@ -51,25 +51,66 @@ class PetService {
   }
 
   /// Add a member to a pet's care circle.
+  ///
+  /// Uses a transaction with a full map rewrite because the member key
+  /// may contain dots (e.g. an email), and Firestore's dot-notation
+  /// would misinterpret them as nested field paths.
   static Future<void> addCareCircleMember(
     String petId,
-    String uid,
+    String memberKey,
     CareCircleMember member,
   ) async {
-    await _petsCollection.doc(petId).update({
-      'careCircle.$uid': member.toFirestore(),
-      'memberUids': FieldValue.arrayUnion([uid]),
+    final docRef = _petsCollection.doc(petId);
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+      if (!snapshot.exists) return;
+
+      final data = snapshot.data() as Map<String, dynamic>;
+      final careCircle =
+          Map<String, dynamic>.from(data['careCircle'] as Map? ?? {});
+      final memberUids =
+          List<String>.from(data['memberUids'] as List? ?? []);
+
+      careCircle[memberKey] = member.toFirestore();
+      if (!memberUids.contains(memberKey)) {
+        memberUids.add(memberKey);
+      }
+
+      transaction.update(docRef, {
+        'careCircle': careCircle,
+        'memberUids': memberUids,
+      });
     });
   }
 
   /// Remove a member from a pet's care circle.
+  ///
+  /// Uses a transaction with a full map rewrite because the member key
+  /// may contain dots (e.g. an email like `user@example.com`), and
+  /// Firestore's dot-notation in field paths would interpret those dots
+  /// as nested fields, corrupting the document.
   static Future<void> removeCareCircleMember(
     String petId,
-    String uid,
+    String memberKey,
   ) async {
-    await _petsCollection.doc(petId).update({
-      'careCircle.$uid': FieldValue.delete(),
-      'memberUids': FieldValue.arrayRemove([uid]),
+    final docRef = _petsCollection.doc(petId);
+    await _firestore.runTransaction((transaction) async {
+      final snapshot = await transaction.get(docRef);
+      if (!snapshot.exists) return;
+
+      final data = snapshot.data() as Map<String, dynamic>;
+      final careCircle =
+          Map<String, dynamic>.from(data['careCircle'] as Map? ?? {});
+      final memberUids =
+          List<String>.from(data['memberUids'] as List? ?? []);
+
+      careCircle.remove(memberKey);
+      memberUids.remove(memberKey);
+
+      transaction.update(docRef, {
+        'careCircle': careCircle,
+        'memberUids': memberUids,
+      });
     });
   }
 
