@@ -1,28 +1,15 @@
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
-import { Resend } from "resend";
-import { invitationEmailHtml, invitationEmailText } from "./email-templates";
+import { sendInvitationViaResend } from "./email";
 
-// Singleton pattern — matches the working OTP email implementation.
-let resendClient: Resend | null = null;
-
-function getResendClient(): Resend {
-  if (!resendClient) {
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      throw new Error("RESEND_API_KEY environment variable is not set");
-    }
-    resendClient = new Resend(apiKey);
-  }
-  return resendClient;
-}
-
-// Use Resend's built-in sender (same as the working OTP email code).
-// Switch to a verified custom domain for production.
-const FROM_EMAIL = "Pet Circle <onboarding@resend.dev>";
+const resendApiKey = defineSecret("RESEND_API_KEY");
 
 export const onInvitationCreated = onDocumentCreated(
-  "invitations/{token}",
+  {
+    document: "invitations/{token}",
+    secrets: [resendApiKey],
+  },
   async (event) => {
     const snap = event.data;
     if (!snap) {
@@ -38,44 +25,29 @@ export const onInvitationCreated = onDocumentCreated(
       return;
     }
 
-    const resend = getResendClient();
     const appUrl = process.env.APP_URL || "https://petcircle.app";
     const inviteLink = `${appUrl}/invite?token=${token}`;
 
-    try {
-      const result = await resend.emails.send({
-        from: FROM_EMAIL,
-        to: [data.invitedEmail],
-        subject: `${data.invitedByName} invited you to ${data.petName}'s care circle`,
-        html: invitationEmailHtml({
-          inviterName: data.invitedByName,
-          petName: data.petName,
-          inviteLink,
-        }),
-        text: invitationEmailText({
-          inviterName: data.invitedByName,
-          petName: data.petName,
-          inviteLink,
-        }),
-      });
+    // Reuse the same email sending pattern as OTP (singleton Resend client)
+    const result = await sendInvitationViaResend(
+      data.invitedEmail,
+      data.invitedByName,
+      data.petName,
+      inviteLink,
+    );
 
-      // Resend SDK returns { data, error } — does NOT throw on API errors.
-      if (result.error) {
-        logger.error("Resend API error", {
-          token,
-          to: data.invitedEmail,
-          error: result.error,
-        });
-        return;
-      }
-
-      logger.info("Invitation email sent", {
+    if (!result.success) {
+      logger.error("Failed to send invitation email", {
         token,
         to: data.invitedEmail,
-        resendId: result.data?.id,
+        error: result.error,
       });
-    } catch (error) {
-      logger.error("Failed to send invitation email", { token, error });
+      return;
     }
+
+    logger.info("Invitation email sent", {
+      token,
+      to: data.invitedEmail,
+    });
   },
 );
