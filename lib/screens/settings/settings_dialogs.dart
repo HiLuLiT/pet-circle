@@ -40,19 +40,18 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
           ),
           TextButton(
             onPressed: () async {
-              // 1. Close the dialog
+              // Capture the GoRouter BEFORE closing anything.
+              final router = GoRouter.of(context);
+
+              // Close the dialog.
               Navigator.pop(dialogCtx);
 
-              // 2. Close the settings bottom sheet
-              if (widget.onClose != null) widget.onClose!();
-
-              // 3. Wait one frame for overlays to fully dismiss
-              await Future.delayed(Duration.zero);
-
-              // 4. Sign out — GoRouter's refreshListenable will
-              //    auto-redirect to auth-gate → welcome screen.
-              //    No manual context.go() needed.
+              // Sign out from Firebase + Google.
               await authProvider.signOut();
+
+              // Navigate to welcome. GoRouter.of(context) was captured
+              // before the dialog was popped, so it's still valid.
+              router.go(AppRoutes.welcome);
             },
             style: TextButton.styleFrom(backgroundColor: c.error),
             child: Text(l10n.signOut, style: TextStyle(color: c.background)),
