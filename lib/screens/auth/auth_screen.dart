@@ -13,9 +13,8 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 
 class AuthScreen extends StatefulWidget {
-  const AuthScreen({super.key, this.role, this.startWithSignIn = false});
+  const AuthScreen({super.key, this.startWithSignIn = false});
 
-  final AppUserRole? role;
   final bool startWithSignIn;
 
   @override
@@ -58,7 +57,7 @@ class _AuthScreenState extends State<AuthScreen> {
       result = await AuthService.signUpWithEmail(
         email: _emailController.text.trim(),
         password: _passwordController.text,
-        role: widget.role ?? AppUserRole.owner,
+        role: AppUserRole.owner,
         displayName: _nameController.text.trim(),
       );
     } else {
@@ -89,7 +88,7 @@ class _AuthScreenState extends State<AuthScreen> {
       _error = null;
     });
 
-    final result = await AuthService.signInWithGoogle(role: widget.role);
+    final result = await AuthService.signInWithGoogle();
 
     if (!mounted) return;
 
@@ -108,7 +107,7 @@ class _AuthScreenState extends State<AuthScreen> {
       _error = null;
     });
 
-    final result = await AuthService.signInWithApple(role: widget.role);
+    final result = await AuthService.signInWithApple();
 
     if (!mounted) return;
 
@@ -163,9 +162,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final isAppleAvailable = !kIsWeb &&
         (defaultTargetPlatform == TargetPlatform.iOS ||
             defaultTargetPlatform == TargetPlatform.macOS);
-    final roleLabel = widget.role != null
-        ? (widget.role == AppUserRole.vet ? l10n.veterinarian : l10n.petOwner)
-        : null;
+    final roleLabel = l10n.petOwner;
 
     return Scaffold(
       backgroundColor: c.primaryLightest,
@@ -213,9 +210,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(
-                      widget.role == AppUserRole.vet
-                          ? Icons.medical_services_outlined
-                          : Icons.pets,
+                      Icons.pets,
                       size: 18,
                       color: c.textPrimary,
                     ),

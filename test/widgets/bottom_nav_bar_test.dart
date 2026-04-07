@@ -24,7 +24,7 @@ void main() {
 
       expect(find.text('Home'), findsOneWidget);
       expect(find.text('Trends'), findsOneWidget);
-      expect(find.text('Diary'), findsOneWidget);
+      expect(find.text('Circle'), findsOneWidget);
       expect(find.text('Mesure'), findsOneWidget);
       expect(find.text('Medicine'), findsOneWidget);
     });
@@ -50,12 +50,12 @@ void main() {
       expect(trendsLabel.style?.color, AppPrimitives.inkLight);
     });
 
-    testWidgets('selecting index 2 highlights Diary tab', (tester) async {
+    testWidgets('selecting index 2 highlights Circle tab', (tester) async {
       await tester.pumpWidget(testApp(
         BottomNavBar(selectedIndex: 2, onTap: (_) {}),
       ));
 
-      final diaryLabel = tester.widget<Text>(find.text('Diary'));
+      final diaryLabel = tester.widget<Text>(find.text('Circle'));
       expect(diaryLabel.style?.color, AppSemanticColors.light.primary);
 
       final homeLabel = tester.widget<Text>(find.text('Home'));
@@ -75,14 +75,14 @@ void main() {
       expect(tappedIndex, 4);
     });
 
-    testWidgets('tapping Diary tab calls onTap with index 2',
+    testWidgets('tapping Circle tab calls onTap with index 2',
         (tester) async {
       int? tappedIndex;
       await tester.pumpWidget(testApp(
         BottomNavBar(selectedIndex: 0, onTap: (i) => tappedIndex = i),
       ));
 
-      await tester.tap(find.text('Diary'));
+      await tester.tap(find.text('Circle'));
       await tester.pump();
       expect(tappedIndex, 2);
     });

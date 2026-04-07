@@ -28,20 +28,13 @@ class PetAccess {
   bool get canManageCircle => role.canManageCircle;
   bool get canDeletePet => role.canDeletePet;
   bool get canAddNotes => role.canAddNotes;
-
-  // Members can help manage day-to-day health data, but viewers remain read-only.
-  bool get canManageMedication =>
-      role == CareCircleRole.admin || role == CareCircleRole.member;
-
-  bool get canDeleteMeasurements =>
-      role == CareCircleRole.admin || role == CareCircleRole.member;
-
-  bool get isViewer => role == CareCircleRole.viewer;
+  bool get canManageMedication => true;
+  bool get canDeleteMeasurements => true;
 
   factory PetAccess.unknown([Pet? pet]) {
     return PetAccess(
       pet: pet,
-      role: CareCircleRole.viewer,
+      role: CareCircleRole.member,
       source: PetAccessSource.unknown,
     );
   }

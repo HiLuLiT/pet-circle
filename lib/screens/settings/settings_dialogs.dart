@@ -6,8 +6,6 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/app_user.dart';
-import 'package:pet_circle/models/care_circle_member.dart';
-import 'package:pet_circle/models/invitation.dart';
 import 'package:pet_circle/services/invitation_service.dart';
 import 'package:pet_circle/services/user_service.dart';
 import 'package:pet_circle/stores/notification_store.dart';
@@ -243,12 +241,10 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                             return;
                           }
                           final navigator = Navigator.of(ctx);
-                          final careCircleRole = CareCirclePermissions.fromString(selectedRole.toLowerCase());
                           final token = await InvitationService.createInvitation(
                             petId: activePet!.id!,
                             petName: activePet.name,
                             invitedEmail: email,
-                            role: careCircleRole,
                             invitedByUid: userStore.currentUserUid ?? '',
                             invitedByName: userStore.currentUserDisplayName ?? '',
                           );
@@ -547,7 +543,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                             }
                           final navigator = Navigator.of(ctx);
 
-                            final validationError = await InvitationService.validateVetInvitation(
+                            final validationError = await InvitationService.validateInvitation(
                               petId: activePet!.id!,
                               email: email,
                               invitedByUid: userStore.currentUserUid ?? '',
@@ -555,10 +551,8 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                             if (validationError != null) {
                               String msg;
                               switch (validationError) {
-                                case 'vetAlreadyInvited':
+                                case 'alreadyInvited':
                                   msg = l10n.vetAlreadyInvited;
-                                case 'maxVetsReached':
-                                  msg = l10n.maxVetsReached;
                                 case 'dailyInviteLimitReached':
                                   msg = l10n.dailyInviteLimitReached;
                                 default:
@@ -572,10 +566,8 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                               petId: activePet.id!,
                               petName: activePet.name,
                               invitedEmail: email,
-                              role: CareCircleRole.viewer,
                               invitedByUid: userStore.currentUserUid ?? '',
                               invitedByName: userStore.currentUserDisplayName ?? '',
-                              type: InvitationType.vet,
                             );
                             await notificationStore.addNotification(
                               AppNotification(

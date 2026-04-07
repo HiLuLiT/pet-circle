@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
-import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet_access.dart';
 import 'package:pet_circle/models/pet.dart';
@@ -143,12 +142,12 @@ class OwnerDashboard extends StatelessWidget {
           onMeasure: access.canMeasure
               ? () {
                   petStore.setActivePet(pet);
-                  context.go(AppRoutes.shell(AppUserRole.owner, tab: 3));
+                  context.go(AppRoutes.shell(tab: 3));
                 }
               : null,
           onTrends: () {
             petStore.setActivePet(pet);
-            context.go(AppRoutes.shell(AppUserRole.owner, tab: 1));
+            context.go(AppRoutes.shell(tab: 1));
           },
         );
       });

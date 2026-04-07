@@ -844,7 +844,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePhoto => 'Profile Photo URL';
 
   @override
-  String get removeMember => 'Remove';
+  String get removeMember => 'Remove Member';
 
   @override
   String get memberRemoved => 'Member removed';
@@ -1039,6 +1039,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navTrends => 'Trends';
 
   @override
+  String get navCircle => 'Circle';
+
+  @override
   String get navMeasure => 'Measure';
 
   @override
@@ -1049,4 +1052,60 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get continueButton => 'Continue';
+
+  @override
+  String circleTitle(String petName) {
+    return '$petName\'s Circle';
+  }
+
+  @override
+  String get circleEmptyTitle => 'You\'re the only one here!';
+
+  @override
+  String circleEmptyDescription(String petName) {
+    return 'Invite family or caregivers to help monitor $petName.';
+  }
+
+  @override
+  String get inviteToCircle => 'Invite to Circle';
+
+  @override
+  String inviteDescription(String petName) {
+    return 'Enter an email to invite someone to $petName\'s care circle. They\'ll be able to measure, view trends, and add notes.';
+  }
+
+  @override
+  String get inviteSent => 'Invite Sent!';
+
+  @override
+  String get inviteLinkCopied =>
+      'An invitation email has been sent. They can join the circle by clicking the link in the email.';
+
+  @override
+  String removeMemberConfirm(String name) {
+    return 'Remove $name from this circle? They will no longer be able to see this pet\'s data.';
+  }
+
+  @override
+  String get remove => 'Remove';
+
+  @override
+  String get pendingInvites => 'Pending Invites';
+
+  @override
+  String pendingInviteExpires(String date) {
+    return 'Expires $date';
+  }
+
+  @override
+  String get cancelInvite => 'Cancel';
+
+  @override
+  String get resendInvite => 'Resend';
+
+  @override
+  String get invitePending => 'Pending';
+
+  @override
+  String get noMembersYet => 'No members yet';
 }

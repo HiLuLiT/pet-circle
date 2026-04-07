@@ -8,7 +8,6 @@ import 'package:pet_circle/screens/pet_detail/pet_detail_widgets.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
-import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
@@ -94,7 +93,7 @@ class PetMeasurementHistory extends StatelessWidget {
               TextButton.icon(
                 onPressed: () {
                   petStore.setActivePet(pet);
-                  context.go(AppRoutes.shell(userStore.role, tab: 1));
+                  context.go(AppRoutes.shell(tab: 1));
                 },
                 icon: const Icon(Icons.show_chart, size: 18),
                 label: Text(l10n.viewGraph),

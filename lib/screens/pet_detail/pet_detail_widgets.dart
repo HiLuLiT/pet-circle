@@ -152,12 +152,10 @@ class RoleBadge extends StatelessWidget {
   Color _color(BuildContext context) {
     final c = AppSemanticColors.of(context);
     switch (role) {
-      case CareCircleRole.admin:
+      case CareCircleRole.owner:
         return c.textPrimary;
       case CareCircleRole.member:
         return c.primaryLight;
-      case CareCircleRole.viewer:
-        return c.primary;
     }
   }
 

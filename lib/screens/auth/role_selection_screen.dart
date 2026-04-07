@@ -16,7 +16,7 @@ class RoleSelectionScreen extends StatelessWidget {
 
   Future<void> _handleRoleSelect(BuildContext context, AppUserRole role) async {
     if (!kEnableFirebase) {
-      context.go(AppRoutes.shell(role));
+      context.go(AppRoutes.shell());
       return;
     }
 

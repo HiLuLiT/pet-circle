@@ -67,8 +67,8 @@ class _OnboardingStep2State extends State<OnboardingStep2>
     super.build(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
-      stepLabel: l10n.onboardingStep(2, 4),
-      progress: 0.5,
+      stepLabel: l10n.onboardingStep(2, 3),
+      progress: 0.66,
       onBack: widget.onBack,
       onNext: widget.onNext,
       nextLabel: widget.nextLabel,

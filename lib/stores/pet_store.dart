@@ -64,6 +64,9 @@ class PetStore extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     _petsSubscription = PetService.streamPetsForUser(uid).listen((pets) {
+      for (final pet in pets) {
+        debugPrint('[PetStore] Stream: pet="${pet.name}" careCircle=${pet.careCircle.map((m) => '{uid=${m.uid}, name=${m.name}, role=${m.role}}').toList()}');
+      }
       // Filter out pets that are pending deletion to avoid race conditions
       // where the stream re-emits before Firestore processes the delete.
       final filtered = _pendingDeletes.isEmpty
@@ -254,7 +257,7 @@ class PetStore extends ChangeNotifier {
     if (uid != null && pet.ownerId == uid) {
       return PetAccess(
         pet: pet,
-        role: CareCircleRole.admin,
+        role: CareCircleRole.owner,
         source: PetAccessSource.ownerId,
         isOwner: true,
       );
@@ -308,34 +311,35 @@ class PetStore extends ChangeNotifier {
     return accessForPet(pet).role;
   }
 
+  /// Remove a care circle member. When Firebase is enabled, the Firestore
+  /// stream handles the UI update — no optimistic local removal is needed
+  /// (which would be overwritten by the stream's stale data, causing flicker).
+  Future<void> removeCareCircleMemberByUid(String petName, String? uid, String memberName) async {
+    final pet = getPetByName(petName);
+    debugPrint('[PetStore] removeCareCircleMemberByUid: petName="$petName", uid="$uid", memberName="$memberName", petId="${pet?.id}", kEnableFirebase=$kEnableFirebase');
+    debugPrint('[PetStore] Current careCircle: ${pet?.careCircle.map((m) => 'uid=${m.uid}, name=${m.name}, role=${m.role}').toList()}');
+
+    if (kEnableFirebase && pet?.id != null && uid != null) {
+      debugPrint('[PetStore] Calling PetService.removeCareCircleMember(${pet!.id!}, $uid)');
+      await PetService.removeCareCircleMember(pet.id!, uid);
+      debugPrint('[PetStore] Firestore removal completed — waiting for stream update');
+    } else {
+      debugPrint('[PetStore] Local-only removal (mock mode or missing uid)');
+      _removeCareCircleMemberLocal(petName, memberName);
+    }
+  }
+
+  @Deprecated('Use removeCareCircleMemberByUid instead')
   Future<void> removeCareCircleMemberWithFirestore(String petName, String memberName) async {
     final pet = getPetByName(petName);
-    final previousCareCircle = pet?.careCircle.toList();
-
-    _removeCareCircleMemberLocal(petName, memberName);
-
     if (kEnableFirebase && pet?.id != null) {
-      final member = previousCareCircle?.firstWhere(
-        (m) => m.name == memberName,
-        orElse: () => CareCircleMember(name: '', avatarUrl: '', role: CareCircleRole.viewer),
-      );
+      final member = pet!.careCircle.where((m) => m.name == memberName).firstOrNull;
       if (member?.uid != null) {
-        try {
-          await PetService.removeCareCircleMember(pet!.id!, member!.uid!);
-        } catch (e) {
-          if (previousCareCircle != null) {
-            for (final list in [_ownerPets, _clinicPets]) {
-              final idx = list.indexWhere((p) => p.name == petName);
-              if (idx != -1) {
-                list[idx] = list[idx].copyWith(careCircle: previousCareCircle);
-              }
-            }
-            notifyListeners();
-          }
-          rethrow;
-        }
+        await PetService.removeCareCircleMember(pet.id!, member!.uid!);
+        return;
       }
     }
+    _removeCareCircleMemberLocal(petName, memberName);
   }
 
   void removeCareCircleMember(String petName, String memberName) {

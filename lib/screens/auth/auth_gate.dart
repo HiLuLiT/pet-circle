@@ -3,8 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
+import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/services/invitation_service.dart';
+import 'package:pet_circle/services/user_service.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
@@ -49,7 +51,14 @@ class _AuthGateState extends State<AuthGate> {
     if (!mounted) return;
 
     if (result.success) {
-      context.go(AppRoutes.shell(appUser.role));
+      // For invited users who haven't completed onboarding, skip it
+      if (!appUser.hasCompletedOnboarding) {
+        if (kEnableFirebase) {
+          await UserService.updateOnboardingStatus(appUser.uid, true);
+          await authProvider.refresh();
+        }
+      }
+      context.go(AppRoutes.shell());
       return;
     }
 
@@ -57,7 +66,7 @@ class _AuthGateState extends State<AuthGate> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(_invitationErrorText(l10n, result.errorCode))),
     );
-    context.go(AppRoutes.shell(appUser.role));
+    context.go(AppRoutes.shell());
   }
 
   String _invitationErrorText(AppLocalizations l10n, String? errorCode) {
@@ -95,8 +104,6 @@ class _AuthGateState extends State<AuthGate> {
           context.go(AppRoutes.welcome);
         case AuthRouteState.needsEmailVerification:
           context.go(AppRoutes.verifyEmail);
-        case AuthRouteState.needsRole:
-          context.go(AppRoutes.roleSelection);
         case AuthRouteState.needsOnboarding:
           context.go(AppRoutes.onboarding);
         case AuthRouteState.authenticated:
@@ -126,7 +133,7 @@ class _AuthGateState extends State<AuthGate> {
       return;
     }
 
-    context.go(AppRoutes.shell(appUser.role));
+    context.go(AppRoutes.shell());
   }
 
   @override

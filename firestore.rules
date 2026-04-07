@@ -28,26 +28,22 @@ service cloud.firestore {
               request.auth.uid in data.memberUids);
     }
 
-    function isPetAdminData(data) {
-      return signedIn() &&
-          (data.ownerId == request.auth.uid ||
-              (data.careCircle[request.auth.uid] != null &&
-                  data.careCircle[request.auth.uid].role == 'admin'));
+    // Simplified: only the pet owner (creator) has admin-level privileges.
+    function isPetOwnerData(data) {
+      return signedIn() && data.ownerId == request.auth.uid;
     }
 
+    // All circle members can manage health data (measure, meds, notes).
     function canManagePetHealthData(data) {
-      return signedIn() &&
-          (isPetAdminData(data) ||
-              (data.careCircle[request.auth.uid] != null &&
-                  data.careCircle[request.auth.uid].role == 'member'));
+      return isPetMemberData(data);
     }
 
     function isPetMember(petId) {
       return petExists(petId) && isPetMemberData(petData(petId));
     }
 
-    function isPetAdmin(petId) {
-      return petExists(petId) && isPetAdminData(petData(petId));
+    function isPetOwner(petId) {
+      return petExists(petId) && isPetOwnerData(petData(petId));
     }
 
     function canManagePetHealthDataFor(petId) {
@@ -58,12 +54,13 @@ service cloud.firestore {
       return signedIn() &&
           request.resource.data.ownerId == request.auth.uid &&
           request.resource.data.careCircle[request.auth.uid] != null &&
-          request.resource.data.careCircle[request.auth.uid].role == 'admin' &&
+          (request.resource.data.careCircle[request.auth.uid].role == 'owner' ||
+              request.resource.data.careCircle[request.auth.uid].role == 'admin') &&
           request.auth.uid in request.resource.data.memberUids;
     }
 
-    function canAdminUpdatePet() {
-      return isPetAdminData(resource.data) &&
+    function canOwnerUpdatePet() {
+      return isPetOwnerData(resource.data) &&
           request.resource.data.ownerId == resource.data.ownerId;
     }
 
@@ -115,8 +112,10 @@ service cloud.firestore {
           request.resource.data.pendingInvites[acceptedInvitationToken()] ==
               null &&
           request.resource.data.careCircle[request.auth.uid] != null &&
-          request.resource.data.careCircle[request.auth.uid].role ==
-              acceptedPendingInvite().role &&
+          // Accept both legacy and new role values
+          (request.resource.data.careCircle[request.auth.uid].role == 'member' ||
+              request.resource.data.careCircle[request.auth.uid].role == 'viewer' ||
+              request.resource.data.careCircle[request.auth.uid].role == 'admin') &&
           (
               request.resource.data.careCircle[request.auth.uid].name ==
                   request.auth.token.email ||
@@ -128,13 +127,13 @@ service cloud.firestore {
       return signedIn() &&
           (resource.data.invitedByUid == request.auth.uid ||
               resource.data.invitedEmail == request.auth.token.email ||
-              isPetAdmin(resource.data.petId));
+              isPetOwner(resource.data.petId));
     }
 
     function canCreateInvitation() {
       return signedIn() &&
           request.resource.data.invitedByUid == request.auth.uid &&
-          isPetAdmin(request.resource.data.petId);
+          isPetOwner(request.resource.data.petId);
     }
 
     function canCancelInvitation() {
@@ -169,10 +168,10 @@ service cloud.firestore {
     match /pets/{petId} {
       allow create: if canCreatePet();
       allow read: if isPetMemberData(resource.data);
-      allow update: if canAdminUpdatePet() ||
+      allow update: if canOwnerUpdatePet() ||
           canUpdateLatestMeasurementOnly() ||
           canAcceptPendingInvite();
-      allow delete: if isPetAdminData(resource.data);
+      allow delete: if isPetOwnerData(resource.data);
 
       match /measurements/{measurementId} {
         allow read: if isPetMember(petId);

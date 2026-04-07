@@ -54,7 +54,7 @@ class _InviteScreenState extends State<InviteScreen> {
     if (!mounted) return;
 
     if (result.success) {
-      context.go(AppRoutes.shell(appUser.role));
+      context.go(AppRoutes.shell());
       return;
     }
 
@@ -127,7 +127,7 @@ class _InviteScreenState extends State<InviteScreen> {
                 onPressed: () {
                   final appUser = authProvider.appUser;
                   if (appUser != null) {
-                    context.go(AppRoutes.shell(appUser.role));
+                    context.go(AppRoutes.shell());
                   } else {
                     context.go(AppRoutes.authGate);
                   }

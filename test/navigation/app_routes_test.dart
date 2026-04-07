@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/app_routes.dart';
-import 'package:pet_circle/models/app_user.dart';
 
 void main() {
   group('AppRoutes — static path constants', () {
@@ -10,10 +9,6 @@ void main() {
 
     test('authGate route is /auth-gate', () {
       expect(AppRoutes.authGate, '/auth-gate');
-    });
-
-    test('roleSelection route is /role-selection', () {
-      expect(AppRoutes.roleSelection, '/role-selection');
     });
 
     test('auth route is /auth', () {
@@ -38,58 +33,72 @@ void main() {
   });
 
   group('AppRoutes.shell()', () {
-    test('returns /shell/owner for owner role with default tab', () {
-      expect(AppRoutes.shell(AppUserRole.owner), '/shell/owner');
+    test('returns /shell with default tab', () {
+      expect(AppRoutes.shell(), '/shell');
     });
 
-    test('returns /shell/vet for vet role with default tab', () {
-      expect(AppRoutes.shell(AppUserRole.vet), '/shell/vet');
+    test('returns /shell?tab=2 for tab 2', () {
+      expect(AppRoutes.shell(tab: 2), '/shell?tab=2');
     });
 
-    test('returns /shell/owner?tab=2 for owner role with tab 2', () {
-      expect(AppRoutes.shell(AppUserRole.owner, tab: 2), '/shell/owner?tab=2');
-    });
-
-    test('returns /shell/vet?tab=1 for vet role with tab 1', () {
-      expect(AppRoutes.shell(AppUserRole.vet, tab: 1), '/shell/vet?tab=1');
+    test('returns /shell?tab=1 for tab 1', () {
+      expect(AppRoutes.shell(tab: 1), '/shell?tab=1');
     });
 
     test('omits tab query param when tab is 0', () {
-      expect(AppRoutes.shell(AppUserRole.owner, tab: 0), '/shell/owner');
+      expect(AppRoutes.shell(tab: 0), '/shell');
+    });
+  });
+
+  group('AppRoutes.shell() — additional tab values', () {
+    test('returns /shell?tab=3 for tab 3', () {
+      expect(AppRoutes.shell(tab: 3), '/shell?tab=3');
+    });
+
+    test('returns /shell?tab=4 for tab 4', () {
+      expect(AppRoutes.shell(tab: 4), '/shell?tab=4');
     });
   });
 
   group('AppRoutes.petDetail()', () {
-    test('returns correct path for owner with pet ID', () {
+    test('returns correct path for pet ID', () {
       expect(
-        AppRoutes.petDetail(AppUserRole.owner, 'pet123'),
-        '/shell/owner/pet/pet123',
+        AppRoutes.petDetail('pet123'),
+        '/shell/pet/pet123',
       );
     });
 
-    test('returns correct path for vet with pet ID', () {
+    test('returns correct path for another pet ID', () {
       expect(
-        AppRoutes.petDetail(AppUserRole.vet, 'abc-456'),
-        '/shell/vet/pet/abc-456',
+        AppRoutes.petDetail('abc-456'),
+        '/shell/pet/abc-456',
+      );
+    });
+
+    test('returns correct path for short ID', () {
+      expect(
+        AppRoutes.petDetail('abc'),
+        '/shell/pet/abc',
       );
     });
   });
 
-  group('parseRole()', () {
-    test('parses "vet" as AppUserRole.vet', () {
-      expect(parseRole('vet'), AppUserRole.vet);
-    });
-
-    test('parses "owner" as AppUserRole.owner', () {
-      expect(parseRole('owner'), AppUserRole.owner);
-    });
-
-    test('parses null as AppUserRole.owner (default)', () {
-      expect(parseRole(null), AppUserRole.owner);
-    });
-
-    test('parses unknown string as AppUserRole.owner (default)', () {
-      expect(parseRole('admin'), AppUserRole.owner);
+  group('AppRoutes — removed constants', () {
+    test('no roleSelection route constant exists', () {
+      // AppRoutes should not expose a roleSelection field.
+      // If someone re-adds it, this test will fail at compile time
+      // because the class members are checked below.
+      final members = <String>[
+        AppRoutes.welcome,
+        AppRoutes.authGate,
+        AppRoutes.auth,
+        AppRoutes.verifyEmail,
+        AppRoutes.onboarding,
+        AppRoutes.invite,
+        AppRoutes.vetDashboard,
+      ];
+      // None of the static constants should be '/role-selection'
+      expect(members.contains('/role-selection'), isFalse);
     });
   });
 }

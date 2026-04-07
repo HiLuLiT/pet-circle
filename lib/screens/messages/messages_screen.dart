@@ -6,7 +6,6 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/stores/notification_store.dart';
-import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/app_notification.dart' as notif;
 
 /// Opens notifications as a slide-up drawer (modal bottom sheet),
@@ -192,13 +191,13 @@ class _AppNotificationCard extends StatelessWidget {
         notificationStore.markRead(notification.id);
         switch (notification.type) {
           case notif.NotificationType.medication:
-            context.go(AppRoutes.shell(userStore.role, tab: 3));
+            context.go(AppRoutes.shell(tab: 3));
           case notif.NotificationType.measurement:
-            context.go(AppRoutes.shell(userStore.role, tab: 1));
+            context.go(AppRoutes.shell(tab: 1));
           case notif.NotificationType.careCircle:
-            context.go(AppRoutes.shell(userStore.role, tab: 0));
+            context.go(AppRoutes.shell(tab: 0));
           case notif.NotificationType.report:
-            context.go(AppRoutes.shell(userStore.role, tab: 1));
+            context.go(AppRoutes.shell(tab: 1));
         }
       },
       child: Container(

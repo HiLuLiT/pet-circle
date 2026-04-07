@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show appDarkMode;
-import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
@@ -27,12 +26,10 @@ const kEmergencyAlertCategories = ['bpm_threshold_exceeded', 'missed_medication_
 class SettingsContent extends StatefulWidget {
   const SettingsContent({
     super.key,
-    required this.role,
     this.scrollController,
     this.onClose,
   });
 
-  final AppUserRole role;
   final ScrollController? scrollController;
   final VoidCallback? onClose;
 
@@ -155,14 +152,13 @@ class _SettingsContentState extends State<SettingsContent>
                     }
                     return Column(
                       children: members.map((member) {
-                        final isAdmin = member.role == CareCircleRole.admin;
-                        final isViewer = member.role == CareCircleRole.viewer;
+                        final isOwner = member.role == CareCircleRole.owner;
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: CareCircleItem(
                             email: member.name,
                             roleLabel: member.roleLabel,
-                            roleColor: isViewer ? c.primary : isAdmin ? c.textPrimary : c.warning,
+                            roleColor: isOwner ? c.textPrimary : c.primaryLight,
                             statusLabel: l10n.active,
                             statusColor: c.primaryLight,
                             onRemove: canManageActivePet

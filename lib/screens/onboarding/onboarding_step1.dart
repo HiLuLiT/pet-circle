@@ -60,8 +60,8 @@ class _OnboardingStep1State extends State<OnboardingStep1>
     final l10n = AppLocalizations.of(context)!;
     return OnboardingShell(
       title: l10n.setupPetProfile,
-      stepLabel: l10n.onboardingStep(1, 4),
-      progress: 0.25,
+      stepLabel: l10n.onboardingStep(1, 3),
+      progress: 0.33,
       onNext: widget.onNext,
       nextLabel: widget.nextLabel,
       child: Column(

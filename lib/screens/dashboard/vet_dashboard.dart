@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
-import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
@@ -166,7 +165,7 @@ class _VetDashboardState extends State<VetDashboard> {
                           (pet) => _PetCard(
                             data: pet,
                             onTap: () => context.push(
-                              AppRoutes.petDetail(AppUserRole.vet, pet.id ?? ''),
+                              AppRoutes.petDetail(pet.id ?? ''),
                             ),
                           ),
                         )
@@ -509,7 +508,7 @@ class _PetCard extends StatelessWidget {
 
   String _getOwnerName(List<CareCircleMember> circle, String fallback) {
     final owner =
-        circle.where((m) => m.role == CareCircleRole.admin).firstOrNull;
+        circle.where((m) => m.role == CareCircleRole.owner).firstOrNull;
     return owner?.name ?? fallback;
   }
 }
