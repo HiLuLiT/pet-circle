@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/invitation_service.dart';
@@ -38,9 +39,11 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
             child: Text(l10n.cancel),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
               if (widget.onClose != null) widget.onClose!();
+              await authProvider.signOut();
+              if (!context.mounted) return;
               context.go(AppRoutes.welcome);
             },
             style: TextButton.styleFrom(backgroundColor: c.error),

@@ -369,7 +369,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Set custom BPM ranges for your pet\'s respiratory rate alerts.';
 
   @override
-  String get createAccount => 'Create Account';
+  String get createAccount => 'Create an account';
 
   @override
   String get email => 'Email';
@@ -1108,4 +1108,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noMembersYet => 'No members yet';
+
+  @override
+  String get pleaseEnterYourDetails =>
+      'Please enter your details to create an account.';
+
+  @override
+  String get enterYourFullName => 'Enter your full name';
+
+  @override
+  String get sendVerificationCode => 'Send email code';
+
+  @override
+  String get or => 'OR';
+
+  @override
+  String get continueWithGoogle => 'Continue with Google';
+
+  @override
+  String get continueWithApple => 'Continue with Apple';
+
+  @override
+  String get login => 'Login';
+
+  @override
+  String get enterDetailsToLogin => 'Enter your details to login.';
+
+  @override
+  String get enterVerificationCode => 'Check your email';
+
+  @override
+  String weSentCodeTo(String email) {
+    return 'Enter the code sent to $email';
+  }
+
+  @override
+  String get verificationCodeSent => 'Verification code sent!';
+
+  @override
+  String get verifyCode => 'Verify';
+
+  @override
+  String get resendCode => 'Resend code';
+
+  @override
+  String resendCodeInSeconds(int seconds) {
+    return 'Resend code in ${seconds}s';
+  }
+
+  @override
+  String get useDifferentEmail => 'Use a different email';
 }

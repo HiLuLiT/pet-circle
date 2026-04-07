@@ -11,12 +11,12 @@ void main() {
       expect(AppRoutes.authGate, '/auth-gate');
     });
 
-    test('auth route is /auth', () {
-      expect(AppRoutes.auth, '/auth');
+    test('signup route is /signup', () {
+      expect(AppRoutes.signup, '/signup');
     });
 
-    test('verifyEmail route is /verify-email', () {
-      expect(AppRoutes.verifyEmail, '/verify-email');
+    test('login route is /login', () {
+      expect(AppRoutes.login, '/login');
     });
 
     test('onboarding route is /onboarding', () {
@@ -91,8 +91,8 @@ void main() {
       final members = <String>[
         AppRoutes.welcome,
         AppRoutes.authGate,
-        AppRoutes.auth,
-        AppRoutes.verifyEmail,
+        AppRoutes.signup,
+        AppRoutes.login,
         AppRoutes.onboarding,
         AppRoutes.invite,
         AppRoutes.vetDashboard,

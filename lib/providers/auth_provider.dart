@@ -13,7 +13,6 @@ import 'package:pet_circle/stores/user_store.dart';
 enum AuthRouteState {
   loading,
   unauthenticated,
-  needsEmailVerification,
   needsOnboarding,
   authenticated,
 }
@@ -38,7 +37,6 @@ class AuthProvider extends ChangeNotifier {
   AuthRouteState get routeState {
     if (_isLoading || _isCreatingUser) return AuthRouteState.loading;
     if (_firebaseUser == null) return AuthRouteState.unauthenticated;
-    if (!isEmailVerified) return AuthRouteState.needsEmailVerification;
     if (_appUser == null) return AuthRouteState.loading;
     // Skip onboarding if user has a pending invitation — they'll join a shared pet
     if (!_appUser!.hasCompletedOnboarding &&
