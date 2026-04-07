@@ -61,6 +61,7 @@ class AuthProvider extends ChangeNotifier {
       _appUser = null;
       _isLoading = false;
       _isCreatingUser = false;
+      userStore.reset();
       petStore.cancelSubscription();
       notificationStore.cancelSubscription();
       notificationStore.reset();

@@ -29,22 +29,30 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
     final c = AppSemanticColors.of(context);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
         title: Text(l10n.signOut, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
         content: Text(l10n.signOutConfirmation, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogCtx),
             child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              // 1. Close the dialog
+              Navigator.pop(dialogCtx);
+
+              // 2. Close the settings bottom sheet
               if (widget.onClose != null) widget.onClose!();
+
+              // 3. Wait one frame for overlays to fully dismiss
+              await Future.delayed(Duration.zero);
+
+              // 4. Sign out — GoRouter's refreshListenable will
+              //    auto-redirect to auth-gate → welcome screen.
+              //    No manual context.go() needed.
               await authProvider.signOut();
-              if (!context.mounted) return;
-              context.go(AppRoutes.welcome);
             },
             style: TextButton.styleFrom(backgroundColor: c.error),
             child: Text(l10n.signOut, style: TextStyle(color: c.background)),

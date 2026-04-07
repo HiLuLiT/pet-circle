@@ -116,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final c = AppSemanticColors.of(context);
 
     return Scaffold(
-      backgroundColor: c.surface,
+      backgroundColor: c.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -125,11 +125,24 @@ class _LoginScreenState extends State<LoginScreen> {
               vertical: AppSpacingTokens.xl,
             ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 380),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Logo icon
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Container(
+                padding: const EdgeInsets.all(AppSpacingTokens.xl),
+                decoration: BoxDecoration(
+                  color: c.surface,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: c.textPrimary.withValues(alpha: 0.05),
+                      blurRadius: 20,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Logo icon
                   Container(
                     width: 64,
                     height: 64,
@@ -309,7 +322,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     label: l10n.continueWithApple,
                     onTap: _isLoading ? null : _handleAppleSignIn,
                   ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
