@@ -1,17 +1,15 @@
-import 'package:flutter/foundation.dart'
-    show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/services/otp_service.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
-import 'package:pet_circle/widgets/primary_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,7 +21,6 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   String? _error;
-
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
@@ -41,68 +38,75 @@ class _LoginScreenState extends State<LoginScreen> {
       _error = null;
     });
 
+    final email = _emailController.text.trim();
+
+    if (!kEnableFirebase) {
+      if (!mounted) return;
+      context.go('/verify-otp?email=${Uri.encodeComponent(email)}&signup=false');
+      return;
+    }
+
     try {
-      final email = _emailController.text.trim();
       final result = await OtpService.sendOtp(email: email);
       if (!mounted) return;
       if (result.success) {
         context.go('/verify-otp?email=${Uri.encodeComponent(email)}&signup=false');
       } else {
-        setState(() => _error = result.error);
+        setState(() {
+          _isLoading = false;
+          _error = result.error;
+        });
       }
     } catch (e) {
       if (!mounted) return;
-      setState(() => _error = e.toString());
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      setState(() {
+        _isLoading = false;
+        _error = e.toString();
+      });
     }
   }
 
   Future<void> _handleGoogleSignIn() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    if (!kEnableFirebase) return;
+    setState(() => _isLoading = true);
 
     final result = await AuthService.signInWithGoogle();
 
     if (!mounted) return;
-
     setState(() => _isLoading = false);
 
     if (result.success) {
-      if (result.isNewUser) {
-        context.go(AppRoutes.authGate);
-      } else {
-        context.go(AppRoutes.authGate);
-      }
-    } else {
-      setState(() => _error = result.error);
+      context.go(AppRoutes.authGate);
+    } else if (result.error != null && result.error != 'Sign in cancelled') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.error!)),
+      );
     }
   }
 
   Future<void> _handleAppleSignIn() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
+    if (!kEnableFirebase) return;
+
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.appleSignInNotAvailableOnWeb)),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
 
     final result = await AuthService.signInWithApple();
 
     if (!mounted) return;
-
     setState(() => _isLoading = false);
 
     if (result.success) {
-      if (result.isNewUser) {
-        context.go(AppRoutes.authGate);
-      } else {
-        context.go(AppRoutes.authGate);
-      }
-    } else {
-      setState(() => _error = result.error);
+      context.go(AppRoutes.authGate);
+    } else if (result.error != null && result.error != 'Sign in cancelled') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result.error!)),
+      );
     }
   }
 
@@ -110,116 +114,164 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppSemanticColors.of(context);
-    final isAppleAvailable = !kIsWeb &&
-        (defaultTargetPlatform == TargetPlatform.iOS ||
-            defaultTargetPlatform == TargetPlatform.macOS);
 
     return Scaffold(
-      backgroundColor: c.primaryLightest,
+      backgroundColor: c.surface,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacingTokens.lg),
-          child: Center(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacingTokens.lg,
+              vertical: AppSpacingTokens.xl,
+            ),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
+              constraints: const BoxConstraints(maxWidth: 380),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(height: 20),
-
-                  // Logo
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(AppSpacingTokens.sm),
-                      decoration: BoxDecoration(
-                        color: c.primaryLight,
-                        shape: BoxShape.circle,
-                      ),
-                      child: SvgPicture.asset(
-                        AppAssets.appLogo,
-                        width: 60,
-                        height: 60,
-                      ),
+                  // Logo icon
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: c.primaryLightest,
+                      shape: BoxShape.circle,
                     ),
+                    child: Icon(Icons.bolt, size: 32, color: c.primary),
                   ),
-                  const SizedBox(height: AppSpacingTokens.lg),
+                  const SizedBox(height: AppSpacingTokens.md),
 
                   // Title
                   Text(
                     l10n.login,
-                    style: AppSemanticTextStyles.title2
-                        .copyWith(color: c.textPrimary),
-                    textAlign: TextAlign.center,
+                    style: AppSemanticTextStyles.title2,
                   ),
                   const SizedBox(height: AppSpacingTokens.sm),
 
                   // Subtitle
                   Text(
                     l10n.enterDetailsToLogin,
-                    style: AppSemanticTextStyles.body
-                        .copyWith(color: c.textSecondary),
-                    textAlign: TextAlign.center,
+                    style: AppSemanticTextStyles.body.copyWith(
+                      color: c.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: AppSpacingTokens.xl),
-
-                  // Error message
-                  if (_error != null)
-                    Container(
-                      margin:
-                          const EdgeInsets.only(bottom: AppSpacingTokens.md),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: c.error.withValues(alpha: 0.1),
-                        borderRadius: AppRadiiTokens.borderRadiusSm,
-                        border:
-                            Border.all(color: c.error.withValues(alpha: 0.3)),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.error_outline, color: c.error, size: 20),
-                          const SizedBox(width: AppSpacingTokens.sm),
-                          Expanded(
-                            child: Text(
-                              _error!,
-                              style: AppSemanticTextStyles.body
-                                  .copyWith(color: c.error),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
 
                   // Form
                   Form(
                     key: _formKey,
-                    child: _buildTextField(
-                      controller: _emailController,
-                      label: l10n.email,
-                      hint: l10n.enterYourEmail,
-                      icon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return l10n.pleaseEnterEmail;
-                        }
-                        if (!value.contains('@') || !value.contains('.')) {
-                          return l10n.pleaseEnterValidEmail;
-                        }
-                        return null;
-                      },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Email label
+                        Text(
+                          l10n.emailAddress,
+                          style: AppSemanticTextStyles.caption.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: c.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacingTokens.xs),
+                        TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.done,
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: c.surface,
+                            hintText: 'Enter your Email',
+                            hintStyle: AppSemanticTextStyles.body.copyWith(
+                              color: c.textTertiary,
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: c.divider),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: c.textPrimary,
+                                width: 2,
+                              ),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: c.error),
+                            ),
+                            focusedErrorBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: c.error,
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                          style: AppSemanticTextStyles.body,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            if (!value.contains('@')) {
+                              return 'Enter a valid email';
+                            }
+                            return null;
+                          },
+                          onFieldSubmitted: (_) => _handleLogin(),
+                        ),
+                      ],
                     ),
                   ),
+
+                  // Error
+                  if (_error != null) ...[
+                    const SizedBox(height: AppSpacingTokens.sm),
+                    Text(
+                      _error!,
+                      style: AppSemanticTextStyles.caption.copyWith(
+                        color: c.error,
+                      ),
+                    ),
+                  ],
 
                   const SizedBox(height: AppSpacingTokens.lg),
 
                   // Login button
-                  PrimaryButton(
-                    label: l10n.login,
-                    onPressed: _isLoading ? null : _handleLogin,
-                    backgroundColor: c.primary,
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _handleLogin,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: c.textPrimary,
+                        foregroundColor: c.surface,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: _isLoading
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: c.surface,
+                              ),
+                            )
+                          : Text(
+                              l10n.login,
+                              style: AppSemanticTextStyles.button.copyWith(
+                                color: c.surface,
+                              ),
+                            ),
+                    ),
                   ),
 
-                  const SizedBox(height: AppSpacingTokens.lg),
+                  const SizedBox(height: AppSpacingTokens.xl),
 
                   // OR divider
                   Row(
@@ -227,48 +279,36 @@ class _LoginScreenState extends State<LoginScreen> {
                       Expanded(child: Divider(color: c.divider)),
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacingTokens.md),
+                          horizontal: AppSpacingTokens.md,
+                        ),
                         child: Text(
                           l10n.or,
-                          style: AppSemanticTextStyles.caption
-                              .copyWith(color: c.textSecondary),
+                          style: AppSemanticTextStyles.caption.copyWith(
+                            color: c.textTertiary,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                       Expanded(child: Divider(color: c.divider)),
                     ],
                   ),
 
-                  const SizedBox(height: AppSpacingTokens.lg),
-
-                  // Continue with Google
-                  PrimaryButton(
-                    label: l10n.continueWithGoogle,
-                    onPressed: _isLoading ? null : _handleGoogleSignIn,
-                    variant: PrimaryButtonVariant.outlined,
-                    icon: Icons.g_mobiledata,
-                  ),
-
-                  // Continue with Apple (iOS/macOS only)
-                  if (isAppleAvailable) ...[
-                    const SizedBox(height: AppSpacingTokens.md),
-                    PrimaryButton(
-                      label: l10n.continueWithApple,
-                      onPressed: _isLoading ? null : _handleAppleSignIn,
-                      variant: PrimaryButtonVariant.outlined,
-                      icon: Icons.apple,
-                    ),
-                  ],
-
                   const SizedBox(height: AppSpacingTokens.xl),
 
-                  // Loading indicator
-                  if (_isLoading)
-                    Container(
-                      margin: const EdgeInsets.only(top: AppSpacingTokens.md),
-                      child: Center(
-                        child: CircularProgressIndicator(color: c.primary),
-                      ),
-                    ),
+                  // Google button
+                  _SocialButton(
+                    icon: Image.asset(AppAssets.googleLogo, width: 20, height: 20),
+                    label: l10n.continueWithGoogle,
+                    onTap: _isLoading ? null : _handleGoogleSignIn,
+                  ),
+                  const SizedBox(height: AppSpacingTokens.md),
+
+                  // Apple button
+                  _SocialButton(
+                    icon: Icon(Icons.apple, size: 22, color: c.textPrimary),
+                    label: l10n.continueWithApple,
+                    onTap: _isLoading ? null : _handleAppleSignIn,
+                  ),
                 ],
               ),
             ),
@@ -277,55 +317,49 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+}
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hint,
-    required IconData icon,
-    TextInputType? keyboardType,
-    String? Function(String?)? validator,
-  }) {
+class _SocialButton extends StatelessWidget {
+  const _SocialButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final Widget icon;
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style:
-              AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: AppSpacingTokens.sm),
-        TextFormField(
-          controller: controller,
-          keyboardType: keyboardType,
-          validator: validator,
-          style: AppSemanticTextStyles.body,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle:
-                AppSemanticTextStyles.body.copyWith(color: c.textTertiary),
-            prefixIcon: Icon(icon, color: c.textSecondary, size: 20),
-            filled: true,
-            fillColor: c.background,
-            border: OutlineInputBorder(
-              borderRadius: AppRadiiTokens.borderRadiusLg,
-              borderSide: BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: AppRadiiTokens.borderRadiusLg,
-              borderSide: BorderSide(color: c.primary, width: 2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: AppRadiiTokens.borderRadiusLg,
-              borderSide:
-                  BorderSide(color: c.error.withValues(alpha: 0.4), width: 1),
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacingTokens.md, vertical: 14),
+    return SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: OutlinedButton(
+        onPressed: onTap,
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: c.divider),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
+          backgroundColor: c.surface,
         ),
-      ],
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: AppSemanticTextStyles.body.copyWith(
+                color: c.textPrimary,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
