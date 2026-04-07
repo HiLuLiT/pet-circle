@@ -137,22 +137,37 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               ),
                               const SizedBox(height: AppSpacingTokens.md),
                               _GoogleSignInButton(
-                                label: l10n.signInWithGoogle,
+                                label: l10n.continueWithGoogle,
                                 onTap: _isLoading ? null : _handleGoogleSignIn,
                               ),
-                                  const SizedBox(height: AppSpacingTokens.sm),
+                              const SizedBox(height: AppSpacingTokens.sm),
                               _AppleSignInButton(
-                                label: l10n.signInWithApple,
+                                label: l10n.continueWithApple,
                                 onTap: _isLoading ? null : _handleAppleSignIn,
                               ),
-                              const SizedBox(height: AppSpacingTokens.md),
-                              PrimaryButton(
-                                label: l10n.signIn,
-                                variant: PrimaryButtonVariant.outlined,
-                                onPressed: _isLoading
+                              const SizedBox(height: AppSpacingTokens.lg),
+                              GestureDetector(
+                                onTap: _isLoading
                                     ? null
-                                    : () => context
-                                        .push(AppRoutes.login),
+                                    : () => context.push(AppRoutes.login),
+                                child: Text.rich(
+                                  TextSpan(
+                                    text: '${l10n.alreadyHaveAccount} ',
+                                    style: AppSemanticTextStyles.body.copyWith(
+                                      color: AppSemanticColors.of(context).textSecondary,
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text: l10n.signIn,
+                                        style: AppSemanticTextStyles.body.copyWith(
+                                          color: AppSemanticColors.of(context).primary,
+                                          fontWeight: FontWeight.w600,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ],
                           ),
