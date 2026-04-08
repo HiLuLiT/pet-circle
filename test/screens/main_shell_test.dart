@@ -115,4 +115,92 @@ void main() {
       expect(find.byType(BottomNavBar), findsOneWidget);
     });
   });
+
+  group('MainShell — navigation', () {
+    testWidgets('starts on index 0 by default', (tester) async {
+      suppressOverflowErrors();
+      tester.view.physicalSize = const Size(430, 932);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MainShell()));
+      await tester.pump();
+
+      final navBar = tester.widget<BottomNavBar>(find.byType(BottomNavBar));
+      expect(navBar.selectedIndex, 0);
+    });
+
+    testWidgets('starts on correct index when initialIndex is set', (tester) async {
+      suppressOverflowErrors();
+      tester.view.physicalSize = const Size(430, 932);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MainShell(initialIndex: 3)));
+      await tester.pump();
+
+      final navBar = tester.widget<BottomNavBar>(find.byType(BottomNavBar));
+      expect(navBar.selectedIndex, 3);
+    });
+
+    testWidgets('uses wide layout on tablet screen (>=768px)', (tester) async {
+      suppressOverflowErrors();
+      // Tablet width triggers NavigationRail layout.
+      tester.view.physicalSize = const Size(1024, 1366);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MainShell()));
+      await tester.pump();
+
+      // Wide layout uses NavigationRail instead of BottomNavBar.
+      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(find.byType(BottomNavBar), findsNothing);
+    });
+
+    testWidgets('NavigationRail has 5 destinations on wide layout', (tester) async {
+      suppressOverflowErrors();
+      tester.view.physicalSize = const Size(1024, 1366);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MainShell()));
+      await tester.pump();
+
+      final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+      expect(rail.destinations.length, 5);
+    });
+
+    testWidgets('uses narrow layout on phone screen (<768px)', (tester) async {
+      suppressOverflowErrors();
+      tester.view.physicalSize = const Size(430, 932);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MainShell()));
+      await tester.pump();
+
+      expect(find.byType(BottomNavBar), findsOneWidget);
+      expect(find.byType(NavigationRail), findsNothing);
+    });
+
+    testWidgets('IndexedStack renders correct number of children', (tester) async {
+      suppressOverflowErrors();
+      tester.view.physicalSize = const Size(430, 932);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MainShell()));
+      await tester.pump();
+
+      final stack = tester.widget<IndexedStack>(find.byType(IndexedStack));
+      expect(stack.children.length, 5);
+    });
+  });
 }
