@@ -179,7 +179,7 @@ void main() {
       petStore.seed(ownerPets: [ownerOnlyPet], clinicPets: []);
     });
 
-    testWidgets('shows empty state message', (tester) async {
+    testWidgets('shows invite description below owner tile', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(
@@ -187,11 +187,15 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // l10n circleEmptyTitle => "You're the only one here!"
-      expect(find.text("You're the only one here!"), findsOneWidget);
+      // l10n circleEmptyDescription('Buddy') =>
+      // "Invite family or caregivers to help monitor Buddy."
+      expect(
+        find.textContaining('Invite family or caregivers to help monitor Buddy'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('shows invite button in empty state', (tester) async {
+    testWidgets('shows invite button for owner', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(
@@ -199,8 +203,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Invite to Circle'), findsAtLeastNWidgets(1));
-      expect(find.byIcon(Icons.group_add), findsOneWidget);
+      // The owner always sees the bottom "Invite to Circle" button
+      // with the person_add_alt_1 icon (not group_add from old empty state).
+      expect(find.text('Invite to Circle'), findsOneWidget);
+      expect(find.byIcon(Icons.person_add_alt_1), findsOneWidget);
     });
   });
 
