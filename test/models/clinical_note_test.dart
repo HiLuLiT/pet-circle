@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/models/clinical_note.dart';
+
+import '../helpers/fake_document_snapshot.dart';
 
 ClinicalNote _makeNote() {
   return ClinicalNote(
@@ -156,6 +159,73 @@ void main() {
 
       final map = note.toFirestore();
       expect(map['authorUid'], isNull);
+    });
+
+    test('toFirestore converts createdAt to Timestamp', () {
+      final note = _makeNote();
+      final map = note.toFirestore();
+
+      expect(map['createdAt'], isA<Timestamp>());
+    });
+  });
+
+  group('ClinicalNote fromFirestore', () {
+    test('fromFirestore creates note with all fields', () {
+      final doc = FakeDocumentSnapshot('note-1', {
+        'authorUid': 'u-1',
+        'authorName': 'Dr. Smith',
+        'authorAvatarUrl': 'https://example.com/smith.png',
+        'content': 'Heart murmur grade 3/6.',
+        'createdAt': Timestamp.fromDate(DateTime(2025, 3, 15, 14, 30)),
+      });
+
+      final note = ClinicalNote.fromFirestore(doc);
+
+      expect(note.id, 'note-1');
+      expect(note.authorUid, 'u-1');
+      expect(note.authorName, 'Dr. Smith');
+      expect(note.authorAvatarUrl, 'https://example.com/smith.png');
+      expect(note.content, 'Heart murmur grade 3/6.');
+      expect(note.createdAt, DateTime(2025, 3, 15, 14, 30));
+    });
+
+    test('fromFirestore handles null authorUid', () {
+      final doc = FakeDocumentSnapshot('note-2', {
+        'authorName': 'Guest',
+        'authorAvatarUrl': '',
+        'content': 'Test note',
+        'createdAt': Timestamp.fromDate(DateTime(2025, 1, 1)),
+      });
+
+      final note = ClinicalNote.fromFirestore(doc);
+
+      expect(note.authorUid, isNull);
+    });
+
+    test('fromFirestore defaults missing strings to empty', () {
+      final doc = FakeDocumentSnapshot('note-3', {
+        'createdAt': Timestamp.fromDate(DateTime(2025, 1, 1)),
+      });
+
+      final note = ClinicalNote.fromFirestore(doc);
+
+      expect(note.authorName, '');
+      expect(note.authorAvatarUrl, '');
+      expect(note.content, '');
+    });
+
+    test('fromFirestore roundtrips with toFirestore', () {
+      final original = _makeNote();
+      final map = original.toFirestore();
+      final doc = FakeDocumentSnapshot('note-1', map);
+      final restored = ClinicalNote.fromFirestore(doc);
+
+      expect(restored.id, 'note-1');
+      expect(restored.authorUid, original.authorUid);
+      expect(restored.authorName, original.authorName);
+      expect(restored.authorAvatarUrl, original.authorAvatarUrl);
+      expect(restored.content, original.content);
+      expect(restored.createdAt, original.createdAt);
     });
   });
 }

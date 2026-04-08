@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/models/medication.dart';
+
+import '../helpers/fake_document_snapshot.dart';
 
 Medication _makeMedication({bool isActive = true}) {
   return Medication(
@@ -119,6 +122,215 @@ void main() {
       expect(med.purpose, isNull);
       expect(med.notes, isNull);
       expect(med.remindersEnabled, isFalse);
+    });
+  });
+
+  group('Medication construction', () {
+    test('remindersEnabled defaults to false', () {
+      final med = Medication(
+        id: 'med-def',
+        name: 'Test',
+        dosage: '1mg',
+        frequency: 'Daily',
+        startDate: DateTime(2025, 1, 1),
+      );
+
+      expect(med.remindersEnabled, isFalse);
+    });
+
+    test('all required fields are set correctly', () {
+      final med = _makeMedication();
+
+      expect(med.id, 'med-1');
+      expect(med.name, 'Furosemide');
+      expect(med.dosage, '10mg');
+      expect(med.frequency, 'Twice daily');
+      expect(med.startDate, DateTime(2025, 1, 1));
+    });
+  });
+
+  group('Medication toFirestore', () {
+    test('toFirestore includes all required fields', () {
+      final med = _makeMedication();
+      final map = med.toFirestore();
+
+      expect(map['name'], 'Furosemide');
+      expect(map['dosage'], '10mg');
+      expect(map['frequency'], 'Twice daily');
+      expect(map['remindersEnabled'], isTrue);
+      expect(map['isActive'], isTrue);
+      expect(map.containsKey('startDate'), isTrue);
+    });
+
+    test('toFirestore does not include id', () {
+      final med = _makeMedication();
+      final map = med.toFirestore();
+
+      expect(map.containsKey('id'), isFalse);
+    });
+
+    test('toFirestore includes optional fields when set', () {
+      final med = _makeMedication();
+      final map = med.toFirestore();
+
+      expect(map['prescribedBy'], 'Dr. Smith');
+      expect(map['purpose'], 'Heart failure');
+      expect(map['notes'], 'Take with food');
+      expect(map.containsKey('endDate'), isTrue);
+    });
+
+    test('toFirestore omits optional fields when null', () {
+      final med = Medication(
+        id: 'med-min',
+        name: 'Basic',
+        dosage: '1mg',
+        frequency: 'Daily',
+        startDate: DateTime(2025, 1, 1),
+      );
+      final map = med.toFirestore();
+
+      expect(map.containsKey('endDate'), isFalse);
+      expect(map.containsKey('prescribedBy'), isFalse);
+      expect(map.containsKey('purpose'), isFalse);
+      expect(map.containsKey('notes'), isFalse);
+    });
+
+    test('toFirestore omits optional strings when empty', () {
+      final med = Medication(
+        id: 'med-empty',
+        name: 'Test',
+        dosage: '1mg',
+        frequency: 'Daily',
+        startDate: DateTime(2025, 1, 1),
+        prescribedBy: '',
+        purpose: '',
+        notes: '',
+      );
+      final map = med.toFirestore();
+
+      expect(map.containsKey('prescribedBy'), isFalse);
+      expect(map.containsKey('purpose'), isFalse);
+      expect(map.containsKey('notes'), isFalse);
+    });
+
+    test('toFirestore converts startDate to Timestamp', () {
+      final med = _makeMedication();
+      final map = med.toFirestore();
+
+      expect(map['startDate'], isA<Timestamp>());
+    });
+
+    test('toFirestore converts endDate to Timestamp', () {
+      final med = _makeMedication();
+      final map = med.toFirestore();
+
+      expect(map['endDate'], isA<Timestamp>());
+    });
+  });
+
+  group('Medication fromFirestore', () {
+    test('fromFirestore creates Medication with all fields', () {
+      final doc = FakeDocumentSnapshot('med-1', {
+        'name': 'Furosemide',
+        'dosage': '10mg',
+        'frequency': 'Twice daily',
+        'startDate': Timestamp.fromDate(DateTime(2025, 1, 1)),
+        'endDate': Timestamp.fromDate(DateTime(2025, 6, 1)),
+        'prescribedBy': 'Dr. Smith',
+        'purpose': 'Heart failure',
+        'notes': 'Take with food',
+        'remindersEnabled': true,
+        'isActive': true,
+      });
+
+      final med = Medication.fromFirestore(doc);
+
+      expect(med.id, 'med-1');
+      expect(med.name, 'Furosemide');
+      expect(med.dosage, '10mg');
+      expect(med.frequency, 'Twice daily');
+      expect(med.startDate, DateTime(2025, 1, 1));
+      expect(med.endDate, DateTime(2025, 6, 1));
+      expect(med.prescribedBy, 'Dr. Smith');
+      expect(med.purpose, 'Heart failure');
+      expect(med.notes, 'Take with food');
+      expect(med.remindersEnabled, isTrue);
+      expect(med.isActive, isTrue);
+    });
+
+    test('fromFirestore handles missing optional fields', () {
+      final doc = FakeDocumentSnapshot('med-2', {
+        'name': 'Basic Med',
+        'dosage': '5mg',
+        'frequency': 'Daily',
+        'startDate': Timestamp.fromDate(DateTime(2025, 3, 1)),
+      });
+
+      final med = Medication.fromFirestore(doc);
+
+      expect(med.id, 'med-2');
+      expect(med.name, 'Basic Med');
+      expect(med.endDate, isNull);
+      expect(med.prescribedBy, isNull);
+      expect(med.purpose, isNull);
+      expect(med.notes, isNull);
+      expect(med.remindersEnabled, isFalse);
+      expect(med.isActive, isTrue);
+    });
+
+    test('fromFirestore defaults name/dosage/frequency to empty string', () {
+      final doc = FakeDocumentSnapshot('med-3', {
+        'startDate': Timestamp.fromDate(DateTime(2025, 1, 1)),
+      });
+
+      final med = Medication.fromFirestore(doc);
+
+      expect(med.name, '');
+      expect(med.dosage, '');
+      expect(med.frequency, '');
+    });
+
+    test('fromFirestore roundtrips with toFirestore', () {
+      final original = _makeMedication();
+      final map = original.toFirestore();
+      final doc = FakeDocumentSnapshot('med-1', map);
+      final restored = Medication.fromFirestore(doc);
+
+      expect(restored.id, 'med-1');
+      expect(restored.name, original.name);
+      expect(restored.dosage, original.dosage);
+      expect(restored.frequency, original.frequency);
+      expect(restored.startDate, original.startDate);
+      expect(restored.endDate, original.endDate);
+      expect(restored.prescribedBy, original.prescribedBy);
+      expect(restored.purpose, original.purpose);
+      expect(restored.notes, original.notes);
+      expect(restored.remindersEnabled, original.remindersEnabled);
+      expect(restored.isActive, original.isActive);
+    });
+  });
+
+  group('Medication copyWith individual fields', () {
+    test('copyWith can update each field independently', () {
+      final original = _makeMedication();
+
+      expect(original.copyWith(id: 'new-id').id, 'new-id');
+      expect(original.copyWith(name: 'New Name').name, 'New Name');
+      expect(original.copyWith(dosage: '20mg').dosage, '20mg');
+      expect(original.copyWith(frequency: 'Once daily').frequency, 'Once daily');
+      expect(
+        original.copyWith(startDate: DateTime(2026, 1, 1)).startDate,
+        DateTime(2026, 1, 1),
+      );
+      expect(
+        original.copyWith(endDate: DateTime(2026, 6, 1)).endDate,
+        DateTime(2026, 6, 1),
+      );
+      expect(original.copyWith(prescribedBy: 'Dr. Jones').prescribedBy, 'Dr. Jones');
+      expect(original.copyWith(purpose: 'New purpose').purpose, 'New purpose');
+      expect(original.copyWith(notes: 'New notes').notes, 'New notes');
+      expect(original.copyWith(remindersEnabled: false).remindersEnabled, isFalse);
+      expect(original.copyWith(isActive: false).isActive, isFalse);
     });
   });
 }

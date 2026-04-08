@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/models/app_notification.dart';
+
+import '../helpers/fake_document_snapshot.dart';
 
 AppNotification _makeNotification({
   bool isRead = false,
@@ -197,6 +200,153 @@ void main() {
 
         expect(notification.toFirestore()['type'], entry.value);
       }
+    });
+
+    test('toFirestore does not include id', () {
+      final notification = _makeNotification();
+      final map = notification.toFirestore();
+
+      expect(map.containsKey('id'), isFalse);
+    });
+
+    test('toFirestore converts createdAt to Timestamp', () {
+      final notification = _makeNotification();
+      final map = notification.toFirestore();
+
+      expect(map['createdAt'], isA<Timestamp>());
+    });
+
+    test('toFirestore includes null petName when not set', () {
+      final notification = AppNotification(
+        id: 'n-no-pet',
+        title: 'Test',
+        body: 'Body',
+        type: NotificationType.careCircle,
+        createdAt: DateTime(2025, 1, 1),
+      );
+      final map = notification.toFirestore();
+
+      expect(map['petName'], isNull);
+    });
+  });
+
+  group('AppNotification fromFirestore', () {
+    test('fromFirestore creates notification with all fields', () {
+      final doc = FakeDocumentSnapshot('n-1', {
+        'title': 'New Measurement',
+        'body': 'Princess has a new SRR reading',
+        'type': 'measurement',
+        'createdAt': Timestamp.fromDate(DateTime(2025, 3, 15, 10, 30)),
+        'isRead': false,
+        'petName': 'Princess',
+      });
+
+      final n = AppNotification.fromFirestore(doc);
+
+      expect(n.id, 'n-1');
+      expect(n.title, 'New Measurement');
+      expect(n.body, contains('Princess'));
+      expect(n.type, NotificationType.measurement);
+      expect(n.createdAt, DateTime(2025, 3, 15, 10, 30));
+      expect(n.isRead, isFalse);
+      expect(n.petName, 'Princess');
+    });
+
+    test('fromFirestore deserializes all type values', () {
+      final typeMap = {
+        'measurement': NotificationType.measurement,
+        'medication': NotificationType.medication,
+        'careCircle': NotificationType.careCircle,
+        'report': NotificationType.report,
+      };
+
+      for (final entry in typeMap.entries) {
+        final doc = FakeDocumentSnapshot('n-type', {
+          'title': 'T',
+          'body': 'B',
+          'type': entry.key,
+          'createdAt': Timestamp.fromDate(DateTime(2025, 1, 1)),
+        });
+
+        final n = AppNotification.fromFirestore(doc);
+        expect(n.type, entry.value);
+      }
+    });
+
+    test('fromFirestore defaults unknown type to measurement', () {
+      final doc = FakeDocumentSnapshot('n-unk', {
+        'title': 'T',
+        'body': 'B',
+        'type': 'unknownType',
+        'createdAt': Timestamp.fromDate(DateTime(2025, 1, 1)),
+      });
+
+      final n = AppNotification.fromFirestore(doc);
+      expect(n.type, NotificationType.measurement);
+    });
+
+    test('fromFirestore defaults null type to measurement', () {
+      final doc = FakeDocumentSnapshot('n-null-type', {
+        'title': 'T',
+        'body': 'B',
+        'createdAt': Timestamp.fromDate(DateTime(2025, 1, 1)),
+      });
+
+      final n = AppNotification.fromFirestore(doc);
+      expect(n.type, NotificationType.measurement);
+    });
+
+    test('fromFirestore handles missing optional fields', () {
+      final doc = FakeDocumentSnapshot('n-min', {
+        'title': 'Alert',
+        'body': 'Body text',
+        'type': 'medication',
+        'createdAt': Timestamp.fromDate(DateTime(2025, 1, 1)),
+      });
+
+      final n = AppNotification.fromFirestore(doc);
+
+      expect(n.isRead, isFalse);
+      expect(n.petName, isNull);
+    });
+
+    test('fromFirestore defaults missing title/body to empty string', () {
+      final doc = FakeDocumentSnapshot('n-empty', {
+        'createdAt': Timestamp.fromDate(DateTime(2025, 1, 1)),
+      });
+
+      final n = AppNotification.fromFirestore(doc);
+
+      expect(n.title, '');
+      expect(n.body, '');
+    });
+
+    test('fromFirestore handles null createdAt gracefully', () {
+      final doc = FakeDocumentSnapshot('n-no-date', {
+        'title': 'Test',
+        'body': 'Body',
+        'type': 'measurement',
+      });
+
+      final n = AppNotification.fromFirestore(doc);
+
+      // When createdAt is null, it falls back to DateTime.now()
+      expect(n.createdAt, isNotNull);
+    });
+
+    test('fromFirestore roundtrips with toFirestore', () {
+      final original = _makeNotification();
+      final map = original.toFirestore();
+      final doc = FakeDocumentSnapshot('n-1', map);
+      final restored = AppNotification.fromFirestore(doc);
+
+      expect(restored.id, 'n-1');
+      expect(restored.title, original.title);
+      expect(restored.body, original.body);
+      expect(restored.type, original.type);
+      expect(restored.createdAt, original.createdAt);
+      expect(restored.isRead, original.isRead);
+      expect(restored.petName, original.petName);
     });
   });
 }

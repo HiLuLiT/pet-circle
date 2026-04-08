@@ -161,5 +161,112 @@ void main() {
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
       expect(scaffold.backgroundColor, isNotNull);
     });
+
+    testWidgets('form validation: valid name + valid email passes validation',
+        (tester) async {
+      await _pumpWelcome(tester);
+
+      // Fill in a valid name
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'Test User',
+      );
+      // Fill in a valid email
+      await tester.enterText(
+        find.byType(TextFormField).last,
+        'test@example.com',
+      );
+
+      await tester.tap(find.text('Send email code'));
+      await tester.pumpAndSettle();
+
+      // No validation errors should appear.
+      // The hint "Enter your full name" should still appear once (hint only, no error).
+      expect(find.text('Enter your full name'), findsOneWidget);
+      // "Enter a valid email" error should NOT appear.
+      expect(find.text('Enter a valid email'), findsNothing);
+      // "Please enter your email" error should NOT appear.
+      expect(find.text('Please enter your email'), findsNothing);
+    });
+
+    testWidgets('form validation: empty email shows error', (tester) async {
+      await _pumpWelcome(tester);
+
+      // Fill in a valid name but leave email empty
+      await tester.enterText(
+        find.byType(TextFormField).first,
+        'Test User',
+      );
+
+      await tester.tap(find.text('Send email code'));
+      await tester.pumpAndSettle();
+
+      // The email validator returns "Please enter your email" on empty input.
+      expect(find.text('Please enter your email'), findsOneWidget);
+    });
+
+    testWidgets('Google sign-in button is tappable', (tester) async {
+      await _pumpWelcome(tester);
+
+      // Find the Google button as an OutlinedButton with the correct text
+      final googleButton = find.widgetWithText(
+        OutlinedButton,
+        'Continue with Google',
+      );
+      expect(googleButton, findsOneWidget);
+
+      // Verify the button is enabled (onPressed is not null before loading)
+      final button = tester.widget<OutlinedButton>(googleButton);
+      expect(button.onPressed, isNotNull);
+    });
+
+    testWidgets('Apple sign-in button is tappable', (tester) async {
+      await _pumpWelcome(tester);
+
+      // Find the Apple button as an OutlinedButton with the correct text
+      final appleButton = find.widgetWithText(
+        OutlinedButton,
+        'Continue with Apple',
+      );
+      expect(appleButton, findsOneWidget);
+
+      // Verify the button is enabled (onPressed is not null before loading)
+      final button = tester.widget<OutlinedButton>(appleButton);
+      expect(button.onPressed, isNotNull);
+    });
+
+    testWidgets('Google button uses OutlinedButton style', (tester) async {
+      await _pumpWelcome(tester);
+
+      final googleButton = find.widgetWithText(
+        OutlinedButton,
+        'Continue with Google',
+      );
+      expect(googleButton, findsOneWidget);
+
+      // Verify it renders as an OutlinedButton (not ElevatedButton)
+      final widget = tester.widget<OutlinedButton>(googleButton);
+      expect(widget, isA<OutlinedButton>());
+    });
+
+    testWidgets('Apple button uses OutlinedButton style', (tester) async {
+      await _pumpWelcome(tester);
+
+      final appleButton = find.widgetWithText(
+        OutlinedButton,
+        'Continue with Apple',
+      );
+      expect(appleButton, findsOneWidget);
+
+      // Verify it renders as an OutlinedButton (not ElevatedButton)
+      final widget = tester.widget<OutlinedButton>(appleButton);
+      expect(widget, isA<OutlinedButton>());
+    });
+
+    testWidgets('Apple button has Apple icon', (tester) async {
+      await _pumpWelcome(tester);
+
+      expect(find.byIcon(Icons.apple), findsOneWidget);
+    });
   });
 }

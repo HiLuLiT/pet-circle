@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pet_circle/models/app_user.dart';
+import 'package:pet_circle/models/user_settings.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 
 void main() {
@@ -145,6 +147,218 @@ void main() {
 
       store.reset();
       expect(callCount, 1);
+    });
+
+    test('notifyListeners called on setPushNotifications', () async {
+      int callCount = 0;
+      store.addListener(() => callCount++);
+
+      await store.setPushNotifications(false);
+      expect(callCount, greaterThanOrEqualTo(1));
+    });
+
+    test('notifyListeners called on setEmergencyAlerts', () async {
+      int callCount = 0;
+      store.addListener(() => callCount++);
+
+      await store.setEmergencyAlerts(false);
+      expect(callCount, greaterThanOrEqualTo(1));
+    });
+
+    test('notifyListeners called on setVisionRREnabled', () async {
+      int callCount = 0;
+      store.addListener(() => callCount++);
+
+      await store.setVisionRREnabled(true);
+      expect(callCount, greaterThanOrEqualTo(1));
+    });
+
+    test('notifyListeners called on setAutoExport', () async {
+      int callCount = 0;
+      store.addListener(() => callCount++);
+
+      await store.setAutoExport(true);
+      expect(callCount, greaterThanOrEqualTo(1));
+    });
+  });
+
+  group('SettingsStore toggle methods', () {
+    test('togglePushNotifications flips value', () async {
+      expect(store.pushNotifications, isTrue);
+
+      await store.togglePushNotifications();
+      expect(store.pushNotifications, isFalse);
+
+      await store.togglePushNotifications();
+      expect(store.pushNotifications, isTrue);
+    });
+
+    test('toggleEmergencyAlerts flips value', () async {
+      expect(store.emergencyAlerts, isTrue);
+
+      await store.toggleEmergencyAlerts();
+      expect(store.emergencyAlerts, isFalse);
+
+      await store.toggleEmergencyAlerts();
+      expect(store.emergencyAlerts, isTrue);
+    });
+
+    test('toggleVisionRR flips value', () async {
+      expect(store.visionRREnabled, isFalse);
+
+      await store.toggleVisionRR();
+      expect(store.visionRREnabled, isTrue);
+
+      await store.toggleVisionRR();
+      expect(store.visionRREnabled, isFalse);
+    });
+
+    test('toggleAutoExport flips value', () async {
+      expect(store.autoExport, isFalse);
+
+      await store.toggleAutoExport();
+      expect(store.autoExport, isTrue);
+
+      await store.toggleAutoExport();
+      expect(store.autoExport, isFalse);
+    });
+  });
+
+  group('SettingsStore seedFromAppUser', () {
+    test('seedFromAppUser applies all settings from AppUser', () {
+      final appUser = AppUser(
+        uid: 'u-1',
+        email: 'test@example.com',
+        role: AppUserRole.owner,
+        settings: const UserSettings(
+          elevatedThreshold: 25,
+          criticalThreshold: 35,
+          pushNotifications: false,
+          emergencyAlerts: false,
+          visionRREnabled: true,
+          autoExport: true,
+        ),
+      );
+
+      store.seedFromAppUser(appUser);
+
+      expect(store.elevatedThreshold, 25);
+      expect(store.criticalThreshold, 35);
+      expect(store.pushNotifications, isFalse);
+      expect(store.emergencyAlerts, isFalse);
+      expect(store.visionRREnabled, isTrue);
+      expect(store.autoExport, isTrue);
+    });
+
+    test('seedFromAppUser with default settings matches store defaults', () {
+      final appUser = AppUser(
+        uid: 'u-2',
+        email: 'test@example.com',
+        role: AppUserRole.owner,
+      );
+
+      store.seedFromAppUser(appUser);
+
+      expect(store.elevatedThreshold, 30);
+      expect(store.criticalThreshold, 40);
+      expect(store.pushNotifications, isTrue);
+      expect(store.emergencyAlerts, isTrue);
+      expect(store.visionRREnabled, isFalse);
+      expect(store.autoExport, isFalse);
+    });
+
+    test('seedFromAppUser notifies listeners', () {
+      int callCount = 0;
+      store.addListener(() => callCount++);
+
+      final appUser = AppUser(
+        uid: 'u-3',
+        email: 'test@example.com',
+        role: AppUserRole.owner,
+      );
+
+      store.seedFromAppUser(appUser);
+      expect(callCount, 1);
+    });
+
+    test('classifyStatus reflects seeded thresholds', () {
+      final appUser = AppUser(
+        uid: 'u-4',
+        email: 'test@example.com',
+        role: AppUserRole.owner,
+        settings: const UserSettings(
+          elevatedThreshold: 20,
+          criticalThreshold: 30,
+        ),
+      );
+
+      store.seedFromAppUser(appUser);
+
+      expect(store.classifyStatus(15), 'Normal');
+      expect(store.classifyStatus(20), 'Elevated');
+      expect(store.classifyStatus(25), 'Elevated');
+      expect(store.classifyStatus(30), 'Critical');
+      expect(store.classifyStatus(40), 'Critical');
+    });
+  });
+
+  group('SettingsStore reset after modifications', () {
+    test('reset restores all values including toggles', () async {
+      await store.setEmergencyAlerts(false);
+      await store.setAutoExport(true);
+      await store.setVisionRREnabled(true);
+
+      store.reset();
+
+      expect(store.emergencyAlerts, isTrue);
+      expect(store.autoExport, isFalse);
+      expect(store.visionRREnabled, isFalse);
+    });
+
+    test('reset after seedFromAppUser restores defaults', () {
+      final appUser = AppUser(
+        uid: 'u-5',
+        email: 'test@example.com',
+        role: AppUserRole.owner,
+        settings: const UserSettings(
+          elevatedThreshold: 10,
+          criticalThreshold: 20,
+          pushNotifications: false,
+          emergencyAlerts: false,
+          visionRREnabled: true,
+          autoExport: true,
+        ),
+      );
+
+      store.seedFromAppUser(appUser);
+      store.reset();
+
+      expect(store.elevatedThreshold, 30);
+      expect(store.criticalThreshold, 40);
+      expect(store.pushNotifications, isTrue);
+      expect(store.emergencyAlerts, isTrue);
+      expect(store.visionRREnabled, isFalse);
+      expect(store.autoExport, isFalse);
+    });
+  });
+
+  group('SettingsStore updateThresholds partial', () {
+    test('updating only elevated preserves critical', () async {
+      await store.updateThresholds(elevated: 15);
+      expect(store.elevatedThreshold, 15);
+      expect(store.criticalThreshold, 40);
+    });
+
+    test('updating only critical preserves elevated', () async {
+      await store.updateThresholds(critical: 50);
+      expect(store.elevatedThreshold, 30);
+      expect(store.criticalThreshold, 50);
+    });
+
+    test('passing null for both does not change values', () async {
+      await store.updateThresholds();
+      expect(store.elevatedThreshold, 30);
+      expect(store.criticalThreshold, 40);
     });
   });
 }
