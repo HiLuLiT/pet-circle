@@ -10,6 +10,7 @@ functions/lib/
 
 # Tool-generated directories
 .superpowers/
+.worktrees/
 docs/superpowers/
 
 # Miscellaneous
