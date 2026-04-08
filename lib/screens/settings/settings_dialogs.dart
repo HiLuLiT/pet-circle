@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/invitation_service.dart';
@@ -28,20 +29,29 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
     final c = AppSemanticColors.of(context);
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
         title: Text(l10n.signOut, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
         content: Text(l10n.signOutConfirmation, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogCtx),
             child: Text(l10n.cancel),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              if (widget.onClose != null) widget.onClose!();
-              context.go(AppRoutes.welcome);
+            onPressed: () async {
+              // Capture the GoRouter BEFORE closing anything.
+              final router = GoRouter.of(context);
+
+              // Close the dialog.
+              Navigator.pop(dialogCtx);
+
+              // Sign out from Firebase + Google.
+              await authProvider.signOut();
+
+              // Navigate to welcome. GoRouter.of(context) was captured
+              // before the dialog was popped, so it's still valid.
+              if (context.mounted) router.go(AppRoutes.welcome);
             },
             style: TextButton.styleFrom(backgroundColor: c.error),
             child: Text(l10n.signOut, style: TextStyle(color: c.background)),

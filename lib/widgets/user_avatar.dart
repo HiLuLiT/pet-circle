@@ -45,7 +45,22 @@ class UserAvatar extends StatelessWidget {
         ),
         child: ClipOval(
           child: _hasNetworkImage
-              ? Image.network(imageUrl!, fit: BoxFit.cover, width: size, height: size)
+              ? Image.network(
+                  imageUrl!,
+                  fit: BoxFit.cover,
+                  width: size,
+                  height: size,
+                  errorBuilder: (_, __, ___) => Center(
+                    child: Text(
+                      _initials,
+                      style: AppSemanticTextStyles.labelSm.copyWith(
+                        color: c.onPrimary,
+                        fontSize: size * 0.38,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                )
               : Center(
                   child: Text(
                     _initials,

@@ -39,9 +39,11 @@ void main() {
       expect(find.text('?'), findsOneWidget);
     });
 
-    testWidgets('shows image (not initials) when imageUrl starts with http',
+    testWidgets('attempts network image when imageUrl starts with http',
         (tester) async {
-      // Network images return 400 in tests; silence the expected error.
+      // Network images fail in tests (no real HTTP), so the errorBuilder
+      // falls back to initials. Verify that Image.network is in the tree
+      // (proving the URL path was taken) even though the fallback shows.
       final errors = <FlutterErrorDetails>[];
       final oldHandler = FlutterError.onError;
       FlutterError.onError = (details) => errors.add(details);
@@ -55,8 +57,10 @@ void main() {
       await tester.pump();
 
       FlutterError.onError = oldHandler;
-      // Should NOT show initials when a valid URL is provided
-      expect(find.text('JD'), findsNothing);
+      // Image.network widget is present in the tree (URL path was taken)
+      expect(find.byType(Image), findsOneWidget);
+      // The errorBuilder shows initials as fallback in test environment
+      expect(find.text('JD'), findsOneWidget);
     });
 
     testWidgets('falls back to initials when imageUrl is empty', (tester) async {

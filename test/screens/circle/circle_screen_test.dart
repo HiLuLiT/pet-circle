@@ -179,7 +179,7 @@ void main() {
       petStore.seed(ownerPets: [ownerOnlyPet], clinicPets: []);
     });
 
-    testWidgets('shows empty state message', (tester) async {
+    testWidgets('shows invite description below owner tile', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(
@@ -187,11 +187,15 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // l10n circleEmptyTitle => "You're the only one here!"
-      expect(find.text("You're the only one here!"), findsOneWidget);
+      // l10n circleEmptyDescription('Buddy') =>
+      // "Invite family or caregivers to help monitor Buddy."
+      expect(
+        find.textContaining('Invite family or caregivers to help monitor Buddy'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('shows invite button in empty state', (tester) async {
+    testWidgets('shows invite button for owner', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(
@@ -199,8 +203,10 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Invite to Circle'), findsAtLeastNWidgets(1));
-      expect(find.byIcon(Icons.group_add), findsOneWidget);
+      // The owner always sees the bottom "Invite to Circle" button
+      // with the person_add_alt_1 icon (not group_add from old empty state).
+      expect(find.text('Invite to Circle'), findsOneWidget);
+      expect(find.byIcon(Icons.person_add_alt_1), findsOneWidget);
     });
   });
 
@@ -425,7 +431,171 @@ void main() {
     });
   });
 
-  // ── Group 8: Remove member dialog ─────────────────────────────────────
+  // ── Group 8: Pending invites section ─────────────────────────────────
+
+  group('CircleScreen pending invites', () {
+    setUp(() {
+      // Seed with a pet that has pending invites.
+      final petWithInvites = Pet(
+        name: 'Luna',
+        breedAndAge: 'Labrador - 5 years old',
+        imageUrl: '',
+        statusLabel: 'Normal',
+        statusColorHex: 0xFF75ACFF,
+        latestMeasurement: Measurement(
+          bpm: 22,
+          recordedAt: DateTime.now(),
+          recordedAtLabel: 'Just now',
+        ),
+        careCircle: const [
+          CareCircleMember(
+            name: 'Hila',
+            avatarUrl: '',
+            role: CareCircleRole.owner,
+          ),
+        ],
+        pendingInvites: [
+          PendingInvite(
+            token: 'test-token-1',
+            invitedEmail: 'friend@example.com',
+            expiresAt: DateTime.now().add(const Duration(days: 5)),
+          ),
+          PendingInvite(
+            token: 'test-token-2',
+            invitedEmail: 'vet@clinic.com',
+            expiresAt: DateTime.now().add(const Duration(days: 3)),
+          ),
+        ],
+      );
+      petStore.seed(ownerPets: [petWithInvites], clinicPets: []);
+    });
+
+    testWidgets('shows "Pending Invites" heading when invites exist',
+        (tester) async {
+      suppressOverflowErrors();
+
+      await tester.pumpWidget(
+        testApp(const CircleScreen(showScaffold: false)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Pending Invites'), findsOneWidget);
+    });
+
+    testWidgets('shows pending invite email addresses', (tester) async {
+      suppressOverflowErrors();
+
+      await tester.pumpWidget(
+        testApp(const CircleScreen(showScaffold: false)),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('friend@example.com'), findsOneWidget);
+      expect(find.text('vet@clinic.com'), findsOneWidget);
+    });
+
+    testWidgets('pending invite tiles show mail icon', (tester) async {
+      suppressOverflowErrors();
+
+      await tester.pumpWidget(
+        testApp(const CircleScreen(showScaffold: false)),
+      );
+      await tester.pumpAndSettle();
+
+      // Each pending invite tile has a mail_outline icon
+      expect(find.byIcon(Icons.mail_outline), findsNWidgets(2));
+    });
+
+    testWidgets('pending invites show cancel button for owner',
+        (tester) async {
+      suppressOverflowErrors();
+
+      await tester.pumpWidget(
+        testApp(const CircleScreen(showScaffold: false)),
+      );
+      await tester.pumpAndSettle();
+
+      // Each pending invite tile uses a TextButton with l10n.cancelInvite
+      // which is "Cancel". There are 2 pending invites so 2 cancel buttons.
+      // Find TextButtons whose child text is "Cancel" (from pending tiles).
+      expect(
+        find.widgetWithText(TextButton, 'Cancel'),
+        findsNWidgets(2),
+      );
+    });
+
+    testWidgets('does not show invite-empty description when invites exist',
+        (tester) async {
+      suppressOverflowErrors();
+
+      await tester.pumpWidget(
+        testApp(const CircleScreen(showScaffold: false)),
+      );
+      await tester.pumpAndSettle();
+
+      // The empty description should not appear when there are pending invites
+      expect(
+        find.textContaining('Invite family or caregivers'),
+        findsNothing,
+      );
+    });
+  });
+
+  // ── Group 9: Invite sheet mock-mode send ──────────────────────────────
+
+  group('CircleScreen invite sheet send flow', () {
+    testWidgets('invite sheet shows description text with pet name',
+        (tester) async {
+      suppressOverflowErrors();
+
+      await tester.pumpWidget(
+        testApp(const CircleScreen(showScaffold: false)),
+      );
+      await tester.pumpAndSettle();
+
+      // Open invite sheet
+      await tester.tap(find.text('Invite to Circle'));
+      await tester.pumpAndSettle();
+
+      // Verify the description mentions the pet name
+      expect(
+        find.textContaining("Princess's care circle"),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('email field is autofocused', (tester) async {
+      suppressOverflowErrors();
+
+      await tester.pumpWidget(
+        testApp(const CircleScreen(showScaffold: false)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Invite to Circle'));
+      await tester.pumpAndSettle();
+
+      // The TextField should have autofocus enabled
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.autofocus, isTrue);
+    });
+
+    testWidgets('send button has send icon', (tester) async {
+      suppressOverflowErrors();
+
+      await tester.pumpWidget(
+        testApp(const CircleScreen(showScaffold: false)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Invite to Circle'));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.send), findsOneWidget);
+    });
+  });
+
+  // ── Group 10: Remove member dialog ────────────────────────────────────
 
   group('CircleScreen remove member dialog', () {
     testWidgets('tapping close on member opens confirmation dialog',

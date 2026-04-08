@@ -367,7 +367,7 @@ class AppLocalizationsHe extends AppLocalizations {
       'הגדרת טווחי BPM מותאמים אישית להתראות קצב הנשימה של חיית המחמד שלך.';
 
   @override
-  String get createAccount => 'יצירת חשבון';
+  String get createAccount => 'צור חשבון';
 
   @override
   String get email => 'אימייל';
@@ -940,6 +940,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get vetAlreadyInvited => 'וטרינר זה כבר הוזמן עבור חיית מחמד זו.';
 
   @override
+  String get alreadyInvited => 'משתמש זה כבר הוזמן למעגל של חיית מחמד זו.';
+
+  @override
   String get maxVetsReached => 'הגעת למקסימום של 2 וטרינרים לכל חיית מחמד.';
 
   @override
@@ -1102,4 +1105,65 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get noMembersYet => 'אין חברים עדיין';
+
+  @override
+  String get pleaseEnterYourDetails => 'הכנס את הפרטים שלך כדי ליצור חשבון.';
+
+  @override
+  String get enterYourFullName => 'הכנס את שמך המלא';
+
+  @override
+  String get sendVerificationCode => 'שלח קוד אימייל';
+
+  @override
+  String get or => 'או';
+
+  @override
+  String get continueWithGoogle => 'המשך עם Google';
+
+  @override
+  String get continueWithApple => 'המשך עם Apple';
+
+  @override
+  String get login => 'התחבר';
+
+  @override
+  String get enterDetailsToLogin => 'הכנס את הפרטים שלך כדי להתחבר.';
+
+  @override
+  String get enterVerificationCode => 'בדוק את האימייל';
+
+  @override
+  String weSentCodeTo(String email) {
+    return 'הכנס את הקוד שנשלח ל-$email';
+  }
+
+  @override
+  String get verificationCodeSent => 'קוד אימות נשלח!';
+
+  @override
+  String get verifyCode => 'אימות';
+
+  @override
+  String get resendCode => 'שלח קוד מחדש';
+
+  @override
+  String resendCodeInSeconds(int seconds) {
+    return 'שלח קוד מחדש בעוד $seconds שניות';
+  }
+
+  @override
+  String get useDifferentEmail => 'השתמש באימייל אחר';
+
+  @override
+  String get enterValidEmail => 'הכנס אימייל תקין';
+
+  @override
+  String get verificationFailed => 'האימות נכשל';
+
+  @override
+  String get petNotFound => 'חיית מחמד לא נמצאה';
+
+  @override
+  String get failedToSendCode => 'שליחת הקוד נכשלה';
 }

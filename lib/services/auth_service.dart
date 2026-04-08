@@ -252,9 +252,15 @@ class AuthService {
   // SIGN OUT
   // ─────────────────────────────────────────────────────────────────────────────
 
-  /// Sign out from all providers
+  /// Sign out from all providers.
+  /// Google sign-out is best-effort — it may fail on web if the
+  /// client ID isn't configured, but Firebase sign-out must always run.
   static Future<void> signOut() async {
-    await _googleSignIn.signOut();
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {
+      // Ignore — Google session may not exist or web client ID missing.
+    }
     await _auth.signOut();
   }
 

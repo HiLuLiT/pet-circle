@@ -5,8 +5,8 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/screens/auth/auth_gate.dart';
-import 'package:pet_circle/screens/auth/auth_screen.dart';
-import 'package:pet_circle/screens/auth/verify_email_screen.dart';
+import 'package:pet_circle/screens/auth/login_screen.dart';
+import 'package:pet_circle/screens/auth/verify_otp_screen.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
 import 'package:pet_circle/screens/invite/invite_screen.dart';
 import 'package:pet_circle/screens/main_shell.dart';
@@ -22,10 +22,11 @@ import 'package:pet_circle/stores/user_store.dart';
 class AppRoutes {
   static const welcome = '/';
   static const authGate = '/auth-gate';
-  static const auth = '/auth';
-  static const verifyEmail = '/verify-email';
+  static const signup = '/signup';
+  static const login = '/login';
   static const onboarding = '/onboarding';
   static const invite = '/invite';
+  static const verifyOtp = '/verify-otp';
   static const vetDashboard = '/vet-dashboard';
 
   /// Build shell path with an optional tab index.
@@ -40,7 +41,7 @@ class AppRoutes {
 
 /// Routes that are exempt from the auth-gate redirect (they handle their own
 /// auth logic or are public).
-const _publicPaths = {'/', '/auth-gate', '/auth', '/verify-email', '/welcome', '/invite', '/onboarding'};
+const _publicPaths = {'/', '/auth-gate', '/signup', '/login', '/verify-otp', '/welcome', '/invite', '/onboarding'};
 
 /// Stashed route the user was trying to reach before being bounced to auth-gate.
 /// Consumed once by [AuthGate] after successful authentication.
@@ -130,17 +131,17 @@ GoRouter buildRouter() {
         path: '/auth-gate',
         builder: (_, _) => const AuthGate(),
       ),
+      GoRoute(path: '/signup', builder: (_, _) => const WelcomeScreen()),
+      GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(
-        path: '/auth',
+        path: '/verify-otp',
         builder: (_, state) {
-          final signIn =
-              state.uri.queryParameters['signIn'] == 'true';
-          return AuthScreen(startWithSignIn: signIn);
+          final email = Uri.decodeComponent(state.uri.queryParameters['email'] ?? '');
+          final isSignup = state.uri.queryParameters['signup'] == 'true';
+          final nameParam = state.uri.queryParameters['name'];
+          final name = nameParam != null ? Uri.decodeComponent(nameParam) : null;
+          return VerifyOtpScreen(email: email, isSignup: isSignup, name: name);
         },
-      ),
-      GoRoute(
-        path: '/verify-email',
-        builder: (_, _) => const VerifyEmailScreen(),
       ),
       GoRoute(
         path: '/onboarding',
@@ -186,6 +187,7 @@ GoRouter buildRouter() {
               final pet = petStore.getPetById(petId);
               if (pet == null) {
                 return const Scaffold(
+                  // TODO: Use l10n.petNotFound once BuildContext is available here
                   body: Center(child: Text('Pet not found')),
                 );
               }

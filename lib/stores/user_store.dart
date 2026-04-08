@@ -53,4 +53,12 @@ class UserStore extends ChangeNotifier {
     _role = role;
     notifyListeners();
   }
+
+  /// Clear all user data on sign-out.
+  void reset() {
+    _currentUser = null;
+    _appUser = null;
+    _role = AppUserRole.owner;
+    notifyListeners();
+  }
 }

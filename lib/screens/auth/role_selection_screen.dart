@@ -34,7 +34,7 @@ class RoleSelectionScreen extends StatelessWidget {
         context.go(AppRoutes.authGate);
       }
     } else {
-      context.push('${AppRoutes.auth}?role=${role.name}');
+      context.push(AppRoutes.signup);
     }
   }
 

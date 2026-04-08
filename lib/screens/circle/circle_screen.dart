@@ -121,46 +121,56 @@ class _CircleContent extends StatelessWidget {
 
           const SizedBox(height: AppSpacingTokens.lg),
 
-          // Member list or empty state
-          if (members.length <= 1 && pendingInvites.isEmpty)
-            _EmptyCircle(petName: petName, isOwner: isOwner)
-          else
-            Expanded(
-              child: ListView(
-                children: [
-                  ...members.map((member) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm),
-                    child: _MemberTile(
-                      member: member,
-                      isOwner: isOwner,
-                      onRemove: isOwner && member.role != CareCircleRole.owner
-                          ? () => _confirmRemove(context, member)
+          // Member list — always show all members including the owner
+          Expanded(
+            child: ListView(
+              children: [
+                ...members.map((member) => Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm),
+                  child: _MemberTile(
+                    member: member,
+                    isOwner: isOwner,
+                    onRemove: isOwner && member.role != CareCircleRole.owner
+                        ? () => _confirmRemove(context, member)
+                        : null,
+                  ),
+                )),
+                // Invite prompt when the owner is the only member
+                if (members.length <= 1 && pendingInvites.isEmpty) ...[
+                  const SizedBox(height: AppSpacingTokens.lg),
+                  Center(
+                    child: Text(
+                      l10n.circleEmptyDescription(petName),
+                      style: AppSemanticTextStyles.body.copyWith(
+                        color: c.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
+                if (pendingInvites.isNotEmpty) ...[
+                  const SizedBox(height: AppSpacingTokens.lg),
+                  Text(
+                    l10n.pendingInvites,
+                    style: AppSemanticTextStyles.headingLg,
+                  ),
+                  const SizedBox(height: AppSpacingTokens.sm),
+                  ...pendingInvites.map((invite) => Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: AppSpacingTokens.sm,
+                    ),
+                    child: _PendingInviteTile(
+                      email: invite.invitedEmail,
+                      expiresAt: invite.expiresAt,
+                      onCancel: isOwner
+                          ? () => _cancelInvite(context, invite.token)
                           : null,
                     ),
                   )),
-                  if (pendingInvites.isNotEmpty) ...[
-                    const SizedBox(height: AppSpacingTokens.lg),
-                    Text(
-                      l10n.pendingInvites,
-                      style: AppSemanticTextStyles.headingLg,
-                    ),
-                    const SizedBox(height: AppSpacingTokens.sm),
-                    ...pendingInvites.map((invite) => Padding(
-                      padding: const EdgeInsets.only(
-                        bottom: AppSpacingTokens.sm,
-                      ),
-                      child: _PendingInviteTile(
-                        email: invite.invitedEmail,
-                        expiresAt: invite.expiresAt,
-                        onCancel: isOwner
-                            ? () => _cancelInvite(context, invite.token)
-                            : null,
-                      ),
-                    )),
-                  ],
                 ],
-              ),
+              ],
             ),
+          ),
 
           // Invite button (owner only)
           if (isOwner)
@@ -401,6 +411,9 @@ class _PendingInviteTile extends StatelessWidget {
     final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final daysLeft = expiresAt.difference(DateTime.now()).inDays;
+    final expiryText = daysLeft > 0
+        ? l10n.pendingInviteExpires('${daysLeft}d')
+        : l10n.invitePending;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacingTokens.md),
@@ -427,7 +440,7 @@ class _PendingInviteTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
-                  '${l10n.invitePending} · ${daysLeft}d',
+                  '${l10n.invitePending} · $expiryText',
                   style: AppSemanticTextStyles.caption.copyWith(
                     color: c.textTertiary,
                   ),
@@ -510,7 +523,7 @@ class _InviteSheetState extends State<_InviteSheet> {
         if (!mounted) return;
         final l10n = AppLocalizations.of(context)!;
         final message = switch (validationError) {
-          'alreadyInvited' => l10n.vetAlreadyInvited,
+          'alreadyInvited' => l10n.alreadyInvited,
           'dailyInviteLimitReached' => l10n.dailyInviteLimitReached,
           _ => validationError,
         };

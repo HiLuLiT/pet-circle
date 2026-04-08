@@ -11,25 +11,23 @@ void main() {
       final enumCases = [
         'loading',
         'unauthenticated',
-        'needsEmailVerification',
-        'needsRole',
-        'needsOnboarding', // This is the new case we're adding
+        'needsOnboarding',
         'authenticated',
       ];
 
-      expect(enumCases, hasLength(6));
+      expect(enumCases, hasLength(4));
       expect(enumCases.contains('needsOnboarding'), true);
-      expect(enumCases.indexOf('needsOnboarding'), equals(4)); // Position between needsRole and authenticated
+      expect(enumCases.indexOf('needsOnboarding'), equals(2));
     });
 
     test('needsOnboarding is positioned correctly in enum', () {
-      // Verify that needsOnboarding comes after needsRole and before authenticated
-      final beforeOnboarding = ['loading', 'unauthenticated', 'needsEmailVerification', 'needsRole'];
+      // Verify that needsOnboarding comes after unauthenticated and before authenticated
+      final beforeOnboarding = ['loading', 'unauthenticated'];
       final afterOnboarding = ['authenticated'];
       final allCases = [...beforeOnboarding, 'needsOnboarding', ...afterOnboarding];
 
       expect(allCases.indexOf('needsOnboarding'),
-             greaterThan(allCases.indexOf('needsRole')));
+             greaterThan(allCases.indexOf('unauthenticated')));
       expect(allCases.indexOf('needsOnboarding'),
              lessThan(allCases.indexOf('authenticated')));
     });

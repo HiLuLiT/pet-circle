@@ -797,7 +797,7 @@ abstract class AppLocalizations {
   /// No description provided for @createAccount.
   ///
   /// In en, this message translates to:
-  /// **'Create Account'**
+  /// **'Create an account'**
   String get createAccount;
 
   /// No description provided for @email.
@@ -1844,6 +1844,12 @@ abstract class AppLocalizations {
   /// **'This veterinarian has already been invited for this pet.'**
   String get vetAlreadyInvited;
 
+  /// No description provided for @alreadyInvited.
+  ///
+  /// In en, this message translates to:
+  /// **'This user has already been invited to this pet\'s circle.'**
+  String get alreadyInvited;
+
   /// No description provided for @maxVetsReached.
   ///
   /// In en, this message translates to:
@@ -2119,6 +2125,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No members yet'**
   String get noMembersYet;
+
+  /// No description provided for @pleaseEnterYourDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your details to create an account.'**
+  String get pleaseEnterYourDetails;
+
+  /// No description provided for @enterYourFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your full name'**
+  String get enterYourFullName;
+
+  /// No description provided for @sendVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send email code'**
+  String get sendVerificationCode;
+
+  /// No description provided for @or.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
+  String get or;
+
+  /// No description provided for @continueWithGoogle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Google'**
+  String get continueWithGoogle;
+
+  /// No description provided for @continueWithApple.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue with Apple'**
+  String get continueWithApple;
+
+  /// No description provided for @login.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get login;
+
+  /// No description provided for @enterDetailsToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your details to login.'**
+  String get enterDetailsToLogin;
+
+  /// No description provided for @enterVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your email'**
+  String get enterVerificationCode;
+
+  /// No description provided for @weSentCodeTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code sent to {email}'**
+  String weSentCodeTo(String email);
+
+  /// No description provided for @verificationCodeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code sent!'**
+  String get verificationCodeSent;
+
+  /// No description provided for @verifyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verifyCode;
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get resendCode;
+
+  /// No description provided for @resendCodeInSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code in {seconds}s'**
+  String resendCodeInSeconds(int seconds);
+
+  /// No description provided for @useDifferentEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a different email'**
+  String get useDifferentEmail;
+
+  /// No description provided for @enterValidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email'**
+  String get enterValidEmail;
+
+  /// No description provided for @verificationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification failed'**
+  String get verificationFailed;
+
+  /// No description provided for @petNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet not found'**
+  String get petNotFound;
+
+  /// No description provided for @failedToSendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send code'**
+  String get failedToSendCode;
 }
 
 class _AppLocalizationsDelegate
