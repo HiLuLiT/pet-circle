@@ -308,6 +308,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                             focusNode: _focusNodes[index],
                             keyboardType: TextInputType.number,
                             textAlign: TextAlign.center,
+                            textAlignVertical: TextAlignVertical.center,
                             maxLength: 1,
                             style: AppSemanticTextStyles.title3.copyWith(
                               color: c.textPrimary,
@@ -320,6 +321,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                               counterText: '',
                               filled: true,
                               fillColor: c.background,
+                              contentPadding: EdgeInsets.zero,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,

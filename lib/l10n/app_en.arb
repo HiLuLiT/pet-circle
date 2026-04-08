@@ -321,6 +321,7 @@
   "vetInviteSent": "Vet invitation sent to {email}",
   "@vetInviteSent": { "placeholders": { "email": { "type": "String" } } },
   "vetAlreadyInvited": "This veterinarian has already been invited for this pet.",
+  "alreadyInvited": "This user has already been invited to this pet's circle.",
   "maxVetsReached": "Maximum of 2 veterinarians per pet has been reached.",
   "dailyInviteLimitReached": "You have reached the daily invitation limit. Please try again tomorrow.",
   "pendingRequests": "Pending Requests",

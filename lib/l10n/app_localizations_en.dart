@@ -945,6 +945,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'This veterinarian has already been invited for this pet.';
 
   @override
+  String get alreadyInvited =>
+      'This user has already been invited to this pet\'s circle.';
+
+  @override
   String get maxVetsReached =>
       'Maximum of 2 veterinarians per pet has been reached.';
 

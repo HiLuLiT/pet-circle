@@ -321,6 +321,7 @@
   "vetInviteSent": "הזמנת וטרינר נשלחה ל-{email}",
   "@vetInviteSent": { "placeholders": { "email": { "type": "String" } } },
   "vetAlreadyInvited": "וטרינר זה כבר הוזמן עבור חיית מחמד זו.",
+  "alreadyInvited": "משתמש זה כבר הוזמן למעגל של חיית מחמד זו.",
   "maxVetsReached": "הגעת למקסימום של 2 וטרינרים לכל חיית מחמד.",
   "dailyInviteLimitReached": "הגעת למגבלת ההזמנות היומית. נסה שוב מחר.",
   "pendingRequests": "בקשות ממתינות",

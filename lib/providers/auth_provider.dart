@@ -80,12 +80,15 @@ class AuthProvider extends ChangeNotifier {
         _isCreatingUser = true;
         notifyListeners();
         try {
+          final displayName = user.displayName ?? '';
+          final photoUrl = user.photoURL ??
+              _uiAvatarsFallback(displayName, user.email ?? '');
           await UserService.createUser(
             uid: user.uid,
             email: user.email ?? '',
             role: AppUserRole.owner,
-            displayName: user.displayName,
-            photoUrl: user.photoURL,
+            displayName: displayName,
+            photoUrl: photoUrl,
           );
         } catch (_) {
           _isCreatingUser = false;
@@ -107,6 +110,13 @@ class AuthProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     });
+  }
+
+  /// Generates a UI Avatars fallback URL from name or email.
+  static String _uiAvatarsFallback(String name, String email) {
+    final label = name.isNotEmpty ? name : email.split('@').first;
+    final encoded = Uri.encodeComponent(label);
+    return 'https://ui-avatars.com/api/?name=$encoded&background=6B4EFF&color=fff&size=128';
   }
 
   Future<void> refresh() async {

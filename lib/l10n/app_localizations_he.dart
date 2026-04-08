@@ -940,6 +940,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get vetAlreadyInvited => 'וטרינר זה כבר הוזמן עבור חיית מחמד זו.';
 
   @override
+  String get alreadyInvited => 'משתמש זה כבר הוזמן למעגל של חיית מחמד זו.';
+
+  @override
   String get maxVetsReached => 'הגעת למקסימום של 2 וטרינרים לכל חיית מחמד.';
 
   @override

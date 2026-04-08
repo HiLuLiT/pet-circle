@@ -1844,6 +1844,12 @@ abstract class AppLocalizations {
   /// **'This veterinarian has already been invited for this pet.'**
   String get vetAlreadyInvited;
 
+  /// No description provided for @alreadyInvited.
+  ///
+  /// In en, this message translates to:
+  /// **'This user has already been invited to this pet\'s circle.'**
+  String get alreadyInvited;
+
   /// No description provided for @maxVetsReached.
   ///
   /// In en, this message translates to:

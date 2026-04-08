@@ -530,7 +530,20 @@ class _AvatarCircle extends StatelessWidget {
       ),
       child: ClipOval(
         child: hasImage
-            ? Image.network(member.avatarUrl, fit: BoxFit.cover)
+            ? Image.network(
+                member.avatarUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Center(
+                  child: Text(
+                    _initials,
+                    style: TextStyle(
+                      color: c.onPrimary,
+                      fontSize: size * 0.42,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              )
             : Center(
                 child: Text(
                   _initials,
