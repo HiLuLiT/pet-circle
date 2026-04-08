@@ -51,7 +51,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
 
               // Navigate to welcome. GoRouter.of(context) was captured
               // before the dialog was popped, so it's still valid.
-              router.go(AppRoutes.welcome);
+              if (context.mounted) router.go(AppRoutes.welcome);
             },
             style: TextButton.styleFrom(backgroundColor: c.error),
             child: Text(l10n.signOut, style: TextStyle(color: c.background)),

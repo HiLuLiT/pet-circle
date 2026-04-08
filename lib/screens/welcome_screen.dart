@@ -45,7 +45,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
     if (!kEnableFirebase) {
       if (!mounted) return;
-      context.go('/verify-otp?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}');
+      setState(() => _isLoading = false);
+      context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}');
       return;
     }
 
@@ -59,9 +60,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     setState(() => _isLoading = false);
 
     if (result.success) {
-      context.go('/verify-otp?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}');
+      context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}');
     } else {
-      setState(() => _error = result.error ?? 'Failed to send code');
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _error = result.error ?? l10n.failedToSendCode);
     }
   }
 
@@ -217,15 +219,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             textInputAction: TextInputAction.done,
                             decoration: _inputDecoration(
                               c,
-                              hintText: 'Enter your Email',
+                              hintText: l10n.enterYourEmail,
                             ),
                             style: AppSemanticTextStyles.body,
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return l10n.emailAddress;
+                                return l10n.pleaseEnterEmail;
                               }
-                              if (!value.contains('@')) {
-                                return 'Enter a valid email';
+                              if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value.trim())) {
+                                return l10n.enterValidEmail;
                               }
                               return null;
                             },
@@ -253,7 +255,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _handleSendCode,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: c.textPrimary,
+                          backgroundColor: c.primary,
                           foregroundColor: c.surface,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -320,10 +322,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     const SizedBox(height: AppSpacingTokens.xl),
 
                     // Already have an account? Sign in
-                    GestureDetector(
-                      onTap: _isLoading
-                          ? null
-                          : () => context.push(AppRoutes.login),
+                    TextButton(
+                      onPressed: _isLoading ? null : () => context.push(AppRoutes.login),
                       child: Text.rich(
                         TextSpan(
                           text: '${l10n.alreadyHaveAccount} ',

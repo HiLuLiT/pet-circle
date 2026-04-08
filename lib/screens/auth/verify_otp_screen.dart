@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/services/otp_service.dart';
 import 'package:pet_circle/theme/app_assets.dart';
@@ -32,6 +33,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   final List<TextEditingController> _controllers =
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  final List<FocusNode> _rawFocusNodes = List.generate(6, (_) => FocusNode());
 
   bool _isVerifying = false;
   bool _isResending = false;
@@ -53,6 +55,9 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     }
     for (final f in _focusNodes) {
       f.dispose();
+    }
+    for (final node in _rawFocusNodes) {
+      node.dispose();
     }
     _cooldownTimer?.cancel();
     super.dispose();
@@ -86,8 +91,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     }
   }
 
-  void _onKeyPressed(int index, RawKeyEvent event) {
-    if (event is RawKeyDownEvent &&
+  void _onKeyPressed(int index, KeyEvent event) {
+    if (event is KeyDownEvent &&
         event.logicalKey == LogicalKeyboardKey.backspace &&
         _controllers[index].text.isEmpty &&
         index > 0) {
@@ -113,14 +118,23 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     if (!mounted) return;
 
     if (result.success && result.token != null) {
-      await FirebaseAuth.instance.signInWithCustomToken(result.token!);
+      try {
+        await FirebaseAuth.instance.signInWithCustomToken(result.token!);
+      } catch (e) {
+        if (!mounted) return;
+        setState(() {
+          _isVerifying = false;
+          _error = 'Sign-in failed. Please try again.';
+        });
+        return;
+      }
       if (!mounted) return;
       // Navigate to auth gate which handles post-auth routing
-      context.go('/auth-gate');
+      context.go(AppRoutes.authGate);
     } else {
       setState(() {
         _isVerifying = false;
-        _error = result.error ?? 'Verification failed';
+        _error = result.error ?? AppLocalizations.of(context)!.verificationFailed;
         // Clear the code fields on error
         for (final c in _controllers) {
           c.clear();
@@ -286,9 +300,9 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                         margin: EdgeInsets.only(
                           right: index < 5 ? AppSpacingTokens.sm : 0,
                         ),
-                        child: RawKeyboardListener(
-                          focusNode: FocusNode(),
-                          onKey: (event) => _onKeyPressed(index, event),
+                        child: KeyboardListener(
+                          focusNode: _rawFocusNodes[index],
+                          onKeyEvent: (event) => _onKeyPressed(index, event),
                           child: TextFormField(
                             controller: _controllers[index],
                             focusNode: _focusNodes[index],
@@ -369,7 +383,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                         if (context.canPop()) {
                           context.pop();
                         } else {
-                          context.go(widget.isSignup ? '/signup' : '/login');
+                          context.go(widget.isSignup ? AppRoutes.signup : AppRoutes.login);
                         }
                       },
                       child: Text(

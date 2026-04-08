@@ -1151,4 +1151,16 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get useDifferentEmail => 'השתמש באימייל אחר';
+
+  @override
+  String get enterValidEmail => 'הכנס אימייל תקין';
+
+  @override
+  String get verificationFailed => 'האימות נכשל';
+
+  @override
+  String get petNotFound => 'חיית מחמד לא נמצאה';
+
+  @override
+  String get failedToSendCode => 'שליחת הקוד נכשלה';
 }

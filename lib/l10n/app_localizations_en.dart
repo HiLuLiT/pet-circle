@@ -1158,4 +1158,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get useDifferentEmail => 'Use a different email';
+
+  @override
+  String get enterValidEmail => 'Enter a valid email';
+
+  @override
+  String get verificationFailed => 'Verification failed';
+
+  @override
+  String get petNotFound => 'Pet not found';
+
+  @override
+  String get failedToSendCode => 'Failed to send code';
 }

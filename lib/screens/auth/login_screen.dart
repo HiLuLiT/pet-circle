@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!kEnableFirebase) {
       if (!mounted) return;
-      context.go('/verify-otp?email=${Uri.encodeComponent(email)}&signup=false');
+      context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=false');
       return;
     }
 
@@ -50,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final result = await OtpService.sendOtp(email: email);
       if (!mounted) return;
       if (result.success) {
-        context.go('/verify-otp?email=${Uri.encodeComponent(email)}&signup=false');
+        context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=false');
       } else {
         setState(() {
           _isLoading = false;
@@ -192,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: c.surface,
-                            hintText: 'Enter your Email',
+                            hintText: l10n.enterYourEmail,
                             hintStyle: AppSemanticTextStyles.body.copyWith(
                               color: c.textTertiary,
                             ),
@@ -226,10 +226,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: AppSemanticTextStyles.body,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
-                              return 'Please enter your email';
+                              return l10n.pleaseEnterEmail;
                             }
-                            if (!value.contains('@')) {
-                              return 'Enter a valid email';
+                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value.trim())) {
+                              return l10n.enterValidEmail;
                             }
                             return null;
                           },
@@ -259,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _handleLogin,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: c.textPrimary,
+                        backgroundColor: c.primary,
                         foregroundColor: c.surface,
                         elevation: 0,
                         shape: RoundedRectangleBorder(

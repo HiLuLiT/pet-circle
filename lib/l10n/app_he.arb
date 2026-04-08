@@ -394,5 +394,9 @@
   "useDifferentEmail": "השתמש באימייל אחר",
   "alreadyHaveAccount": "כבר יש לך חשבון?",
   "createAccount": "צור חשבון",
-  "fullName": "שם מלא"
+  "fullName": "שם מלא",
+  "enterValidEmail": "הכנס אימייל תקין",
+  "verificationFailed": "האימות נכשל",
+  "petNotFound": "חיית מחמד לא נמצאה",
+  "failedToSendCode": "שליחת הקוד נכשלה"
 }

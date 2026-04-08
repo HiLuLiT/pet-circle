@@ -2209,6 +2209,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Use a different email'**
   String get useDifferentEmail;
+
+  /// No description provided for @enterValidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email'**
+  String get enterValidEmail;
+
+  /// No description provided for @verificationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification failed'**
+  String get verificationFailed;
+
+  /// No description provided for @petNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet not found'**
+  String get petNotFound;
+
+  /// No description provided for @failedToSendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send code'**
+  String get failedToSendCode;
 }
 
 class _AppLocalizationsDelegate

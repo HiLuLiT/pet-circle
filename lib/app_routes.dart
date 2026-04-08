@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/main.dart' show kEnableFirebase;
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/screens/auth/auth_gate.dart';
-import 'package:pet_circle/screens/auth/signup_screen.dart';
 import 'package:pet_circle/screens/auth/login_screen.dart';
 import 'package:pet_circle/screens/auth/verify_otp_screen.dart';
 import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
@@ -27,6 +26,7 @@ class AppRoutes {
   static const login = '/login';
   static const onboarding = '/onboarding';
   static const invite = '/invite';
+  static const verifyOtp = '/verify-otp';
   static const vetDashboard = '/vet-dashboard';
 
   /// Build shell path with an optional tab index.
@@ -131,7 +131,7 @@ GoRouter buildRouter() {
         path: '/auth-gate',
         builder: (_, _) => const AuthGate(),
       ),
-      GoRoute(path: '/signup', builder: (_, _) => const SignupScreen()),
+      GoRoute(path: '/signup', builder: (_, _) => const WelcomeScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(
         path: '/verify-otp',
@@ -187,6 +187,7 @@ GoRouter buildRouter() {
               final pet = petStore.getPetById(petId);
               if (pet == null) {
                 return const Scaffold(
+                  // TODO: Use l10n.petNotFound once BuildContext is available here
                   body: Center(child: Text('Pet not found')),
                 );
               }

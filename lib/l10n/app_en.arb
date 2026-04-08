@@ -400,5 +400,9 @@
   "useDifferentEmail": "Use a different email",
   "alreadyHaveAccount": "Already have an account?",
   "createAccount": "Create an account",
-  "fullName": "Full Name"
+  "fullName": "Full Name",
+  "enterValidEmail": "Enter a valid email",
+  "verificationFailed": "Verification failed",
+  "petNotFound": "Pet not found",
+  "failedToSendCode": "Failed to send code"
 }
