@@ -107,10 +107,10 @@ void main() {
       expect(richTextFinder, findsOneWidget);
     });
 
-    testWidgets('shows bolt icon in circular logo', (tester) async {
+    testWidgets('shows person icon in circular logo', (tester) async {
       await _pumpWelcome(tester);
 
-      expect(find.byIcon(Icons.bolt), findsOneWidget);
+      expect(find.byIcon(Icons.person_outline), findsOneWidget);
     });
 
     testWidgets('shows subtitle text', (tester) async {
