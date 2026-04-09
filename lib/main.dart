@@ -23,15 +23,7 @@ import 'package:pet_circle/services/reminder_service.dart';
 import 'package:pet_circle/services/web_reminder_service.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/utils/error_handler.dart';
-
-// Set to true when Firebase is fully configured
-const bool kEnableFirebase = true;
-
-/// Global locale notifier -- updated from Settings language switcher.
-final ValueNotifier<Locale> appLocale = ValueNotifier(const Locale('en'));
-
-/// Global dark-mode notifier -- updated from Settings dark mode toggle.
-final ValueNotifier<bool> appDarkMode = ValueNotifier(false);
+import 'package:pet_circle/config/app_config.dart';
 
 /// Application-wide GoRouter instance.
 late final GoRouter router;

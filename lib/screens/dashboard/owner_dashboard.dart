@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet_access.dart';
@@ -349,7 +350,7 @@ class _PetCard extends StatelessWidget {
                     ),
                     trailing: Text(
                       hasMeasurement
-                          ? latest.timeAgo
+                          ? formatTimeAgo(latest.recordedAt)
                           : l10n.noMeasurementsYet,
                       style: AppSemanticTextStyles.body
                           .copyWith(color: c.textPrimary),

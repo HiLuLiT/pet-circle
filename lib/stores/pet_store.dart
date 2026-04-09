@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet_access.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/services/pet_service.dart';
-import 'package:pet_circle/services/user_service.dart';
+import 'package:pet_circle/repositories/user_repository.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/note_store.dart';
@@ -140,7 +140,7 @@ class PetStore extends ChangeNotifier {
       final petWithOwner = pet.copyWith(ownerId: uid);
       final created = await PetService.createPet(petWithOwner);
       if (uid != null && created.id != null) {
-        await UserService.addPetToUser(uid, created.id!);
+        await userRepository.addPetToUser(uid, created.id!);
       }
       return created;
     } else {
@@ -216,7 +216,7 @@ class PetStore extends ChangeNotifier {
         final uid = userStore.currentUserUid;
         await PetService.deletePet(petId);
         if (uid != null) {
-          await UserService.removePetFromUser(uid, petId);
+          await userRepository.removePetFromUser(uid, petId);
         }
       } catch (e) {
         _pendingDeletes.remove(petId);

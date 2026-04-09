@@ -4,17 +4,17 @@ import 'package:pet_circle/models/user_settings.dart';
 enum AppUserRole { vet, owner }
 
 class AppUser {
-  const AppUser({
+  AppUser({
     required this.uid,
     required this.email,
     required this.role,
     this.displayName,
     this.photoUrl,
     this.createdAt,
-    this.petIds = const [],
+    List<String> petIds = const [],
     this.settings = const UserSettings(),
     this.hasCompletedOnboarding = false,
-  });
+  }) : petIds = List.unmodifiable(petIds);
 
   final String uid;
   final String email;

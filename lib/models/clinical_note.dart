@@ -17,6 +17,7 @@ class ClinicalNote {
   final String content;
   final DateTime createdAt;
 
+  @Deprecated('Use formatTimeAgo(note.createdAt) from utils/formatters.dart')
   String get timeAgo {
     final now = DateTime.now();
     final diff = now.difference(createdAt);

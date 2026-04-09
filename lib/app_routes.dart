@@ -2,7 +2,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/screens/auth/auth_gate.dart';
 import 'package:pet_circle/screens/auth/login_screen.dart';
@@ -14,9 +14,7 @@ import 'package:pet_circle/screens/onboarding/onboarding_flow.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_screen.dart';
 import 'package:pet_circle/screens/welcome_screen.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
-import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
-import 'package:pet_circle/stores/user_store.dart';
 
 /// Named path constants for use with context.go() / context.push().
 class AppRoutes {
@@ -88,14 +86,8 @@ GoRouter buildRouter() {
         // Invitation acceptance is async — let AuthGate handle it.
         if (deepLinkService.pendingInvitationToken != null) return null;
 
-        // Seed stores before leaving.
-        final appUser = authProvider.appUser!;
-        userStore.seedFromAppUser(appUser);
-        if (petStore.currentSubscribedUid != appUser.uid) {
-          petStore.subscribeForUser(appUser.uid);
-          notificationStore.subscribeForUser(appUser.uid);
-        }
         // Restore the URL the user was on before the bounce, or go to default.
+        // Store seeding and Firestore subscriptions are handled by AuthProvider.
         return consumePendingDeepRoute() ?? AppRoutes.shell();
       }
 

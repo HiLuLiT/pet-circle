@@ -6,6 +6,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/stores/notification_store.dart';
+import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/models/app_notification.dart' as notif;
 
 /// Opens notifications as a slide-up drawer (modal bottom sheet),
@@ -261,7 +262,7 @@ class _AppNotificationCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    notification.timeAgo,
+                    formatTimeAgoShort(notification.createdAt),
                     style: AppSemanticTextStyles.caption.copyWith(
                       color: c.textPrimary,
                       fontSize: 11,

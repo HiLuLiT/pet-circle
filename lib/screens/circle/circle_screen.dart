@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
-import 'package:pet_circle/services/invitation_service.dart';
+import 'package:pet_circle/stores/invitation_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
@@ -248,7 +248,7 @@ class _CircleContent extends StatelessWidget {
       ),
     );
     if (confirmed == true && kEnableFirebase) {
-      await InvitationService.cancelInvitation(token);
+      await invitationStore.declineInvitation(token);
     }
   }
 
@@ -513,7 +513,7 @@ class _InviteSheetState extends State<_InviteSheet> {
     }
 
     try {
-      final validationError = await InvitationService.validateInvitation(
+      final validationError = await invitationStore.validateInvitation(
         petId: pet!.id!,
         email: email,
         invitedByUid: userStore.currentUserUid ?? '',
@@ -534,7 +534,7 @@ class _InviteSheetState extends State<_InviteSheet> {
         return;
       }
 
-      await InvitationService.createInvitation(
+      await invitationStore.createInvitation(
         petId: pet.id!,
         petName: pet.name,
         invitedEmail: email,

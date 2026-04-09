@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
+import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
@@ -88,7 +89,7 @@ class NoteCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      note.timeAgo,
+                      formatTimeAgo(note.createdAt),
                       style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
                     ),
                   ],

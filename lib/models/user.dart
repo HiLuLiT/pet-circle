@@ -7,14 +7,14 @@ enum UserRole {
 }
 
 class User {
-  const User({
+  User({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
     required this.avatarUrl,
-    this.pets = const [],
-  });
+    List<Pet> pets = const [],
+  }) : pets = List.unmodifiable(pets);
 
   final String id;
   final String name;

@@ -282,7 +282,6 @@ void main() {
       setViewSize(tester);
       suppressErrors(tester);
 
-      // Create a pet with bpm=0 and seed empty measurements
       final basePet = testPet();
       final noBpmPet = basePet.copyWith(
         latestMeasurement: Measurement(
@@ -291,6 +290,7 @@ void main() {
           recordedAtLabel: 'No measurements yet',
         ),
       );
+      petStore.updatePet(basePet.name, noBpmPet);
       measurementStore.seed({basePet.id!: []});
 
       await tester.pumpWidget(testApp(PetDetailScreen(pet: noBpmPet)));

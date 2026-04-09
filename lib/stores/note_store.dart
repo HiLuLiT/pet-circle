@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/clinical_note.dart';
-import 'package:pet_circle/services/pet_service.dart';
+import 'package:pet_circle/services/note_service.dart';
 
 final noteStore = NoteStore();
 
 class NoteStore extends ChangeNotifier {
   Map<String, List<ClinicalNote>> _notes = {};
   final Map<String, StreamSubscription<List<ClinicalNote>>> _subscriptions = {};
+  final Set<String> _pendingWritePetIds = {};
 
   void seed(Map<String, List<ClinicalNote>> initial) {
     _notes = {
@@ -24,16 +25,21 @@ class NoteStore extends ChangeNotifier {
   Future<void> addNote(String petId, ClinicalNote note) async {
     _notes.putIfAbsent(petId, () => []);
     _notes[petId]!.insert(0, note);
+    _pendingWritePetIds.add(petId);
     notifyListeners();
 
     if (kEnableFirebase) {
       try {
-        await PetService.addNote(petId, note);
+        await NoteService.add(petId, note);
       } catch (e) {
         _notes[petId]?.remove(note);
         notifyListeners();
         rethrow;
+      } finally {
+        _pendingWritePetIds.remove(petId);
       }
+    } else {
+      _pendingWritePetIds.remove(petId);
     }
   }
 
@@ -48,7 +54,8 @@ class NoteStore extends ChangeNotifier {
     }
 
     for (final id in newIds.difference(currentIds)) {
-      _subscriptions[id] = PetService.streamNotes(id).listen((list) {
+      _subscriptions[id] = NoteService.stream(id).listen((list) {
+        if (_pendingWritePetIds.contains(id)) return;
         _notes[id] = list;
         notifyListeners();
       });

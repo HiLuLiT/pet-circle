@@ -3,12 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/app_user.dart';
-import 'package:pet_circle/services/invitation_service.dart';
-import 'package:pet_circle/services/user_service.dart';
+import 'package:pet_circle/stores/invitation_store.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
@@ -251,7 +250,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                             return;
                           }
                           final navigator = Navigator.of(ctx);
-                          final token = await InvitationService.createInvitation(
+                          final token = await invitationStore.createInvitation(
                             petId: activePet!.id!,
                             petName: activePet.name,
                             invitedEmail: email,
@@ -407,12 +406,12 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                             return;
                           }
 
-                          final vet = await UserService.findVetByEmail(email);
+                          final vet = await userStore.findVetByEmail(email);
                           if (vet != null) {
                             setSheetState(() { state = 2; foundVet = vet; });
                             return;
                           }
-                          final user = await UserService.findUserByEmail(email);
+                          final user = await userStore.findUserByEmail(email);
                           setSheetState(() {
                             foundVet = null;
                             state = user != null ? 3 : 4;
@@ -553,7 +552,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                             }
                           final navigator = Navigator.of(ctx);
 
-                            final validationError = await InvitationService.validateInvitation(
+                            final validationError = await invitationStore.validateInvitation(
                               petId: activePet!.id!,
                               email: email,
                               invitedByUid: userStore.currentUserUid ?? '',
@@ -572,7 +571,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                               return;
                             }
 
-                            await InvitationService.createInvitation(
+                            await invitationStore.createInvitation(
                               petId: activePet.id!,
                               petName: activePet.name,
                               invitedEmail: email,

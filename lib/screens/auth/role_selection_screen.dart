@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
-import 'package:pet_circle/services/user_service.dart';
+import 'package:pet_circle/repositories/user_repository.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
@@ -22,7 +22,7 @@ class RoleSelectionScreen extends StatelessWidget {
 
     final firebaseUser = authProvider.firebaseUser;
     if (firebaseUser != null) {
-      await UserService.createUser(
+      await userRepository.createUser(
         uid: firebaseUser.uid,
         email: firebaseUser.email ?? '',
         role: role,

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/utils/responsive_utils.dart';
+import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/invitation.dart';
 import 'package:pet_circle/models/pet.dart';
-import 'package:pet_circle/services/invitation_service.dart';
+import 'package:pet_circle/stores/invitation_store.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
@@ -28,9 +29,6 @@ class VetDashboard extends StatefulWidget {
 }
 
 class _VetDashboardState extends State<VetDashboard> {
-  List<Invitation> _pendingInvitations = [];
-  final Set<String> _processingTokens = {};
-
   @override
   void initState() {
     super.initState();
@@ -41,17 +39,11 @@ class _VetDashboardState extends State<VetDashboard> {
     if (!kEnableFirebase) return;
     final email = userStore.currentUserEmail;
     if (email == null || email.isEmpty) return;
-
-    final invitations =
-        await InvitationService.getPendingInvitationsForEmail(email);
-    if (mounted) {
-      setState(() => _pendingInvitations = invitations);
-    }
+    await invitationStore.loadPendingForEmail(email);
   }
 
   Future<void> _acceptInvitation(Invitation inv) async {
-    setState(() => _processingTokens.add(inv.id));
-    final result = await InvitationService.acceptInvitation(
+    final result = await invitationStore.acceptInvitation(
       token: inv.id,
       uid: userStore.currentUserUid ?? '',
       email: userStore.currentUserEmail ?? '',
@@ -60,10 +52,6 @@ class _VetDashboardState extends State<VetDashboard> {
           'https://ui-avatars.com/api/?name=${Uri.encodeComponent(userStore.currentUserDisplayName ?? '')}&background=E8B4B8&color=5B2C3F',
     );
     if (!mounted) return;
-    setState(() {
-      _processingTokens.remove(inv.id);
-      _pendingInvitations.removeWhere((i) => i.id == inv.id);
-    });
     final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -93,13 +81,8 @@ class _VetDashboardState extends State<VetDashboard> {
   }
 
   Future<void> _declineInvitation(Invitation inv) async {
-    setState(() => _processingTokens.add(inv.id));
-    await InvitationService.cancelInvitation(inv.id);
+    await invitationStore.declineInvitation(inv.id);
     if (!mounted) return;
-    setState(() {
-      _processingTokens.remove(inv.id);
-      _pendingInvitations.removeWhere((i) => i.id == inv.id);
-    });
     final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(l10n.requestDeclined)),
@@ -109,7 +92,7 @@ class _VetDashboardState extends State<VetDashboard> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([petStore, measurementStore]),
+      listenable: Listenable.merge([petStore, measurementStore, invitationStore]),
       builder: (context, _) {
         final c = AppSemanticColors.of(context);
         final pets = petStore.allClinicPets;
@@ -139,10 +122,10 @@ class _VetDashboardState extends State<VetDashboard> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: AppSpacingTokens.md),
-                  if (_pendingInvitations.isNotEmpty) ...[
+                  if (invitationStore.pendingInvitations.isNotEmpty) ...[
                     _PendingRequestsSection(
-                      invitations: _pendingInvitations,
-                      processingTokens: _processingTokens,
+                      invitations: invitationStore.pendingInvitations,
+                      processingTokens: invitationStore.processingTokens,
                       onAccept: _acceptInvitation,
                       onDecline: _declineInvitation,
                     ),
@@ -468,7 +451,7 @@ class _PetCard extends StatelessWidget {
                         ],
                       ),
                       Text(
-                        hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
+                        hasMeasurement ? formatTimeAgo(latest.recordedAt) : l10n.noMeasurementsYet,
                         style: AppSemanticTextStyles.caption,
                       ),
                     ],

@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/services/notification_service.dart';
 import 'package:pet_circle/stores/user_store.dart';

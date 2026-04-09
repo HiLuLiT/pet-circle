@@ -6,6 +6,7 @@ import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_widgets.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
@@ -51,7 +52,7 @@ class PetInfoSection extends StatelessWidget {
                 child: InfoTile(
                   icon: Icons.access_time,
                   iconColor: c.primaryLight,
-                  value: hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
+                  value: hasMeasurement ? formatTimeAgo(latest.recordedAt) : l10n.noMeasurementsYet,
                   label: l10n.lastMeasured,
                 ),
               ),
@@ -150,7 +151,7 @@ class PetMeasurementHistory extends StatelessWidget {
             children: measurements.take(5).map((m) {
               return Expanded(
                 child: Text(
-                  m.timeAgo.replaceAll(' ago', ''),
+                  formatTimeAgo(m.recordedAt).replaceAll(' ago', ''),
                   style: AppSemanticTextStyles.caption.copyWith(fontSize: 9),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,

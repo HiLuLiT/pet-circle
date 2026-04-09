@@ -26,13 +26,9 @@ class PetDetailScreen extends StatefulWidget {
 
 class _PetDetailScreenState extends State<PetDetailScreen> {
   final _noteController = TextEditingController();
-  late Pet _pet;
 
-  @override
-  void initState() {
-    super.initState();
-    _pet = widget.pet;
-  }
+  Pet get _pet =>
+      petStore.getPetById(widget.pet.id ?? '') ?? widget.pet;
 
   @override
   void dispose() {
@@ -114,7 +110,6 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                               : _pet.imageUrl,
                         );
                         petStore.updatePetWithFirestore(updated);
-                        setState(() => _pet = updated);
                         navigator.pop();
                         messenger.showSnackBar(
                           SnackBar(content: Text(l10n.petUpdated)),

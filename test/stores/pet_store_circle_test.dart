@@ -33,7 +33,7 @@ Pet _makePet({
 void main() {
   setUp(() {
     // Seed userStore with a known owner user for each test.
-    userStore.seed(const User(
+    userStore.seed(User(
       id: 'uid-owner',
       name: 'Hila',
       email: 'hila@example.com',

@@ -70,6 +70,7 @@ class AppNotification {
     );
   }
 
+  @Deprecated('Use formatTimeAgoShort(notification.createdAt) from utils/formatters.dart')
   String get timeAgo {
     final now = DateTime.now();
     final diff = now.difference(createdAt);
