@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/main.dart' show appDarkMode;
+import 'package:pet_circle/config/app_config.dart' show appDarkMode;
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';

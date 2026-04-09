@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/services/auth_service.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
-import 'package:pet_circle/services/user_service.dart';
+import 'package:pet_circle/repositories/user_repository.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
@@ -24,6 +24,7 @@ class AuthProvider extends ChangeNotifier {
   AppUser? _appUser;
   bool _isLoading = true;
   bool _isCreatingUser = false;
+  String? _subscribedUid;
   StreamSubscription<User?>? _authSubscription;
   StreamSubscription<AppUser?>? _userSubscription;
 
@@ -61,6 +62,7 @@ class AuthProvider extends ChangeNotifier {
       _appUser = null;
       _isLoading = false;
       _isCreatingUser = false;
+      _subscribedUid = null;
       userStore.reset();
       petStore.cancelSubscription();
       notificationStore.cancelSubscription();
@@ -74,16 +76,15 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _userSubscription = UserService.streamUser(user.uid).listen((appUser) async {
+    _userSubscription = userRepository.streamUser(user.uid).listen((appUser) async {
       if (appUser == null && !_isCreatingUser) {
-        // No user doc in Firestore — auto-create with owner role.
         _isCreatingUser = true;
         notifyListeners();
         try {
           final displayName = user.displayName ?? '';
           final photoUrl = user.photoURL ??
               _uiAvatarsFallback(displayName, user.email ?? '');
-          await UserService.createUser(
+          await userRepository.createUser(
             uid: user.uid,
             email: user.email ?? '',
             role: AppUserRole.owner,
@@ -104,6 +105,11 @@ class AuthProvider extends ChangeNotifier {
       if (appUser != null) {
         userStore.seedFromAppUser(appUser);
         settingsStore.seedFromAppUser(appUser);
+        if (_subscribedUid != appUser.uid) {
+          _subscribedUid = appUser.uid;
+          petStore.subscribeForUser(appUser.uid);
+          notificationStore.subscribeForUser(appUser.uid);
+        }
       } else {
         settingsStore.reset();
       }
@@ -123,7 +129,7 @@ class AuthProvider extends ChangeNotifier {
     await AuthService.reloadUser();
     _firebaseUser = AuthService.currentUser;
     if (_firebaseUser != null) {
-      _appUser = await UserService.getUser(_firebaseUser!.uid);
+      _appUser = await userRepository.getUser(_firebaseUser!.uid);
       if (_appUser != null) {
         settingsStore.seedFromAppUser(_appUser!);
       }

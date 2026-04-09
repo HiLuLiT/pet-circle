@@ -4,7 +4,7 @@ import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
-import 'package:pet_circle/services/invitation_service.dart';
+import 'package:pet_circle/stores/invitation_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 
 /// Screen shown when the user navigates to `/invite?token=XYZ`.
@@ -40,7 +40,7 @@ class _InviteScreenState extends State<InviteScreen> {
       return;
     }
 
-    final result = await InvitationService.acceptInvitation(
+    final result = await invitationStore.acceptInvitation(
       token: widget.token,
       uid: appUser.uid,
       email: appUser.email,

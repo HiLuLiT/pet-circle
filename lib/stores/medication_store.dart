@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/medication.dart';
-import 'package:pet_circle/services/pet_service.dart';
+import 'package:pet_circle/services/medication_service.dart';
 import 'package:pet_circle/services/reminder_service.dart';
 
 final medicationStore = MedicationStore();
@@ -10,6 +10,7 @@ final medicationStore = MedicationStore();
 class MedicationStore extends ChangeNotifier {
   Map<String, List<Medication>> _medications = {};
   final Map<String, StreamSubscription<List<Medication>>> _subscriptions = {};
+  final Set<String> _pendingWritePetIds = {};
 
   void seed(Map<String, List<Medication>> initial) {
     _medications = {
@@ -31,16 +32,21 @@ class MedicationStore extends ChangeNotifier {
   Future<void> addMedication(String petId, Medication medication) async {
     _medications.putIfAbsent(petId, () => []);
     _medications[petId]!.add(medication);
+    _pendingWritePetIds.add(petId);
     notifyListeners();
 
     if (kEnableFirebase) {
       try {
-        await PetService.addMedication(petId, medication);
+        await MedicationService.add(petId, medication);
       } catch (e) {
         _medications[petId]?.remove(medication);
         notifyListeners();
         rethrow;
+      } finally {
+        _pendingWritePetIds.remove(petId);
       }
+    } else {
+      _pendingWritePetIds.remove(petId);
     }
   }
 
@@ -48,7 +54,10 @@ class MedicationStore extends ChangeNotifier {
     final list = _medications[petId];
     final idx = list?.indexWhere((m) => m.id == medicationId) ?? -1;
     final removed = (list != null && idx != -1) ? list.removeAt(idx) : null;
-    if (removed != null) notifyListeners();
+    if (removed != null) {
+      _pendingWritePetIds.add(petId);
+      notifyListeners();
+    }
 
     if (!kIsWeb) {
       ReminderService.instance.cancelMedicationReminder(medicationId);
@@ -56,14 +65,18 @@ class MedicationStore extends ChangeNotifier {
 
     if (kEnableFirebase) {
       try {
-        await PetService.deleteMedication(petId, medicationId);
+        await MedicationService.delete(petId, medicationId);
       } catch (e) {
         if (removed != null && list != null) {
           list.insert(idx.clamp(0, list.length), removed);
           notifyListeners();
         }
         rethrow;
+      } finally {
+        _pendingWritePetIds.remove(petId);
       }
+    } else {
+      _pendingWritePetIds.remove(petId);
     }
   }
 
@@ -74,16 +87,21 @@ class MedicationStore extends ChangeNotifier {
     if (idx == -1) return;
     final previous = list[idx];
     list[idx] = updated;
+    _pendingWritePetIds.add(petId);
     notifyListeners();
 
     if (kEnableFirebase) {
       try {
-        await PetService.updateMedication(petId, medicationId, updated.toFirestore());
+        await MedicationService.update(petId, medicationId, updated.toFirestore());
       } catch (e) {
         list[idx] = previous;
         notifyListeners();
         rethrow;
+      } finally {
+        _pendingWritePetIds.remove(petId);
       }
+    } else {
+      _pendingWritePetIds.remove(petId);
     }
   }
 
@@ -95,6 +113,7 @@ class MedicationStore extends ChangeNotifier {
     final previous = list[idx];
     final toggled = previous.copyWith(isActive: !previous.isActive);
     list[idx] = toggled;
+    _pendingWritePetIds.add(petId);
     notifyListeners();
 
     if (!kIsWeb && !toggled.isActive) {
@@ -103,12 +122,16 @@ class MedicationStore extends ChangeNotifier {
 
     if (kEnableFirebase) {
       try {
-        await PetService.updateMedication(petId, medicationId, {'isActive': toggled.isActive});
+        await MedicationService.update(petId, medicationId, {'isActive': toggled.isActive});
       } catch (e) {
         list[idx] = previous;
         notifyListeners();
         rethrow;
+      } finally {
+        _pendingWritePetIds.remove(petId);
       }
+    } else {
+      _pendingWritePetIds.remove(petId);
     }
   }
 
@@ -123,7 +146,8 @@ class MedicationStore extends ChangeNotifier {
     }
 
     for (final id in newIds.difference(currentIds)) {
-      _subscriptions[id] = PetService.streamMedications(id).listen((list) {
+      _subscriptions[id] = MedicationService.stream(id).listen((list) {
+        if (_pendingWritePetIds.contains(id)) return;
         _medications[id] = list;
         notifyListeners();
       });

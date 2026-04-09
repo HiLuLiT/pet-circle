@@ -8,10 +8,15 @@ class TogglePill extends StatelessWidget {
 
   final bool isOn;
 
+  static const _duration = Duration(milliseconds: 250);
+  static const _curve = Curves.easeInOut;
+
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return Container(
+    return AnimatedContainer(
+      duration: _duration,
+      curve: _curve,
       width: 75,
       height: 36,
       padding: const EdgeInsets.all(2),
@@ -19,7 +24,9 @@ class TogglePill extends StatelessWidget {
         color: isOn ? c.primary : c.disabled,
         borderRadius: AppRadiiTokens.borderRadiusFull,
       ),
-      child: Align(
+      child: AnimatedAlign(
+        duration: _duration,
+        curve: _curve,
         alignment: isOn ? Alignment.centerRight : Alignment.centerLeft,
         child: Container(
           width: 31,

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/user.dart';
+import 'package:pet_circle/repositories/user_repository.dart';
 
 final userStore = UserStore();
 
@@ -53,6 +54,15 @@ class UserStore extends ChangeNotifier {
     _role = role;
     notifyListeners();
   }
+
+  Future<AppUser?> findUserByEmail(String email) =>
+      userRepository.findUserByEmail(email);
+
+  Future<AppUser?> findVetByEmail(String email) =>
+      userRepository.findVetByEmail(email);
+
+  Future<void> updateOnboardingStatus(String uid, bool completed) =>
+      userRepository.updateOnboardingStatus(uid, completed);
 
   /// Clear all user data on sign-out.
   void reset() {

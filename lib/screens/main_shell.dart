@@ -16,6 +16,7 @@ import 'package:pet_circle/screens/messages/messages_screen.dart'
 import 'package:pet_circle/screens/trends/trends_screen.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
@@ -67,14 +68,14 @@ class _MainShellState extends State<MainShell> {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: c.background,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
       ),
       builder: (context) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 12),
+            SizedBox(height: AppSpacingTokens.sm + 4),
             Container(
               width: 40,
               height: 4,
@@ -83,7 +84,7 @@ class _MainShellState extends State<MainShell> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacingTokens.md),
             ...List.generate(pets.length, (i) {
               final pet = pets[i];
               final isSelected = i == petStore.activePetIndex;
@@ -118,7 +119,7 @@ class _MainShellState extends State<MainShell> {
                 },
               );
             }),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacingTokens.sm),
           ],
         ),
       ),

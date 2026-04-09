@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/providers/auth_provider.dart';
-import 'package:pet_circle/services/user_service.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
-import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step1.dart';
@@ -72,7 +71,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
       // Mark onboarding as complete
       if (kEnableFirebase) {
-        await UserService.updateOnboardingStatus(userStore.currentUserUid!, true);
+        await userStore.updateOnboardingStatus(userStore.currentUserUid!, true);
         await authProvider.refresh();
       }
 

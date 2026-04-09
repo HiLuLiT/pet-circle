@@ -1,15 +1,16 @@
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
-import 'package:pet_circle/services/invitation_service.dart';
+import 'package:pet_circle/stores/invitation_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/user_avatar.dart';
 
@@ -85,10 +86,12 @@ class _CircleContent extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.all(AppSpacingTokens.lg),
-      child: Column(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
+          child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header
           Row(
             children: [
               Icon(Icons.people, size: 24, color: c.primary),
@@ -106,7 +109,7 @@ class _CircleContent extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: c.primaryLightest,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadiiTokens.sm + 8),
                 ),
                 child: Text(
                   '${members.length}',
@@ -187,6 +190,8 @@ class _CircleContent extends StatelessWidget {
             ),
         ],
       ),
+        ),
+      ),
     );
   }
 
@@ -248,7 +253,7 @@ class _CircleContent extends StatelessWidget {
       ),
     );
     if (confirmed == true && kEnableFirebase) {
-      await InvitationService.cancelInvitation(token);
+      await invitationStore.declineInvitation(token);
     }
   }
 
@@ -337,7 +342,7 @@ class _MemberTile extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacingTokens.md),
       decoration: BoxDecoration(
         color: c.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
       ),
       child: Row(
         children: [
@@ -374,7 +379,7 @@ class _MemberTile extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: c.primaryLightest,
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(AppRadiiTokens.md),
               ),
               child: Text(
                 member.roleLabel,
@@ -419,7 +424,7 @@ class _PendingInviteTile extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacingTokens.md),
       decoration: BoxDecoration(
         color: c.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
         border: Border.all(color: c.divider, width: 1),
       ),
       child: Row(
@@ -513,7 +518,7 @@ class _InviteSheetState extends State<_InviteSheet> {
     }
 
     try {
-      final validationError = await InvitationService.validateInvitation(
+      final validationError = await invitationStore.validateInvitation(
         petId: pet!.id!,
         email: email,
         invitedByUid: userStore.currentUserUid ?? '',
@@ -534,7 +539,7 @@ class _InviteSheetState extends State<_InviteSheet> {
         return;
       }
 
-      await InvitationService.createInvitation(
+      await invitationStore.createInvitation(
         petId: pet.id!,
         petName: pet.name,
         invitedEmail: email,
@@ -567,7 +572,9 @@ class _InviteSheetState extends State<_InviteSheet> {
     return Container(
       decoration: BoxDecoration(
         color: c.background,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppRadiiTokens.lg),
+        ),
       ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.viewInsetsOf(context).bottom + AppSpacingTokens.lg,
@@ -614,14 +621,17 @@ class _InviteSheetState extends State<_InviteSheet> {
                 hintText: 'email@example.com',
                 hintStyle: AppSemanticTextStyles.body.copyWith(color: c.textTertiary),
                 enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
                   borderSide: BorderSide(color: c.divider),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
                   borderSide: BorderSide(color: c.primary, width: 2),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacingTokens.md,
+                  vertical: AppSpacingTokens.sm + 6,
+                ),
               ),
               style: AppSemanticTextStyles.body,
               onSubmitted: (_) => _sendInvite(),
@@ -659,7 +669,7 @@ class _InviteSuccess extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacingTokens.md),
       decoration: BoxDecoration(
         color: c.primaryLightest,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
       ),
       child: Column(
         children: [

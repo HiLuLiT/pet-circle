@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/user_settings.dart';
-import 'package:pet_circle/services/user_service.dart';
+import 'package:pet_circle/repositories/user_repository.dart';
 import 'package:pet_circle/stores/user_store.dart';
 
 final settingsStore = SettingsStore();
@@ -111,7 +111,7 @@ class SettingsStore extends ChangeNotifier {
     if (!kEnableFirebase) return;
     final uid = userStore.currentUserUid;
     if (uid == null || uid.isEmpty) return;
-    await UserService.updateUser(uid, {
+    await userRepository.updateUser(uid, {
       'settings': _snapshot().toMap(),
     });
   }

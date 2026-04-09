@@ -11,6 +11,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
+import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class TrendsScreen extends StatefulWidget {
@@ -61,9 +62,9 @@ class _TrendsScreenState extends State<TrendsScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(l10n.csvPreview, style: AppSemanticTextStyles.body),
-              const SizedBox(height: 12),
+              SizedBox(height: AppSpacingTokens.sm + 4),
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(AppSpacingTokens.sm + 4),
                 decoration: BoxDecoration(
                   color: c.background,
                   borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -162,7 +163,10 @@ class _TrendsScreenState extends State<TrendsScreen> {
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(AppSpacingTokens.lg),
-              child: Column(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
+                  child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
               const SizedBox(height: AppSpacingTokens.md),
@@ -176,12 +180,12 @@ class _TrendsScreenState extends State<TrendsScreen> {
               ),
               const SizedBox(height: AppSpacingTokens.md),
               Wrap(
-                spacing: 8,
-                runSpacing: 12,
+                spacing: AppSpacingTokens.sm,
+                runSpacing: AppSpacingTokens.sm + 4,
                 children: [
                   Container(
                     height: 40,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 4),
                     decoration: BoxDecoration(
                       color: c.background,
                       borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -204,7 +208,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                     onTap: () => _showExportDialog(context),
                     child: Container(
                       height: 40,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 4),
                       decoration: BoxDecoration(
                         color: c.primaryLight,
                         borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -213,7 +217,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(Icons.file_download, size: 16, color: c.textPrimary),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacingTokens.sm),
                           Text(l10n.exportLabel, style: AppSemanticTextStyles.body),
                         ],
                       ),
@@ -247,7 +251,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                   final status = settingsStore.classifyStatus(m.bpm);
                   final statusColor = status == 'Normal' ? c.primaryLight : status == 'Elevated' ? c.warning : c.error;
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm),
                     child: Dismissible(
                       key: ValueKey('${m.recordedAt.millisecondsSinceEpoch}-${m.bpm}'),
                       direction: access.canDeleteMeasurements
@@ -255,7 +259,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                           : DismissDirection.none,
                       background: Container(
                         alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 20),
+                        padding: EdgeInsets.only(right: AppSpacingTokens.md + 4),
                         decoration: BoxDecoration(
                           color: c.error,
                           borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -268,7 +272,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                         return false;
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: EdgeInsets.symmetric(horizontal: AppSpacingTokens.md, vertical: AppSpacingTokens.sm + 4),
                         decoration: BoxDecoration(
                           color: c.background,
                           borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -279,7 +283,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                               width: 8, height: 8,
                               decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: AppSpacingTokens.sm + 4),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,7 +294,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                               ),
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm, vertical: 2),
                               decoration: BoxDecoration(
                                 color: statusColor.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(AppRadiiTokens.full),
@@ -305,6 +309,8 @@ class _TrendsScreenState extends State<TrendsScreen> {
                 }),
               ],
                 ],
+              ),
+            ),
               ),
             ),
           ),
@@ -332,13 +338,13 @@ class _StatGrid extends StatelessWidget {
         child: Column(children: [
           Row(children: [
             _StatCard(title: l10n.averageSrr, value: '--', footnote: l10n.bpm),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacingTokens.sm),
             _StatCard(title: l10n.range, value: '--', footnote: l10n.minMax),
           ]),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacingTokens.sm),
           Row(children: [
             _StatCard(title: l10n.trend, value: '--', footnote: l10n.bpmChange),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacingTokens.sm),
             _StatusCard(measurements: filtered),
           ]),
         ]),
@@ -361,13 +367,13 @@ class _StatGrid extends StatelessWidget {
       child: Column(children: [
         Row(children: [
           _StatCard(title: l10n.averageSrr, value: '$avg', footnote: l10n.bpm),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacingTokens.sm),
           _StatCard(title: l10n.range, value: '$minBpm-$maxBpm', footnote: l10n.minMax),
         ]),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacingTokens.sm),
         Row(children: [
           _StatCard(title: l10n.trend, value: trendStr, footnote: l10n.bpmChange),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacingTokens.sm),
           _StatusCard(measurements: filtered),
         ]),
       ]),
@@ -400,11 +406,14 @@ class _BadgeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return Row(children: [
-      _LegendBadge(color: c.primaryLight, label: 'Normal (<30)'),
-      const SizedBox(width: 8),
-      _LegendBadge(color: c.warning, label: 'Elevated (30-40)'),
-    ]);
+    return Wrap(
+      spacing: AppSpacingTokens.sm,
+      runSpacing: AppSpacingTokens.sm,
+      children: [
+        _LegendBadge(color: c.primaryLight, label: 'Normal (<30)'),
+        _LegendBadge(color: c.warning, label: 'Elevated (30-40)'),
+      ],
+    );
   }
 }
 
@@ -428,7 +437,7 @@ class _LegendBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm, vertical: AppSpacingTokens.xs),
       decoration: BoxDecoration(
         color: c.surface,
         borderRadius: BorderRadius.circular(AppRadiiTokens.full),
@@ -437,7 +446,7 @@ class _LegendBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacingTokens.xs),
           Text(label, style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary)),
         ],
       ),
@@ -493,7 +502,7 @@ class _StatusCard extends StatelessWidget {
     return Expanded(
       child: Container(
         height: 109,
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(AppSpacingTokens.sm + 4),
         decoration: BoxDecoration(
           color: c.surface,
           borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -502,12 +511,12 @@ class _StatusCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(l10n.status, style: AppSemanticTextStyles.caption.copyWith(fontSize: 12)),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacingTokens.md),
             Row(children: [
               _StatusPill(value: '$normal', color: c.primaryLight),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacingTokens.sm),
               _StatusPill(value: '$elevated', color: c.warning),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacingTokens.sm),
               _StatusPill(value: '$critical', color: c.error, muted: critical == 0),
             ]),
           ],
@@ -528,7 +537,7 @@ class _StatusPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(children: [
       Text(value, style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: color)),
-      const SizedBox(height: 4),
+      const SizedBox(height: AppSpacingTokens.xs),
       Container(
         width: 27, height: 2,
         decoration: BoxDecoration(
@@ -554,7 +563,7 @@ class _SrrChart extends StatelessWidget {
       return Container(
         height: 280,
         width: double.infinity,
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacingTokens.lg),
         decoration: BoxDecoration(
           color: c.surface,
           borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -563,9 +572,9 @@ class _SrrChart extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.show_chart, size: 48, color: c.textPrimary.withValues(alpha: 0.2)),
-            const SizedBox(height: 12),
+            SizedBox(height: AppSpacingTokens.sm + 4),
             Text(l10n.noMeasurementsYet, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacingTokens.sm),
             Text(
               l10n.noMeasurementsDescription,
               style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
@@ -599,7 +608,12 @@ class _SrrChart extends StatelessWidget {
     return Container(
       height: 280,
       width: double.infinity,
-      padding: const EdgeInsets.only(top: 12, right: 12, bottom: 4, left: 4),
+      padding: EdgeInsets.only(
+        top: AppSpacingTokens.sm + 4,
+        right: AppSpacingTokens.sm + 4,
+        bottom: AppSpacingTokens.xs,
+        left: AppSpacingTokens.xs,
+      ),
       decoration: BoxDecoration(
         color: surfaceColor,
         borderRadius: BorderRadius.circular(AppRadiiTokens.sm),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
-import 'package:pet_circle/services/user_service.dart';
+import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
@@ -84,7 +84,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
       return;
     }
 
-    final vet = await UserService.findVetByEmail(email);
+    final vet = await userStore.findVetByEmail(email);
     if (vet != null) {
       setState(() {
         _foundVet = vet;
@@ -93,7 +93,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
       return;
     }
 
-    final user = await UserService.findUserByEmail(email);
+    final user = await userStore.findUserByEmail(email);
     setState(() {
       _foundVet = null;
       _vetLookupState =

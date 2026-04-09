@@ -26,13 +26,9 @@ class PetDetailScreen extends StatefulWidget {
 
 class _PetDetailScreenState extends State<PetDetailScreen> {
   final _noteController = TextEditingController();
-  late Pet _pet;
 
-  @override
-  void initState() {
-    super.initState();
-    _pet = widget.pet;
-  }
+  Pet get _pet =>
+      petStore.getPetById(widget.pet.id ?? '') ?? widget.pet;
 
   @override
   void dispose() {
@@ -55,10 +51,10 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: Container(
           constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacingTokens.lg),
           decoration: BoxDecoration(
             color: c.background,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -66,7 +62,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(l10n.editPet, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacingTokens.md),
                 TextField(
                   controller: nameCtrl,
                   decoration: InputDecoration(
@@ -75,14 +71,14 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.sm), borderSide: BorderSide.none),
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppSpacingTokens.sm + 4),
                 BreedSearchField(
                   label: l10n.breed,
                   initialValue: _pet.breedAndAge,
                   onChanged: (breed) => selectedBreed = breed,
                   maxHeight: 150,
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppSpacingTokens.sm + 4),
                 TextField(
                   controller: imageCtrl,
                   decoration: InputDecoration(
@@ -91,7 +87,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.sm), borderSide: BorderSide.none),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacingTokens.md),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -99,7 +95,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                       onPressed: () => Navigator.pop(ctx),
                       child: Text(l10n.cancel),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacingTokens.sm),
                     TextButton(
                       onPressed: () {
                         final navigator = Navigator.of(ctx);
@@ -114,7 +110,6 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                               : _pet.imageUrl,
                         );
                         petStore.updatePetWithFirestore(updated);
-                        setState(() => _pet = updated);
                         navigator.pop();
                         messenger.showSnackBar(
                           SnackBar(content: Text(l10n.petUpdated)),
@@ -174,21 +169,21 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
           slivers: [
             _buildAppBar(),
             SliverPadding(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppSpacingTokens.lg),
               sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   PetInfoSection(pet: _pet),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacingTokens.lg),
                   PetMeasurementHistory(pet: _pet),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacingTokens.lg),
                   PetClinicalNotes(
                     pet: _pet,
                     noteController: _noteController,
                     onAddNote: _addNote,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacingTokens.lg),
                   PetCareCircle(pet: _pet),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: AppSpacingTokens.xl + 8),
                 ]),
               ),
             ),
@@ -235,8 +230,8 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             ),
             Positioned(
               bottom: 60,
-              left: 24,
-              right: 24,
+              left: AppSpacingTokens.lg,
+              right: AppSpacingTokens.lg,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -248,7 +243,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacingTokens.sm),
                   Text(
                     _pet.name,
                     style: AppSemanticTextStyles.title2.copyWith(color: c.background),

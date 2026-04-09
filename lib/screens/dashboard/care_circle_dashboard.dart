@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
@@ -167,7 +168,7 @@ class _PetCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Text(hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
+                    Text(hasMeasurement ? formatTimeAgo(latest.recordedAt) : l10n.noMeasurementsYet,
                         style: AppSemanticTextStyles.caption),
                   ],
                 ),

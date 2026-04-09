@@ -13,7 +13,7 @@ import '../../helpers/test_http_overrides.dart';
 
 /// Vet user with empty email to prevent Firebase invitation lookup
 /// during initState (kEnableFirebase is const true).
-const _testVetUser = User(
+final _testVetUser = User(
   id: 'vet-test',
   name: 'Dr. Test',
   email: '',

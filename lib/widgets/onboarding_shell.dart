@@ -43,7 +43,7 @@ class OnboardingShell extends StatelessWidget {
             padding: const EdgeInsets.all(AppSpacingTokens.xl),
             decoration: BoxDecoration(
               color: c.background,
-              borderRadius: BorderRadius.circular(AppSpacingTokens.md),
+              borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -130,11 +130,11 @@ class _Header extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacingTokens.sm + 4),
         ClipRRect(
-          borderRadius: BorderRadius.circular(1000),
+          borderRadius: AppRadiiTokens.borderRadiusFull,
           child: Container(
-            height: 8,
+            height: AppSpacingTokens.sm,
             color: c.divider,
             child: Align(
               alignment: AlignmentDirectional.centerStart,

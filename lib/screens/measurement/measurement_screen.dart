@@ -11,6 +11,7 @@ import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/utils/responsive_utils.dart';
 
 class MeasurementScreen extends StatefulWidget {
   const MeasurementScreen({super.key, this.showScaffold = true});
@@ -66,14 +67,17 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
 
         final content = SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
+            padding: const EdgeInsets.all(AppSpacingTokens.lg),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
+                child: Column(
               children: [
                 _TabSelector(
                   selectedIndex: _selectedTab,
                   onChanged: (index) => setState(() => _selectedTab = index),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: AppSpacingTokens.xl),
                 Expanded(
                   child: _selectedTab == 0
                       ? _ManualMode(
@@ -84,6 +88,8 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                       : const _VisionMode(),
                 ),
               ],
+            ),
+              ),
             ),
           ),
         );
@@ -115,7 +121,7 @@ class _TabSelector extends StatelessWidget {
     final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: const EdgeInsets.all(AppSpacingTokens.xs),
       decoration: BoxDecoration(
         color: c.background,
         borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
@@ -161,7 +167,7 @@ class _TabButton extends StatelessWidget {
         onTap: onTap,
         child: Container(
           height: 29,
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          padding: EdgeInsets.symmetric(vertical: AppSpacingTokens.xs + 2),
           decoration: BoxDecoration(
             color: selected ? c.surface : Colors.transparent,
             borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
@@ -277,7 +283,10 @@ class _ManualModeState extends State<_ManualMode>
           backgroundColor: c.surface,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.lg)),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacingTokens.lg,
+              vertical: AppSpacingTokens.lg + 4,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -285,14 +294,14 @@ class _ManualModeState extends State<_ManualMode>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.favorite, color: c.primaryLight),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacingTokens.sm),
                     Text(
                       l10n.measurementComplete,
                       style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacingTokens.md),
                 Text(
                   '$bpm',
                   style: TextStyle(
@@ -305,13 +314,13 @@ class _ManualModeState extends State<_ManualMode>
                   l10n.breathsPerMinute,
                   style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacingTokens.md),
                 Text(
                   l10n.breathCountMessage(_tapCount, widget.selectedDuration),
                   style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacingTokens.lg),
                 Row(
                   children: [
                     Expanded(
@@ -324,7 +333,7 @@ class _ManualModeState extends State<_ManualMode>
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: EdgeInsets.symmetric(vertical: AppSpacingTokens.sm + 4),
                           decoration: BoxDecoration(
                             color: c.background,
                             borderRadius: BorderRadius.circular(AppRadiiTokens.full),
@@ -340,7 +349,7 @@ class _ManualModeState extends State<_ManualMode>
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppSpacingTokens.sm + 4),
                     Expanded(
                       child: GestureDetector(
                         onTap: () {
@@ -385,7 +394,7 @@ class _ManualModeState extends State<_ManualMode>
                           );
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          padding: EdgeInsets.symmetric(vertical: AppSpacingTokens.sm + 4),
                           decoration: BoxDecoration(
                             color: c.primaryLight,
                             borderRadius: BorderRadius.circular(AppRadiiTokens.full),
@@ -425,7 +434,9 @@ class _ManualModeState extends State<_ManualMode>
     HapticFeedback.mediumImpact();
 
     // Scale animation: shrink then bounce back
-    _scaleController.forward().then((_) => _scaleController.reverse());
+    _scaleController.forward().then((_) {
+      if (mounted) _scaleController.reverse();
+    });
 
     if (!_isRunning) {
       _startTimer();
@@ -447,7 +458,7 @@ class _ManualModeState extends State<_ManualMode>
       children: [
         // Timer Duration selector
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacingTokens.lg),
           decoration: BoxDecoration(
             color: c.background,
             borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
@@ -467,13 +478,13 @@ class _ManualModeState extends State<_ManualMode>
                     selected: widget.selectedDuration == 15,
                     onTap: _isRunning ? null : () => widget.onDurationChanged(15),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacingTokens.md),
                   _DurationChip(
                     label: l10n.duration30s,
                     selected: widget.selectedDuration == 30,
                     onTap: _isRunning ? null : () => widget.onDurationChanged(30),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: AppSpacingTokens.md),
                   _DurationChip(
                     label: l10n.duration60s,
                     selected: widget.selectedDuration == 60,
@@ -486,7 +497,10 @@ class _ManualModeState extends State<_ManualMode>
         ),
         const SizedBox(height: AppSpacingTokens.lg),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
+          padding: EdgeInsets.symmetric(
+            horizontal: AppSpacingTokens.xl + 16,
+            vertical: AppSpacingTokens.md,
+          ),
           decoration: BoxDecoration(
             color: c.background,
             borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
@@ -502,7 +516,7 @@ class _ManualModeState extends State<_ManualMode>
                   height: 1.2,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacingTokens.sm),
               LayoutBuilder(
                 builder: (context, constraints) {
                   final width = constraints.maxWidth;
@@ -529,7 +543,7 @@ class _ManualModeState extends State<_ManualMode>
                   );
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacingTokens.md),
               GestureDetector(
                 onTap: _onTap,
                 child: AnimatedBuilder(
@@ -564,7 +578,7 @@ class _ManualModeState extends State<_ManualMode>
                             height: 1.0,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacingTokens.sm),
                         Text(
                           _isRunning ? l10n.tapToStop : l10n.tapToBegin,
                           style: AppSemanticTextStyles.body.copyWith(
@@ -578,7 +592,7 @@ class _ManualModeState extends State<_ManualMode>
               ),
               if (_isRunning)
                 Padding(
-                  padding: const EdgeInsets.only(top: 12),
+                  padding: EdgeInsets.only(top: AppSpacingTokens.sm + 4),
                   child: TextButton.icon(
                     onPressed: _resetTimer,
                     icon: Icon(Icons.refresh, size: 18, color: c.error),
@@ -645,7 +659,7 @@ class _VisionMode extends StatelessWidget {
     final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacingTokens.lg),
       decoration: BoxDecoration(
         color: c.background,
         borderRadius: BorderRadius.circular(AppRadiiTokens.lg),

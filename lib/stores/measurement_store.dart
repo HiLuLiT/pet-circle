@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/measurement.dart';
-import 'package:pet_circle/services/pet_service.dart';
+import 'package:pet_circle/services/measurement_service.dart';
 
 final measurementStore = MeasurementStore();
 
 class MeasurementStore extends ChangeNotifier {
   Map<String, List<Measurement>> _measurements = {};
   final Map<String, StreamSubscription<List<Measurement>>> _subscriptions = {};
-  bool _hasPendingWrite = false;
+  final Set<String> _pendingWritePetIds = {};
 
   void seed(Map<String, List<Measurement>> initial) {
     _measurements = {
@@ -31,21 +31,21 @@ class MeasurementStore extends ChangeNotifier {
   Future<void> addMeasurement(String petId, Measurement measurement) async {
     _measurements.putIfAbsent(petId, () => []);
     _measurements[petId]!.insert(0, measurement);
-    _hasPendingWrite = true;
+    _pendingWritePetIds.add(petId);
     notifyListeners();
 
     if (kEnableFirebase) {
       try {
-        await PetService.addMeasurement(petId, measurement);
+        await MeasurementService.add(petId, measurement);
       } catch (e) {
         _measurements[petId]?.remove(measurement);
         notifyListeners();
         rethrow;
       } finally {
-        _hasPendingWrite = false;
+        _pendingWritePetIds.remove(petId);
       }
     } else {
-      _hasPendingWrite = false;
+      _pendingWritePetIds.remove(petId);
     }
   }
 
@@ -59,16 +59,21 @@ class MeasurementStore extends ChangeNotifier {
     if (idx == -1) return;
 
     list.removeAt(idx);
+    _pendingWritePetIds.add(petId);
     notifyListeners();
 
     if (kEnableFirebase && measurement.id != null) {
       try {
-        await PetService.deleteMeasurement(petId, measurement.id!);
+        await MeasurementService.delete(petId, measurement.id!);
       } catch (e) {
         list.insert(idx.clamp(0, list.length), measurement);
         notifyListeners();
         rethrow;
+      } finally {
+        _pendingWritePetIds.remove(petId);
       }
+    } else {
+      _pendingWritePetIds.remove(petId);
     }
   }
 
@@ -83,12 +88,9 @@ class MeasurementStore extends ChangeNotifier {
     }
 
     for (final id in newIds.difference(currentIds)) {
-      _subscriptions[id] = PetService.streamMeasurements(id).listen((list) {
+      _subscriptions[id] = MeasurementService.stream(id).listen((list) {
+        if (_pendingWritePetIds.contains(id)) return;
         _measurements[id] = list;
-        debugPrint('[MeasurementStore] Pet $id: ${list.length} measurements');
-        for (final m in list) {
-          debugPrint('  - ${m.id}: ${m.bpm} BPM @ ${m.recordedAt}');
-        }
         notifyListeners();
       });
     }

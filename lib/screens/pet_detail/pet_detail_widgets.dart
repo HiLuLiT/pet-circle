@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
+import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
@@ -23,7 +24,7 @@ class InfoTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacingTokens.md),
       decoration: BoxDecoration(
         color: c.surface,
         borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -31,14 +32,14 @@ class InfoTile extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(AppSpacingTokens.sm + 2),
             decoration: BoxDecoration(
               color: iconColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
             ),
             child: Icon(icon, color: iconColor, size: 22),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: AppSpacingTokens.sm + 4),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -67,7 +68,7 @@ class NoteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.only(bottom: AppSpacingTokens.md),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -75,7 +76,7 @@ class NoteCard extends StatelessWidget {
             radius: 18,
             backgroundImage: NetworkImage(note.authorAvatarUrl),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: AppSpacingTokens.sm + 4),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,14 +87,14 @@ class NoteCard extends StatelessWidget {
                       note.authorName,
                       style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacingTokens.sm),
                     Text(
-                      note.timeAgo,
+                      formatTimeAgo(note.createdAt),
                       style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacingTokens.xs),
                 Text(note.content, style: AppSemanticTextStyles.body),
               ],
             ),
@@ -113,14 +114,14 @@ class MemberTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.only(bottom: AppSpacingTokens.sm + 4),
       child: Row(
         children: [
           CircleAvatar(
             radius: 20,
             backgroundImage: NetworkImage(member.avatarUrl),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: AppSpacingTokens.sm + 4),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -163,7 +164,7 @@ class RoleBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _color(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 2, vertical: AppSpacingTokens.xs),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppRadiiTokens.sm),

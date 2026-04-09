@@ -23,7 +23,7 @@ class PendingInvite {
 }
 
 class Pet {
-  const Pet({
+  Pet({
     this.id,
     required this.name,
     required this.breedAndAge,
@@ -31,11 +31,12 @@ class Pet {
     required this.statusLabel,
     required this.statusColorHex,
     required this.latestMeasurement,
-    required this.careCircle,
+    required List<CareCircleMember> careCircle,
     this.diagnosis,
     this.ownerId,
-    this.pendingInvites = const [],
-  });
+    List<PendingInvite> pendingInvites = const [],
+  })  : careCircle = List.unmodifiable(careCircle),
+        pendingInvites = List.unmodifiable(pendingInvites);
 
   final String? id;
   final String name;

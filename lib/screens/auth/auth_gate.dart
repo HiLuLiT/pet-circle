@@ -3,12 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/providers/auth_provider.dart';
-import 'package:pet_circle/main.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/services/deep_link_service.dart';
-import 'package:pet_circle/services/invitation_service.dart';
-import 'package:pet_circle/services/user_service.dart';
-import 'package:pet_circle/stores/notification_store.dart';
-import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/invitation_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 
@@ -37,7 +34,7 @@ class _AuthGateState extends State<AuthGate> {
     final appUser = authProvider.appUser;
     if (appUser == null) return;
 
-    final result = await InvitationService.acceptInvitation(
+    final result = await invitationStore.acceptInvitation(
       token: token,
       uid: appUser.uid,
       email: appUser.email,
@@ -54,7 +51,7 @@ class _AuthGateState extends State<AuthGate> {
       // For invited users who haven't completed onboarding, skip it
       if (!appUser.hasCompletedOnboarding) {
         if (kEnableFirebase) {
-          await UserService.updateOnboardingStatus(appUser.uid, true);
+          await userStore.updateOnboardingStatus(appUser.uid, true);
           await authProvider.refresh();
         }
       }
@@ -113,11 +110,6 @@ class _AuthGateState extends State<AuthGate> {
   }
 
   void _handleAuthenticated() {
-    final appUser = authProvider.appUser!;
-    userStore.seedFromAppUser(appUser);
-    petStore.subscribeForUser(appUser.uid);
-    notificationStore.subscribeForUser(appUser.uid);
-
     final pendingToken = deepLinkService.pendingInvitationToken;
     if (pendingToken != null) {
       _acceptInvitation(pendingToken);

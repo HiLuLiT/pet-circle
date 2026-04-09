@@ -6,6 +6,7 @@ import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_widgets.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
@@ -27,7 +28,7 @@ class PetInfoSection extends StatelessWidget {
     final hasMeasurement = latest.bpm > 0;
     return NeumorphicCard(
       radius: BorderRadius.circular(AppRadiiTokens.md),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacingTokens.md + 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -35,7 +36,7 @@ class PetInfoSection extends StatelessWidget {
             l10n.latestReading,
             style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacingTokens.md),
           Row(
             children: [
               Expanded(
@@ -46,12 +47,12 @@ class PetInfoSection extends StatelessWidget {
                   label: l10n.bpm,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacingTokens.md),
               Expanded(
                 child: InfoTile(
                   icon: Icons.access_time,
                   iconColor: c.primaryLight,
-                  value: hasMeasurement ? latest.timeAgo : l10n.noMeasurementsYet,
+                  value: hasMeasurement ? formatTimeAgo(latest.recordedAt) : l10n.noMeasurementsYet,
                   label: l10n.lastMeasured,
                 ),
               ),
@@ -79,16 +80,19 @@ class PetMeasurementHistory extends StatelessWidget {
 
     return NeumorphicCard(
       radius: BorderRadius.circular(AppRadiiTokens.md),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacingTokens.md + 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                l10n.measurementHistory,
-                style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
+              Expanded(
+                child: Text(
+                  l10n.measurementHistory,
+                  style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
               TextButton.icon(
                 onPressed: () {
@@ -101,7 +105,7 @@ class PetMeasurementHistory extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacingTokens.md),
           // Simple bar chart visualization
           SizedBox(
             height: 80,
@@ -112,7 +116,7 @@ class PetMeasurementHistory extends StatelessWidget {
                 final isElevated = m.bpm > 30;
                 return Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.xs),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -123,7 +127,7 @@ class PetMeasurementHistory extends StatelessWidget {
                             color: isElevated ? c.error : c.primaryLight,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacingTokens.xs),
                         Container(
                           height: height.clamp(20, 60),
                           decoration: BoxDecoration(
@@ -144,13 +148,13 @@ class PetMeasurementHistory extends StatelessWidget {
               }).toList(),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacingTokens.sm),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: measurements.take(5).map((m) {
               return Expanded(
                 child: Text(
-                  m.timeAgo.replaceAll(' ago', ''),
+                  formatTimeAgo(m.recordedAt).replaceAll(' ago', ''),
                   style: AppSemanticTextStyles.caption.copyWith(fontSize: 9),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
@@ -184,24 +188,24 @@ class PetClinicalNotes extends StatelessWidget {
     final notes = noteStore.getNotes(pet.id ?? '');
     return NeumorphicCard(
       radius: BorderRadius.circular(AppRadiiTokens.md),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacingTokens.md + 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Icon(Icons.note_alt_outlined, color: c.textPrimary),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacingTokens.sm),
               Text(
                 l10n.clinicalNotes,
                 style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacingTokens.md),
           // Add note input
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppSpacingTokens.sm + 4),
             decoration: BoxDecoration(
               color: c.surface,
               borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -220,7 +224,7 @@ class PetClinicalNotes extends StatelessWidget {
                   ),
                   style: AppSemanticTextStyles.body,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacingTokens.sm),
                 Align(
                   alignment: Alignment.centerRight,
                   child: ElevatedButton.icon(
@@ -230,7 +234,10 @@ class PetClinicalNotes extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: c.textPrimary,
                       foregroundColor: c.background,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacingTokens.md,
+                        vertical: AppSpacingTokens.sm + 2,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
                       ),
@@ -241,13 +248,13 @@ class PetClinicalNotes extends StatelessWidget {
             ),
           ),
           if (notes.isNotEmpty) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacingTokens.md + 4),
             const Divider(height: 1),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacingTokens.md),
             ...notes.map((note) => NoteCard(note: note)),
           ],
           if (notes.isEmpty) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacingTokens.md + 4),
             Center(
               child: Column(
                 children: [
@@ -256,7 +263,7 @@ class PetClinicalNotes extends StatelessWidget {
                     size: 40,
                     color: c.textPrimary.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacingTokens.sm),
                   Text(
                     l10n.noClinicalNotesYet,
                     style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
@@ -282,21 +289,21 @@ class PetCareCircle extends StatelessWidget {
     final c = AppSemanticColors.of(context);
     return NeumorphicCard(
       radius: BorderRadius.circular(AppRadiiTokens.md),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppSpacingTokens.md + 4),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Icon(Icons.group, color: c.textPrimary),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacingTokens.sm),
               Text(
                 l10n.careCircle,
                 style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacingTokens.md),
           ...pet.careCircle.map(
             (member) => MemberTile(member: member),
           ),
