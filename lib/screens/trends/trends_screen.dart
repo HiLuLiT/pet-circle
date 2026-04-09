@@ -1,6 +1,7 @@
 import 'dart:math' show max;
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
@@ -561,23 +562,23 @@ class _SrrChart extends StatelessWidget {
 
     if (measurements.isEmpty) {
       return Container(
-        height: 280,
+        height: 392,
         width: double.infinity,
         padding: const EdgeInsets.all(AppSpacingTokens.lg),
         decoration: BoxDecoration(
-          color: c.surface,
-          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
+          color: c.background,
+          borderRadius: BorderRadius.circular(AppRadiiTokens.md),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.show_chart, size: 48, color: c.textPrimary.withValues(alpha: 0.2)),
+            Icon(Icons.show_chart, size: 48, color: c.textSecondary.withValues(alpha: 0.4)),
             SizedBox(height: AppSpacingTokens.sm + 4),
             Text(l10n.noMeasurementsYet, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
             const SizedBox(height: AppSpacingTokens.sm),
             Text(
               l10n.noMeasurementsDescription,
-              style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
+              style: AppSemanticTextStyles.body.copyWith(color: c.textSecondary),
               textAlign: TextAlign.center,
             ),
           ],
@@ -585,38 +586,36 @@ class _SrrChart extends StatelessWidget {
       );
     }
 
-    // Build chronological list (reversed from reversed-order source list)
     final ordered = measurements.reversed.toList();
     final spots = ordered.indexed
         .map((entry) => FlSpot(entry.$1.toDouble(), entry.$2.bpm.toDouble()))
         .toList();
 
-    // X-axis labels: show up to 6 evenly-spaced date strings to avoid crowding
+    final dateFormat = DateFormat('MMM d');
     final labels = ordered
-        .map((m) => '${m.recordedAt.month}/${m.recordedAt.day}')
+        .map((m) => dateFormat.format(m.recordedAt))
         .toList();
     final labelStep = (labels.length / 6).ceil().clamp(1, labels.length);
 
     final maxBpm = spots.isEmpty ? 50.0 : spots.map((s) => s.y).reduce((a, b) => a > b ? a : b);
     final maxY = max(50.0, maxBpm + 10.0);
 
-    final textPrimaryColor = c.textPrimary;
-    final backgroundColor = c.background;
-    final primaryColor = c.primary;
-    final surfaceColor = c.surface;
+    final labelColor = c.textSecondary;
+    final chartColor = c.info;
+    final gridColor = c.divider;
 
     return Container(
-      height: 280,
+      height: 392,
       width: double.infinity,
-      padding: EdgeInsets.only(
-        top: AppSpacingTokens.sm + 4,
-        right: AppSpacingTokens.sm + 4,
+      padding: const EdgeInsets.only(
+        top: AppSpacingTokens.md,
+        right: AppSpacingTokens.sm,
         bottom: AppSpacingTokens.xs,
         left: AppSpacingTokens.xs,
       ),
       decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
+        color: c.background,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
       ),
       child: LineChart(
         LineChartData(
@@ -628,34 +627,21 @@ class _SrrChart extends StatelessWidget {
           gridData: FlGridData(
             show: true,
             drawVerticalLine: true,
-            horizontalInterval: 10,
+            drawHorizontalLine: false,
             verticalInterval: labelStep.toDouble(),
-            getDrawingHorizontalLine: (_) => FlLine(
-              color: backgroundColor,
-              strokeWidth: 0.5,
-              dashArray: [3, 3],
-            ),
             getDrawingVerticalLine: (_) => FlLine(
-              color: backgroundColor,
-              strokeWidth: 0.5,
-              dashArray: [3, 3],
+              color: gridColor,
+              strokeWidth: 1,
+              dashArray: [4, 4],
             ),
           ),
-          borderData: FlBorderData(
-            show: true,
-            border: Border(
-              bottom: BorderSide(color: textPrimaryColor, width: 1),
-              left: BorderSide(color: textPrimaryColor, width: 1),
-              top: BorderSide.none,
-              right: BorderSide.none,
-            ),
-          ),
+          borderData: FlBorderData(show: false),
           titlesData: FlTitlesData(
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
                 interval: 10,
-                reservedSize: 28,
+                reservedSize: 36,
                 getTitlesWidget: (value, meta) {
                   if (value % 10 != 0) return const SizedBox.shrink();
                   return SideTitleWidget(
@@ -663,8 +649,7 @@ class _SrrChart extends StatelessWidget {
                     child: Text(
                       value.toInt().toString(),
                       style: AppSemanticTextStyles.caption.copyWith(
-                        color: textPrimaryColor,
-                        fontSize: 10,
+                        color: labelColor,
                       ),
                     ),
                   );
@@ -675,7 +660,7 @@ class _SrrChart extends StatelessWidget {
               sideTitles: SideTitles(
                 showTitles: true,
                 interval: labelStep.toDouble(),
-                reservedSize: 22,
+                reservedSize: 32,
                 getTitlesWidget: (value, meta) {
                   final index = value.toInt();
                   if (index < 0 || index >= labels.length) {
@@ -687,8 +672,7 @@ class _SrrChart extends StatelessWidget {
                     child: Text(
                       labels[index],
                       style: AppSemanticTextStyles.caption.copyWith(
-                        color: textPrimaryColor,
-                        fontSize: 10,
+                        color: labelColor,
                       ),
                     ),
                   );
@@ -702,31 +686,29 @@ class _SrrChart extends StatelessWidget {
             horizontalLines: [
               HorizontalLine(
                 y: settingsStore.elevatedThreshold.toDouble(),
-                color: textPrimaryColor,
+                color: gridColor,
                 strokeWidth: 1,
                 dashArray: [4, 4],
                 label: HorizontalLineLabel(
                   show: true,
                   alignment: Alignment.topRight,
-                  labelResolver: (_) => 'Normal Threshold (${settingsStore.elevatedThreshold} BPM)',
+                  labelResolver: (_) => 'Normal (${settingsStore.elevatedThreshold})',
                   style: AppSemanticTextStyles.caption.copyWith(
-                    color: textPrimaryColor,
-                    fontSize: 9,
+                    color: labelColor,
                   ),
                 ),
               ),
               HorizontalLine(
                 y: settingsStore.criticalThreshold.toDouble(),
-                color: textPrimaryColor,
+                color: gridColor,
                 strokeWidth: 1,
                 dashArray: [4, 4],
                 label: HorizontalLineLabel(
                   show: true,
                   alignment: Alignment.topRight,
-                  labelResolver: (_) => 'Alert Threshold (${settingsStore.criticalThreshold} BPM)',
+                  labelResolver: (_) => 'Alert (${settingsStore.criticalThreshold})',
                   style: AppSemanticTextStyles.caption.copyWith(
-                    color: textPrimaryColor,
-                    fontSize: 9,
+                    color: labelColor,
                   ),
                 ),
               ),
@@ -736,15 +718,15 @@ class _SrrChart extends StatelessWidget {
             LineChartBarData(
               spots: spots,
               isCurved: false,
-              color: primaryColor,
+              color: chartColor,
               barWidth: 2,
               dotData: FlDotData(
                 show: true,
                 getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
-                  radius: 4,
-                  color: primaryColor,
+                  radius: 5,
+                  color: chartColor,
                   strokeWidth: 2,
-                  strokeColor: surfaceColor,
+                  strokeColor: c.surface,
                 ),
               ),
               belowBarData: BarAreaData(
@@ -753,8 +735,8 @@ class _SrrChart extends StatelessWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    primaryColor.withValues(alpha: 0.25),
-                    primaryColor.withValues(alpha: 0.0),
+                    chartColor.withValues(alpha: 0.3),
+                    chartColor.withValues(alpha: 0.05),
                   ],
                 ),
               ),
