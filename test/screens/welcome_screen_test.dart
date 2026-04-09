@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/screens/welcome_screen.dart';
+import 'package:pet_circle/screens/auth/create_account_screen.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 import '../helpers/ignore_overflow_errors.dart';
@@ -14,11 +14,11 @@ Widget _buildApp() {
     theme: buildAppTheme(),
     localizationsDelegates: AppLocalizations.localizationsDelegates,
     supportedLocales: AppLocalizations.supportedLocales,
-    home: const WelcomeScreen(),
+    home: const CreateAccountScreen(),
   );
 }
 
-/// Pump the WelcomeScreen with overflow errors suppressed.
+/// Pump [CreateAccountScreen] with overflow errors suppressed.
 /// The social-sign-in button rows overflow in the test environment because
 /// Flutter's test font metrics differ from real device rendering.
 Future<void> _pumpWelcome(WidgetTester tester) async {
@@ -37,11 +37,11 @@ void main() {
   setUpAll(() => HttpOverrides.global = MockHttpOverrides());
   tearDownAll(() => HttpOverrides.global = null);
 
-  group('WelcomeScreen', () {
+  group('CreateAccountScreen', () {
     testWidgets('renders without error', (tester) async {
       await _pumpWelcome(tester);
 
-      expect(find.byType(WelcomeScreen), findsOneWidget);
+      expect(find.byType(CreateAccountScreen), findsOneWidget);
     });
 
     testWidgets('shows "Create an account" heading', (tester) async {

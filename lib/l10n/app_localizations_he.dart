@@ -768,6 +768,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get getStarted => 'התחל';
 
   @override
+  String get chooseSignUpMethod => 'צור חשבון או המשך עם Google.';
+
+  @override
   String get noPetsYet => 'אין עדיין חיות מחמד';
 
   @override
@@ -1132,6 +1135,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get enterVerificationCode => 'בדוק את האימייל';
+
+  @override
+  String get enterTheCodeSentToLead => 'הכנס את הקוד שנשלח ל ';
 
   @override
   String weSentCodeTo(String email) {

@@ -12,7 +12,8 @@ import 'package:pet_circle/screens/invite/invite_screen.dart';
 import 'package:pet_circle/screens/main_shell.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_flow.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_screen.dart';
-import 'package:pet_circle/screens/welcome_screen.dart';
+import 'package:pet_circle/screens/auth/create_account_screen.dart';
+import 'package:pet_circle/screens/landing_screen.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 
@@ -117,13 +118,13 @@ GoRouter buildRouter() {
     routes: [
       GoRoute(
         path: '/',
-        builder: (_, _) => const WelcomeScreen(),
+        builder: (_, _) => const LandingScreen(),
       ),
       GoRoute(
         path: '/auth-gate',
         builder: (_, _) => const AuthGate(),
       ),
-      GoRoute(path: '/signup', builder: (_, _) => const WelcomeScreen()),
+      GoRoute(path: '/signup', builder: (_, _) => const CreateAccountScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(
         path: '/verify-otp',
