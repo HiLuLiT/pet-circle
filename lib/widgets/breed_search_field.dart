@@ -252,7 +252,7 @@ class _BreedSearchFieldState extends State<BreedSearchField>
           onTap: _toggle,
           child: Container(
             height: 36,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 4),
             decoration: BoxDecoration(
               color: AppPrimitives.skyLighter,
               borderRadius: AppRadiiTokens.borderRadiusLg,

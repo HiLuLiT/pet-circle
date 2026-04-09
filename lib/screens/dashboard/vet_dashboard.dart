@@ -375,19 +375,20 @@ class _PetCard extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  top: 16,
-                  right: 12,
+                  top: AppSpacingTokens.md,
+                  right: AppSpacingTokens.sm + 4,
                   child: StatusBadge(
                     label: data.statusLabel,
                     color: Color(data.statusColorHex),
                   ),
                 ),
                 Positioned(
-                  top: 16,
-                  left: 12,
+                  top: AppSpacingTokens.md,
+                  left: AppSpacingTokens.sm + 4,
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
+                        horizontal: AppSpacingTokens.sm,
+                        vertical: AppSpacingTokens.xs),
                     decoration: BoxDecoration(
                       color: c.textPrimary.withValues(alpha: 0.9),
                       borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -396,7 +397,7 @@ class _PetCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.visibility, size: 12, color: c.background),
-                        const SizedBox(width: 4),
+                        const SizedBox(width: AppSpacingTokens.xs),
                         Text(
                           l10n.viewOnly,
                           style: AppSemanticTextStyles.caption.copyWith(
@@ -411,7 +412,7 @@ class _PetCard extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacingTokens.md + 4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -420,22 +421,23 @@ class _PetCard extends StatelessWidget {
                     style:
                         AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacingTokens.xs),
                   Text(data.breedAndAge, style: AppSemanticTextStyles.bodyMuted),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacingTokens.md),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           NeumorphicCard(
                             inner: true,
                             color: c.surface,
-                            padding: const EdgeInsets.all(10),
+                            padding: const EdgeInsets.all(AppSpacingTokens.sm + 2),
                             child: Icon(Icons.favorite_border,
                                 size: 18, color: c.textPrimary),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: AppSpacingTokens.sm + 2),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -450,31 +452,43 @@ class _PetCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Text(
-                        hasMeasurement ? formatTimeAgo(latest.recordedAt) : l10n.noMeasurementsYet,
-                        style: AppSemanticTextStyles.caption,
+                      Flexible(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: AppSpacingTokens.sm),
+                          child: Text(
+                            hasMeasurement ? formatTimeAgo(latest.recordedAt) : l10n.noMeasurementsYet,
+                            style: AppSemanticTextStyles.caption,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: AppSpacingTokens.sm + 6),
                   Divider(
                       color: c.primaryLight.withValues(alpha: 0.15),
                       height: 1),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: AppSpacingTokens.sm + 2),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.person_outline,
-                              size: 14, color: c.textPrimary),
-                          const SizedBox(width: 6),
-                          Text(
-                            l10n.ownerLabel(_getOwnerName(
-                                data.careCircle, l10n.unknown)),
-                            style: AppSemanticTextStyles.caption,
-                          ),
-                        ],
+                      Flexible(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.person_outline,
+                                size: 14, color: c.textPrimary),
+                            const SizedBox(width: AppSpacingTokens.xs + 2),
+                            Flexible(
+                              child: Text(
+                                l10n.ownerLabel(_getOwnerName(
+                                    data.careCircle, l10n.unknown)),
+                                style: AppSemanticTextStyles.caption,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       Icon(Icons.chevron_right,
                           size: 18, color: c.textPrimary),
@@ -575,8 +589,8 @@ class _ResponsiveGrid extends StatelessWidget {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           crossAxisCount: count,
-          crossAxisSpacing: 24,
-          mainAxisSpacing: 24,
+          crossAxisSpacing: AppSpacingTokens.lg,
+          mainAxisSpacing: AppSpacingTokens.lg,
           childAspectRatio: childAspectRatio,
           children: children,
         );

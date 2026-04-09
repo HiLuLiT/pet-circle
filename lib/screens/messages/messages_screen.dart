@@ -7,6 +7,7 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/utils/formatters.dart';
+import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/models/app_notification.dart' as notif;
 
 /// Opens notifications as a slide-up drawer (modal bottom sheet),
@@ -33,7 +34,10 @@ class NotificationsDrawer extends StatelessWidget {
               color: c.surface,
               child: SingleChildScrollView(
                 controller: scrollController,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacingTokens.lg,
+                  vertical: AppSpacingTokens.lg,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -51,7 +55,7 @@ class NotificationsDrawer extends StatelessWidget {
                                   letterSpacing: -0.96,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: AppSpacingTokens.xs),
                               Text(
                                 l10n.unreadNotifications(
                                   notificationStore.unreadCount,
@@ -81,9 +85,9 @@ class NotificationsDrawer extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacingTokens.lg),
                     ...notifications.map((notification) => Padding(
-                      padding: const EdgeInsets.only(bottom: 12),
+                      padding: EdgeInsets.only(bottom: AppSpacingTokens.sm + 4),
                       child: _AppNotificationCard(notification: notification),
                     )),
                   ],
@@ -113,11 +117,14 @@ class MessagesScreen extends StatelessWidget {
 
         final content = SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
+            padding: const EdgeInsets.all(AppSpacingTokens.lg),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
+                child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacingTokens.md),
                 Text(
                   l10n.notifications,
                   style: AppSemanticTextStyles.title3.copyWith(
@@ -125,19 +132,21 @@ class MessagesScreen extends StatelessWidget {
                     letterSpacing: -0.96,
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppSpacingTokens.sm),
                 Text(
                   l10n.unreadNotifications(notificationStore.unreadCount),
                   style: AppSemanticTextStyles.body.copyWith(
                     color: c.textPrimary,
                   ),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppSpacingTokens.lg),
                 ...notifications.map((notification) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
+                  padding: EdgeInsets.only(bottom: AppSpacingTokens.sm + 4),
                   child: _AppNotificationCard(notification: notification),
                 )),
               ],
+            ),
+              ),
             ),
           ),
         );
@@ -202,7 +211,7 @@ class _AppNotificationCard extends StatelessWidget {
         }
       },
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacingTokens.md),
         decoration: BoxDecoration(
           color: notification.isRead ? c.surface : c.background,
           borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
@@ -222,7 +231,7 @@ class _AppNotificationCard extends StatelessWidget {
               ),
               child: Icon(_icon, size: 20, color: iconColor),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: AppSpacingTokens.sm + 4),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,7 +260,7 @@ class _AppNotificationCard extends StatelessWidget {
                         ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacingTokens.xs),
                   Text(
                     notification.body,
                     style: AppSemanticTextStyles.caption.copyWith(
@@ -260,7 +269,7 @@ class _AppNotificationCard extends StatelessWidget {
                       height: 1.4,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacingTokens.sm),
                   Text(
                     formatTimeAgoShort(notification.createdAt),
                     style: AppSemanticTextStyles.caption.copyWith(

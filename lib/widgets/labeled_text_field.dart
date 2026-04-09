@@ -49,7 +49,7 @@ class LabeledTextField extends StatelessWidget {
                 borderSide: BorderSide.none,
               ),
               contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 4, vertical: AppSpacingTokens.xs),
             ),
             style: AppSemanticTextStyles.body.copyWith(
               color: c.textPrimary,

@@ -140,33 +140,101 @@ void _seedMockStores() {
   ]);
 }
 
-class PetCircleApp extends StatelessWidget {
+class PetCircleApp extends StatefulWidget {
   const PetCircleApp({super.key});
 
   @override
+  State<PetCircleApp> createState() => _PetCircleAppState();
+}
+
+class _PetCircleAppState extends State<PetCircleApp>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _overlayController;
+  bool _isDark = false;
+  bool _themeSwapped = false;
+  Color _overlayColor = Colors.black;
+
+  @override
+  void initState() {
+    super.initState();
+    _isDark = appDarkMode.value;
+    _overlayController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _overlayController.addListener(_swapThemeAtMidpoint);
+    _overlayController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _overlayController.reset();
+        _themeSwapped = false;
+      }
+    });
+    appDarkMode.addListener(_onDarkModeToggled);
+  }
+
+  void _onDarkModeToggled() {
+    _themeSwapped = false;
+    _overlayColor = appDarkMode.value ? Colors.black : Colors.white;
+    _overlayController.forward(from: 0.0);
+  }
+
+  void _swapThemeAtMidpoint() {
+    if (_overlayController.value >= 0.5 && !_themeSwapped) {
+      _themeSwapped = true;
+      setState(() => _isDark = appDarkMode.value);
+    }
+  }
+
+  @override
+  void dispose() {
+    appDarkMode.removeListener(_onDarkModeToggled);
+    _overlayController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder<Locale>(
-      valueListenable: appLocale,
-      builder: (context, locale, _) => ValueListenableBuilder<bool>(
-        valueListenable: appDarkMode,
-        builder: (context, isDark, _) => MaterialApp.router(
-      routerConfig: router,
-      title: 'Pet Circle',
-      debugShowCheckedModeBanner: false,
-      theme: isDark ? buildDarkTheme() : buildAppTheme(),
-      locale: locale,
-      localizationsDelegates: const [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en'),
-        Locale('he'),
-      ],
-    ),
-    ),
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Stack(
+        children: [
+          ValueListenableBuilder<Locale>(
+            valueListenable: appLocale,
+            builder: (context, locale, _) => MaterialApp.router(
+              routerConfig: router,
+              title: 'Pet Circle',
+              debugShowCheckedModeBanner: false,
+              theme: _isDark ? buildDarkTheme() : buildAppTheme(),
+              themeAnimationDuration: Duration.zero,
+              locale: locale,
+              localizationsDelegates: const [
+                AppLocalizations.delegate,
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: const [
+                Locale('en'),
+                Locale('he'),
+              ],
+            ),
+          ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child: AnimatedBuilder(
+                animation: _overlayController,
+                builder: (context, _) {
+                  final v = _overlayController.value;
+                  final fade = v <= 0.5 ? v * 2 : (1.0 - v) * 2;
+                  return ColoredBox(
+                    color: _overlayColor.withValues(alpha: fade * 0.35),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

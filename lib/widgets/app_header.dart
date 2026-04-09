@@ -53,7 +53,7 @@ class AppHeader extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                 color: c.background,
-                borderRadius: BorderRadius.circular(AppSpacingTokens.lg),
+                borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -71,11 +71,14 @@ class AppHeader extends StatelessWidget {
                     ),
                   if (petImageUrl != null && petImageUrl!.isNotEmpty)
                     const SizedBox(width: 6),
-                  Text(
-                    petName!,
-                    style: AppSemanticTextStyles.bodySm.copyWith(
-                      color: AppPrimitives.inkDarkest,
-                      fontWeight: FontWeight.w500,
+                  Flexible(
+                    child: Text(
+                      petName!,
+                      style: AppSemanticTextStyles.bodySm.copyWith(
+                        color: AppPrimitives.inkDarkest,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   if (onPetSelectorTap != null) ...[
