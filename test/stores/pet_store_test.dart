@@ -398,9 +398,9 @@ void main() {
     });
   });
 
-  group('PetStore cancelSubscription', () {
-    test('cancelSubscription clears subscribedUid', () {
-      store.cancelSubscription();
+  group('PetStore clearData', () {
+    test('clearData clears subscribedUid', () {
+      store.clearData();
       expect(store.currentSubscribedUid, isNull);
     });
   });

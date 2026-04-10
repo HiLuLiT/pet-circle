@@ -165,29 +165,32 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
       backgroundColor: c.background,
       body: ListenableBuilder(
         listenable: Listenable.merge([noteStore, measurementStore, petStore]),
-        builder: (context, _) => CustomScrollView(
-          slivers: [
-            _buildAppBar(),
-            SliverPadding(
-              padding: const EdgeInsets.all(AppSpacingTokens.lg),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  PetInfoSection(pet: _pet),
-                  const SizedBox(height: AppSpacingTokens.lg),
-                  PetMeasurementHistory(pet: _pet),
-                  const SizedBox(height: AppSpacingTokens.lg),
-                  PetClinicalNotes(
-                    pet: _pet,
-                    noteController: _noteController,
-                    onAddNote: _addNote,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.lg),
-                  PetCareCircle(pet: _pet),
-                  const SizedBox(height: AppSpacingTokens.xl + 8),
-                ]),
+        builder: (context, _) => RefreshIndicator(
+          onRefresh: () => petStore.refresh(),
+          child: CustomScrollView(
+            slivers: [
+              _buildAppBar(),
+              SliverPadding(
+                padding: const EdgeInsets.all(AppSpacingTokens.lg),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate([
+                    PetInfoSection(pet: _pet),
+                    const SizedBox(height: AppSpacingTokens.lg),
+                    PetMeasurementHistory(pet: _pet),
+                    const SizedBox(height: AppSpacingTokens.lg),
+                    PetClinicalNotes(
+                      pet: _pet,
+                      noteController: _noteController,
+                      onAddNote: _addNote,
+                    ),
+                    const SizedBox(height: AppSpacingTokens.lg),
+                    PetCareCircle(pet: _pet),
+                    const SizedBox(height: AppSpacingTokens.xl + 8),
+                  ]),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

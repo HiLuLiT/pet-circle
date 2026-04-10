@@ -8,6 +8,15 @@ class NotificationService {
   static CollectionReference<Map<String, dynamic>> _notificationsRef(String uid) =>
       _usersCollection.doc(uid).collection('notifications');
 
+  /// Fetch all notifications for a user (one-time read).
+  static Future<List<AppNotification>> fetchNotifications(String uid) async {
+    final snapshot = await _notificationsRef(uid)
+        .orderBy('createdAt', descending: true)
+        .get();
+    return snapshot.docs.map((doc) => AppNotification.fromFirestore(doc)).toList();
+  }
+
+  @Deprecated('Use fetchNotifications instead')
   static Stream<List<AppNotification>> streamNotifications(String uid) {
     return _notificationsRef(uid)
         .orderBy('createdAt', descending: true)

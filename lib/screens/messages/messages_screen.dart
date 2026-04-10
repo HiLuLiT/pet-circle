@@ -116,8 +116,11 @@ class MessagesScreen extends StatelessWidget {
         final notifications = notificationStore.all;
 
         final content = SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppSpacingTokens.lg),
+          child: RefreshIndicator(
+            onRefresh: () => notificationStore.refresh(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(AppSpacingTokens.lg),
             child: Center(
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
@@ -148,6 +151,7 @@ class MessagesScreen extends StatelessWidget {
             ),
               ),
             ),
+          ),
           ),
         );
 

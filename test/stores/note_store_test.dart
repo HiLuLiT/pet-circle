@@ -224,24 +224,15 @@ void main() {
     });
   });
 
-  group('NoteStore subscribeForPets', () {
-    test('subscribeForPets does not throw when called with empty list', () {
-      store.seed({});
-      // kEnableFirebase=true — this will try to set up subscriptions.
-      // With an empty list there is nothing to subscribe to.
-      expect(() => store.subscribeForPets([]), returnsNormally);
-    });
-  });
-
-  group('NoteStore cancelSubscriptions', () {
-    test('cancelSubscriptions completes without throwing when no subscriptions active', () {
-      expect(() => store.cancelSubscriptions(), returnsNormally);
+  group('NoteStore clearData', () {
+    test('clearData completes without throwing when empty', () {
+      expect(() => store.clearData(), returnsNormally);
     });
 
-    test('cancelSubscriptions can be called multiple times safely', () {
+    test('clearData can be called multiple times safely', () {
       expect(() {
-        store.cancelSubscriptions();
-        store.cancelSubscriptions();
+        store.clearData();
+        store.clearData();
       }, returnsNormally);
     });
   });

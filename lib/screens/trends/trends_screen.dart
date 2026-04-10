@@ -161,8 +161,11 @@ class _TrendsScreenState extends State<TrendsScreen> {
         final filtered = _filterByPeriod(allMeasurements, l10n);
 
         final content = SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
+          child: RefreshIndicator(
+            onRefresh: () => measurementStore.refresh(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
               padding: const EdgeInsets.all(AppSpacingTokens.lg),
               child: Center(
                 child: ConstrainedBox(
@@ -314,6 +317,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
             ),
               ),
             ),
+          ),
           ),
         );
 

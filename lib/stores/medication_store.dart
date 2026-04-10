@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/medication.dart';
@@ -9,7 +8,7 @@ final medicationStore = MedicationStore();
 
 class MedicationStore extends ChangeNotifier {
   Map<String, List<Medication>> _medications = {};
-  final Map<String, StreamSubscription<List<Medication>>> _subscriptions = {};
+  List<String> _currentPetIds = [];
   final Set<String> _pendingWritePetIds = {};
 
   void seed(Map<String, List<Medication>> initial) {
@@ -135,29 +134,36 @@ class MedicationStore extends ChangeNotifier {
     }
   }
 
-  void subscribeForPets(List<String> petIds) {
-    final currentIds = _subscriptions.keys.toSet();
+  /// Fetch medications for the given pet IDs from Firestore.
+  Future<void> fetchForPets(List<String> petIds) async {
     final newIds = petIds.toSet();
+    _medications.removeWhere((id, _) => !newIds.contains(id));
+    _currentPetIds = List.of(petIds);
 
-    for (final id in currentIds.difference(newIds)) {
-      _subscriptions[id]?.cancel();
-      _subscriptions.remove(id);
-      _medications.remove(id);
+    final futures = <Future<void>>[];
+    for (final id in petIds) {
+      if (_pendingWritePetIds.contains(id)) continue;
+      futures.add(
+        MedicationService.fetch(id).then((list) {
+          _medications[id] = list;
+        }).catchError((Object e) {
+          debugPrint('[MedicationStore] Failed to fetch for pet $id: $e');
+        }),
+      );
     }
-
-    for (final id in newIds.difference(currentIds)) {
-      _subscriptions[id] = MedicationService.stream(id).listen((list) {
-        if (_pendingWritePetIds.contains(id)) return;
-        _medications[id] = list;
-        notifyListeners();
-      });
-    }
+    await Future.wait(futures);
+    notifyListeners();
   }
 
-  void cancelSubscriptions() {
-    for (final sub in _subscriptions.values) {
-      sub.cancel();
-    }
-    _subscriptions.clear();
+  /// Re-fetch all medications for the current pet IDs (pull-to-refresh).
+  Future<void> refresh() async {
+    if (_currentPetIds.isEmpty) return;
+    await fetchForPets(_currentPetIds);
+  }
+
+  void clearData() {
+    _medications.clear();
+    _currentPetIds = [];
+    notifyListeners();
   }
 }

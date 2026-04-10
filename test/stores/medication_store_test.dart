@@ -300,10 +300,9 @@ void main() {
     });
   });
 
-  group('MedicationStore cancelSubscriptions', () {
-    test('cancelSubscriptions clears subscriptions without throwing', () {
-      // No subscriptions active — calling cancel is a no-op.
-      expect(() => store.cancelSubscriptions(), returnsNormally);
+  group('MedicationStore clearData', () {
+    test('clearData completes without throwing when empty', () {
+      expect(() => store.clearData(), returnsNormally);
     });
   });
 
