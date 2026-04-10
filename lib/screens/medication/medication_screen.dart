@@ -144,8 +144,11 @@ class _MedicationScreenState extends State<MedicationScreen> {
         final petName = petStore.activePet?.name ?? l10n.petName;
         final count = medicationStore.getActiveMedications(petId).length;
         return SafeArea(
-          child: SingleChildScrollView(
-            child: Padding(
+          child: RefreshIndicator(
+            onRefresh: () => medicationStore.refresh(),
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Padding(
               padding: const EdgeInsets.all(AppSpacingTokens.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,6 +246,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
                 ],
               ),
             ),
+          ),
           ),
         );
       },

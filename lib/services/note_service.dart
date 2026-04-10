@@ -12,6 +12,15 @@ class NoteService {
     await _ref(petId).add(note.toFirestore());
   }
 
+  /// Fetch all clinical notes for a pet (one-time read).
+  static Future<List<ClinicalNote>> fetch(String petId) async {
+    final snapshot = await _ref(petId)
+        .orderBy('createdAt', descending: true)
+        .get();
+    return snapshot.docs.map((doc) => ClinicalNote.fromFirestore(doc)).toList();
+  }
+
+  @Deprecated('Use fetch instead')
   static Stream<List<ClinicalNote>> stream(String petId) {
     return _ref(petId)
         .orderBy('createdAt', descending: true)

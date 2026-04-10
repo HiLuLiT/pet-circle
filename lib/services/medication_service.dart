@@ -24,6 +24,15 @@ class MedicationService {
     await _ref(petId).doc(medicationId).delete();
   }
 
+  /// Fetch all medications for a pet (one-time read).
+  static Future<List<Medication>> fetch(String petId) async {
+    final snapshot = await _ref(petId)
+        .orderBy('startDate', descending: true)
+        .get();
+    return snapshot.docs.map((doc) => Medication.fromFirestore(doc)).toList();
+  }
+
+  @Deprecated('Use fetch instead')
   static Stream<List<Medication>> stream(String petId) {
     return _ref(petId)
         .orderBy('startDate', descending: true)

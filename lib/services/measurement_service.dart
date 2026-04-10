@@ -16,6 +16,23 @@ class MeasurementService {
     unawaited(_updateLatest(petId, m));
   }
 
+  /// Fetch all measurements for a pet (one-time read).
+  static Future<List<Measurement>> fetch(String petId) async {
+    final snapshot = await _ref(petId)
+        .orderBy('recordedAt', descending: true)
+        .get();
+    final list = <Measurement>[];
+    for (final doc in snapshot.docs) {
+      try {
+        list.add(Measurement.fromFirestore(doc));
+      } catch (e) {
+        debugPrint('Skipping malformed measurement ${doc.id}: $e');
+      }
+    }
+    return list;
+  }
+
+  @Deprecated('Use fetch instead')
   static Stream<List<Measurement>> stream(String petId) {
     return _ref(petId)
         .orderBy('recordedAt', descending: true)

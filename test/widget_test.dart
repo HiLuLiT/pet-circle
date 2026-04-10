@@ -34,6 +34,6 @@ void main() {
 
     expect(find.byType(LandingScreen), findsOneWidget);
     expect(find.text('A smarter way to care for your pet.'), findsOneWidget);
-    expect(find.text('Get Started'), findsOneWidget);
+    expect(find.text('Get started'), findsOneWidget);
   });
 }
