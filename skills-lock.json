@@ -1,6 +1,11 @@
 {
   "version": 1,
   "skills": {
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "computedHash": "9e1c8b3103f92fa8092568a44fe64858de7c5c9dc65ce4bea8f168080e889cfd"
+    },
     "flutter-animating-apps": {
       "source": "flutter/skills",
       "sourceType": "github",
@@ -25,6 +30,11 @@
       "source": "flutter/skills",
       "sourceType": "github",
       "computedHash": "2fc5b3828e53902e4e61d79d2bbd5557409e27e9713ea0aa4efb307a6c9cda43"
+    },
+    "flutter-caching-data": {
+      "source": "flutter/skills",
+      "sourceType": "github",
+      "computedHash": "402048bac26e92fa8fc973a411bccda6e6ad08ee13122874bf2dd576186f6912"
     },
     "flutter-implementing-navigation-and-routing": {
       "source": "flutter/skills",
