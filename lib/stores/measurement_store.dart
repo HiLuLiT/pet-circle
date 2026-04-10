@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/measurement.dart';
@@ -8,7 +7,7 @@ final measurementStore = MeasurementStore();
 
 class MeasurementStore extends ChangeNotifier {
   Map<String, List<Measurement>> _measurements = {};
-  final Map<String, StreamSubscription<List<Measurement>>> _subscriptions = {};
+  List<String> _currentPetIds = [];
   final Set<String> _pendingWritePetIds = {};
 
   void seed(Map<String, List<Measurement>> initial) {
@@ -77,30 +76,39 @@ class MeasurementStore extends ChangeNotifier {
     }
   }
 
-  void subscribeForPets(List<String> petIds) {
-    final currentIds = _subscriptions.keys.toSet();
+  /// Fetch measurements for the given pet IDs from Firestore.
+  Future<void> fetchForPets(List<String> petIds) async {
+    // Remove data for pets no longer in the list
     final newIds = petIds.toSet();
+    _measurements.removeWhere((id, _) => !newIds.contains(id));
+    _currentPetIds = List.of(petIds);
 
-    for (final id in currentIds.difference(newIds)) {
-      _subscriptions[id]?.cancel();
-      _subscriptions.remove(id);
-      _measurements.remove(id);
+    // Fetch all pet IDs in parallel, isolating per-pet errors
+    final futures = <Future<void>>[];
+    for (final id in petIds) {
+      if (_pendingWritePetIds.contains(id)) continue;
+      futures.add(
+        MeasurementService.fetch(id).then((list) {
+          _measurements[id] = list;
+        }).catchError((Object e) {
+          debugPrint('[MeasurementStore] Failed to fetch for pet $id: $e');
+        }),
+      );
     }
-
-    for (final id in newIds.difference(currentIds)) {
-      _subscriptions[id] = MeasurementService.stream(id).listen((list) {
-        if (_pendingWritePetIds.contains(id)) return;
-        _measurements[id] = list;
-        notifyListeners();
-      });
-    }
+    await Future.wait(futures);
+    notifyListeners();
   }
 
-  void cancelSubscriptions() {
-    for (final sub in _subscriptions.values) {
-      sub.cancel();
-    }
-    _subscriptions.clear();
+  /// Re-fetch all measurements for the current pet IDs (pull-to-refresh).
+  Future<void> refresh() async {
+    if (_currentPetIds.isEmpty) return;
+    await fetchForPets(_currentPetIds);
+  }
+
+  void clearData() {
+    _measurements.clear();
+    _currentPetIds = [];
+    notifyListeners();
   }
 
   int get totalCount =>

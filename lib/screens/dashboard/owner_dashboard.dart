@@ -155,8 +155,11 @@ class OwnerDashboard extends StatelessWidget {
     }).toList();
 
     final content = SafeArea(
-      child: SingleChildScrollView(
-        child: Center(
+      child: RefreshIndicator(
+        onRefresh: () => petStore.refresh(),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Center(
           child: ConstrainedBox(
             constraints:
                 BoxConstraints(maxWidth: responsiveMaxWidth(context)),
@@ -220,6 +223,7 @@ class OwnerDashboard extends StatelessWidget {
             ),
           ),
         ),
+      ),
       ),
     );
 

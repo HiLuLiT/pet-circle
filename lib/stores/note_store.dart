@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/clinical_note.dart';
@@ -8,7 +7,7 @@ final noteStore = NoteStore();
 
 class NoteStore extends ChangeNotifier {
   Map<String, List<ClinicalNote>> _notes = {};
-  final Map<String, StreamSubscription<List<ClinicalNote>>> _subscriptions = {};
+  List<String> _currentPetIds = [];
   final Set<String> _pendingWritePetIds = {};
 
   void seed(Map<String, List<ClinicalNote>> initial) {
@@ -43,30 +42,37 @@ class NoteStore extends ChangeNotifier {
     }
   }
 
-  void subscribeForPets(List<String> petIds) {
-    final currentIds = _subscriptions.keys.toSet();
+  /// Fetch notes for the given pet IDs from Firestore.
+  Future<void> fetchForPets(List<String> petIds) async {
     final newIds = petIds.toSet();
+    _notes.removeWhere((id, _) => !newIds.contains(id));
+    _currentPetIds = List.of(petIds);
 
-    for (final id in currentIds.difference(newIds)) {
-      _subscriptions[id]?.cancel();
-      _subscriptions.remove(id);
-      _notes.remove(id);
+    final futures = <Future<void>>[];
+    for (final id in petIds) {
+      if (_pendingWritePetIds.contains(id)) continue;
+      futures.add(
+        NoteService.fetch(id).then((list) {
+          _notes[id] = list;
+        }).catchError((Object e) {
+          debugPrint('[NoteStore] Failed to fetch for pet $id: $e');
+        }),
+      );
     }
-
-    for (final id in newIds.difference(currentIds)) {
-      _subscriptions[id] = NoteService.stream(id).listen((list) {
-        if (_pendingWritePetIds.contains(id)) return;
-        _notes[id] = list;
-        notifyListeners();
-      });
-    }
+    await Future.wait(futures);
+    notifyListeners();
   }
 
-  void cancelSubscriptions() {
-    for (final sub in _subscriptions.values) {
-      sub.cancel();
-    }
-    _subscriptions.clear();
+  /// Re-fetch all notes for the current pet IDs (pull-to-refresh).
+  Future<void> refresh() async {
+    if (_currentPetIds.isEmpty) return;
+    await fetchForPets(_currentPetIds);
+  }
+
+  void clearData() {
+    _notes.clear();
+    _currentPetIds = [];
+    notifyListeners();
   }
 
   int countForPet(String petId) {

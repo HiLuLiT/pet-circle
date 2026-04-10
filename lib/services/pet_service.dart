@@ -31,8 +31,17 @@ class PetService {
     return Pet.fromFirestore(doc);
   }
 
+  /// Fetch all pets where the given user is in the care circle (one-time read).
+  static Future<List<Pet>> fetchPetsForUser(String uid) async {
+    final snapshot = await _petsCollection
+        .where('memberUids', arrayContains: uid)
+        .get();
+    return snapshot.docs.map((doc) => Pet.fromFirestore(doc)).toList();
+  }
+
   /// Stream all pets where the given user is in the care circle.
   /// Uses the `memberUids` array field for efficient querying.
+  @Deprecated('Use fetchPetsForUser instead')
   static Stream<List<Pet>> streamPetsForUser(String uid) {
     return _petsCollection
         .where('memberUids', arrayContains: uid)

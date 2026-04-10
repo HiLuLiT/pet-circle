@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_notification.dart';
@@ -9,7 +8,7 @@ final notificationStore = NotificationStore();
 
 class NotificationStore extends ChangeNotifier {
   List<AppNotification> _notifications = [];
-  StreamSubscription<List<AppNotification>>? _subscription;
+  String? _subscribedUid;
 
   void seed(List<AppNotification> initial) {
     _notifications = List.of(initial);
@@ -18,20 +17,26 @@ class NotificationStore extends ChangeNotifier {
 
   void reset() {
     _notifications = [];
+    _subscribedUid = null;
     notifyListeners();
   }
 
-  void subscribeForUser(String uid) {
-    _subscription?.cancel();
-    _subscription = NotificationService.streamNotifications(uid).listen((items) {
-      _notifications = items;
-      notifyListeners();
-    });
+  /// Fetch notifications for a user from Firestore (one-time read).
+  Future<void> fetchForUser(String uid) async {
+    _subscribedUid = uid;
+    _notifications = await NotificationService.fetchNotifications(uid);
+    notifyListeners();
   }
 
-  void cancelSubscription() {
-    _subscription?.cancel();
-    _subscription = null;
+  /// Re-fetch notifications (pull-to-refresh).
+  Future<void> refresh() async {
+    if (_subscribedUid == null) return;
+    await fetchForUser(_subscribedUid!);
+  }
+
+  void clearData() {
+    _subscribedUid = null;
+    _notifications = [];
   }
 
   List<AppNotification> get all => List.unmodifiable(_notifications);

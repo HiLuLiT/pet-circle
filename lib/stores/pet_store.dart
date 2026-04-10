@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/care_circle_member.dart';
@@ -17,7 +16,6 @@ class PetStore extends ChangeNotifier {
   List<Pet> _ownerPets = [];
   List<Pet> _clinicPets = [];
   int _activePetIndex = 0;
-  StreamSubscription<List<Pet>>? _petsSubscription;
   String? _subscribedUid;
   bool _isLoading = false;
   final Set<String> _pendingDeletes = {};
@@ -56,25 +54,23 @@ class PetStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Subscribe to Firestore streams for a given user.
-  /// Pets where the user is in the careCircle appear in ownerPets.
-  void subscribeForUser(String uid) {
-    _petsSubscription?.cancel();
+  /// Fetch pets for a given user from Firestore (one-time read).
+  /// Then fetches child store data (measurements, notes, medications) in parallel.
+  Future<void> fetchForUser(String uid) async {
     _subscribedUid = uid;
     _isLoading = true;
     notifyListeners();
-    _petsSubscription = PetService.streamPetsForUser(uid).listen((pets) {
-      for (final pet in pets) {
-        debugPrint('[PetStore] Stream: pet="${pet.name}" careCircle=${pet.careCircle.map((m) => '{uid=${m.uid}, name=${m.name}, role=${m.role}}').toList()}');
-      }
-      // Filter out pets that are pending deletion to avoid race conditions
-      // where the stream re-emits before Firestore processes the delete.
+
+    try {
+      final pets = await PetService.fetchPetsForUser(uid);
+
+      // Filter out pets that are pending deletion to avoid race conditions.
       final filtered = _pendingDeletes.isEmpty
           ? pets
           : pets.where((p) => p.id == null || !_pendingDeletes.contains(p.id)).toList();
       final previousActivePetId = activePet?.id;
-      _ownerPets = filtered;
-      _clinicPets = filtered;
+      _ownerPets = List.of(filtered);
+      _clinicPets = List.of(filtered);
       if (previousActivePetId != null) {
         final newIndex =
             _ownerPets.indexWhere((pet) => pet.id == previousActivePetId);
@@ -82,26 +78,39 @@ class PetStore extends ChangeNotifier {
       } else {
         _activePetIndex = activePetIndex;
       }
+
       final petIds = _ownerPets
           .map((pet) => pet.id)
           .whereType<String>()
           .where((id) => id.isNotEmpty)
           .toList();
-      measurementStore.subscribeForPets(petIds);
-      noteStore.subscribeForPets(petIds);
-      medicationStore.subscribeForPets(petIds);
+
+      // Fetch child store data in parallel
+      await Future.wait([
+        measurementStore.fetchForPets(petIds),
+        noteStore.fetchForPets(petIds),
+        medicationStore.fetchForPets(petIds),
+      ]);
+    } finally {
       _isLoading = false;
       notifyListeners();
-    });
+    }
   }
 
-  void cancelSubscription() {
-    _petsSubscription?.cancel();
-    _petsSubscription = null;
+  /// Re-fetch all data for the current user (pull-to-refresh).
+  Future<void> refresh() async {
+    if (_subscribedUid == null) return;
+    await fetchForUser(_subscribedUid!);
+  }
+
+  void clearData() {
     _subscribedUid = null;
-    measurementStore.cancelSubscriptions();
-    noteStore.cancelSubscriptions();
-    medicationStore.cancelSubscriptions();
+    _ownerPets = [];
+    _clinicPets = [];
+    measurementStore.clearData();
+    noteStore.clearData();
+    medicationStore.clearData();
+    notifyListeners();
   }
 
   Pet? getPetByName(String name) {
@@ -311,21 +320,22 @@ class PetStore extends ChangeNotifier {
     return accessForPet(pet).role;
   }
 
-  /// Remove a care circle member. When Firebase is enabled, the Firestore
-  /// stream handles the UI update — no optimistic local removal is needed
-  /// (which would be overwritten by the stream's stale data, causing flicker).
+  /// Remove a care circle member. Updates local state immediately (optimistic),
+  /// then persists to Firestore. Rolls back on error.
   Future<void> removeCareCircleMemberByUid(String petName, String? uid, String memberName) async {
     final pet = getPetByName(petName);
-    debugPrint('[PetStore] removeCareCircleMemberByUid: petName="$petName", uid="$uid", memberName="$memberName", petId="${pet?.id}", kEnableFirebase=$kEnableFirebase');
-    debugPrint('[PetStore] Current careCircle: ${pet?.careCircle.map((m) => 'uid=${m.uid}, name=${m.name}, role=${m.role}').toList()}');
+
+    // Always update local state first for immediate UI feedback
+    _removeCareCircleMemberLocal(petName, memberName);
 
     if (kEnableFirebase && pet?.id != null && uid != null) {
-      debugPrint('[PetStore] Calling PetService.removeCareCircleMember(${pet!.id!}, $uid)');
-      await PetService.removeCareCircleMember(pet.id!, uid);
-      debugPrint('[PetStore] Firestore removal completed — waiting for stream update');
-    } else {
-      debugPrint('[PetStore] Local-only removal (mock mode or missing uid)');
-      _removeCareCircleMemberLocal(petName, memberName);
+      try {
+        await PetService.removeCareCircleMember(pet!.id!, uid);
+      } catch (e) {
+        // Rollback: re-fetch to restore the member in the local state
+        await refresh();
+        rethrow;
+      }
     }
   }
 

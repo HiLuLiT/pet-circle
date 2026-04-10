@@ -26,7 +26,6 @@ class AuthProvider extends ChangeNotifier {
   bool _isCreatingUser = false;
   String? _subscribedUid;
   StreamSubscription<User?>? _authSubscription;
-  StreamSubscription<AppUser?>? _userSubscription;
 
   User? get firebaseUser => _firebaseUser;
   AppUser? get appUser => _appUser;
@@ -55,17 +54,14 @@ class AuthProvider extends ChangeNotifier {
   Future<void> _onAuthStateChanged(User? user) async {
     _firebaseUser = user;
 
-    await _userSubscription?.cancel();
-    _userSubscription = null;
-
     if (user == null) {
       _appUser = null;
       _isLoading = false;
       _isCreatingUser = false;
       _subscribedUid = null;
       userStore.reset();
-      petStore.cancelSubscription();
-      notificationStore.cancelSubscription();
+      petStore.clearData();
+      notificationStore.clearData();
       notificationStore.reset();
       settingsStore.reset();
       notifyListeners();
@@ -76,46 +72,51 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    _userSubscription = userRepository.streamUser(user.uid).listen((appUser) async {
-      if (appUser == null && !_isCreatingUser) {
-        _isCreatingUser = true;
+    var appUser = await userRepository.getUser(user.uid);
+
+    if (appUser == null && !_isCreatingUser) {
+      _isCreatingUser = true;
+      notifyListeners();
+      try {
+        final displayName = user.displayName ?? '';
+        final photoUrl = user.photoURL ??
+            _uiAvatarsFallback(displayName, user.email ?? '');
+        await userRepository.createUser(
+          uid: user.uid,
+          email: user.email ?? '',
+          role: AppUserRole.owner,
+          displayName: displayName,
+          photoUrl: photoUrl,
+        );
+        // Re-fetch the newly created user doc.
+        appUser = await userRepository.getUser(user.uid);
+      } catch (_) {
+        _isCreatingUser = false;
+        _isLoading = false;
         notifyListeners();
-        try {
-          final displayName = user.displayName ?? '';
-          final photoUrl = user.photoURL ??
-              _uiAvatarsFallback(displayName, user.email ?? '');
-          await userRepository.createUser(
-            uid: user.uid,
-            email: user.email ?? '',
-            role: AppUserRole.owner,
-            displayName: displayName,
-            photoUrl: photoUrl,
-          );
-        } catch (_) {
-          _isCreatingUser = false;
-          _isLoading = false;
-          notifyListeners();
-        }
-        // The stream will fire again with the new doc.
         return;
       }
+    }
 
-      _appUser = appUser;
-      _isCreatingUser = false;
-      if (appUser != null) {
-        userStore.seedFromAppUser(appUser);
-        settingsStore.seedFromAppUser(appUser);
-        if (_subscribedUid != appUser.uid) {
-          _subscribedUid = appUser.uid;
-          petStore.subscribeForUser(appUser.uid);
-          notificationStore.subscribeForUser(appUser.uid);
+    _appUser = appUser;
+    _isCreatingUser = false;
+    if (appUser != null) {
+      userStore.seedFromAppUser(appUser);
+      settingsStore.seedFromAppUser(appUser);
+      if (_subscribedUid != appUser.uid) {
+        _subscribedUid = appUser.uid;
+        try {
+          await petStore.fetchForUser(appUser.uid);
+          await notificationStore.fetchForUser(appUser.uid);
+        } catch (e) {
+          debugPrint('[AuthProvider] Failed to fetch data: $e');
         }
-      } else {
-        settingsStore.reset();
       }
-      _isLoading = false;
-      notifyListeners();
-    });
+    } else {
+      settingsStore.reset();
+    }
+    _isLoading = false;
+    notifyListeners();
   }
 
   /// Generates a UI Avatars fallback URL from name or email.
@@ -144,7 +145,6 @@ class AuthProvider extends ChangeNotifier {
   @override
   void dispose() {
     _authSubscription?.cancel();
-    _userSubscription?.cancel();
     super.dispose();
   }
 }

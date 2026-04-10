@@ -385,9 +385,9 @@ void main() {
     });
   });
 
-  group('MeasurementStore cancelSubscriptions', () {
-    test('cancelSubscriptions completes without throwing when no subscriptions', () {
-      expect(() => store.cancelSubscriptions(), returnsNormally);
+  group('MeasurementStore clearData', () {
+    test('clearData completes without throwing when empty', () {
+      expect(() => store.clearData(), returnsNormally);
     });
   });
 
