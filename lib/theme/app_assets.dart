@@ -3,6 +3,7 @@ class AppAssets {
   static const welcomeGraphic = 'assets/figma/welcome.svg';
   static const welcomeCat = 'assets/figma/welcome_cat.svg';
   static const welcomeDog = 'assets/figma/welcome_dog.svg';
+  static const welcomeCombined = 'assets/figma/welcome_combined.svg';
   static const googleLogo = 'assets/figma/google_logo.png';
   static const appLogo = 'assets/figma/app_logo.svg';
   static const petPlaceholder = 'assets/figma/pet_placeholder.png';

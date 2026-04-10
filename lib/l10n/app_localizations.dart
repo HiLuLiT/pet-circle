@@ -1535,8 +1535,14 @@ abstract class AppLocalizations {
   /// No description provided for @getStarted.
   ///
   /// In en, this message translates to:
-  /// **'Get Started'**
+  /// **'Get started'**
   String get getStarted;
+
+  /// No description provided for @chooseSignUpMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Create an account or continue with Google.'**
+  String get chooseSignUpMethod;
 
   /// No description provided for @noPetsYet.
   ///
@@ -2179,6 +2185,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Check your email'**
   String get enterVerificationCode;
+
+  /// No description provided for @enterTheCodeSentToLead.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the code sent to '**
+  String get enterTheCodeSentToLead;
 
   /// No description provided for @weSentCodeTo.
   ///

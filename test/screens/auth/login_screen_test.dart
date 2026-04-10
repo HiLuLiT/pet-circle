@@ -128,13 +128,13 @@ void main() {
       expect(find.text('OR'), findsOneWidget);
     });
 
-    testWidgets('shows bolt icon in logo', (tester) async {
+    testWidgets('shows person icon in logo', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const LoginScreen()));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.bolt), findsOneWidget);
+      expect(find.byIcon(Icons.person_outline), findsOneWidget);
     });
 
     testWidgets('shows email hint text', (tester) async {

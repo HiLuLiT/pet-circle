@@ -767,7 +767,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterEmailAddress => 'Enter email address';
 
   @override
-  String get getStarted => 'Get Started';
+  String get getStarted => 'Get started';
+
+  @override
+  String get chooseSignUpMethod => 'Create an account or continue with Google.';
 
   @override
   String get noPetsYet => 'No pets yet';
@@ -1140,6 +1143,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get enterVerificationCode => 'Check your email';
+
+  @override
+  String get enterTheCodeSentToLead => 'Enter the code sent to ';
 
   @override
   String weSentCodeTo(String email) {

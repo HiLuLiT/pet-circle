@@ -2,16 +2,13 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/services/otp_service.dart';
-import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
-import 'package:pet_circle/widgets/primary_button.dart';
 
 class VerifyOtpScreen extends StatefulWidget {
   const VerifyOtpScreen({
@@ -129,13 +126,11 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         return;
       }
       if (!mounted) return;
-      // Navigate to auth gate which handles post-auth routing
       context.go(AppRoutes.authGate);
     } else {
       setState(() {
         _isVerifying = false;
         _error = result.error ?? AppLocalizations.of(context)!.verificationFailed;
-        // Clear the code fields on error
         for (final c in _controllers) {
           c.clear();
         }
@@ -183,9 +178,10 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     final c = AppSemanticColors.of(context);
 
     return Scaffold(
-      backgroundColor: c.primaryLightest,
+      backgroundColor: c.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: c.textPrimary),
@@ -200,198 +196,214 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacingTokens.lg),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.xl),
           child: Center(
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
+              constraints: const BoxConstraints(maxWidth: 393),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 20),
-
-                  // Logo
-                  Center(
+                  const SizedBox(height: AppSpacingTokens.md),
+                  Align(
                     child: Container(
-                      padding: const EdgeInsets.all(AppSpacingTokens.sm),
+                      width: 64,
+                      height: 64,
                       decoration: BoxDecoration(
-                        color: c.primaryLight,
+                        color: c.primaryLightest,
                         shape: BoxShape.circle,
                       ),
-                      child: SvgPicture.asset(
-                        AppAssets.appLogo,
-                        width: 60,
-                        height: 60,
-                      ),
+                      child: Icon(Icons.mail_outline, size: 36, color: c.primary),
                     ),
                   ),
-                  const SizedBox(height: AppSpacingTokens.xl),
-
-                  // Lock icon
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: c.background,
-                        borderRadius: AppRadiiTokens.borderRadiusLg,
-                      ),
-                      child: Icon(
-                        Icons.lock_outline,
-                        size: 64,
-                        color: c.textPrimary,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacingTokens.xl),
-
-                  // Title
+                  const SizedBox(height: AppSpacingTokens.lg),
                   Text(
                     l10n.enterVerificationCode,
-                    style: AppSemanticTextStyles.title2
-                        .copyWith(color: c.textPrimary),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.md),
-
-                  // Subtitle
-                  Text(
-                    l10n.weSentCodeTo(widget.email),
-                    style: AppSemanticTextStyles.body
-                        .copyWith(color: c.textSecondary),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.xs),
-                  Text(
-                    widget.email,
-                    style: AppSemanticTextStyles.body.copyWith(
+                    style: AppSemanticTextStyles.title3.copyWith(
                       color: c.textPrimary,
-                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: AppSpacingTokens.sm),
+                  Text.rich(
+                    TextSpan(
+                      style: AppSemanticTextStyles.body.copyWith(
+                        color: c.textPrimary,
+                      ),
+                      children: [
+                        TextSpan(text: l10n.enterTheCodeSentToLead),
+                        TextSpan(
+                          text: widget.email,
+                          style: AppSemanticTextStyles.body.copyWith(
+                            color: c.textPrimary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacingTokens.xl),
-
-                  // Error message
-                  if (_error != null)
-                    Container(
-                      margin:
-                          const EdgeInsets.only(bottom: AppSpacingTokens.md),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: c.error.withValues(alpha: 0.1),
-                        borderRadius: AppRadiiTokens.borderRadiusSm,
-                        border:
-                            Border.all(color: c.error.withValues(alpha: 0.3)),
+                  if (_error != null) ...[
+                    Text(
+                      _error!,
+                      style: AppSemanticTextStyles.caption.copyWith(
+                        color: c.error,
                       ),
-                      child: Text(
-                        _error!,
-                        style:
-                            AppSemanticTextStyles.body.copyWith(color: c.error),
-                        textAlign: TextAlign.center,
-                      ),
+                      textAlign: TextAlign.center,
                     ),
-
-                  // OTP input fields
+                    const SizedBox(height: AppSpacingTokens.md),
+                  ],
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(6, (index) {
-                      return Container(
-                        width: 48,
-                        height: 56,
-                        margin: EdgeInsets.only(
-                          right: index < 5 ? AppSpacingTokens.sm : 0,
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          right: index < 5 ? AppSpacingTokens.sm + 4 : 0,
                         ),
-                        child: KeyboardListener(
-                          focusNode: _rawFocusNodes[index],
-                          onKeyEvent: (event) => _onKeyPressed(index, event),
-                          child: TextFormField(
-                            controller: _controllers[index],
-                            focusNode: _focusNodes[index],
-                            keyboardType: TextInputType.number,
-                            textAlign: TextAlign.center,
-                            textAlignVertical: TextAlignVertical.center,
-                            maxLength: 1,
-                            style: AppSemanticTextStyles.title3.copyWith(
-                              color: c.textPrimary,
-                              fontWeight: FontWeight.w700,
-                            ),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            decoration: InputDecoration(
-                              counterText: '',
-                              filled: true,
-                              fillColor: c.background,
-                              contentPadding: EdgeInsets.zero,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
+                        child: SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: KeyboardListener(
+                            focusNode: _rawFocusNodes[index],
+                            onKeyEvent: (event) => _onKeyPressed(index, event),
+                            child: TextFormField(
+                              controller: _controllers[index],
+                              focusNode: _focusNodes[index],
+                              keyboardType: TextInputType.number,
+                              textAlign: TextAlign.center,
+                              textAlignVertical: TextAlignVertical.center,
+                              maxLength: 1,
+                              style: AppSemanticTextStyles.body.copyWith(
+                                color: c.textPrimary,
+                                fontWeight: FontWeight.w600,
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    BorderSide(color: c.primary, width: 2),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              decoration: InputDecoration(
+                                counterText: '',
+                                filled: true,
+                                fillColor: c.surface,
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadiiTokens.sm,
+                                  ),
+                                  borderSide: BorderSide(color: c.divider),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadiiTokens.sm,
+                                  ),
+                                  borderSide: BorderSide(color: c.divider),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadiiTokens.sm,
+                                  ),
+                                  borderSide: BorderSide(
+                                    color: c.primary,
+                                    width: 2,
+                                  ),
+                                ),
                               ),
+                              onChanged: (value) =>
+                                  _onDigitChanged(index, value),
                             ),
-                            onChanged: (value) =>
-                                _onDigitChanged(index, value),
                           ),
                         ),
                       );
                     }),
                   ),
-                  const SizedBox(height: AppSpacingTokens.xl),
-
-                  // Verify button
+                  const SizedBox(height: AppSpacingTokens.lg),
                   if (_isVerifying)
                     Center(
-                      child: CircularProgressIndicator(color: c.primary),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: AppSpacingTokens.sm,
+                        ),
+                        child: CircularProgressIndicator(color: c.primary),
+                      ),
                     )
                   else
-                    PrimaryButton(
-                      label: l10n.verifyCode,
-                      onPressed:
-                          _otpCode.length == 6 ? _verifyOtp : null,
-                      backgroundColor: c.primary,
-                    ),
-
-                  const SizedBox(height: AppSpacingTokens.lg),
-
-                  // Resend code
-                  if (_isResending)
-                    Center(
-                      child: CircularProgressIndicator(color: c.primary),
-                    )
-                  else
-                    Center(
-                      child: TextButton(
-                        onPressed: _canResend ? _resendCode : null,
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed:
+                            _otpCode.length == 6 ? _verifyOtp : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: c.primary,
+                          foregroundColor: c.onPrimary,
+                          disabledBackgroundColor: c.disabled,
+                          disabledForegroundColor: c.textDisabled,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                              AppRadiiTokens.xl,
+                            ),
+                          ),
+                        ),
                         child: Text(
-                          _canResend
-                              ? l10n.resendCode
-                              : l10n.resendCodeInSeconds(_resendCooldown),
-                          style: AppSemanticTextStyles.body.copyWith(
-                            color: _canResend ? c.primary : c.textTertiary,
+                          l10n.verifyCode,
+                          style: AppSemanticTextStyles.button.copyWith(
+                            color: c.onPrimary,
                           ),
                         ),
                       ),
                     ),
-
                   const SizedBox(height: AppSpacingTokens.md),
-
-                  // Use different email
+                  if (_isResending)
+                    Center(
+                      child: CircularProgressIndicator(color: c.primary),
+                    )
+                  else if (_canResend)
+                    Center(
+                      child: TextButton(
+                        onPressed: _resendCode,
+                        child: Text(
+                          l10n.resendCode,
+                          style: AppSemanticTextStyles.body.copyWith(
+                            color: c.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    )
+                  else
+                    Text(
+                      l10n.resendCodeInSeconds(_resendCooldown),
+                      style: AppSemanticTextStyles.body.copyWith(
+                        color: c.textPrimary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  SizedBox(height: MediaQuery.sizeOf(context).height * 0.08),
                   Center(
                     child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: c.primary,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacingTokens.md,
+                          vertical: AppSpacingTokens.sm,
+                        ),
+                        shape: const StadiumBorder(),
+                      ),
                       onPressed: () {
                         if (context.canPop()) {
                           context.pop();
                         } else {
-                          context.go(widget.isSignup ? AppRoutes.signup : AppRoutes.login);
+                          context.go(
+                            widget.isSignup ? AppRoutes.signup : AppRoutes.login,
+                          );
                         }
                       },
                       child: Text(
                         l10n.useDifferentEmail,
-                        style: AppSemanticTextStyles.body
-                            .copyWith(color: c.textSecondary),
+                        style: AppSemanticTextStyles.body.copyWith(
+                          color: c.primary,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ),

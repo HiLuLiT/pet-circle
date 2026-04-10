@@ -83,7 +83,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('user@domain.com'), findsOneWidget);
+      expect(find.textContaining('user@domain.com'), findsOneWidget);
     });
 
     testWidgets('shows 6 digit input fields', (tester) async {

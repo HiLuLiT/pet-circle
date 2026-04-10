@@ -11,26 +11,29 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+/// Email / social sign-up (Figma create-account). Routed at [AppRoutes.signup].
+class CreateAccountScreen extends StatefulWidget {
+  const CreateAccountScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<CreateAccountScreen> createState() => _CreateAccountScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _CreateAccountScreenState extends State<CreateAccountScreen> {
   bool _isLoading = false;
   String? _error;
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
 
   @override
   void dispose() {
+    _nameController.dispose();
     _emailController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleSendCode() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -39,30 +42,29 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     final email = _emailController.text.trim();
+    final name = _nameController.text.trim();
 
     if (!kEnableFirebase) {
       if (!mounted) return;
-      context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=false');
+      setState(() => _isLoading = false);
+      context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}');
       return;
     }
 
-    try {
-      final result = await OtpService.sendOtp(email: email);
-      if (!mounted) return;
-      if (result.success) {
-        context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=false');
-      } else {
-        setState(() {
-          _isLoading = false;
-          _error = result.error;
-        });
-      }
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _error = e.toString();
-      });
+    final result = await OtpService.sendOtp(
+      email: email,
+      name: name,
+      isSignup: true,
+    );
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (result.success) {
+      context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}');
+    } else {
+      final l10n = AppLocalizations.of(context)!;
+      setState(() => _error = result.error ?? l10n.failedToSendCode);
     }
   }
 
@@ -110,35 +112,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  InputDecoration _inputDecoration(AppSemanticColors c, {required String hintText}) {
-    return InputDecoration(
-      filled: true,
-      fillColor: c.surface,
-      hintText: hintText,
-      hintStyle: AppSemanticTextStyles.body.copyWith(color: c.textTertiary),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacingTokens.md,
-        vertical: 14,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-        borderSide: BorderSide(color: c.divider),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-        borderSide: BorderSide(color: c.primary, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-        borderSide: BorderSide(color: c.error),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-        borderSide: BorderSide(color: c.error, width: 2),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -170,14 +143,14 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: AppSpacingTokens.lg),
                   Text(
-                    l10n.login,
+                    l10n.createAccount,
                     style: AppSemanticTextStyles.title3.copyWith(
                       color: c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: AppSpacingTokens.sm),
                   Text(
-                    l10n.enterDetailsToLogin,
+                    l10n.pleaseEnterYourDetails,
                     style: AppSemanticTextStyles.body.copyWith(
                       color: c.textPrimary,
                     ),
@@ -189,6 +162,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Text(
+                          l10n.fullName,
+                          style: AppSemanticTextStyles.body.copyWith(
+                            fontWeight: FontWeight.w500,
+                            color: c.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacingTokens.sm),
+                        TextFormField(
+                          controller: _nameController,
+                          textInputAction: TextInputAction.next,
+                          decoration: _inputDecoration(
+                            c,
+                            hintText: l10n.enterYourFullName,
+                          ),
+                          style: AppSemanticTextStyles.body,
+                          validator: (value) {
+                            if (value == null || value.trim().isEmpty) {
+                              return l10n.enterYourFullName;
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: AppSpacingTokens.lg),
                         Text(
                           l10n.emailAddress,
                           style: AppSemanticTextStyles.body.copyWith(
@@ -215,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             }
                             return null;
                           },
-                          onFieldSubmitted: (_) => _handleLogin(),
+                          onFieldSubmitted: (_) => _handleSendCode(),
                         ),
                       ],
                     ),
@@ -224,9 +221,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: AppSpacingTokens.sm),
                     Text(
                       _error!,
-                      style: AppSemanticTextStyles.caption.copyWith(
-                        color: c.error,
-                      ),
+                      style: AppSemanticTextStyles.caption.copyWith(color: c.error),
                     ),
                   ],
                   const SizedBox(height: AppSpacingTokens.lg),
@@ -234,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: double.infinity,
                     height: 48,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : _handleLogin,
+                      onPressed: _isLoading ? null : _handleSendCode,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: c.primary,
                         foregroundColor: c.onPrimary,
@@ -253,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             )
                           : Text(
-                              l10n.login,
+                              l10n.sendVerificationCode,
                               style: AppSemanticTextStyles.button.copyWith(
                                 color: c.onPrimary,
                               ),
@@ -292,16 +287,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: AppSpacingTokens.xl),
                   TextButton(
-                    onPressed: _isLoading ? null : () => context.push(AppRoutes.signup),
+                    onPressed: _isLoading ? null : () => context.push(AppRoutes.login),
                     child: Text.rich(
                       TextSpan(
-                        text: '${l10n.dontHaveAccount} ',
+                        text: '${l10n.alreadyHaveAccount} ',
                         style: AppSemanticTextStyles.caption.copyWith(
                           color: c.textSecondary,
                         ),
                         children: [
                           TextSpan(
-                            text: l10n.signUp,
+                            text: l10n.signIn,
                             style: AppSemanticTextStyles.caption.copyWith(
                               color: c.info,
                               decoration: TextDecoration.underline,
@@ -316,6 +311,35 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(AppSemanticColors c, {required String hintText}) {
+    return InputDecoration(
+      filled: true,
+      fillColor: c.surface,
+      hintText: hintText,
+      hintStyle: AppSemanticTextStyles.body.copyWith(color: c.textTertiary),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacingTokens.md,
+        vertical: 14,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
+        borderSide: BorderSide(color: c.divider),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
+        borderSide: BorderSide(color: c.primary, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
+        borderSide: BorderSide(color: c.error),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
+        borderSide: BorderSide(color: c.error, width: 2),
       ),
     );
   }
