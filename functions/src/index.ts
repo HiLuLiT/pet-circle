@@ -21,6 +21,9 @@ const db = admin.firestore();
 // ── Invitation email (Firestore trigger) ────────────────────────────
 export { onInvitationCreated } from "./invitation-email";
 
+// ── Invitation push notification (Firestore trigger) ────────────────
+export { onInvitationStatusChanged } from "./invitation-notification";
+
 // ── OTP functions (callable) ────────────────────────────────────────
 
 function redactEmail(email: string): string {

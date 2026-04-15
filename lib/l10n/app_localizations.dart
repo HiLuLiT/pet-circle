@@ -2251,6 +2251,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to send code'**
   String get failedToSendCode;
+
+  /// No description provided for @pushNotificationPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay Updated'**
+  String get pushNotificationPermissionTitle;
+
+  /// No description provided for @pushNotificationPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications to receive medication reminders, measurement alerts, and care circle updates.'**
+  String get pushNotificationPermissionBody;
+
+  /// No description provided for @notificationChannelPush.
+  ///
+  /// In en, this message translates to:
+  /// **'Push Notifications'**
+  String get notificationChannelPush;
+
+  /// No description provided for @notificationChannelPushDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications from Pet Circle'**
+  String get notificationChannelPushDescription;
+
+  /// No description provided for @inviteAcceptedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{email} joined {petName}\'s care circle'**
+  String inviteAcceptedTitle(String email, String petName);
+
+  /// No description provided for @inviteAcceptedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your invitation was accepted'**
+  String get inviteAcceptedBody;
+
+  /// No description provided for @measurementReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement Reminders'**
+  String get measurementReminders;
+
+  /// No description provided for @measurementRemindersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get reminded to check your pet\'s respiratory rate'**
+  String get measurementRemindersDesc;
+
+  /// No description provided for @measurementReminderFrequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency'**
+  String get measurementReminderFrequency;
+
+  /// No description provided for @measurementReminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Time'**
+  String get measurementReminderTime;
+
+  /// No description provided for @frequencyTwoPerWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'2x / week'**
+  String get frequencyTwoPerWeek;
+
+  /// No description provided for @frequencyThreePerWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'3x / week'**
+  String get frequencyThreePerWeek;
+
+  /// No description provided for @frequencyDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get frequencyDaily;
+
+  /// No description provided for @measurementReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to Measure'**
+  String get measurementReminderTitle;
+
+  /// No description provided for @measurementReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s time to check your pet\'s respiratory rate'**
+  String get measurementReminderBody;
+
+  /// No description provided for @medicationSupply.
+  ///
+  /// In en, this message translates to:
+  /// **'Supply Tracking'**
+  String get medicationSupply;
+
+  /// No description provided for @totalSupply.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Supply'**
+  String get totalSupply;
+
+  /// No description provided for @currentSupply.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Supply'**
+  String get currentSupply;
+
+  /// No description provided for @lowSupplyThreshold.
+  ///
+  /// In en, this message translates to:
+  /// **'Low Supply Alert At'**
+  String get lowSupplyThreshold;
+
+  /// No description provided for @dosesLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'doses left'**
+  String get dosesLeft;
+
+  /// No description provided for @lowSupplyAlertTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Low Supply: {name}'**
+  String lowSupplyAlertTitle(String name);
+
+  /// No description provided for @lowSupplyAlertBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is running low — {count} doses remaining'**
+  String lowSupplyAlertBody(String name, int count);
+
+  /// No description provided for @markDoseTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose Taken'**
+  String get markDoseTaken;
+
+  /// No description provided for @doseTakenConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Dose recorded'**
+  String get doseTakenConfirmation;
+
+  /// No description provided for @medicationReminderTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Reminder Times'**
+  String get medicationReminderTimes;
+
+  /// No description provided for @morningReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morningReminder;
+
+  /// No description provided for @eveningReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get eveningReminder;
 }
 
 class _AppLocalizationsDelegate

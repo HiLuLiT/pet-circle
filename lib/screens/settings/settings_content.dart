@@ -198,6 +198,60 @@ class _SettingsContentState extends State<SettingsContent>
                         setState(() {});
                       },
                     ),
+                    const SizedBox(height: 12),
+                    SettingsToggleRow(
+                      label: l10n.measurementReminders,
+                      description: l10n.measurementRemindersDesc,
+                      isOn: settingsStore.measurementRemindersEnabled,
+                      onChanged: () async {
+                        await settingsStore.toggleMeasurementReminders();
+                        if (!mounted) return;
+                        setState(() {});
+                      },
+                    ),
+                    if (settingsStore.measurementRemindersEnabled) ...[
+                      const SizedBox(height: 12),
+                      _MeasurementReminderFrequencyRow(
+                        currentFrequency:
+                            settingsStore.measurementReminderFrequency,
+                      ),
+                      const SizedBox(height: 8),
+                      _MeasurementReminderTimeRow(
+                        hour: settingsStore.measurementReminderHour,
+                        minute: settingsStore.measurementReminderMinute,
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+                    Divider(color: c.divider, height: 1),
+                    const SizedBox(height: 12),
+                    Text(
+                      l10n.medicationReminderTimes,
+                      style: AppSemanticTextStyles.label.copyWith(
+                        color: c.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    _MedicationTimeRow(
+                      label: l10n.morningReminder,
+                      hour: settingsStore.medicationMorningHour,
+                      minute: settingsStore.medicationMorningMinute,
+                      onChanged: (h, m) async {
+                        await settingsStore.setMedicationMorningTime(h, m);
+                        if (!mounted) return;
+                        setState(() {});
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    _MedicationTimeRow(
+                      label: l10n.eveningReminder,
+                      hour: settingsStore.medicationEveningHour,
+                      minute: settingsStore.medicationEveningMinute,
+                      onChanged: (h, m) async {
+                        await settingsStore.setMedicationEveningTime(h, m);
+                        if (!mounted) return;
+                        setState(() {});
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -338,6 +392,138 @@ class _SettingsContentState extends State<SettingsContent>
           );
         },
       ),
+    );
+  }
+}
+
+// ── Measurement reminder helper widgets ──────────────────────────────
+
+class _MeasurementReminderFrequencyRow extends StatelessWidget {
+  const _MeasurementReminderFrequencyRow({required this.currentFrequency});
+
+  final int currentFrequency;
+  static const _options = [2, 3, 7];
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppSemanticColors.of(context);
+    final current = currentFrequency;
+    final labels = {
+      2: l10n.frequencyTwoPerWeek,
+      3: l10n.frequencyThreePerWeek,
+      7: l10n.frequencyDaily,
+    };
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            l10n.measurementReminderFrequency,
+            style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
+          ),
+        ),
+        SegmentedButton<int>(
+          segments: _options
+              .map((v) => ButtonSegment(value: v, label: Text(labels[v]!)))
+              .toList(),
+          selected: {current},
+          onSelectionChanged: (selected) async {
+            await settingsStore
+                .setMeasurementReminderFrequency(selected.first);
+          },
+          showSelectedIcon: false,
+          style: ButtonStyle(
+            visualDensity: VisualDensity.compact,
+            textStyle: WidgetStatePropertyAll(
+              AppSemanticTextStyles.caption,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MedicationTimeRow extends StatelessWidget {
+  const _MedicationTimeRow({
+    required this.label,
+    required this.hour,
+    required this.minute,
+    required this.onChanged,
+  });
+
+  final String label;
+  final int hour;
+  final int minute;
+  final void Function(int hour, int minute) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppSemanticColors.of(context);
+    final time = TimeOfDay(hour: hour, minute: minute);
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
+          ),
+        ),
+        TextButton(
+          onPressed: () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: time,
+            );
+            if (picked != null) {
+              onChanged(picked.hour, picked.minute);
+            }
+          },
+          child: Text(time.format(context)),
+        ),
+      ],
+    );
+  }
+}
+
+class _MeasurementReminderTimeRow extends StatelessWidget {
+  const _MeasurementReminderTimeRow({
+    required this.hour,
+    required this.minute,
+  });
+
+  final int hour;
+  final int minute;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppSemanticColors.of(context);
+    final time = TimeOfDay(hour: hour, minute: minute);
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            l10n.measurementReminderTime,
+            style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
+          ),
+        ),
+        TextButton(
+          onPressed: () async {
+            final picked = await showTimePicker(
+              context: context,
+              initialTime: time,
+            );
+            if (picked != null) {
+              await settingsStore.setMeasurementReminderTime(
+                picked.hour,
+                picked.minute,
+              );
+            }
+          },
+          child: Text(time.format(context)),
+        ),
+      ],
     );
   }
 }

@@ -333,4 +333,176 @@ void main() {
       expect(original.copyWith(isActive: false).isActive, isFalse);
     });
   });
+
+  // ── Supply tracking tests ──────────────────────────────────────────
+
+  group('Medication supply tracking', () {
+    Medication _makeWithSupply({
+      int totalSupply = 60,
+      int currentSupply = 45,
+      int lowSupplyThreshold = 7,
+    }) {
+      return Medication(
+        id: 'med-supply',
+        name: 'Pimobendan',
+        dosage: '5mg',
+        frequency: 'Once daily',
+        startDate: DateTime(2025, 1, 1),
+        totalSupply: totalSupply,
+        currentSupply: currentSupply,
+        lowSupplyThreshold: lowSupplyThreshold,
+      );
+    }
+
+    test('hasSupplyTracking is true when both total and current are set', () {
+      final med = _makeWithSupply();
+      expect(med.hasSupplyTracking, isTrue);
+    });
+
+    test('hasSupplyTracking is false when fields are null', () {
+      final med = _makeMedication();
+      expect(med.hasSupplyTracking, isFalse);
+    });
+
+    test('hasSupplyTracking is false when only totalSupply is set', () {
+      final med = Medication(
+        id: 'med-partial',
+        name: 'Test',
+        dosage: '1mg',
+        frequency: 'Daily',
+        startDate: DateTime(2025, 1, 1),
+        totalSupply: 60,
+      );
+      expect(med.hasSupplyTracking, isFalse);
+    });
+
+    test('isLowSupply is true when currentSupply <= threshold', () {
+      final med = _makeWithSupply(currentSupply: 7, lowSupplyThreshold: 7);
+      expect(med.isLowSupply, isTrue);
+    });
+
+    test('isLowSupply is true when currentSupply < threshold', () {
+      final med = _makeWithSupply(currentSupply: 3, lowSupplyThreshold: 7);
+      expect(med.isLowSupply, isTrue);
+    });
+
+    test('isLowSupply is false when currentSupply > threshold', () {
+      final med = _makeWithSupply(currentSupply: 45, lowSupplyThreshold: 7);
+      expect(med.isLowSupply, isFalse);
+    });
+
+    test('isLowSupply uses default threshold of 7 when not set', () {
+      final med = Medication(
+        id: 'med-default-thresh',
+        name: 'Test',
+        dosage: '1mg',
+        frequency: 'Daily',
+        startDate: DateTime(2025, 1, 1),
+        totalSupply: 60,
+        currentSupply: 7,
+      );
+      expect(med.isLowSupply, isTrue);
+    });
+
+    test('isLowSupply is false when supply tracking disabled', () {
+      final med = _makeMedication();
+      expect(med.isLowSupply, isFalse);
+    });
+
+    test('copyWith updates supply fields', () {
+      final med = _makeWithSupply();
+      final updated = med.copyWith(currentSupply: 10);
+
+      expect(updated.currentSupply, 10);
+      expect(updated.totalSupply, 60); // preserved
+      expect(updated.lowSupplyThreshold, 7); // preserved
+    });
+
+    test('copyWith clearTotalSupply removes totalSupply', () {
+      final med = _makeWithSupply();
+      final cleared = med.copyWith(clearTotalSupply: true);
+
+      expect(cleared.totalSupply, isNull);
+      expect(cleared.hasSupplyTracking, isFalse);
+    });
+
+    test('copyWith clearCurrentSupply removes currentSupply', () {
+      final med = _makeWithSupply();
+      final cleared = med.copyWith(clearCurrentSupply: true);
+
+      expect(cleared.currentSupply, isNull);
+      expect(cleared.hasSupplyTracking, isFalse);
+    });
+
+    test('copyWith clearLowSupplyThreshold removes threshold', () {
+      final med = _makeWithSupply();
+      final cleared = med.copyWith(clearLowSupplyThreshold: true);
+
+      expect(cleared.lowSupplyThreshold, isNull);
+    });
+
+    test('toFirestore includes supply fields when set', () {
+      final med = _makeWithSupply();
+      final map = med.toFirestore();
+
+      expect(map['totalSupply'], 60);
+      expect(map['currentSupply'], 45);
+      expect(map['lowSupplyThreshold'], 7);
+    });
+
+    test('toFirestore omits supply fields when null', () {
+      final med = _makeMedication();
+      final map = med.toFirestore();
+
+      expect(map.containsKey('totalSupply'), isFalse);
+      expect(map.containsKey('currentSupply'), isFalse);
+      expect(map.containsKey('lowSupplyThreshold'), isFalse);
+    });
+
+    test('fromFirestore reads supply fields', () {
+      final doc = FakeDocumentSnapshot('med-supply', {
+        'name': 'Pimobendan',
+        'dosage': '5mg',
+        'frequency': 'Once daily',
+        'startDate': Timestamp.fromDate(DateTime(2025, 1, 1)),
+        'totalSupply': 60,
+        'currentSupply': 45,
+        'lowSupplyThreshold': 7,
+      });
+
+      final med = Medication.fromFirestore(doc);
+
+      expect(med.totalSupply, 60);
+      expect(med.currentSupply, 45);
+      expect(med.lowSupplyThreshold, 7);
+      expect(med.hasSupplyTracking, isTrue);
+    });
+
+    test('fromFirestore handles missing supply fields', () {
+      final doc = FakeDocumentSnapshot('med-no-supply', {
+        'name': 'Basic',
+        'dosage': '1mg',
+        'frequency': 'Daily',
+        'startDate': Timestamp.fromDate(DateTime(2025, 1, 1)),
+      });
+
+      final med = Medication.fromFirestore(doc);
+
+      expect(med.totalSupply, isNull);
+      expect(med.currentSupply, isNull);
+      expect(med.lowSupplyThreshold, isNull);
+      expect(med.hasSupplyTracking, isFalse);
+    });
+
+    test('supply fields roundtrip through toFirestore/fromFirestore', () {
+      final original = _makeWithSupply();
+      final map = original.toFirestore();
+      final doc = FakeDocumentSnapshot('med-supply', map);
+      final restored = Medication.fromFirestore(doc);
+
+      expect(restored.totalSupply, original.totalSupply);
+      expect(restored.currentSupply, original.currentSupply);
+      expect(restored.lowSupplyThreshold, original.lowSupplyThreshold);
+    });
+  });
 }

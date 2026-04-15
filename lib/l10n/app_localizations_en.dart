@@ -1180,4 +1180,95 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToSendCode => 'Failed to send code';
+
+  @override
+  String get pushNotificationPermissionTitle => 'Stay Updated';
+
+  @override
+  String get pushNotificationPermissionBody =>
+      'Enable notifications to receive medication reminders, measurement alerts, and care circle updates.';
+
+  @override
+  String get notificationChannelPush => 'Push Notifications';
+
+  @override
+  String get notificationChannelPushDescription =>
+      'Notifications from Pet Circle';
+
+  @override
+  String inviteAcceptedTitle(String email, String petName) {
+    return '$email joined $petName\'s care circle';
+  }
+
+  @override
+  String get inviteAcceptedBody => 'Your invitation was accepted';
+
+  @override
+  String get measurementReminders => 'Measurement Reminders';
+
+  @override
+  String get measurementRemindersDesc =>
+      'Get reminded to check your pet\'s respiratory rate';
+
+  @override
+  String get measurementReminderFrequency => 'Frequency';
+
+  @override
+  String get measurementReminderTime => 'Reminder Time';
+
+  @override
+  String get frequencyTwoPerWeek => '2x / week';
+
+  @override
+  String get frequencyThreePerWeek => '3x / week';
+
+  @override
+  String get frequencyDaily => 'Daily';
+
+  @override
+  String get measurementReminderTitle => 'Time to Measure';
+
+  @override
+  String get measurementReminderBody =>
+      'It\'s time to check your pet\'s respiratory rate';
+
+  @override
+  String get medicationSupply => 'Supply Tracking';
+
+  @override
+  String get totalSupply => 'Total Supply';
+
+  @override
+  String get currentSupply => 'Current Supply';
+
+  @override
+  String get lowSupplyThreshold => 'Low Supply Alert At';
+
+  @override
+  String get dosesLeft => 'doses left';
+
+  @override
+  String lowSupplyAlertTitle(String name) {
+    return 'Low Supply: $name';
+  }
+
+  @override
+  String lowSupplyAlertBody(String name, int count) {
+    return '$name is running low — $count doses remaining';
+  }
+
+  @override
+  String get markDoseTaken => 'Dose Taken';
+
+  @override
+  String get doseTakenConfirmation => 'Dose recorded';
+
+  @override
+  String get medicationReminderTimes => 'Medication Reminder Times';
+
+  @override
+  String get morningReminder => 'Morning';
+
+  @override
+  String get eveningReminder => 'Evening';
 }
