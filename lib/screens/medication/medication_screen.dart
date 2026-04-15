@@ -360,10 +360,26 @@ class _ActiveMedicationsList extends StatelessWidget {
                               color: c.textPrimary),
                         ),
                       ),
+                      if (med.hasSupplyTracking) ...[
+                        const SizedBox(height: AppSpacingTokens.xs),
+                        Text(
+                          '${med.currentSupply}/${med.totalSupply} ${l10n.dosesLeft}',
+                          style: AppSemanticTextStyles.caption.copyWith(
+                            color: med.isLowSupply ? c.error : c.textPrimary,
+                            fontWeight: med.isLowSupply
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: AppSpacingTokens.xs),
                       Text(dateStr,
                           style: AppSemanticTextStyles.caption
                               .copyWith(color: c.textPrimary)),
+                      if (med.isActive && med.hasSupplyTracking) ...[
+                        const SizedBox(height: AppSpacingTokens.xs),
+                        _MarkDoseButton(petId: petId, medication: med),
+                      ],
                     ],
                   ),
                 ],
@@ -372,6 +388,63 @@ class _ActiveMedicationsList extends StatelessWidget {
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+class _MarkDoseButton extends StatelessWidget {
+  const _MarkDoseButton({required this.petId, required this.medication});
+
+  final String petId;
+  final Medication medication;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppSemanticColors.of(context);
+    return SizedBox(
+      height: 28,
+      child: TextButton(
+        onPressed: () async {
+          final updated =
+              await medicationStore.markDoseTaken(petId, medication.id);
+          if (!context.mounted) return;
+          if (updated != null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(l10n.doseTakenConfirmation)),
+            );
+            if (updated.isLowSupply) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    l10n.lowSupplyAlertBody(
+                      medication.name,
+                      updated.currentSupply ?? 0,
+                    ),
+                  ),
+                  backgroundColor: c.error,
+                ),
+              );
+            }
+          }
+        },
+        style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          backgroundColor: c.primary.withValues(alpha: 0.1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadiiTokens.full),
+          ),
+        ),
+        child: Text(
+          l10n.markDoseTaken,
+          style: AppSemanticTextStyles.caption.copyWith(
+            color: c.primary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
     );
   }
 }

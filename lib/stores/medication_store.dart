@@ -134,6 +134,55 @@ class MedicationStore extends ChangeNotifier {
     }
   }
 
+  /// Decrement the current supply count by one dose.
+  /// Returns the updated medication, or null if supply tracking is not active.
+  Future<Medication?> markDoseTaken(String petId, String medicationId) async {
+    final list = _medications[petId];
+    if (list == null) return null;
+    final idx = list.indexWhere((m) => m.id == medicationId);
+    if (idx == -1) return null;
+    final med = list[idx];
+    if (!med.hasSupplyTracking || med.currentSupply == null) return null;
+
+    final newSupply = (med.currentSupply! - 1).clamp(0, med.totalSupply!);
+    final updated = med.copyWith(currentSupply: newSupply);
+    list[idx] = updated;
+    _pendingWritePetIds.add(petId);
+    notifyListeners();
+
+    if (kEnableFirebase) {
+      try {
+        await MedicationService.update(
+          petId,
+          medicationId,
+          {'currentSupply': newSupply},
+        );
+      } catch (e) {
+        list[idx] = med;
+        notifyListeners();
+        rethrow;
+      } finally {
+        _pendingWritePetIds.remove(petId);
+      }
+    } else {
+      _pendingWritePetIds.remove(petId);
+    }
+    return updated;
+  }
+
+  /// Return all active medications with low supply across all pets.
+  List<Medication> getLowSupplyMedications() {
+    final result = <Medication>[];
+    for (final meds in _medications.values) {
+      for (final med in meds) {
+        if (med.isActive && med.isLowSupply) {
+          result.add(med);
+        }
+      }
+    }
+    return List.unmodifiable(result);
+  }
+
   /// Fetch medications for the given pet IDs from Firestore.
   Future<void> fetchForPets(List<String> petIds) async {
     final newIds = petIds.toSet();

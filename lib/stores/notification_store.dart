@@ -56,6 +56,13 @@ class NotificationStore extends ChangeNotifier {
     }
   }
 
+  /// Add a notification to the in-memory list only (no Firestore write).
+  /// Used for FCM foreground messages where the server already persisted it.
+  void addLocal(AppNotification notification) {
+    _notifications.insert(0, notification);
+    notifyListeners();
+  }
+
   Future<void> markRead(String id) async {
     final idx = _notifications.indexWhere((n) => n.id == id);
     if (idx != -1 && !_notifications[idx].isRead) {

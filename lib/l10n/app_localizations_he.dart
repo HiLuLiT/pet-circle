@@ -1172,4 +1172,94 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get failedToSendCode => 'שליחת הקוד נכשלה';
+
+  @override
+  String get pushNotificationPermissionTitle => 'הישאר מעודכן';
+
+  @override
+  String get pushNotificationPermissionBody =>
+      'הפעל התראות כדי לקבל תזכורות לתרופות, התראות מדידה ועדכוני מעגל טיפול.';
+
+  @override
+  String get notificationChannelPush => 'התראות דחיפה';
+
+  @override
+  String get notificationChannelPushDescription => 'התראות מ-Pet Circle';
+
+  @override
+  String inviteAcceptedTitle(String email, String petName) {
+    return '$email הצטרף/ה למעגל הטיפול של $petName';
+  }
+
+  @override
+  String get inviteAcceptedBody => 'ההזמנה שלך התקבלה';
+
+  @override
+  String get measurementReminders => 'תזכורות מדידה';
+
+  @override
+  String get measurementRemindersDesc =>
+      'קבל תזכורת לבדוק את קצב הנשימה של חיית המחמד שלך';
+
+  @override
+  String get measurementReminderFrequency => 'תדירות';
+
+  @override
+  String get measurementReminderTime => 'שעת תזכורת';
+
+  @override
+  String get frequencyTwoPerWeek => '2 פעמים בשבוע';
+
+  @override
+  String get frequencyThreePerWeek => '3 פעמים בשבוע';
+
+  @override
+  String get frequencyDaily => 'יומי';
+
+  @override
+  String get measurementReminderTitle => 'זמן למדוד';
+
+  @override
+  String get measurementReminderBody =>
+      'הגיע הזמן לבדוק את קצב הנשימה של חיית המחמד שלך';
+
+  @override
+  String get medicationSupply => 'מעקב מלאי';
+
+  @override
+  String get totalSupply => 'סה\"כ מלאי';
+
+  @override
+  String get currentSupply => 'מלאי נוכחי';
+
+  @override
+  String get lowSupplyThreshold => 'התראה כאשר נשאר';
+
+  @override
+  String get dosesLeft => 'מנות נותרו';
+
+  @override
+  String lowSupplyAlertTitle(String name) {
+    return 'מלאי נמוך: $name';
+  }
+
+  @override
+  String lowSupplyAlertBody(String name, int count) {
+    return '$name עומד להיגמר — נותרו $count מנות';
+  }
+
+  @override
+  String get markDoseTaken => 'מנה נלקחה';
+
+  @override
+  String get doseTakenConfirmation => 'המנה נרשמה';
+
+  @override
+  String get medicationReminderTimes => 'שעות תזכורת תרופות';
+
+  @override
+  String get morningReminder => 'בוקר';
+
+  @override
+  String get eveningReminder => 'ערב';
 }

@@ -12,12 +12,14 @@ class ValidatedFormField extends StatelessWidget {
     required this.hint,
     this.controller,
     this.validator,
+    this.keyboardType,
   });
 
   final String label;
   final String hint;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,7 @@ class ValidatedFormField extends StatelessWidget {
         TextFormField(
           controller: controller,
           validator: validator,
+          keyboardType: keyboardType,
           autovalidateMode: AutovalidateMode.onUserInteraction,
           decoration: InputDecoration(
             filled: true,

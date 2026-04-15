@@ -13,6 +13,9 @@ class Medication {
     this.notes,
     this.remindersEnabled = false,
     this.isActive = true,
+    this.totalSupply,
+    this.currentSupply,
+    this.lowSupplyThreshold,
   });
 
   final String id;
@@ -27,6 +30,23 @@ class Medication {
   final bool remindersEnabled;
   final bool isActive;
 
+  /// Total number of doses dispensed (null = supply tracking disabled).
+  final int? totalSupply;
+
+  /// Remaining doses (null = supply tracking disabled).
+  final int? currentSupply;
+
+  /// Alert when currentSupply falls to this level (default: 7 when enabled).
+  final int? lowSupplyThreshold;
+
+  /// Whether supply tracking is active for this medication.
+  bool get hasSupplyTracking => totalSupply != null && currentSupply != null;
+
+  /// Whether the supply is running low.
+  bool get isLowSupply =>
+      hasSupplyTracking &&
+      currentSupply! <= (lowSupplyThreshold ?? 7);
+
   Map<String, dynamic> toFirestore() {
     return {
       'name': name,
@@ -40,6 +60,9 @@ class Medication {
       if (notes != null && notes!.isNotEmpty) 'notes': notes,
       'remindersEnabled': remindersEnabled,
       'isActive': isActive,
+      if (totalSupply != null) 'totalSupply': totalSupply,
+      if (currentSupply != null) 'currentSupply': currentSupply,
+      if (lowSupplyThreshold != null) 'lowSupplyThreshold': lowSupplyThreshold,
     };
   }
 
@@ -59,6 +82,9 @@ class Medication {
       notes: data['notes'] as String?,
       remindersEnabled: data['remindersEnabled'] ?? false,
       isActive: data['isActive'] ?? true,
+      totalSupply: data['totalSupply'] as int?,
+      currentSupply: data['currentSupply'] as int?,
+      lowSupplyThreshold: data['lowSupplyThreshold'] as int?,
     );
   }
 
@@ -75,6 +101,12 @@ class Medication {
     String? notes,
     bool? remindersEnabled,
     bool? isActive,
+    int? totalSupply,
+    bool clearTotalSupply = false,
+    int? currentSupply,
+    bool clearCurrentSupply = false,
+    int? lowSupplyThreshold,
+    bool clearLowSupplyThreshold = false,
   }) {
     return Medication(
       id: id ?? this.id,
@@ -88,6 +120,13 @@ class Medication {
       notes: notes ?? this.notes,
       remindersEnabled: remindersEnabled ?? this.remindersEnabled,
       isActive: isActive ?? this.isActive,
+      totalSupply:
+          clearTotalSupply ? null : (totalSupply ?? this.totalSupply),
+      currentSupply:
+          clearCurrentSupply ? null : (currentSupply ?? this.currentSupply),
+      lowSupplyThreshold: clearLowSupplyThreshold
+          ? null
+          : (lowSupplyThreshold ?? this.lowSupplyThreshold),
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
+import 'package:pet_circle/main.dart' show pushService;
 
 enum AuthRouteState {
   loading,
@@ -55,13 +56,16 @@ class AuthProvider extends ChangeNotifier {
     _firebaseUser = user;
 
     if (user == null) {
+      // Unregister push token before clearing user state.
+      if (_subscribedUid != null) {
+        await pushService.unregisterToken(_subscribedUid!);
+      }
       _appUser = null;
       _isLoading = false;
       _isCreatingUser = false;
       _subscribedUid = null;
       userStore.reset();
       petStore.clearData();
-      notificationStore.clearData();
       notificationStore.reset();
       settingsStore.reset();
       notifyListeners();
@@ -108,6 +112,7 @@ class AuthProvider extends ChangeNotifier {
         try {
           await petStore.fetchForUser(appUser.uid);
           await notificationStore.fetchForUser(appUser.uid);
+          await pushService.registerToken(appUser.uid);
         } catch (e) {
           debugPrint('[AuthProvider] Failed to fetch data: $e');
         }
