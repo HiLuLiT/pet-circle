@@ -11,11 +11,45 @@ class WebReminderService implements AbstractReminderService {
   Future<bool> requestPermission() async => false;
 
   @override
-  Future<void> scheduleMedicationReminder(Medication med) async {}
+  Future<void> scheduleMedicationReminder(
+    Medication med, {
+    int morningHour = 9,
+    int morningMinute = 0,
+    int eveningHour = 21,
+    int eveningMinute = 0,
+  }) async {}
 
   @override
   Future<void> cancelMedicationReminder(String medicationId) async {}
 
   @override
+  Future<void> scheduleRestockReminder(
+    Medication med, {
+    required String title,
+    required String body,
+  }) async {}
+
+  @override
+  Future<void> cancelRestockReminder(String medicationId) async {}
+
+  @override
+  Future<void> scheduleMeasurementReminder({
+    required List<int> days,
+    required int hour,
+    required int minute,
+  }) async {}
+
+  @override
+  Future<void> cancelMeasurementReminder() async {}
+
+  @override
   Future<void> cancelAllReminders() async {}
+
+  @override
+  Future<void> showImmediateNotification(
+    int id,
+    String title,
+    String body,
+    String? payload,
+  ) async {}
 }

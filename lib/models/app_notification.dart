@@ -16,6 +16,8 @@ class AppNotification {
     required this.createdAt,
     this.isRead = false,
     this.petName,
+    this.route,
+    this.petId,
   });
 
   final String id;
@@ -25,6 +27,8 @@ class AppNotification {
   final DateTime createdAt;
   final bool isRead;
   final String? petName;
+  final String? route;
+  final String? petId;
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -34,6 +38,8 @@ class AppNotification {
       'createdAt': Timestamp.fromDate(createdAt),
       'isRead': isRead,
       'petName': petName,
+      if (route != null) 'route': route,
+      if (petId != null) 'petId': petId,
     };
   }
 
@@ -47,6 +53,8 @@ class AppNotification {
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       isRead: data['isRead'] ?? false,
       petName: data['petName'],
+      route: data['route'],
+      petId: data['petId'],
     );
   }
 
@@ -58,6 +66,8 @@ class AppNotification {
     DateTime? createdAt,
     bool? isRead,
     String? petName,
+    String? route,
+    String? petId,
   }) {
     return AppNotification(
       id: id ?? this.id,
@@ -67,6 +77,8 @@ class AppNotification {
       createdAt: createdAt ?? this.createdAt,
       isRead: isRead ?? this.isRead,
       petName: petName ?? this.petName,
+      route: route ?? this.route,
+      petId: petId ?? this.petId,
     );
   }
 

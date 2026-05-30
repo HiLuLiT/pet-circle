@@ -2251,6 +2251,198 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to send code'**
   String get failedToSendCode;
+
+  /// No description provided for @pushNotificationPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stay Updated'**
+  String get pushNotificationPermissionTitle;
+
+  /// No description provided for @pushNotificationPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable notifications to receive medication reminders, measurement alerts, and care circle updates.'**
+  String get pushNotificationPermissionBody;
+
+  /// No description provided for @notificationChannelPush.
+  ///
+  /// In en, this message translates to:
+  /// **'Push Notifications'**
+  String get notificationChannelPush;
+
+  /// No description provided for @notificationChannelPushDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications from Pet Circle'**
+  String get notificationChannelPushDescription;
+
+  /// No description provided for @inviteAcceptedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{email} joined {petName}\'s care circle'**
+  String inviteAcceptedTitle(String email, String petName);
+
+  /// No description provided for @inviteAcceptedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your invitation was accepted'**
+  String get inviteAcceptedBody;
+
+  /// No description provided for @measurementReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Measurement Reminders'**
+  String get measurementReminders;
+
+  /// No description provided for @measurementRemindersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Get reminded to check your pet\'s respiratory rate'**
+  String get measurementRemindersDesc;
+
+  /// No description provided for @measurementReminderFrequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency'**
+  String get measurementReminderFrequency;
+
+  /// No description provided for @measurementReminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Time'**
+  String get measurementReminderTime;
+
+  /// No description provided for @frequencyTwoPerWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'2x / week'**
+  String get frequencyTwoPerWeek;
+
+  /// No description provided for @frequencyThreePerWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'3x / week'**
+  String get frequencyThreePerWeek;
+
+  /// No description provided for @frequencyDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get frequencyDaily;
+
+  /// No description provided for @measurementReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to Measure'**
+  String get measurementReminderTitle;
+
+  /// No description provided for @measurementReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s time to check your pet\'s respiratory rate'**
+  String get measurementReminderBody;
+
+  /// No description provided for @medicationSupply.
+  ///
+  /// In en, this message translates to:
+  /// **'Supply Tracking'**
+  String get medicationSupply;
+
+  /// No description provided for @totalSupply.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Supply'**
+  String get totalSupply;
+
+  /// No description provided for @totalDoses.
+  ///
+  /// In en, this message translates to:
+  /// **'Total doses'**
+  String get totalDoses;
+
+  /// No description provided for @restockLeadDaysLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me before running out (days)'**
+  String get restockLeadDaysLabel;
+
+  /// No description provided for @restockButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Restock'**
+  String get restockButton;
+
+  /// No description provided for @restockDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restock {name}'**
+  String restockDialogTitle(String name);
+
+  /// No description provided for @restockDialogHint.
+  ///
+  /// In en, this message translates to:
+  /// **'New total doses'**
+  String get restockDialogHint;
+
+  /// No description provided for @supplyStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'≈{count} doses left · runs out {date}'**
+  String supplyStatus(int count, String date);
+
+  /// No description provided for @restockNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to restock {name}'**
+  String restockNotificationTitle(String name);
+
+  /// No description provided for @restockNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} runs out in about {days} days — order a refill'**
+  String restockNotificationBody(String name, int days);
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @deleteMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Medication'**
+  String get deleteMedication;
+
+  /// No description provided for @deleteMedicationConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}? This will remove the medication and cancel its reminders.'**
+  String deleteMedicationConfirmation(String name);
+
+  /// No description provided for @medicationDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication deleted'**
+  String get medicationDeleted;
+
+  /// No description provided for @medicationReminderTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication Reminder Times'**
+  String get medicationReminderTimes;
+
+  /// No description provided for @morningReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning'**
+  String get morningReminder;
+
+  /// No description provided for @eveningReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening'**
+  String get eveningReminder;
 }
 
 class _AppLocalizationsDelegate

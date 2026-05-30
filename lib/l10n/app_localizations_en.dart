@@ -1180,4 +1180,116 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToSendCode => 'Failed to send code';
+
+  @override
+  String get pushNotificationPermissionTitle => 'Stay Updated';
+
+  @override
+  String get pushNotificationPermissionBody =>
+      'Enable notifications to receive medication reminders, measurement alerts, and care circle updates.';
+
+  @override
+  String get notificationChannelPush => 'Push Notifications';
+
+  @override
+  String get notificationChannelPushDescription =>
+      'Notifications from Pet Circle';
+
+  @override
+  String inviteAcceptedTitle(String email, String petName) {
+    return '$email joined $petName\'s care circle';
+  }
+
+  @override
+  String get inviteAcceptedBody => 'Your invitation was accepted';
+
+  @override
+  String get measurementReminders => 'Measurement Reminders';
+
+  @override
+  String get measurementRemindersDesc =>
+      'Get reminded to check your pet\'s respiratory rate';
+
+  @override
+  String get measurementReminderFrequency => 'Frequency';
+
+  @override
+  String get measurementReminderTime => 'Reminder Time';
+
+  @override
+  String get frequencyTwoPerWeek => '2x / week';
+
+  @override
+  String get frequencyThreePerWeek => '3x / week';
+
+  @override
+  String get frequencyDaily => 'Daily';
+
+  @override
+  String get measurementReminderTitle => 'Time to Measure';
+
+  @override
+  String get measurementReminderBody =>
+      'It\'s time to check your pet\'s respiratory rate';
+
+  @override
+  String get medicationSupply => 'Supply Tracking';
+
+  @override
+  String get totalSupply => 'Total Supply';
+
+  @override
+  String get totalDoses => 'Total doses';
+
+  @override
+  String get restockLeadDaysLabel => 'Remind me before running out (days)';
+
+  @override
+  String get restockButton => 'Restock';
+
+  @override
+  String restockDialogTitle(String name) {
+    return 'Restock $name';
+  }
+
+  @override
+  String get restockDialogHint => 'New total doses';
+
+  @override
+  String supplyStatus(int count, String date) {
+    return '≈$count doses left · runs out $date';
+  }
+
+  @override
+  String restockNotificationTitle(String name) {
+    return 'Time to restock $name';
+  }
+
+  @override
+  String restockNotificationBody(String name, int days) {
+    return '$name runs out in about $days days — order a refill';
+  }
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get deleteMedication => 'Delete Medication';
+
+  @override
+  String deleteMedicationConfirmation(String name) {
+    return 'Delete $name? This will remove the medication and cancel its reminders.';
+  }
+
+  @override
+  String get medicationDeleted => 'Medication deleted';
+
+  @override
+  String get medicationReminderTimes => 'Medication Reminder Times';
+
+  @override
+  String get morningReminder => 'Morning';
+
+  @override
+  String get eveningReminder => 'Evening';
 }

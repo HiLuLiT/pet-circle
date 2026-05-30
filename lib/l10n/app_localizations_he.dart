@@ -1172,4 +1172,115 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get failedToSendCode => 'שליחת הקוד נכשלה';
+
+  @override
+  String get pushNotificationPermissionTitle => 'הישאר מעודכן';
+
+  @override
+  String get pushNotificationPermissionBody =>
+      'הפעל התראות כדי לקבל תזכורות לתרופות, התראות מדידה ועדכוני מעגל טיפול.';
+
+  @override
+  String get notificationChannelPush => 'התראות דחיפה';
+
+  @override
+  String get notificationChannelPushDescription => 'התראות מ-Pet Circle';
+
+  @override
+  String inviteAcceptedTitle(String email, String petName) {
+    return '$email הצטרף/ה למעגל הטיפול של $petName';
+  }
+
+  @override
+  String get inviteAcceptedBody => 'ההזמנה שלך התקבלה';
+
+  @override
+  String get measurementReminders => 'תזכורות מדידה';
+
+  @override
+  String get measurementRemindersDesc =>
+      'קבל תזכורת לבדוק את קצב הנשימה של חיית המחמד שלך';
+
+  @override
+  String get measurementReminderFrequency => 'תדירות';
+
+  @override
+  String get measurementReminderTime => 'שעת תזכורת';
+
+  @override
+  String get frequencyTwoPerWeek => '2 פעמים בשבוע';
+
+  @override
+  String get frequencyThreePerWeek => '3 פעמים בשבוע';
+
+  @override
+  String get frequencyDaily => 'יומי';
+
+  @override
+  String get measurementReminderTitle => 'זמן למדוד';
+
+  @override
+  String get measurementReminderBody =>
+      'הגיע הזמן לבדוק את קצב הנשימה של חיית המחמד שלך';
+
+  @override
+  String get medicationSupply => 'מעקב מלאי';
+
+  @override
+  String get totalSupply => 'סה\"כ מלאי';
+
+  @override
+  String get totalDoses => 'מספר מנות כולל';
+
+  @override
+  String get restockLeadDaysLabel => 'תזכורת לפני שייגמר (ימים)';
+
+  @override
+  String get restockButton => 'חידוש מלאי';
+
+  @override
+  String restockDialogTitle(String name) {
+    return 'חידוש מלאי עבור $name';
+  }
+
+  @override
+  String get restockDialogHint => 'מספר מנות חדש';
+
+  @override
+  String supplyStatus(int count, String date) {
+    return '≈$count מנות נותרו · ייגמר ב-$date';
+  }
+
+  @override
+  String restockNotificationTitle(String name) {
+    return 'הגיע הזמן לחדש מלאי של $name';
+  }
+
+  @override
+  String restockNotificationBody(String name, int days) {
+    return '$name ייגמר בעוד כ-$days ימים — הזמינו מלאי נוסף';
+  }
+
+  @override
+  String get delete => 'מחיקה';
+
+  @override
+  String get deleteMedication => 'מחיקת תרופה';
+
+  @override
+  String deleteMedicationConfirmation(String name) {
+    return 'למחוק את $name? פעולה זו תסיר את התרופה ותבטל את התזכורות שלה.';
+  }
+
+  @override
+  String get medicationDeleted => 'התרופה נמחקה';
+
+  @override
+  String get medicationReminderTimes => 'שעות תזכורת תרופות';
+
+  @override
+  String get morningReminder => 'בוקר';
+
+  @override
+  String get eveningReminder => 'ערב';
 }

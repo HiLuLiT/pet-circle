@@ -134,6 +134,22 @@ class MedicationStore extends ChangeNotifier {
     }
   }
 
+  /// All medications across all pets, regardless of active state.
+  List<Medication> get allMedications => List.unmodifiable(
+        _medications.values.expand((meds) => meds).toList(),
+      );
+
+  /// Active medications across all pets that are within their restock window.
+  List<Medication> getMedicationsNeedingRestock() {
+    final result = <Medication>[];
+    for (final meds in _medications.values) {
+      for (final med in meds) {
+        if (med.isActive && med.needsRestock) result.add(med);
+      }
+    }
+    return List.unmodifiable(result);
+  }
+
   /// Fetch medications for the given pet IDs from Firestore.
   Future<void> fetchForPets(List<String> petIds) async {
     final newIds = petIds.toSet();

@@ -333,4 +333,129 @@ void main() {
       expect(original.copyWith(isActive: false).isActive, isFalse);
     });
   });
+
+  // ── Supply tracking tests ──────────────────────────────────────────
+
+  group('Medication supply tracking', () {
+    Medication makeMed({
+      String frequency = 'Twice daily',
+      int? totalSupply = 60,
+      DateTime? supplyStartDate,
+      int? restockLeadDays = 5,
+    }) {
+      return Medication(
+        id: 'm1',
+        name: 'Furosemide',
+        dosage: '12.5mg',
+        frequency: frequency,
+        startDate: DateTime(2026, 1, 1),
+        totalSupply: totalSupply,
+        supplyStartDate: supplyStartDate,
+        restockLeadDays: restockLeadDays,
+      );
+    }
+
+    test('dosesPerDay maps frequency', () {
+      expect(makeMed(frequency: 'Once daily').dosesPerDay, 1);
+      expect(makeMed(frequency: 'Twice daily').dosesPerDay, 2);
+      expect(makeMed(frequency: 'As needed').dosesPerDay, isNull);
+    });
+
+    test('hasSupplyTracking requires total, start date, and a daily rate', () {
+      expect(makeMed(supplyStartDate: DateTime(2026, 1, 1)).hasSupplyTracking,
+          isTrue);
+      expect(makeMed(supplyStartDate: null).hasSupplyTracking, isFalse);
+      expect(
+          makeMed(totalSupply: null, supplyStartDate: DateTime(2026, 1, 1))
+              .hasSupplyTracking,
+          isFalse);
+      expect(
+          makeMed(frequency: 'As needed', supplyStartDate: DateTime(2026, 1, 1))
+              .hasSupplyTracking,
+          isFalse);
+    });
+
+    test('remainingDoses decreases with elapsed days and clamps at 0', () {
+      final start = DateTime.now().subtract(const Duration(days: 5));
+      // twice daily, 60 doses, 5 days elapsed => 60 - 10 = 50
+      expect(makeMed(totalSupply: 60, supplyStartDate: start).remainingDoses, 50);
+      // fully depleted clamps to 0
+      final old = DateTime.now().subtract(const Duration(days: 100));
+      expect(makeMed(totalSupply: 60, supplyStartDate: old).remainingDoses, 0);
+    });
+
+    test('runOutDate = start + ceil(total / dosesPerDay) days', () {
+      final start = DateTime(2026, 1, 1);
+      // 60 / 2 = 30 days
+      expect(makeMed(totalSupply: 60, supplyStartDate: start).runOutDate,
+          DateTime(2026, 1, 31));
+      // 5 / 2 = 2.5 -> ceil 3 days
+      expect(makeMed(totalSupply: 5, supplyStartDate: start).runOutDate,
+          DateTime(2026, 1, 4));
+    });
+
+    test('restockDate = runOutDate - restockLeadDays', () {
+      final start = DateTime(2026, 1, 1);
+      final med =
+          makeMed(totalSupply: 60, supplyStartDate: start, restockLeadDays: 5);
+      expect(med.restockDate, DateTime(2026, 1, 26));
+    });
+
+    test('needsRestock true once within the lead window', () {
+      final soon = DateTime.now().subtract(const Duration(days: 28));
+      // twice daily, 60 doses -> runs out in ~2 days, lead 5 -> already in window
+      expect(makeMed(totalSupply: 60, supplyStartDate: soon).needsRestock,
+          isTrue);
+      final fresh = DateTime.now();
+      expect(makeMed(totalSupply: 60, supplyStartDate: fresh).needsRestock,
+          isFalse);
+    });
+
+    test('fromFirestore falls back to startDate when supplyStartDate missing',
+        () {
+      final doc = FakeDocumentSnapshot('m1', {
+        'name': 'Med',
+        'dosage': '1mg',
+        'frequency': 'Once daily',
+        'startDate': Timestamp.fromDate(DateTime(2026, 2, 1)),
+        'totalSupply': 30,
+        // no supplyStartDate, plus legacy fields that must be ignored
+        'currentSupply': 12,
+        'lowSupplyThreshold': 7,
+      });
+      final med = Medication.fromFirestore(doc);
+      expect(med.totalSupply, 30);
+      expect(med.supplyStartDate, DateTime(2026, 2, 1));
+      expect(med.restockLeadDays, isNull);
+    });
+
+    test('toFirestore includes new supply fields when set', () {
+      final med =
+          makeMed(supplyStartDate: DateTime(2026, 1, 1), restockLeadDays: 5);
+      final map = med.toFirestore();
+
+      expect(map['totalSupply'], 60);
+      expect(map['supplyStartDate'], isA<Timestamp>());
+      expect(map['restockLeadDays'], 5);
+    });
+
+    test('supply fields roundtrip through toFirestore/fromFirestore', () {
+      final original =
+          makeMed(supplyStartDate: DateTime(2026, 1, 1), restockLeadDays: 5);
+      final map = original.toFirestore();
+      final doc = FakeDocumentSnapshot('m1', map);
+      final restored = Medication.fromFirestore(doc);
+
+      expect(restored.totalSupply, original.totalSupply);
+      expect(restored.supplyStartDate, original.supplyStartDate);
+      expect(restored.restockLeadDays, original.restockLeadDays);
+    });
+
+    test('copyWith clearSupplyStartDate disables tracking', () {
+      final med = makeMed(supplyStartDate: DateTime(2026, 1, 1));
+      final cleared = med.copyWith(clearSupplyStartDate: true);
+      expect(cleared.supplyStartDate, isNull);
+      expect(cleared.hasSupplyTracking, isFalse);
+    });
+  });
 }
