@@ -137,6 +137,10 @@ class ReminderService implements AbstractReminderService {
   int _medMorningId(String medId) => _stableHash(medId) * 2;
   int _medEveningId(String medId) => _stableHash(medId) * 2 + 1;
 
+  /// Dedicated namespace; high bit set so it can't collide with med
+  /// morning/evening IDs (_stableHash*2 / *2+1) or measurement IDs.
+  int _medRestockId(String medId) => 0x40000000 | _stableHash(medId);
+
   @override
   Future<void> scheduleMedicationReminder(
     Medication med, {
@@ -232,6 +236,71 @@ class ReminderService implements AbstractReminderService {
   Future<void> cancelMedicationReminder(String medicationId) async {
     await _plugin.cancel(_medMorningId(medicationId));
     await _plugin.cancel(_medEveningId(medicationId));
+  }
+
+  @override
+  Future<void> scheduleRestockReminder(
+    Medication med, {
+    required String title,
+    required String body,
+  }) async {
+    if (!_initialized) await init();
+    final permitted = await requestPermission();
+    if (!permitted) return;
+
+    await cancelRestockReminder(med.id);
+
+    if (!med.hasSupplyTracking || !med.isActive) return;
+    if (med.endDate != null && med.endDate!.isBefore(DateTime.now())) return;
+
+    // If the restock date already passed, fire shortly so it isn't lost.
+    final now = tz.TZDateTime.now(tz.local);
+    var when = tz.TZDateTime.from(med.restockDate, tz.local);
+    if (!when.isAfter(now)) {
+      when = now.add(const Duration(minutes: 1));
+    }
+
+    const androidDetails = AndroidNotificationDetails(
+      'medication_reminders',
+      'Medication Reminders',
+      channelDescription: 'Reminders for scheduled pet medications',
+      importance: Importance.high,
+      priority: Priority.high,
+      groupKey: 'medication',
+    );
+    const darwinDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: darwinDetails,
+      macOS: darwinDetails,
+    );
+
+    final payload = json.encode({
+      'type': 'medication',
+      'route': '/shell?tab=4',
+      'medicationId': med.id,
+    });
+
+    await _plugin.zonedSchedule(
+      _medRestockId(med.id),
+      title,
+      body,
+      when,
+      details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      payload: payload,
+    );
+  }
+
+  @override
+  Future<void> cancelRestockReminder(String medicationId) async {
+    await _plugin.cancel(_medRestockId(medicationId));
   }
 
   // ── Measurement reminders ───────────────────────────────────────

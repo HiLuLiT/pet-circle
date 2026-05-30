@@ -11,6 +11,17 @@ abstract class AbstractReminderService {
     int eveningMinute = 0,
   });
   Future<void> cancelMedicationReminder(String medicationId);
+
+  /// Schedule a one-shot restock reminder for [med] at its restock date.
+  Future<void> scheduleRestockReminder(
+    Medication med, {
+    required String title,
+    required String body,
+  });
+
+  /// Cancel a scheduled restock reminder.
+  Future<void> cancelRestockReminder(String medicationId);
+
   Future<void> cancelAllReminders();
 
   /// Schedule recurring measurement reminders on specific weekdays.

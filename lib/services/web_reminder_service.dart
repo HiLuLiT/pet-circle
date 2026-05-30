@@ -23,6 +23,16 @@ class WebReminderService implements AbstractReminderService {
   Future<void> cancelMedicationReminder(String medicationId) async {}
 
   @override
+  Future<void> scheduleRestockReminder(
+    Medication med, {
+    required String title,
+    required String body,
+  }) async {}
+
+  @override
+  Future<void> cancelRestockReminder(String medicationId) async {}
+
+  @override
   Future<void> scheduleMeasurementReminder({
     required List<int> days,
     required int hour,
