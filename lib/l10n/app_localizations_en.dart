@@ -638,7 +638,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get medicationReminders => 'Medication Reminders';
 
   @override
-  String get medicationRemindersDesc => 'Notify care circle when doses are due';
+  String get medicationRemindersDesc =>
+      'Remind me the morning this medication ends';
 
   @override
   String get csvPreview => 'CSV Preview:';
@@ -1233,41 +1234,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'It\'s time to check your pet\'s respiratory rate';
 
   @override
-  String get medicationSupply => 'Supply Tracking';
+  String get medicationEndingTitle => 'Medication ending today';
 
   @override
-  String get totalSupply => 'Total Supply';
-
-  @override
-  String get totalDoses => 'Total doses';
-
-  @override
-  String get restockLeadDaysLabel => 'Remind me before running out (days)';
-
-  @override
-  String get restockButton => 'Restock';
-
-  @override
-  String restockDialogTitle(String name) {
-    return 'Restock $name';
-  }
-
-  @override
-  String get restockDialogHint => 'New total doses';
-
-  @override
-  String supplyStatus(int count, String date) {
-    return '≈$count doses left · runs out $date';
-  }
-
-  @override
-  String restockNotificationTitle(String name) {
-    return 'Time to restock $name';
-  }
-
-  @override
-  String restockNotificationBody(String name, int days) {
-    return '$name runs out in about $days days — order a refill';
+  String medicationEndingBody(String name) {
+    return '$name\'s medication course ends today';
   }
 
   @override

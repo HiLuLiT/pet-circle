@@ -64,19 +64,22 @@ class NotificationStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Add an in-app restock notification for each due medication, once per batch.
+  /// Add an in-app notification for each medication whose end date has arrived,
+  /// once per medication end date.
   ///
-  /// Dedup key is `restock-<medId>-<runOutDayEpoch>`, so a given batch of a
-  /// medication only ever produces a single in-app entry.
-  void reconcileRestockNotifications(
-    List<Medication> dueMeds, {
+  /// Dedup key is `med-end-<medId>-<endDayEpoch>`, so a given medication's end
+  /// date only ever produces a single in-app entry.
+  void reconcileMedicationEndNotifications(
+    List<Medication> endedMeds, {
     required String title,
     required String body,
   }) {
     var changed = false;
-    for (final med in dueMeds) {
-      final dayEpoch = med.runOutDate.millisecondsSinceEpoch ~/ 86400000;
-      final id = 'restock-${med.id}-$dayEpoch';
+    for (final med in endedMeds) {
+      final endDate = med.endDate;
+      if (endDate == null) continue;
+      final dayEpoch = endDate.millisecondsSinceEpoch ~/ 86400000;
+      final id = 'med-end-${med.id}-$dayEpoch';
       if (_notifications.any((n) => n.id == id)) continue;
       _notifications.insert(
         0,

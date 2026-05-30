@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class Medication {
   const Medication({
     required this.id,
+    required this.petId,
     required this.name,
     required this.dosage,
     required this.frequency,
@@ -13,12 +14,13 @@ class Medication {
     this.notes,
     this.remindersEnabled = false,
     this.isActive = true,
-    this.totalSupply,
-    this.supplyStartDate,
-    this.restockLeadDays,
   });
 
   final String id;
+
+  /// The pet this medication belongs to. Medications are stored privately per
+  /// user (users/{uid}/medications), so each doc records its own pet.
+  final String petId;
   final String name;
   final String dosage;
   final String frequency;
@@ -30,51 +32,14 @@ class Medication {
   final bool remindersEnabled;
   final bool isActive;
 
-  /// Total number of doses dispensed (null = supply tracking disabled).
-  final int? totalSupply;
-
-  /// When the current batch (of [totalSupply] doses) started.
-  final DateTime? supplyStartDate;
-
-  /// Fire the restock reminder this many days before predicted run-out.
-  final int? restockLeadDays;
-
-  /// Doses consumed per day, derived from frequency. null => not trackable.
-  int? get dosesPerDay => switch (frequency) {
-        'Once daily' => 1,
-        'Twice daily' => 2,
-        _ => null,
-      };
-
-  bool get hasSupplyTracking =>
-      totalSupply != null && supplyStartDate != null && dosesPerDay != null;
-
-  int get _daysElapsed {
-    final d = DateTime.now().difference(supplyStartDate!).inDays;
-    return d < 0 ? 0 : d;
-  }
-
-  /// Remaining doses, clamped to [0, totalSupply].
-  int get remainingDoses {
-    if (!hasSupplyTracking) return 0;
-    final used = dosesPerDay! * _daysElapsed;
-    return (totalSupply! - used).clamp(0, totalSupply!).toInt();
-  }
-
-  /// Predicted date the batch runs out.
-  DateTime get runOutDate => supplyStartDate!
-      .add(Duration(days: (totalSupply! / dosesPerDay!).ceil()));
-
-  /// When the restock reminder should fire.
-  DateTime get restockDate =>
-      runOutDate.subtract(Duration(days: restockLeadDays ?? 5));
-
-  /// True once within the restock lead window.
-  bool get needsRestock =>
-      hasSupplyTracking && !DateTime.now().isBefore(restockDate);
+  /// True when this medication should fire an end-of-course reminder:
+  /// it is active, reminders are enabled, and an end date is set.
+  bool get hasEndReminder =>
+      isActive && remindersEnabled && endDate != null;
 
   Map<String, dynamic> toFirestore() {
     return {
+      'petId': petId,
       'name': name,
       'dosage': dosage,
       'frequency': frequency,
@@ -86,10 +51,6 @@ class Medication {
       if (notes != null && notes!.isNotEmpty) 'notes': notes,
       'remindersEnabled': remindersEnabled,
       'isActive': isActive,
-      if (totalSupply != null) 'totalSupply': totalSupply,
-      if (supplyStartDate != null)
-        'supplyStartDate': Timestamp.fromDate(supplyStartDate!),
-      if (restockLeadDays != null) 'restockLeadDays': restockLeadDays,
     };
   }
 
@@ -97,6 +58,7 @@ class Medication {
     final data = doc.data() as Map<String, dynamic>;
     return Medication(
       id: doc.id,
+      petId: data['petId'] ?? '',
       name: data['name'] ?? '',
       dosage: data['dosage'] ?? '',
       frequency: data['frequency'] ?? '',
@@ -109,18 +71,12 @@ class Medication {
       notes: data['notes'] as String?,
       remindersEnabled: data['remindersEnabled'] ?? false,
       isActive: data['isActive'] ?? true,
-      totalSupply: data['totalSupply'] as int?,
-      supplyStartDate: data['supplyStartDate'] != null
-          ? (data['supplyStartDate'] as Timestamp).toDate()
-          : (data['totalSupply'] != null
-              ? (data['startDate'] as Timestamp).toDate()
-              : null),
-      restockLeadDays: data['restockLeadDays'] as int?,
     );
   }
 
   Medication copyWith({
     String? id,
+    String? petId,
     String? name,
     String? dosage,
     String? frequency,
@@ -132,15 +88,10 @@ class Medication {
     String? notes,
     bool? remindersEnabled,
     bool? isActive,
-    int? totalSupply,
-    bool clearTotalSupply = false,
-    DateTime? supplyStartDate,
-    bool clearSupplyStartDate = false,
-    int? restockLeadDays,
-    bool clearRestockLeadDays = false,
   }) {
     return Medication(
       id: id ?? this.id,
+      petId: petId ?? this.petId,
       name: name ?? this.name,
       dosage: dosage ?? this.dosage,
       frequency: frequency ?? this.frequency,
@@ -151,14 +102,6 @@ class Medication {
       notes: notes ?? this.notes,
       remindersEnabled: remindersEnabled ?? this.remindersEnabled,
       isActive: isActive ?? this.isActive,
-      totalSupply:
-          clearTotalSupply ? null : (totalSupply ?? this.totalSupply),
-      supplyStartDate: clearSupplyStartDate
-          ? null
-          : (supplyStartDate ?? this.supplyStartDate),
-      restockLeadDays: clearRestockLeadDays
-          ? null
-          : (restockLeadDays ?? this.restockLeadDays),
     );
   }
 }

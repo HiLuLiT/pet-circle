@@ -89,7 +89,7 @@ class PetStore extends ChangeNotifier {
       await Future.wait([
         measurementStore.fetchForPets(petIds),
         noteStore.fetchForPets(petIds),
-        medicationStore.fetchForPets(petIds),
+        medicationStore.fetchForUser(uid),
       ]);
     } finally {
       _isLoading = false;

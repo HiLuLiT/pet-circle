@@ -4,11 +4,13 @@ import 'package:pet_circle/stores/medication_store.dart';
 
 Medication _makeMedication({
   String id = 'med-1',
+  String petId = 'pet-1',
   String name = 'Furosemide',
   bool isActive = true,
 }) {
   return Medication(
     id: id,
+    petId: petId,
     name: name,
     dosage: '10mg',
     frequency: 'Twice daily',
@@ -551,40 +553,157 @@ void main() {
     });
   });
 
-  group('MedicationStore getMedicationsNeedingRestock', () {
-    test('returns only active, due, tracked meds', () {
-      final due = Medication(
-        id: 'due',
+  group('MedicationStore getMedicationsWithEndReminder', () {
+    Medication endReminderMed({
+      String id = 'end',
+      bool isActive = true,
+      bool remindersEnabled = true,
+      DateTime? endDate,
+    }) {
+      return Medication(
+        id: id,
+        petId: 'p1',
         name: 'A',
         dosage: '1mg',
         frequency: 'Twice daily',
         startDate: DateTime(2026, 1, 1),
-        totalSupply: 60,
-        supplyStartDate: DateTime.now().subtract(const Duration(days: 28)),
-        restockLeadDays: 5,
+        endDate: endDate ?? DateTime(2026, 6, 1),
+        remindersEnabled: remindersEnabled,
+        isActive: isActive,
       );
-      final fresh = Medication(
-        id: 'fresh',
+    }
+
+    test('returns only active meds with reminders enabled and an end date', () {
+      final due = endReminderMed(id: 'due');
+      final noReminder = endReminderMed(id: 'noReminder', remindersEnabled: false);
+      final inactive = endReminderMed(id: 'inactive', isActive: false);
+      final noEndDate = Medication(
+        id: 'noEndDate',
+        petId: 'p1',
         name: 'B',
         dosage: '1mg',
         frequency: 'Once daily',
         startDate: DateTime(2026, 1, 1),
-        totalSupply: 90,
-        supplyStartDate: DateTime.now(),
-        restockLeadDays: 5,
+        remindersEnabled: true,
       );
-      final inactive = due.copyWith(id: 'inactive', isActive: false);
       store.seed({
-        'p1': [due, fresh, inactive],
+        'p1': [due, noReminder, inactive, noEndDate],
       });
 
-      final result = store.getMedicationsNeedingRestock();
+      final result = store.getMedicationsWithEndReminder();
       expect(result.map((m) => m.id), ['due']);
     });
 
-    test('returns empty when no meds need restock', () {
+    test('returns empty when no meds have an end reminder', () {
       store.seed({'pet-1': [_makeMedication()]});
-      expect(store.getMedicationsNeedingRestock(), isEmpty);
+      expect(store.getMedicationsWithEndReminder(), isEmpty);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Real mutation methods. In unit tests userStore.currentUserUid is null, so
+  // the Firebase branch is skipped and the local-only path runs. Methods that
+  // touch ReminderService (remove/toggle) are exercised via seed simulation
+  // above to avoid platform-channel calls.
+  // ---------------------------------------------------------------------------
+  group('MedicationStore addMedication (real, local-only path)', () {
+    test('adds to a new pet bucket and notifies', () async {
+      int calls = 0;
+      store.addListener(() => calls++);
+
+      await store.addMedication('pet-1', _makeMedication(id: 'm1'));
+
+      expect(store.getMedications('pet-1').map((m) => m.id), ['m1']);
+      expect(calls, 1);
+    });
+
+    test('appends to an existing pet bucket', () async {
+      store.seed({'pet-1': [_makeMedication(id: 'm1')]});
+      await store.addMedication('pet-1', _makeMedication(id: 'm2', name: 'Two'));
+
+      expect(store.getMedications('pet-1').map((m) => m.id), ['m1', 'm2']);
+    });
+  });
+
+  group('MedicationStore updateMedication (real, local-only path)', () {
+    test('replaces the matching medication and notifies', () async {
+      store.seed({'pet-1': [_makeMedication(id: 'm1', name: 'Old')]});
+      int calls = 0;
+      store.addListener(() => calls++);
+
+      await store.updateMedication(
+        'pet-1',
+        'm1',
+        _makeMedication(id: 'm1', name: 'New'),
+      );
+
+      expect(store.getMedications('pet-1').first.name, 'New');
+      expect(calls, 1);
+    });
+
+    test('returns early for unknown pet without notifying', () async {
+      store.seed({'pet-1': [_makeMedication(id: 'm1')]});
+      int calls = 0;
+      store.addListener(() => calls++);
+
+      await store.updateMedication('ghost', 'm1', _makeMedication(id: 'm1'));
+
+      expect(calls, 0);
+    });
+  });
+
+  group('MedicationStore fetchForUser / refresh', () {
+    test('fetchForUser without Firebase swallows the error and notifies', () async {
+      int calls = 0;
+      store.addListener(() => calls++);
+
+      await store.fetchForUser('uid-1');
+
+      // The Firebase call throws (no app initialised); the catch path notifies.
+      expect(calls, 1);
+    });
+
+    test('refresh is a no-op before any fetch (null current uid)', () async {
+      int calls = 0;
+      store.addListener(() => calls++);
+
+      await store.refresh();
+
+      expect(calls, 0);
+    });
+  });
+
+  group('MedicationStore allMedications', () {
+    test('flattens all pet buckets', () {
+      store.seed({
+        'pet-1': [_makeMedication(id: 'm1')],
+        'pet-2': [_makeMedication(id: 'm2'), _makeMedication(id: 'm3')],
+      });
+
+      expect(store.allMedications.map((m) => m.id).toSet(),
+          {'m1', 'm2', 'm3'});
+    });
+
+    test('returns an unmodifiable list', () {
+      store.seed({'pet-1': [_makeMedication(id: 'm1')]});
+      expect(
+        () => store.allMedications.add(_makeMedication(id: 'x')),
+        throwsUnsupportedError,
+      );
+    });
+  });
+
+  group('MedicationStore clearData (with data)', () {
+    test('empties all buckets and notifies', () {
+      store.seed({'pet-1': [_makeMedication(id: 'm1')]});
+      int calls = 0;
+      store.addListener(() => calls++);
+
+      store.clearData();
+
+      expect(store.getMedications('pet-1'), isEmpty);
+      expect(store.allMedications, isEmpty);
+      expect(calls, 1);
     });
   });
 }

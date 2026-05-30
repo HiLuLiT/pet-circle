@@ -1295,7 +1295,7 @@ abstract class AppLocalizations {
   /// No description provided for @medicationRemindersDesc.
   ///
   /// In en, this message translates to:
-  /// **'Notify care circle when doses are due'**
+  /// **'Remind me the morning this medication ends'**
   String get medicationRemindersDesc;
 
   /// No description provided for @csvPreview.
@@ -2342,65 +2342,17 @@ abstract class AppLocalizations {
   /// **'It\'s time to check your pet\'s respiratory rate'**
   String get measurementReminderBody;
 
-  /// No description provided for @medicationSupply.
+  /// No description provided for @medicationEndingTitle.
   ///
   /// In en, this message translates to:
-  /// **'Supply Tracking'**
-  String get medicationSupply;
+  /// **'Medication ending today'**
+  String get medicationEndingTitle;
 
-  /// No description provided for @totalSupply.
+  /// No description provided for @medicationEndingBody.
   ///
   /// In en, this message translates to:
-  /// **'Total Supply'**
-  String get totalSupply;
-
-  /// No description provided for @totalDoses.
-  ///
-  /// In en, this message translates to:
-  /// **'Total doses'**
-  String get totalDoses;
-
-  /// No description provided for @restockLeadDaysLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Remind me before running out (days)'**
-  String get restockLeadDaysLabel;
-
-  /// No description provided for @restockButton.
-  ///
-  /// In en, this message translates to:
-  /// **'Restock'**
-  String get restockButton;
-
-  /// No description provided for @restockDialogTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Restock {name}'**
-  String restockDialogTitle(String name);
-
-  /// No description provided for @restockDialogHint.
-  ///
-  /// In en, this message translates to:
-  /// **'New total doses'**
-  String get restockDialogHint;
-
-  /// No description provided for @supplyStatus.
-  ///
-  /// In en, this message translates to:
-  /// **'≈{count} doses left · runs out {date}'**
-  String supplyStatus(int count, String date);
-
-  /// No description provided for @restockNotificationTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Time to restock {name}'**
-  String restockNotificationTitle(String name);
-
-  /// No description provided for @restockNotificationBody.
-  ///
-  /// In en, this message translates to:
-  /// **'{name} runs out in about {days} days — order a refill'**
-  String restockNotificationBody(String name, int days);
+  /// **'{name}\'s medication course ends today'**
+  String medicationEndingBody(String name);
 
   /// No description provided for @delete.
   ///

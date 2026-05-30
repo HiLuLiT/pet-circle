@@ -133,23 +133,19 @@ class ReminderService implements AbstractReminderService {
     return hash & 0x0FFFFFFF;
   }
 
-  /// Stable numeric IDs for medication reminders.
-  /// Uses a stride of 2 per medication to avoid collisions between
-  /// morning (baseId) and evening (baseId + 1) slots.
-  int _medMorningId(String medId) => _stableHash(medId) * 2;
-  int _medEveningId(String medId) => _stableHash(medId) * 2 + 1;
-
-  /// Dedicated namespace; high bit set so it can't collide with med
-  /// morning/evening IDs (_stableHash*2 / *2+1) or measurement IDs.
-  int _medRestockId(String medId) => 0x40000000 | _stableHash(medId);
+  /// Stable numeric ID for a medication's end-date reminder.
+  /// (Even slot of the per-medication stride; the odd slot is a legacy
+  /// evening slot kept only so [cancelMedicationReminder] can clear it.)
+  int _medReminderId(String medId) => _stableHash(medId) * 2;
+  int _legacyMedEveningId(String medId) => _stableHash(medId) * 2 + 1;
 
   @override
   Future<void> scheduleMedicationReminder(
     Medication med, {
-    int morningHour = 9,
-    int morningMinute = 0,
-    int eveningHour = 21,
-    int eveningMinute = 0,
+    required String title,
+    required String body,
+    int hour = 9,
+    int minute = 0,
   }) async {
     if (!_initialized) await init();
 
@@ -158,10 +154,17 @@ class ReminderService implements AbstractReminderService {
 
     await cancelMedicationReminder(med.id);
 
-    if (med.endDate != null && med.endDate!.isBefore(DateTime.now())) return;
-
-    final morningId = _medMorningId(med.id);
-    final eveningId = _medEveningId(med.id);
+    // One-shot reminder on the morning of the medication's end date.
+    if (!med.hasEndReminder) return;
+    final when = tz.TZDateTime(
+      tz.local,
+      med.endDate!.year,
+      med.endDate!.month,
+      med.endDate!.day,
+      hour,
+      minute,
+    );
+    if (!when.isAfter(tz.TZDateTime.now(tz.local))) return;
 
     const androidDetails = AndroidNotificationDetails(
       'medication_reminders',
@@ -178,103 +181,6 @@ class ReminderService implements AbstractReminderService {
       presentSound: true,
     );
 
-    const details = NotificationDetails(
-      android: androidDetails,
-      iOS: darwinDetails,
-      macOS: darwinDetails,
-    );
-
-    final title = 'Medication Due: ${med.name}';
-    final body = '${med.dosage} — ${med.frequency}';
-    final payload = json.encode({
-      'type': 'medication',
-      'route': '/shell?tab=4',
-      'medicationId': med.id,
-    });
-
-    if (med.frequency == 'Once daily') {
-      await _plugin.zonedSchedule(
-        morningId,
-        title,
-        body,
-        _nextInstanceOfTime(morningHour, morningMinute),
-        details,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
-        payload: payload,
-      );
-    } else if (med.frequency == 'Twice daily') {
-      await _plugin.zonedSchedule(
-        morningId,
-        title,
-        body,
-        _nextInstanceOfTime(morningHour, morningMinute),
-        details,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
-        payload: payload,
-      );
-      await _plugin.zonedSchedule(
-        eveningId,
-        title,
-        body,
-        _nextInstanceOfTime(eveningHour, eveningMinute),
-        details,
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
-        matchDateTimeComponents: DateTimeComponents.time,
-        payload: payload,
-      );
-    }
-    // 'As needed' -- no automatic schedule
-  }
-
-  @override
-  Future<void> cancelMedicationReminder(String medicationId) async {
-    await _plugin.cancel(_medMorningId(medicationId));
-    await _plugin.cancel(_medEveningId(medicationId));
-  }
-
-  @override
-  Future<void> scheduleRestockReminder(
-    Medication med, {
-    required String title,
-    required String body,
-  }) async {
-    if (!_initialized) await init();
-    final permitted = await requestPermission();
-    if (!permitted) return;
-
-    await cancelRestockReminder(med.id);
-
-    if (!med.hasSupplyTracking || !med.isActive) return;
-    if (med.endDate != null && med.endDate!.isBefore(DateTime.now())) return;
-
-    // If the restock date already passed, fire shortly so it isn't lost.
-    final now = tz.TZDateTime.now(tz.local);
-    var when = tz.TZDateTime.from(med.restockDate, tz.local);
-    if (!when.isAfter(now)) {
-      when = now.add(const Duration(minutes: 1));
-    }
-
-    const androidDetails = AndroidNotificationDetails(
-      'medication_reminders',
-      'Medication Reminders',
-      channelDescription: 'Reminders for scheduled pet medications',
-      importance: Importance.high,
-      priority: Priority.high,
-      groupKey: 'medication',
-    );
-    const darwinDetails = DarwinNotificationDetails(
-      presentAlert: true,
-      presentBadge: true,
-      presentSound: true,
-    );
     const details = NotificationDetails(
       android: androidDetails,
       iOS: darwinDetails,
@@ -288,7 +194,7 @@ class ReminderService implements AbstractReminderService {
     });
 
     await _plugin.zonedSchedule(
-      _medRestockId(med.id),
+      _medReminderId(med.id),
       title,
       body,
       when,
@@ -301,8 +207,10 @@ class ReminderService implements AbstractReminderService {
   }
 
   @override
-  Future<void> cancelRestockReminder(String medicationId) async {
-    await _plugin.cancel(_medRestockId(medicationId));
+  Future<void> cancelMedicationReminder(String medicationId) async {
+    await _plugin.cancel(_medReminderId(medicationId));
+    // Clear the legacy evening slot from the previous daily-reminder version.
+    await _plugin.cancel(_legacyMedEveningId(medicationId));
   }
 
   // ── Measurement reminders ───────────────────────────────────────
@@ -413,16 +321,6 @@ class ReminderService implements AbstractReminderService {
     );
 
     await _plugin.show(id, title, body, details, payload: payload);
-  }
-
-  tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduled =
-        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
-    if (scheduled.isBefore(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
-    }
-    return scheduled;
   }
 
   /// Next occurrence of a specific weekday and time.

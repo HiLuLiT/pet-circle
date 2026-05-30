@@ -636,7 +636,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get medicationReminders => 'תזכורות תרופות';
 
   @override
-  String get medicationRemindersDesc => 'הודע למעגל הטיפול כאשר מינונים מגיעים';
+  String get medicationRemindersDesc => 'הזכירו לי בבוקר שבו תרופה זו מסתיימת';
 
   @override
   String get csvPreview => 'תצוגה מקדימה של CSV:';
@@ -1224,41 +1224,11 @@ class AppLocalizationsHe extends AppLocalizations {
       'הגיע הזמן לבדוק את קצב הנשימה של חיית המחמד שלך';
 
   @override
-  String get medicationSupply => 'מעקב מלאי';
+  String get medicationEndingTitle => 'התרופה מסתיימת היום';
 
   @override
-  String get totalSupply => 'סה\"כ מלאי';
-
-  @override
-  String get totalDoses => 'מספר מנות כולל';
-
-  @override
-  String get restockLeadDaysLabel => 'תזכורת לפני שייגמר (ימים)';
-
-  @override
-  String get restockButton => 'חידוש מלאי';
-
-  @override
-  String restockDialogTitle(String name) {
-    return 'חידוש מלאי עבור $name';
-  }
-
-  @override
-  String get restockDialogHint => 'מספר מנות חדש';
-
-  @override
-  String supplyStatus(int count, String date) {
-    return '≈$count מנות נותרו · ייגמר ב-$date';
-  }
-
-  @override
-  String restockNotificationTitle(String name) {
-    return 'הגיע הזמן לחדש מלאי של $name';
-  }
-
-  @override
-  String restockNotificationBody(String name, int days) {
-    return '$name ייגמר בעוד כ-$days ימים — הזמינו מלאי נוסף';
+  String medicationEndingBody(String name) {
+    return 'מהלך הטיפול התרופתי של $name מסתיים היום';
   }
 
   @override

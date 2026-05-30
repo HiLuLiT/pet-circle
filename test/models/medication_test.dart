@@ -7,6 +7,7 @@ import '../helpers/fake_document_snapshot.dart';
 Medication _makeMedication({bool isActive = true}) {
   return Medication(
     id: 'med-1',
+    petId: 'pet-1',
     name: 'Furosemide',
     dosage: '10mg',
     frequency: 'Twice daily',
@@ -67,6 +68,7 @@ void main() {
     test('isActive defaults to true', () {
       final med = Medication(
         id: 'med-x',
+        petId: 'pet-1',
         name: 'Test',
         dosage: '5mg',
         frequency: 'Daily',
@@ -111,6 +113,7 @@ void main() {
     test('optional fields can be null', () {
       final med = Medication(
         id: 'med-minimal',
+        petId: 'pet-1',
         name: 'Basic',
         dosage: '1mg',
         frequency: 'Daily',
@@ -129,6 +132,7 @@ void main() {
     test('remindersEnabled defaults to false', () {
       final med = Medication(
         id: 'med-def',
+        petId: 'pet-1',
         name: 'Test',
         dosage: '1mg',
         frequency: 'Daily',
@@ -182,6 +186,7 @@ void main() {
     test('toFirestore omits optional fields when null', () {
       final med = Medication(
         id: 'med-min',
+        petId: 'pet-1',
         name: 'Basic',
         dosage: '1mg',
         frequency: 'Daily',
@@ -198,6 +203,7 @@ void main() {
     test('toFirestore omits optional strings when empty', () {
       final med = Medication(
         id: 'med-empty',
+        petId: 'pet-1',
         name: 'Test',
         dosage: '1mg',
         frequency: 'Daily',
@@ -334,128 +340,82 @@ void main() {
     });
   });
 
-  // ── Supply tracking tests ──────────────────────────────────────────
+  // ── petId + end-reminder tests ─────────────────────────────────────
 
-  group('Medication supply tracking', () {
-    Medication makeMed({
-      String frequency = 'Twice daily',
-      int? totalSupply = 60,
-      DateTime? supplyStartDate,
-      int? restockLeadDays = 5,
-    }) {
-      return Medication(
-        id: 'm1',
-        name: 'Furosemide',
-        dosage: '12.5mg',
-        frequency: frequency,
-        startDate: DateTime(2026, 1, 1),
-        totalSupply: totalSupply,
-        supplyStartDate: supplyStartDate,
-        restockLeadDays: restockLeadDays,
-      );
-    }
-
-    test('dosesPerDay maps frequency', () {
-      expect(makeMed(frequency: 'Once daily').dosesPerDay, 1);
-      expect(makeMed(frequency: 'Twice daily').dosesPerDay, 2);
-      expect(makeMed(frequency: 'As needed').dosesPerDay, isNull);
+  group('Medication petId', () {
+    test('toFirestore includes petId', () {
+      final map = _makeMedication().toFirestore();
+      expect(map['petId'], 'pet-1');
     });
 
-    test('hasSupplyTracking requires total, start date, and a daily rate', () {
-      expect(makeMed(supplyStartDate: DateTime(2026, 1, 1)).hasSupplyTracking,
-          isTrue);
-      expect(makeMed(supplyStartDate: null).hasSupplyTracking, isFalse);
-      expect(
-          makeMed(totalSupply: null, supplyStartDate: DateTime(2026, 1, 1))
-              .hasSupplyTracking,
-          isFalse);
-      expect(
-          makeMed(frequency: 'As needed', supplyStartDate: DateTime(2026, 1, 1))
-              .hasSupplyTracking,
-          isFalse);
+    test('petId roundtrips through toFirestore/fromFirestore', () {
+      final original = _makeMedication();
+      final map = original.toFirestore();
+      final doc = FakeDocumentSnapshot('med-1', map);
+      final restored = Medication.fromFirestore(doc);
+
+      expect(restored.petId, original.petId);
+      expect(restored.name, original.name);
+      expect(restored.endDate, original.endDate);
     });
 
-    test('remainingDoses decreases with elapsed days and clamps at 0', () {
-      final start = DateTime.now().subtract(const Duration(days: 5));
-      // twice daily, 60 doses, 5 days elapsed => 60 - 10 = 50
-      expect(makeMed(totalSupply: 60, supplyStartDate: start).remainingDoses, 50);
-      // fully depleted clamps to 0
-      final old = DateTime.now().subtract(const Duration(days: 100));
-      expect(makeMed(totalSupply: 60, supplyStartDate: old).remainingDoses, 0);
-    });
-
-    test('runOutDate = start + ceil(total / dosesPerDay) days', () {
-      final start = DateTime(2026, 1, 1);
-      // 60 / 2 = 30 days
-      expect(makeMed(totalSupply: 60, supplyStartDate: start).runOutDate,
-          DateTime(2026, 1, 31));
-      // 5 / 2 = 2.5 -> ceil 3 days
-      expect(makeMed(totalSupply: 5, supplyStartDate: start).runOutDate,
-          DateTime(2026, 1, 4));
-    });
-
-    test('restockDate = runOutDate - restockLeadDays', () {
-      final start = DateTime(2026, 1, 1);
-      final med =
-          makeMed(totalSupply: 60, supplyStartDate: start, restockLeadDays: 5);
-      expect(med.restockDate, DateTime(2026, 1, 26));
-    });
-
-    test('needsRestock true once within the lead window', () {
-      final soon = DateTime.now().subtract(const Duration(days: 28));
-      // twice daily, 60 doses -> runs out in ~2 days, lead 5 -> already in window
-      expect(makeMed(totalSupply: 60, supplyStartDate: soon).needsRestock,
-          isTrue);
-      final fresh = DateTime.now();
-      expect(makeMed(totalSupply: 60, supplyStartDate: fresh).needsRestock,
-          isFalse);
-    });
-
-    test('fromFirestore falls back to startDate when supplyStartDate missing',
-        () {
+    test('fromFirestore defaults petId to empty string when missing', () {
       final doc = FakeDocumentSnapshot('m1', {
         'name': 'Med',
         'dosage': '1mg',
         'frequency': 'Once daily',
         'startDate': Timestamp.fromDate(DateTime(2026, 2, 1)),
-        'totalSupply': 30,
-        // no supplyStartDate, plus legacy fields that must be ignored
-        'currentSupply': 12,
-        'lowSupplyThreshold': 7,
       });
-      final med = Medication.fromFirestore(doc);
-      expect(med.totalSupply, 30);
-      expect(med.supplyStartDate, DateTime(2026, 2, 1));
-      expect(med.restockLeadDays, isNull);
+      expect(Medication.fromFirestore(doc).petId, '');
     });
 
-    test('toFirestore includes new supply fields when set', () {
-      final med =
-          makeMed(supplyStartDate: DateTime(2026, 1, 1), restockLeadDays: 5);
-      final map = med.toFirestore();
+    test('copyWith updates petId', () {
+      final med = _makeMedication();
+      expect(med.copyWith(petId: 'pet-2').petId, 'pet-2');
+      expect(med.copyWith().petId, 'pet-1');
+    });
+  });
 
-      expect(map['totalSupply'], 60);
-      expect(map['supplyStartDate'], isA<Timestamp>());
-      expect(map['restockLeadDays'], 5);
+  group('Medication hasEndReminder', () {
+    Medication makeMed({
+      bool remindersEnabled = true,
+      bool isActive = true,
+      DateTime? endDate,
+    }) {
+      return Medication(
+        id: 'm1',
+        petId: 'pet-1',
+        name: 'Furosemide',
+        dosage: '12.5mg',
+        frequency: 'Twice daily',
+        startDate: DateTime(2026, 1, 1),
+        endDate: endDate,
+        remindersEnabled: remindersEnabled,
+        isActive: isActive,
+      );
+    }
+
+    test('true when active, reminders enabled, and an end date is set', () {
+      expect(makeMed(endDate: DateTime(2026, 6, 1)).hasEndReminder, isTrue);
     });
 
-    test('supply fields roundtrip through toFirestore/fromFirestore', () {
-      final original =
-          makeMed(supplyStartDate: DateTime(2026, 1, 1), restockLeadDays: 5);
-      final map = original.toFirestore();
-      final doc = FakeDocumentSnapshot('m1', map);
-      final restored = Medication.fromFirestore(doc);
-
-      expect(restored.totalSupply, original.totalSupply);
-      expect(restored.supplyStartDate, original.supplyStartDate);
-      expect(restored.restockLeadDays, original.restockLeadDays);
+    test('false when no end date', () {
+      expect(makeMed(endDate: null).hasEndReminder, isFalse);
     });
 
-    test('copyWith clearSupplyStartDate disables tracking', () {
-      final med = makeMed(supplyStartDate: DateTime(2026, 1, 1));
-      final cleared = med.copyWith(clearSupplyStartDate: true);
-      expect(cleared.supplyStartDate, isNull);
-      expect(cleared.hasSupplyTracking, isFalse);
+    test('false when reminders disabled', () {
+      expect(
+        makeMed(endDate: DateTime(2026, 6, 1), remindersEnabled: false)
+            .hasEndReminder,
+        isFalse,
+      );
+    });
+
+    test('false when inactive', () {
+      expect(
+        makeMed(endDate: DateTime(2026, 6, 1), isActive: false).hasEndReminder,
+        isFalse,
+      );
     });
   });
 }
