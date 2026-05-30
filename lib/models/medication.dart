@@ -14,8 +14,8 @@ class Medication {
     this.remindersEnabled = false,
     this.isActive = true,
     this.totalSupply,
-    this.currentSupply,
-    this.lowSupplyThreshold,
+    this.supplyStartDate,
+    this.restockLeadDays,
   });
 
   final String id;
@@ -33,19 +33,45 @@ class Medication {
   /// Total number of doses dispensed (null = supply tracking disabled).
   final int? totalSupply;
 
-  /// Remaining doses (null = supply tracking disabled).
-  final int? currentSupply;
+  /// When the current batch (of [totalSupply] doses) started.
+  final DateTime? supplyStartDate;
 
-  /// Alert when currentSupply falls to this level (default: 7 when enabled).
-  final int? lowSupplyThreshold;
+  /// Fire the restock reminder this many days before predicted run-out.
+  final int? restockLeadDays;
 
-  /// Whether supply tracking is active for this medication.
-  bool get hasSupplyTracking => totalSupply != null && currentSupply != null;
+  /// Doses consumed per day, derived from frequency. null => not trackable.
+  int? get dosesPerDay => switch (frequency) {
+        'Once daily' => 1,
+        'Twice daily' => 2,
+        _ => null,
+      };
 
-  /// Whether the supply is running low.
-  bool get isLowSupply =>
-      hasSupplyTracking &&
-      currentSupply! <= (lowSupplyThreshold ?? 7);
+  bool get hasSupplyTracking =>
+      totalSupply != null && supplyStartDate != null && dosesPerDay != null;
+
+  int get _daysElapsed {
+    final d = DateTime.now().difference(supplyStartDate!).inDays;
+    return d < 0 ? 0 : d;
+  }
+
+  /// Remaining doses, clamped to [0, totalSupply].
+  int get remainingDoses {
+    if (!hasSupplyTracking) return 0;
+    final used = dosesPerDay! * _daysElapsed;
+    return (totalSupply! - used).clamp(0, totalSupply!).toInt();
+  }
+
+  /// Predicted date the batch runs out.
+  DateTime get runOutDate => supplyStartDate!
+      .add(Duration(days: (totalSupply! / dosesPerDay!).ceil()));
+
+  /// When the restock reminder should fire.
+  DateTime get restockDate =>
+      runOutDate.subtract(Duration(days: restockLeadDays ?? 5));
+
+  /// True once within the restock lead window.
+  bool get needsRestock =>
+      hasSupplyTracking && !DateTime.now().isBefore(restockDate);
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -61,8 +87,9 @@ class Medication {
       'remindersEnabled': remindersEnabled,
       'isActive': isActive,
       if (totalSupply != null) 'totalSupply': totalSupply,
-      if (currentSupply != null) 'currentSupply': currentSupply,
-      if (lowSupplyThreshold != null) 'lowSupplyThreshold': lowSupplyThreshold,
+      if (supplyStartDate != null)
+        'supplyStartDate': Timestamp.fromDate(supplyStartDate!),
+      if (restockLeadDays != null) 'restockLeadDays': restockLeadDays,
     };
   }
 
@@ -83,8 +110,12 @@ class Medication {
       remindersEnabled: data['remindersEnabled'] ?? false,
       isActive: data['isActive'] ?? true,
       totalSupply: data['totalSupply'] as int?,
-      currentSupply: data['currentSupply'] as int?,
-      lowSupplyThreshold: data['lowSupplyThreshold'] as int?,
+      supplyStartDate: data['supplyStartDate'] != null
+          ? (data['supplyStartDate'] as Timestamp).toDate()
+          : (data['totalSupply'] != null
+              ? (data['startDate'] as Timestamp).toDate()
+              : null),
+      restockLeadDays: data['restockLeadDays'] as int?,
     );
   }
 
@@ -103,10 +134,10 @@ class Medication {
     bool? isActive,
     int? totalSupply,
     bool clearTotalSupply = false,
-    int? currentSupply,
-    bool clearCurrentSupply = false,
-    int? lowSupplyThreshold,
-    bool clearLowSupplyThreshold = false,
+    DateTime? supplyStartDate,
+    bool clearSupplyStartDate = false,
+    int? restockLeadDays,
+    bool clearRestockLeadDays = false,
   }) {
     return Medication(
       id: id ?? this.id,
@@ -122,11 +153,12 @@ class Medication {
       isActive: isActive ?? this.isActive,
       totalSupply:
           clearTotalSupply ? null : (totalSupply ?? this.totalSupply),
-      currentSupply:
-          clearCurrentSupply ? null : (currentSupply ?? this.currentSupply),
-      lowSupplyThreshold: clearLowSupplyThreshold
+      supplyStartDate: clearSupplyStartDate
           ? null
-          : (lowSupplyThreshold ?? this.lowSupplyThreshold),
+          : (supplyStartDate ?? this.supplyStartDate),
+      restockLeadDays: clearRestockLeadDays
+          ? null
+          : (restockLeadDays ?? this.restockLeadDays),
     );
   }
 }
