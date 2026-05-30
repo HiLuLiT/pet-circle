@@ -46,6 +46,10 @@
           {
             "type": "command",
             "command": "/Users/hilabb/repos/pet-circle/.claude/hooks/pc-pre-push.sh"
+          },
+          {
+            "type": "command",
+            "command": "/Users/hilabb/repos/pet-circle/.claude/hooks/pc-pr-create.sh"
           }
         ]
       }

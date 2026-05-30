@@ -280,15 +280,24 @@ Compute the verdict:
 - `❌ BLOCKED (CRITICAL)` — `--auto` mode with CRITICAL findings (autonomous variant of NEEDS REVIEW)
 - `❌ BUILD BROKEN` — should have already exited at Step 3, but a re-verify failure here also counts
 
-**If `AUTO_MODE=1` AND verdict is `✅ PHASE PASSED`:** write a pass-marker so the pre-push hook can short-circuit consecutive pushes:
+**If `AUTO_MODE=1` AND verdict is `✅ PHASE PASSED`:** write TWO pass-markers so the autonomous hooks downstream can short-circuit:
 
 ```bash
 BRANCH="$(cd /Users/hilabb/repos/pet-circle && git rev-parse --abbrev-ref HEAD)"
 BRANCH_HASH="$(echo -n "$BRANCH" | shasum | awk '{print $1}' | cut -c1-12)"
+
+# Static marker — proves analyze + test green. Read by pc-pre-push.sh.
 touch "/tmp/pc-gate-${BRANCH_HASH}.pass"
+
+# Review marker — proves full review (reviewers + CRITICAL clean) passed.
+# Only write this when reviewers actually ran (NOT when --skip-reviewers was set).
+# Read by pc-pr-create.sh to allow `gh pr create` / `gh pr ready`.
+if [ -z "$SKIP_REVIEWERS" ]; then
+  touch "/tmp/pc-review-${BRANCH_HASH}.pass"
+fi
 ```
 
-The pre-push hook reads this marker (TTL 10 min, also checks no files edited since) and skips re-running the static gate.
+The pre-push hook reads the static marker (TTL 10 min, also checks no files edited since) and skips re-running the static gate. The pre-PR-creation hook reads the review marker to allow `gh pr create`.
 
 Print a final block:
 

@@ -1,0 +1,131 @@
+name: PR Code Review
+
+# Layer 3 of the autonomous gate stack:
+#   Layer 1 (local): pc-pre-push.sh — analyze + tests on git push (~30s)
+#   Layer 2 (local): pc-pr-create.sh — full review on gh pr create (~3–5min)
+#   Layer 3 (this):  GitHub Actions reviewers on PR opened/synchronized
+#
+# This workflow runs the same 3-reviewer suite that /pc-phase dispatches
+# locally, but server-side on every PR sync. Findings are posted back as a
+# PR comment. CI fails (red check) if any HIGH or CRITICAL severity findings
+# remain after one pass — blocking merge.
+#
+# Required GitHub secret:
+#   ANTHROPIC_API_KEY — set at: Settings → Secrets and variables → Actions
+#
+# If the secret is missing, the workflow skips the LLM review steps and only
+# runs the static gate (analyze + test).
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [main]
+
+concurrency:
+  group: pr-review-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  # ----------------------------------------------------------------------
+  # 1. Static gate — analyze + test. Must pass before LLM reviewers run.
+  # ----------------------------------------------------------------------
+  static-gate:
+    name: Static gate (analyze + test)
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.38.5'
+          cache: true
+
+      - run: flutter pub get
+
+      - name: flutter analyze
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: flutter test
+        run: flutter test
+
+  # ----------------------------------------------------------------------
+  # 2. Claude reviewers — 3 parallel agents (flutter, code, security)
+  # ----------------------------------------------------------------------
+  claude-review:
+    name: Claude code review
+    needs: static-gate
+    runs-on: ubuntu-latest
+    if: |
+      github.event.pull_request.draft == false &&
+      vars.ENABLE_CLAUDE_REVIEW != 'false'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Confirm secret is set
+        run: |
+          if [ -z "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "::warning::ANTHROPIC_API_KEY not set — skipping LLM review."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+        id: secret_check
+
+      - name: Run Claude reviewers
+        if: steps.secret_check.outputs.skip != 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          mode: review
+          prompt: |
+            Review this Flutter+Firebase pull request using THREE reviewers in parallel:
+              • flutter-reviewer (Dart idioms, immutability, copyWith, widget patterns)
+              • code-reviewer (general quality, error handling, file organization)
+              • security-reviewer (vulnerabilities, secrets, payload validation)
+
+            Project conventions to respect (from /Users/hilabb/repos/pet-circle/CLAUDE.md):
+              - Models are immutable; mutations via copyWith()
+              - All user-visible strings go through AppLocalizations (en + he)
+              - ChangeNotifier stores in lib/stores/
+              - Services in lib/services/ follow abstract + concrete + web-stub pattern
+              - Colors via AppSemanticColors.of(context), never hardcoded hex
+              - Cloud Functions in functions/src/, Node 20 required
+
+            REPORT ONLY HIGH AND CRITICAL severity findings.
+            Skip LOW, INFO, and MEDIUM unless they cascade into a HIGH.
+
+            Output format for each finding:
+              ### [HIGH|CRITICAL] {one-line title}
+              - File: {path}:{line}
+              - Description: {what's wrong, 1-3 sentences}
+              - Suggested fix: {minimal change to resolve}
+
+            If nothing of severity HIGH or CRITICAL: respond exactly:
+              ### Clean review
+
+              No HIGH or CRITICAL issues found.
+
+            Post the consolidated findings as a single PR comment.
+            If any CRITICAL or HIGH found, exit with code 1 so this check
+            fails red on the PR. Otherwise exit 0.
+
+      - name: Comment review skipped
+        if: steps.secret_check.outputs.skip == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ Claude code review skipped — `ANTHROPIC_API_KEY` secret not configured.\n\nTo enable: Settings → Secrets and variables → Actions → New repository secret\n\nOr set repository variable `ENABLE_CLAUDE_REVIEW=false` to suppress this notice.'
+            });
