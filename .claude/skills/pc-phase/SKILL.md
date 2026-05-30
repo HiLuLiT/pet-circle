@@ -15,7 +15,19 @@ Run this skill after finishing the code changes for a feature phase. It performs
 /pc-phase --phase "Phase 3 — Measurement Reminders"   # name the phase for reviewer context
 /pc-phase --skip-reviewers           # quick mid-phase check: only gen-l10n + analyze + test
 /pc-phase --no-autofix               # run reviewers but report only — no pc-issue-fixer dispatch
+/pc-phase --auto                     # autonomous mode: no CRITICAL prompt, writes pass-marker
+                                     # (invoked automatically by pc-pre-push.sh on failed push)
 ```
+
+### `--auto` mode (for autonomous use by the pre-push hook)
+
+When `--auto` is set:
+- CRITICAL findings are **reported but never prompted on**. The skill returns verdict
+  `❌ BLOCKED (CRITICAL)` instead of asking the user. The user resolves manually.
+- On `✅ PHASE PASSED`, the skill writes a pass-marker file to
+  `/tmp/pc-gate-<branch-hash>.pass`. The pre-push hook reads this to skip a
+  redundant re-run on the next `git push` within 10 minutes (assuming no edits).
+- The skill must run to completion silently; do not pause for input.
 
 ## What it does
 
@@ -41,6 +53,7 @@ Read the user's invocation for these flags:
 - `--phase "<name>"` — capture phase name (default: read from `.claude/plans/*.md` if a single plan exists, else empty)
 - `--skip-reviewers` — set `SKIP_REVIEWERS=1`
 - `--no-autofix` — set `NO_AUTOFIX=1`
+- `--auto` — set `AUTO_MODE=1`. In `--auto`: never prompt on CRITICAL; write pass-marker on success.
 
 Load configuration from `.claude/pc-config.yaml`:
 - `analyze_command` (default `flutter analyze --no-pub`)
@@ -231,8 +244,8 @@ If all three returned `Clean review`: skip to Step 9 with verdict `✅ PHASE PAS
 If any CRITICAL findings exist:
 1. Print the full CRITICAL findings (not just the table — include description + suggested fix)
 2. STOP. Do not auto-fix. Do not proceed to Step 8.
-3. Ask the user: "Found N CRITICAL issues. Auto-fix is disabled for CRITICAL severity. How should I proceed?"
-4. Wait for direction.
+3. **If `AUTO_MODE=1`**: do NOT prompt. Set verdict to `❌ BLOCKED (CRITICAL)` and skip to Step 9. The user will see the findings in the final report and resolve manually before retrying the push.
+4. **Otherwise (interactive)**: Ask the user: "Found N CRITICAL issues. Auto-fix is disabled for CRITICAL severity. How should I proceed?" — wait for direction.
 
 ### Step 8 — Auto-fix HIGH findings (unless `NO_AUTOFIX=1`)
 
@@ -264,7 +277,18 @@ Compute the verdict:
 
 - `✅ PHASE PASSED` — analyze + test green AND no CRITICAL findings AND (HIGH count is 0 OR all HIGH fixes applied successfully)
 - `⚠️ NEEDS REVIEW` — CRITICAL findings present OR HIGH fixes failed OR `--no-autofix` and HIGH findings remain
+- `❌ BLOCKED (CRITICAL)` — `--auto` mode with CRITICAL findings (autonomous variant of NEEDS REVIEW)
 - `❌ BUILD BROKEN` — should have already exited at Step 3, but a re-verify failure here also counts
+
+**If `AUTO_MODE=1` AND verdict is `✅ PHASE PASSED`:** write a pass-marker so the pre-push hook can short-circuit consecutive pushes:
+
+```bash
+BRANCH="$(cd /Users/hilabb/repos/pet-circle && git rev-parse --abbrev-ref HEAD)"
+BRANCH_HASH="$(echo -n "$BRANCH" | shasum | awk '{print $1}' | cut -c1-12)"
+touch "/tmp/pc-gate-${BRANCH_HASH}.pass"
+```
+
+The pre-push hook reads this marker (TTL 10 min, also checks no files edited since) and skips re-running the static gate.
 
 Print a final block:
 
