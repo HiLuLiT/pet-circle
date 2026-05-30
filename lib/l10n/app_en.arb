@@ -438,6 +438,11 @@
   "@restockNotificationTitle": { "placeholders": { "name": { "type": "String" } } },
   "restockNotificationBody": "{name} runs out in about {days} days — order a refill",
   "@restockNotificationBody": { "placeholders": { "name": { "type": "String" }, "days": { "type": "int" } } },
+  "delete": "Delete",
+  "deleteMedication": "Delete Medication",
+  "deleteMedicationConfirmation": "Delete {name}? This will remove the medication and cancel its reminders.",
+  "@deleteMedicationConfirmation": { "placeholders": { "name": { "type": "String" } } },
+  "medicationDeleted": "Medication deleted",
   "medicationReminderTimes": "Medication Reminder Times",
   "morningReminder": "Morning",
   "eveningReminder": "Evening"

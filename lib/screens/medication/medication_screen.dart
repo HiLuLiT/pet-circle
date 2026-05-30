@@ -29,6 +29,7 @@ class _MedicationScreenState extends State<MedicationScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => AddMedicationSheet(medication: medication),
     );

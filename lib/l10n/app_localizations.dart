@@ -2402,6 +2402,30 @@ abstract class AppLocalizations {
   /// **'{name} runs out in about {days} days — order a refill'**
   String restockNotificationBody(String name, int days);
 
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @deleteMedication.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Medication'**
+  String get deleteMedication;
+
+  /// No description provided for @deleteMedicationConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {name}? This will remove the medication and cancel its reminders.'**
+  String deleteMedicationConfirmation(String name);
+
+  /// No description provided for @medicationDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication deleted'**
+  String get medicationDeleted;
+
   /// No description provided for @medicationReminderTimes.
   ///
   /// In en, this message translates to:

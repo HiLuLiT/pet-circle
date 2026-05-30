@@ -28,8 +28,8 @@ class PetAccess {
   bool get canManageCircle => role.canManageCircle;
   bool get canDeletePet => role.canDeletePet;
   bool get canAddNotes => role.canAddNotes;
-  bool get canManageMedication => true;
-  bool get canDeleteMeasurements => true;
+  bool get canManageMedication => role.canManageMedication;
+  bool get canDeleteMeasurements => role.canDeleteMeasurements;
 
   factory PetAccess.unknown([Pet? pet]) {
     return PetAccess(

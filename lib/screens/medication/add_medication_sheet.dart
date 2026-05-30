@@ -236,6 +236,56 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     );
   }
 
+  Future<void> _confirmDelete() async {
+    final med = widget.medication;
+    if (med == null) return;
+
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppSemanticColors.of(context);
+
+    final access = petStore.accessForActivePet();
+    if (!access.canManageMedication) return;
+    final petId = petStore.activePet?.id ?? '';
+    if (petId.isEmpty) return;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(l10n.deleteMedication),
+        content: Text(l10n.deleteMedicationConfirmation(med.name)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: Text(
+              l10n.delete,
+              style: TextStyle(color: c.error),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    await medicationStore.removeMedication(petId, med.id);
+    if (!mounted) return;
+
+    if (!kIsWeb) {
+      ReminderService.instance.cancelRestockReminder(med.id);
+    }
+
+    navigator.pop();
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.medicationDeleted)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -258,12 +308,22 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.close),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (_isEditing)
+                        IconButton(
+                          onPressed: _confirmDelete,
+                          icon: Icon(Icons.delete_outline, color: c.error),
+                          tooltip: l10n.deleteMedication,
+                        )
+                      else
+                        const SizedBox(width: 48),
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: AppSpacingTokens.sm),
                   Center(

@@ -1271,6 +1271,20 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get delete => 'Delete';
+
+  @override
+  String get deleteMedication => 'Delete Medication';
+
+  @override
+  String deleteMedicationConfirmation(String name) {
+    return 'Delete $name? This will remove the medication and cancel its reminders.';
+  }
+
+  @override
+  String get medicationDeleted => 'Medication deleted';
+
+  @override
   String get medicationReminderTimes => 'Medication Reminder Times';
 
   @override

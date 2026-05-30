@@ -432,6 +432,11 @@
   "@restockNotificationTitle": { "placeholders": { "name": { "type": "String" } } },
   "restockNotificationBody": "{name} ייגמר בעוד כ-{days} ימים — הזמינו מלאי נוסף",
   "@restockNotificationBody": { "placeholders": { "name": { "type": "String" }, "days": { "type": "int" } } },
+  "delete": "מחיקה",
+  "deleteMedication": "מחיקת תרופה",
+  "deleteMedicationConfirmation": "למחוק את {name}? פעולה זו תסיר את התרופה ותבטל את התזכורות שלה.",
+  "@deleteMedicationConfirmation": { "placeholders": { "name": { "type": "String" } } },
+  "medicationDeleted": "התרופה נמחקה",
   "medicationReminderTimes": "שעות תזכורת תרופות",
   "morningReminder": "בוקר",
   "eveningReminder": "ערב"

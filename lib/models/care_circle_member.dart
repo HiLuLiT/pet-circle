@@ -6,6 +6,8 @@ extension CareCirclePermissions on CareCircleRole {
   bool get canManageCircle => this == CareCircleRole.owner;
   bool get canAddNotes => true;
   bool get canDeletePet => this == CareCircleRole.owner;
+  bool get canManageMedication => true;
+  bool get canDeleteMeasurements => true;
 
   /// Maps legacy Firestore values to the simplified role model.
   /// 'admin' -> owner, everything else -> member.

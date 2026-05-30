@@ -1262,6 +1262,20 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
+  String get delete => 'מחיקה';
+
+  @override
+  String get deleteMedication => 'מחיקת תרופה';
+
+  @override
+  String deleteMedicationConfirmation(String name) {
+    return 'למחוק את $name? פעולה זו תסיר את התרופה ותבטל את התזכורות שלה.';
+  }
+
+  @override
+  String get medicationDeleted => 'התרופה נמחקה';
+
+  @override
   String get medicationReminderTimes => 'שעות תזכורת תרופות';
 
   @override
