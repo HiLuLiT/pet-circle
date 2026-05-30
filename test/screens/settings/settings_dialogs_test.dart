@@ -12,8 +12,13 @@ import '../../helpers/test_http_overrides.dart';
 
 /// Sets a tall viewport so SettingsContent can render all sections without
 /// overflow errors causing widgets to be skipped.
+///
+/// 3600px chosen to comfortably fit the Settings screen including the
+/// notification preferences (measurement reminder controls + medication time
+/// pickers added in the push-notifications feature) plus the About card and
+/// the Sign Out button at the bottom. Bump this if Settings grows again.
 void _setTallView(WidgetTester tester) {
-  tester.view.physicalSize = const Size(600, 2400);
+  tester.view.physicalSize = const Size(600, 3600);
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);

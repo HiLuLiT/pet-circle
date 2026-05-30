@@ -1,0 +1,34 @@
+# Pet Circle automation config — used by /pc-phase skill and the pc-* agents.
+# Change values here rather than editing the skill body.
+
+# Localization
+locales: [en, he]
+arb_dir: lib/l10n
+arb_en: lib/l10n/app_en.arb
+arb_he: lib/l10n/app_he.arb
+gen_l10n_command: flutter gen-l10n
+
+# Static checks
+analyze_command: flutter analyze --no-pub
+test_command: flutter test
+# Patterns matching analyzer ERROR lines (treated as gate failures).
+# Info/warning lines pass the gate per the existing CI policy.
+analyze_error_pattern: "error • "
+
+# Reviewer set — invoked in parallel by /pc-phase
+reviewers:
+  - everything-claude-code:flutter-reviewer
+  - everything-claude-code:code-reviewer
+  - everything-claude-code:security-reviewer
+
+# Severity handling
+severities_to_fix: [HIGH]          # auto-dispatch pc-issue-fixer for each
+severities_to_prompt: [CRITICAL]    # stop and ask the user
+severities_to_ignore: [LOW, INFO, MEDIUM]
+
+# Cloud Functions
+node_version_for_functions: v20.12.2
+node_path_for_functions: $HOME/.nvm/versions/node/v20.12.2/bin
+
+# Project paths (referenced by hooks)
+project_root: /Users/hilabb/repos/pet-circle
