@@ -102,6 +102,9 @@ void main() async {
   // Reconcile restock reminders whenever medications change: schedule OS
   // notifications for supply-tracked meds and surface an in-app entry for any
   // medication that has reached its restock window.
+  // Cache the last restockDate scheduled per medication so unrelated store
+  // mutations (notes, fetches, other pets) don't re-issue OS scheduling calls.
+  final scheduledRestockDates = <String, DateTime>{};
   medicationStore.addListener(() {
     final l10n = lookupAppLocalizations(appLocale.value);
     for (final med in medicationStore.getMedicationsNeedingRestock()) {
@@ -113,8 +116,13 @@ void main() async {
       );
     }
     if (!kIsWeb) {
+      final liveIds = <String>{};
       for (final med in medicationStore.allMedications) {
         if (med.hasSupplyTracking && med.isActive) {
+          liveIds.add(med.id);
+          final restockDate = med.restockDate;
+          if (scheduledRestockDates[med.id] == restockDate) continue;
+          scheduledRestockDates[med.id] = restockDate;
           reminderService.scheduleRestockReminder(
             med,
             title: l10n.restockNotificationTitle(med.name),
@@ -123,6 +131,8 @@ void main() async {
           );
         }
       }
+      // Drop cache entries for meds that no longer track supply.
+      scheduledRestockDates.removeWhere((id, _) => !liveIds.contains(id));
     }
   });
 

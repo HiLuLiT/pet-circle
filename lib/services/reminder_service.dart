@@ -128,7 +128,9 @@ class ReminderService implements AbstractReminderService {
       hash ^= s.codeUnitAt(i);
       hash = (hash * 0x01000193) & 0xFFFFFFFF;
     }
-    return hash & 0x3FFFFFFF; // 30 bits — leaves room for stride
+    // 28 bits: morning/evening IDs (hash*2 / *2+1) max out at 0x1FFFFFFF,
+    // staying clear of the 0x40000000 restock namespace below.
+    return hash & 0x0FFFFFFF;
   }
 
   /// Stable numeric IDs for medication reminders.
