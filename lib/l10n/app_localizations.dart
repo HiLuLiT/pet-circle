@@ -2525,26 +2525,26 @@ abstract class AppLocalizations {
   /// No description provided for @exportFailedWithError.
   ///
   /// In en, this message translates to:
-  /// **'Export failed: {error}'**
-  String exportFailedWithError(String error);
+  /// **'Export failed. Please try again.'**
+  String get exportFailedWithError;
 
   /// No description provided for @failedToCreatePet.
   ///
   /// In en, this message translates to:
-  /// **'Failed to create pet: {error}'**
-  String failedToCreatePet(String error);
+  /// **'Failed to create pet. Please try again.'**
+  String get failedToCreatePet;
 
   /// No description provided for @failedToRemoveMember.
   ///
   /// In en, this message translates to:
-  /// **'Failed to remove member: {error}'**
-  String failedToRemoveMember(String error);
+  /// **'Failed to remove member. Please try again.'**
+  String get failedToRemoveMember;
 
   /// No description provided for @failedToSendInvite.
   ///
   /// In en, this message translates to:
-  /// **'Failed to send invite: {error}'**
-  String failedToSendInvite(String error);
+  /// **'Failed to send invite. Please try again.'**
+  String get failedToSendInvite;
 
   /// No description provided for @noActivePet.
   ///

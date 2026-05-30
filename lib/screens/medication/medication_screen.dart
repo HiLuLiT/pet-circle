@@ -54,9 +54,9 @@ class _MedicationScreenState extends State<MedicationScreen> {
       return v;
     }
 
-    final header = l10n.medicationCsvHeader;
+    const header = 'Medication,Dosage,Frequency,Start Date,End Date,Status,Prescribed By,Purpose,Notes';
     final csvLines = meds.map((m) {
-      final status = m.isActive ? l10n.ongoing : l10n.completed;
+      final status = m.isActive ? 'Ongoing' : 'Completed';
       return [
         csvEscape(m.name),
         csvEscape(m.dosage),
@@ -115,8 +115,9 @@ class _MedicationScreenState extends State<MedicationScreen> {
                   SnackBar(content: Text(l10n.medicationLogExported)),
                 );
               } catch (e) {
+                debugPrint('[MedicationScreen] CSV export failed: $e');
                 messenger.showSnackBar(
-                  SnackBar(content: Text(l10n.exportFailedWithError(e.toString()))),
+                  SnackBar(content: Text(l10n.exportFailedWithError)),
                 );
               }
             },

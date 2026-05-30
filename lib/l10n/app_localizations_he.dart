@@ -1329,24 +1329,16 @@ class AppLocalizationsHe extends AppLocalizations {
   String get exportFailedRetry => 'הייצוא נכשל. אנא נסה שוב.';
 
   @override
-  String exportFailedWithError(String error) {
-    return 'הייצוא נכשל: $error';
-  }
+  String get exportFailedWithError => 'הייצוא נכשל. אנא נסה שוב.';
 
   @override
-  String failedToCreatePet(String error) {
-    return 'יצירת חיית המחמד נכשלה: $error';
-  }
+  String get failedToCreatePet => 'יצירת חיית המחמד נכשלה. אנא נסה שוב.';
 
   @override
-  String failedToRemoveMember(String error) {
-    return 'הסרת החבר נכשלה: $error';
-  }
+  String get failedToRemoveMember => 'הסרת החבר נכשלה. אנא נסה שוב.';
 
   @override
-  String failedToSendInvite(String error) {
-    return 'שליחת ההזמנה נכשלה: $error';
-  }
+  String get failedToSendInvite => 'שליחת ההזמנה נכשלה. אנא נסה שוב.';
 
   @override
   String get noActivePet => 'אין חיית מחמד פעילה';

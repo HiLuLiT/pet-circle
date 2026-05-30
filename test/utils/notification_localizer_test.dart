@@ -75,11 +75,18 @@ void main() {
       expect(localizeNotification(n, en).body, en.measurementSavedBpm(12));
     });
 
-    test('resolves invitationSentTo with two args', () {
+    test('resolves invitationSentTo with two args (en)', () {
       final n = _notif(
           bodyKey: 'invitationSentTo', args: const ['a@b.com', 'Member']);
       expect(localizeNotification(n, en).body,
-          en.invitationSentTo('a@b.com', 'Member'));
+          en.invitationSentTo('a@b.com', en.roleMember));
+    });
+
+    test('resolves invitationSentTo role in Hebrew (he)', () {
+      final n = _notif(
+          bodyKey: 'invitationSentTo', args: const ['a@b.com', 'Member']);
+      expect(localizeNotification(n, he).body,
+          he.invitationSentTo('a@b.com', he.roleMember));
     });
 
     test('resolves vetInviteSent with one arg', () {

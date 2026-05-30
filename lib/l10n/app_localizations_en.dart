@@ -1339,24 +1339,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportFailedRetry => 'Export failed. Please try again.';
 
   @override
-  String exportFailedWithError(String error) {
-    return 'Export failed: $error';
-  }
+  String get exportFailedWithError => 'Export failed. Please try again.';
 
   @override
-  String failedToCreatePet(String error) {
-    return 'Failed to create pet: $error';
-  }
+  String get failedToCreatePet => 'Failed to create pet. Please try again.';
 
   @override
-  String failedToRemoveMember(String error) {
-    return 'Failed to remove member: $error';
-  }
+  String get failedToRemoveMember =>
+      'Failed to remove member. Please try again.';
 
   @override
-  String failedToSendInvite(String error) {
-    return 'Failed to send invite: $error';
-  }
+  String get failedToSendInvite => 'Failed to send invite. Please try again.';
 
   @override
   String get noActivePet => 'No active pet';

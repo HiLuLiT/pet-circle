@@ -80,10 +80,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       context.go(AppRoutes.shell());
     } catch (e) {
       if (!mounted) return;
+      debugPrint('[OnboardingFlow] Failed to create pet: $e');
       final l10n = AppLocalizations.of(context)!;
       setState(() => _isSubmitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.failedToCreatePet(e.toString()))),
+        SnackBar(content: Text(l10n.failedToCreatePet)),
       );
     }
   }

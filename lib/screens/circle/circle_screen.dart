@@ -226,7 +226,7 @@ class _CircleContent extends StatelessWidget {
         debugPrint('[CircleScreen] Remove failed: $e');
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.failedToRemoveMember(e.toString()))),
+          SnackBar(content: Text(l10n.failedToRemoveMember)),
         );
       }
     }
@@ -564,7 +564,7 @@ class _InviteSheetState extends State<_InviteSheet> {
       final l10n = AppLocalizations.of(context)!;
       setState(() {
         _isLoading = false;
-        _error = l10n.failedToSendInvite(e.toString());
+        _error = l10n.failedToSendInvite;
       });
     }
   }

@@ -1,5 +1,6 @@
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/app_notification.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 
 /// Title and body of a notification, resolved into the current locale.
 class LocalizedNotification {
@@ -52,7 +53,7 @@ String? _resolveBody(String? key, List<String> args, AppLocalizations l10n) {
       return bpm != null ? l10n.measurementSavedBpm(bpm) : null;
     case 'invitationSentTo':
       return args.length >= 2
-          ? l10n.invitationSentTo(args[0], args[1])
+          ? l10n.invitationSentTo(args[0], localizeRoleName(args[1], l10n))
           : null;
     case 'vetInviteSent':
       return args.isNotEmpty ? l10n.vetInviteSent(args[0]) : null;
