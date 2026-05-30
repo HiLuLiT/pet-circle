@@ -269,46 +269,65 @@ void main() {
     });
   });
 
-  group('NotificationStore reconcileRestockNotifications', () {
-    Medication dueMed(String id) => Medication(
+  group('NotificationStore reconcileMedicationEndNotifications', () {
+    Medication endedMed(String id) => Medication(
           id: id,
+          petId: 'p1',
           name: 'Furosemide',
           dosage: '12.5mg',
           frequency: 'Twice daily',
           startDate: DateTime(2026, 1, 1),
-          totalSupply: 60,
-          supplyStartDate: DateTime.now().subtract(const Duration(days: 28)),
-          restockLeadDays: 5,
+          endDate: DateTime(2026, 6, 1),
+          remindersEnabled: true,
         );
 
-    test('adds one entry per due med and is idempotent', () {
+    test('adds one entry per ended med and is idempotent', () {
       store.seed([]);
-      store.reconcileRestockNotifications(
-        [dueMed('m1')],
-        title: 'Time to restock',
-        body: 'Order a refill',
+      store.reconcileMedicationEndNotifications(
+        [endedMed('m1')],
+        title: 'Medication ending today',
+        body: "Furosemide's medication course ends today",
       );
-      store.reconcileRestockNotifications(
-        [dueMed('m1')],
-        title: 'Time to restock',
-        body: 'Order a refill',
+      store.reconcileMedicationEndNotifications(
+        [endedMed('m1')],
+        title: 'Medication ending today',
+        body: "Furosemide's medication course ends today",
       );
       expect(
-        store.all.where((n) => n.id.startsWith('restock-m1-')).length,
+        store.all.where((n) => n.id.startsWith('med-end-m1-')).length,
         1,
       );
     });
 
     test('creates a medication-type notification with the med name', () {
       store.seed([]);
-      store.reconcileRestockNotifications(
-        [dueMed('m2')],
-        title: 'Time to restock',
-        body: 'Order a refill',
+      store.reconcileMedicationEndNotifications(
+        [endedMed('m2')],
+        title: 'Medication ending today',
+        body: "Furosemide's medication course ends today",
       );
-      final entry = store.all.firstWhere((n) => n.id.startsWith('restock-m2-'));
+      final entry = store.all.firstWhere((n) => n.id.startsWith('med-end-m2-'));
       expect(entry.type, NotificationType.medication);
       expect(entry.petName, 'Furosemide');
+    });
+
+    test('skips meds with no end date', () {
+      store.seed([]);
+      final noEnd = Medication(
+        id: 'm3',
+        petId: 'p1',
+        name: 'Aspirin',
+        dosage: '1mg',
+        frequency: 'Once daily',
+        startDate: DateTime(2026, 1, 1),
+        remindersEnabled: true,
+      );
+      store.reconcileMedicationEndNotifications(
+        [noEnd],
+        title: 'Medication ending today',
+        body: 'x',
+      );
+      expect(store.all, isEmpty);
     });
   });
 }

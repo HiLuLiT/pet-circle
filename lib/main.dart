@@ -99,40 +99,39 @@ void main() async {
     }
   };
 
-  // Reconcile restock reminders whenever medications change: schedule OS
-  // notifications for supply-tracked meds and surface an in-app entry for any
-  // medication that has reached its restock window.
-  // Cache the last restockDate scheduled per medication so unrelated store
+  // Reconcile medication-end reminders whenever medications change: schedule a
+  // one-shot OS notification on the morning of each med's end date, and surface
+  // an in-app entry once that end date has arrived.
+  // Cache the last endDate scheduled per medication so unrelated store
   // mutations (notes, fetches, other pets) don't re-issue OS scheduling calls.
-  final scheduledRestockDates = <String, DateTime>{};
+  final scheduledEndDates = <String, DateTime>{};
   medicationStore.addListener(() {
     final l10n = lookupAppLocalizations(appLocale.value);
-    for (final med in medicationStore.getMedicationsNeedingRestock()) {
-      notificationStore.reconcileRestockNotifications(
-        [med],
-        title: l10n.restockNotificationTitle(med.name),
-        body: l10n.restockNotificationBody(
-            med.name, med.restockLeadDays ?? 5),
-      );
+    final now = DateTime.now();
+    for (final med in medicationStore.getMedicationsWithEndReminder()) {
+      if (!med.endDate!.isAfter(now)) {
+        notificationStore.reconcileMedicationEndNotifications(
+          [med],
+          title: l10n.medicationEndingTitle,
+          body: l10n.medicationEndingBody(med.name),
+        );
+      }
     }
     if (!kIsWeb) {
       final liveIds = <String>{};
-      for (final med in medicationStore.allMedications) {
-        if (med.hasSupplyTracking && med.isActive) {
-          liveIds.add(med.id);
-          final restockDate = med.restockDate;
-          if (scheduledRestockDates[med.id] == restockDate) continue;
-          scheduledRestockDates[med.id] = restockDate;
-          reminderService.scheduleRestockReminder(
-            med,
-            title: l10n.restockNotificationTitle(med.name),
-            body: l10n.restockNotificationBody(
-                med.name, med.restockLeadDays ?? 5),
-          );
-        }
+      for (final med in medicationStore.getMedicationsWithEndReminder()) {
+        liveIds.add(med.id);
+        final endDate = med.endDate!;
+        if (scheduledEndDates[med.id] == endDate) continue;
+        scheduledEndDates[med.id] = endDate;
+        reminderService.scheduleMedicationReminder(
+          med,
+          title: l10n.medicationEndingTitle,
+          body: l10n.medicationEndingBody(med.name),
+        );
       }
-      // Drop cache entries for meds that no longer track supply.
-      scheduledRestockDates.removeWhere((id, _) => !liveIds.contains(id));
+      // Drop cache entries for meds that no longer have an end reminder.
+      scheduledEndDates.removeWhere((id, _) => !liveIds.contains(id));
     }
   });
 
@@ -182,6 +181,7 @@ void _seedMockStores() {
     princessId: [
       Medication(
         id: 'med-1',
+        petId: princessId,
         name: 'Furosemide',
         dosage: '12.5mg',
         frequency: 'Twice daily',
@@ -189,6 +189,7 @@ void _seedMockStores() {
       ),
       Medication(
         id: 'med-2',
+        petId: princessId,
         name: 'Pimobendan',
         dosage: '2.5mg',
         frequency: 'Twice daily',

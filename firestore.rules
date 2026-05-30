@@ -167,6 +167,10 @@ service cloud.firestore {
       match /fcmTokens/{tokenId} {
         allow read, create, update, delete: if isSelf(userId);
       }
+
+      match /medications/{medicationId} {
+        allow read, create, update, delete: if isSelf(userId);
+      }
     }
 
     match /pets/{petId} {
@@ -187,11 +191,6 @@ service cloud.firestore {
         allow read: if isPetMember(petId);
         allow create: if isPetMember(petId);
         allow update, delete: if false;
-      }
-
-      match /medications/{medicationId} {
-        allow read: if isPetMember(petId);
-        allow create, update, delete: if canManagePetHealthDataFor(petId);
       }
     }
 

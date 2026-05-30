@@ -89,6 +89,7 @@ void main() {
         petId: [
           Medication(
             id: 'med-test-1',
+            petId: petId,
             name: 'Furosemide',
             dosage: '10mg',
             frequency: 'Twice daily',
@@ -97,6 +98,7 @@ void main() {
           ),
           Medication(
             id: 'med-test-2',
+            petId: petId,
             name: 'Enalapril',
             dosage: '5mg',
             frequency: 'Once daily',

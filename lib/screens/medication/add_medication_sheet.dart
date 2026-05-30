@@ -38,12 +38,9 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
   late final TextEditingController _prescribedByController;
   late final TextEditingController _purposeController;
   late final TextEditingController _notesController;
-  late final TextEditingController _totalSupplyController;
-  late final TextEditingController _restockLeadDaysController;
 
   DateTime? _startDate;
   DateTime? _endDate;
-  bool _supplyTrackingEnabled = false;
 
   bool get _isEditing => widget.medication != null;
 
@@ -70,11 +67,6 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     _purposeController = TextEditingController(text: med?.purpose ?? '');
     _notesController = TextEditingController(text: med?.notes ?? '');
     _remindersEnabled = med?.remindersEnabled ?? false;
-    _supplyTrackingEnabled = med?.hasSupplyTracking ?? false;
-    _totalSupplyController = TextEditingController(
-        text: med?.totalSupply?.toString() ?? '');
-    _restockLeadDaysController = TextEditingController(
-        text: med?.restockLeadDays?.toString() ?? '5');
   }
 
   @override
@@ -86,8 +78,6 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     _prescribedByController.dispose();
     _purposeController.dispose();
     _notesController.dispose();
-    _totalSupplyController.dispose();
-    _restockLeadDaysController.dispose();
     super.dispose();
   }
 
@@ -138,14 +128,6 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     final purpose = _purposeController.text.trim();
     final notes = _notesController.text.trim();
 
-    final trackSupply = _supplyTrackingEnabled && _frequency != 'As needed';
-    final totalSupply =
-        trackSupply ? int.tryParse(_totalSupplyController.text.trim()) : null;
-    final restockLeadDays = trackSupply
-        ? int.tryParse(_restockLeadDaysController.text.trim()) ?? 5
-        : null;
-    final supplyStartDate = trackSupply ? startDate : null;
-
     if (_isEditing) {
       final updated = widget.medication!.copyWith(
         name: name,
@@ -158,36 +140,25 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         purpose: purpose.isNotEmpty ? purpose : null,
         notes: notes.isNotEmpty ? notes : null,
         remindersEnabled: _remindersEnabled,
-        totalSupply: totalSupply,
-        clearTotalSupply: !trackSupply,
-        supplyStartDate: supplyStartDate,
-        clearSupplyStartDate: !trackSupply,
-        restockLeadDays: restockLeadDays,
-        clearRestockLeadDays: !trackSupply,
       );
       medicationStore.updateMedication(petId, widget.medication!.id, updated);
 
-      if (!kIsWeb && _remindersEnabled && _frequency != 'As needed') {
-        ReminderService.instance.scheduleMedicationReminder(updated);
-      } else if (!kIsWeb) {
-        ReminderService.instance.cancelMedicationReminder(widget.medication!.id);
-      }
-
       if (!kIsWeb) {
-        if (updated.hasSupplyTracking && updated.isActive) {
-          ReminderService.instance.scheduleRestockReminder(
+        if (updated.hasEndReminder) {
+          ReminderService.instance.scheduleMedicationReminder(
             updated,
-            title: l10n.restockNotificationTitle(updated.name),
-            body: l10n.restockNotificationBody(
-                updated.name, updated.restockLeadDays ?? 5),
+            title: l10n.medicationEndingTitle,
+            body: l10n.medicationEndingBody(updated.name),
           );
         } else {
-          ReminderService.instance.cancelRestockReminder(widget.medication!.id);
+          ReminderService.instance
+              .cancelMedicationReminder(widget.medication!.id);
         }
       }
     } else {
       final newMed = Medication(
         id: 'med-${DateTime.now().millisecondsSinceEpoch}',
+        petId: petId,
         name: name,
         dosage: dosage,
         frequency: _frequency,
@@ -197,22 +168,14 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         purpose: purpose.isNotEmpty ? purpose : null,
         notes: notes.isNotEmpty ? notes : null,
         remindersEnabled: _remindersEnabled,
-        totalSupply: totalSupply,
-        supplyStartDate: supplyStartDate,
-        restockLeadDays: restockLeadDays,
       );
       medicationStore.addMedication(petId, newMed);
 
-      if (!kIsWeb && _remindersEnabled && _frequency != 'As needed') {
-        ReminderService.instance.scheduleMedicationReminder(newMed);
-      }
-
-      if (!kIsWeb && newMed.hasSupplyTracking && newMed.isActive) {
-        ReminderService.instance.scheduleRestockReminder(
+      if (!kIsWeb && newMed.hasEndReminder) {
+        ReminderService.instance.scheduleMedicationReminder(
           newMed,
-          title: l10n.restockNotificationTitle(newMed.name),
-          body: l10n.restockNotificationBody(
-              newMed.name, newMed.restockLeadDays ?? 5),
+          title: l10n.medicationEndingTitle,
+          body: l10n.medicationEndingBody(newMed.name),
         );
       }
     }
@@ -275,10 +238,6 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
 
     await medicationStore.removeMedication(petId, med.id);
     if (!mounted) return;
-
-    if (!kIsWeb) {
-      ReminderService.instance.cancelRestockReminder(med.id);
-    }
 
     navigator.pop();
     messenger.showSnackBar(
@@ -416,16 +375,6 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                     controller: _notesController,
                   ),
                   const SizedBox(height: AppSpacingTokens.md),
-                  if (_frequency != 'As needed') ...[
-                    _SupplyTrackingCard(
-                      enabled: _supplyTrackingEnabled,
-                      onEnabledChanged: (v) =>
-                          setState(() => _supplyTrackingEnabled = v),
-                      totalSupplyController: _totalSupplyController,
-                      restockLeadDaysController: _restockLeadDaysController,
-                    ),
-                    const SizedBox(height: AppSpacingTokens.md),
-                  ],
                   ReminderCard(
                     enabled: _remindersEnabled,
                     onChanged: (v) =>
@@ -471,81 +420,3 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
   }
 }
 
-// ── Supply Tracking Card ─────────────────────────────────────────────
-
-class _SupplyTrackingCard extends StatelessWidget {
-  const _SupplyTrackingCard({
-    required this.enabled,
-    required this.onEnabledChanged,
-    required this.totalSupplyController,
-    required this.restockLeadDaysController,
-  });
-
-  final bool enabled;
-  final ValueChanged<bool> onEnabledChanged;
-  final TextEditingController totalSupplyController;
-  final TextEditingController restockLeadDaysController;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppSemanticColors.of(context);
-    return Container(
-      padding: const EdgeInsets.all(AppSpacingTokens.md),
-      decoration: BoxDecoration(
-        color: c.primaryLightest,
-        borderRadius: AppRadiiTokens.borderRadiusLg,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.inventory_2_outlined, size: 20, color: c.primary),
-              const SizedBox(width: AppSpacingTokens.sm),
-              Expanded(
-                child: Text(
-                  l10n.medicationSupply,
-                  style: AppSemanticTextStyles.label.copyWith(color: c.primary),
-                ),
-              ),
-              Switch.adaptive(
-                value: enabled,
-                onChanged: onEnabledChanged,
-              ),
-            ],
-          ),
-          if (enabled) ...[
-            const SizedBox(height: AppSpacingTokens.md),
-            Row(
-              children: [
-                Expanded(
-                  child: ValidatedFormField(
-                    label: l10n.totalDoses,
-                    hint: 'e.g., 60',
-                    controller: totalSupplyController,
-                    keyboardType: TextInputType.number,
-                    validator: enabled
-                        ? (v) => (v == null || v.trim().isEmpty || int.tryParse(v.trim()) == null)
-                            ? l10n.fieldRequired
-                            : null
-                        : null,
-                  ),
-                ),
-                const SizedBox(width: AppSpacingTokens.md),
-                Expanded(
-                  child: ValidatedFormField(
-                    label: l10n.restockLeadDaysLabel,
-                    hint: '5',
-                    controller: restockLeadDaysController,
-                    keyboardType: TextInputType.number,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}

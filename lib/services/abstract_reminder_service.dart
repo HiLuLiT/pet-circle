@@ -3,24 +3,15 @@ import 'package:pet_circle/models/medication.dart';
 abstract class AbstractReminderService {
   Future<void> init();
   Future<bool> requestPermission();
+  /// Schedule a one-shot reminder on the morning of [med]'s end date.
   Future<void> scheduleMedicationReminder(
-    Medication med, {
-    int morningHour = 9,
-    int morningMinute = 0,
-    int eveningHour = 21,
-    int eveningMinute = 0,
-  });
-  Future<void> cancelMedicationReminder(String medicationId);
-
-  /// Schedule a one-shot restock reminder for [med] at its restock date.
-  Future<void> scheduleRestockReminder(
     Medication med, {
     required String title,
     required String body,
+    int hour = 9,
+    int minute = 0,
   });
-
-  /// Cancel a scheduled restock reminder.
-  Future<void> cancelRestockReminder(String medicationId);
+  Future<void> cancelMedicationReminder(String medicationId);
 
   Future<void> cancelAllReminders();
 

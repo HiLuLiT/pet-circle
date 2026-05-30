@@ -2,42 +2,33 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pet_circle/models/medication.dart';
 
 class MedicationService {
-  static final _petsCollection =
-      FirebaseFirestore.instance.collection('pets');
+  static final _usersCollection =
+      FirebaseFirestore.instance.collection('users');
 
-  static CollectionReference _ref(String petId) =>
-      _petsCollection.doc(petId).collection('medications');
+  /// Medications are private per user: users/{uid}/medications.
+  static CollectionReference _ref(String uid) =>
+      _usersCollection.doc(uid).collection('medications');
 
-  static Future<void> add(String petId, Medication med) async {
-    await _ref(petId).add(med.toFirestore());
+  static Future<void> add(String uid, Medication med) async {
+    await _ref(uid).add(med.toFirestore());
   }
 
   static Future<void> update(
-    String petId,
+    String uid,
     String medicationId,
     Map<String, dynamic> data,
   ) async {
-    await _ref(petId).doc(medicationId).update(data);
+    await _ref(uid).doc(medicationId).update(data);
   }
 
-  static Future<void> delete(String petId, String medicationId) async {
-    await _ref(petId).doc(medicationId).delete();
+  static Future<void> delete(String uid, String medicationId) async {
+    await _ref(uid).doc(medicationId).delete();
   }
 
-  /// Fetch all medications for a pet (one-time read).
-  static Future<List<Medication>> fetch(String petId) async {
-    final snapshot = await _ref(petId)
-        .orderBy('startDate', descending: true)
-        .get();
+  /// Fetch all of the current user's medications (one-time read).
+  static Future<List<Medication>> fetchForUser(String uid) async {
+    final snapshot =
+        await _ref(uid).orderBy('startDate', descending: true).get();
     return snapshot.docs.map((doc) => Medication.fromFirestore(doc)).toList();
-  }
-
-  @Deprecated('Use fetch instead')
-  static Stream<List<Medication>> stream(String petId) {
-    return _ref(petId)
-        .orderBy('startDate', descending: true)
-        .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Medication.fromFirestore(doc)).toList());
   }
 }
