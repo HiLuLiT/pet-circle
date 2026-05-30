@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/models/app_notification.dart';
+import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 
 AppNotification _makeNotification({
@@ -265,6 +266,49 @@ void main() {
       store.seed([_makeNotification(id: 'n-3')]);
       expect(store.all.length, 1);
       expect(store.all.first.id, 'n-3');
+    });
+  });
+
+  group('NotificationStore reconcileRestockNotifications', () {
+    Medication dueMed(String id) => Medication(
+          id: id,
+          name: 'Furosemide',
+          dosage: '12.5mg',
+          frequency: 'Twice daily',
+          startDate: DateTime(2026, 1, 1),
+          totalSupply: 60,
+          supplyStartDate: DateTime.now().subtract(const Duration(days: 28)),
+          restockLeadDays: 5,
+        );
+
+    test('adds one entry per due med and is idempotent', () {
+      store.seed([]);
+      store.reconcileRestockNotifications(
+        [dueMed('m1')],
+        title: 'Time to restock',
+        body: 'Order a refill',
+      );
+      store.reconcileRestockNotifications(
+        [dueMed('m1')],
+        title: 'Time to restock',
+        body: 'Order a refill',
+      );
+      expect(
+        store.all.where((n) => n.id.startsWith('restock-m1-')).length,
+        1,
+      );
+    });
+
+    test('creates a medication-type notification with the med name', () {
+      store.seed([]);
+      store.reconcileRestockNotifications(
+        [dueMed('m2')],
+        title: 'Time to restock',
+        body: 'Order a refill',
+      );
+      final entry = store.all.firstWhere((n) => n.id.startsWith('restock-m2-'));
+      expect(entry.type, NotificationType.medication);
+      expect(entry.petName, 'Furosemide');
     });
   });
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_notification.dart';
+import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/services/notification_service.dart';
 import 'package:pet_circle/stores/user_store.dart';
 
@@ -61,6 +62,36 @@ class NotificationStore extends ChangeNotifier {
   void addLocal(AppNotification notification) {
     _notifications.insert(0, notification);
     notifyListeners();
+  }
+
+  /// Add an in-app restock notification for each due medication, once per batch.
+  ///
+  /// Dedup key is `restock-<medId>-<runOutDayEpoch>`, so a given batch of a
+  /// medication only ever produces a single in-app entry.
+  void reconcileRestockNotifications(
+    List<Medication> dueMeds, {
+    required String title,
+    required String body,
+  }) {
+    var changed = false;
+    for (final med in dueMeds) {
+      final dayEpoch = med.runOutDate.millisecondsSinceEpoch ~/ 86400000;
+      final id = 'restock-${med.id}-$dayEpoch';
+      if (_notifications.any((n) => n.id == id)) continue;
+      _notifications.insert(
+        0,
+        AppNotification(
+          id: id,
+          title: title,
+          body: body,
+          type: NotificationType.medication,
+          createdAt: DateTime.now(),
+          petName: med.name,
+        ),
+      );
+      changed = true;
+    }
+    if (changed) notifyListeners();
   }
 
   Future<void> markRead(String id) async {
