@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/shadows.dart';
@@ -20,28 +21,24 @@ class BottomNavBar extends StatelessWidget {
   final void Function(int) onTap;
 
   static const _tabs = [
-    _TabDef(icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Home'),
-    _TabDef(
-        icon: Icons.show_chart_outlined,
-        activeIcon: Icons.show_chart,
-        label: 'Trends'),
-    _TabDef(
-        icon: Icons.people_outline,
-        activeIcon: Icons.people,
-        label: 'Circle'),
-    _TabDef(
-        icon: Icons.monitor_heart_outlined,
-        activeIcon: Icons.monitor_heart,
-        label: 'Mesure'),
-    _TabDef(
-        icon: Icons.medication_outlined,
-        activeIcon: Icons.medication,
-        label: 'Medicine'),
+    _TabDef(icon: Icons.home_outlined, activeIcon: Icons.home),
+    _TabDef(icon: Icons.show_chart_outlined, activeIcon: Icons.show_chart),
+    _TabDef(icon: Icons.people_outline, activeIcon: Icons.people),
+    _TabDef(icon: Icons.monitor_heart_outlined, activeIcon: Icons.monitor_heart),
+    _TabDef(icon: Icons.medication_outlined, activeIcon: Icons.medication),
   ];
 
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final labels = [
+      l10n.navHome,
+      l10n.navTrends,
+      l10n.navCircle,
+      l10n.navMeasure,
+      l10n.navMedication,
+    ];
     return Container(
       decoration: BoxDecoration(
         color: AppPrimitives.skyWhite,
@@ -60,7 +57,7 @@ class BottomNavBar extends StatelessWidget {
             final isActive = selectedIndex == i;
             return Expanded(
               child: Semantics(
-                label: tab.label,
+                label: labels[i],
                 button: true,
                 child: GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -80,7 +77,7 @@ class BottomNavBar extends StatelessWidget {
                         ),
                         const SizedBox(height: AppSpacingTokens.xs),
                         Text(
-                          tab.label,
+                          labels[i],
                           style: AppSemanticTextStyles.caption.copyWith(
                             color: isActive
                                 ? c.primary
@@ -108,10 +105,8 @@ class _TabDef {
   const _TabDef({
     required this.icon,
     required this.activeIcon,
-    required this.label,
   });
 
   final IconData icon;
   final IconData activeIcon;
-  final String label;
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
@@ -9,6 +10,8 @@ import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 Widget _wrap(Widget child) {
   return MaterialApp(
     theme: buildAppTheme(),
+    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: AppLocalizations.supportedLocales,
     home: Scaffold(body: Center(child: child)),
   );
 }
@@ -84,27 +87,27 @@ void main() {
       );
     });
 
-    testWidgets('Mesure nav item has semantic label "Mesure"',
+    testWidgets('Mesure nav item has semantic label "Measure"',
         (tester) async {
       await tester.pumpWidget(buildNav());
       await tester.pump();
 
       expect(
-        find.bySemanticsLabel(RegExp('Mesure')),
+        find.bySemanticsLabel(RegExp('Measure')),
         findsOneWidget,
-        reason: 'Mesure tab must expose a "Mesure" semantics label',
+        reason: 'Mesure tab must expose a "Measure" semantics label',
       );
     });
 
-    testWidgets('Medicine nav item has semantic label "Medicine"',
+    testWidgets('Medicine nav item has semantic label "Medication"',
         (tester) async {
       await tester.pumpWidget(buildNav());
       await tester.pump();
 
       expect(
-        find.bySemanticsLabel(RegExp('Medicine')),
+        find.bySemanticsLabel(RegExp('Medication')),
         findsOneWidget,
-        reason: 'Medicine tab must expose a "Medicine" semantics label',
+        reason: 'Medicine tab must expose a "Medication" semantics label',
       );
     });
 
@@ -113,7 +116,7 @@ void main() {
       await tester.pumpWidget(buildNav(selectedIndex: 2));
       await tester.pump();
 
-      for (final label in ['Home', 'Trends', 'Circle', 'Mesure', 'Medicine']) {
+      for (final label in ['Home', 'Trends', 'Circle', 'Measure', 'Medication']) {
         expect(
           find.bySemanticsLabel(RegExp(label)),
           findsOneWidget,

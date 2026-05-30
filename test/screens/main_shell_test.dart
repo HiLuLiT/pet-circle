@@ -77,8 +77,8 @@ void main() {
       expect(find.text('Home'), findsWidgets);
       expect(find.text('Trends'), findsWidgets);
       expect(find.text('Circle'), findsWidgets);
-      expect(find.text('Mesure'), findsWidgets);
-      expect(find.text('Medicine'), findsWidgets);
+      expect(find.text('Measure'), findsWidgets);
+      expect(find.text('Medication'), findsWidgets);
     });
 
     testWidgets('renders with vet role', (tester) async {

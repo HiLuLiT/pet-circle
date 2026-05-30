@@ -184,6 +184,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
       AppNotification(
         id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
         title: _isEditing ? l10n.medicationUpdated : l10n.medicationAdded,
+        titleKey: _isEditing ? 'medicationUpdated' : 'medicationAdded',
         body: name,
         type: NotificationType.medication,
         createdAt: DateTime.now(),
@@ -310,7 +311,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                   const SizedBox(height: AppSpacingTokens.lg),
                   ValidatedFormField(
                     label: l10n.medicationNameRequired,
-                    hint: 'e.g., Pimobendan',
+                    hint: l10n.hintMedicationName,
                     controller: _nameController,
                     validator: (v) => (v == null || v.trim().isEmpty)
                         ? l10n.fieldRequired
@@ -319,7 +320,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                   const SizedBox(height: AppSpacingTokens.md),
                   ValidatedFormField(
                     label: l10n.dosageRequired,
-                    hint: 'e.g., 5mg',
+                    hint: l10n.hintDosage,
                     controller: _dosageController,
                     validator: (v) => (v == null || v.trim().isEmpty)
                         ? l10n.fieldRequired
@@ -358,20 +359,19 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                   const SizedBox(height: AppSpacingTokens.md),
                   ValidatedFormField(
                     label: l10n.prescribedBy,
-                    hint: 'e.g., Dr. Smith, DVM',
+                    hint: l10n.hintPrescribedBy,
                     controller: _prescribedByController,
                   ),
                   const SizedBox(height: AppSpacingTokens.md),
                   ValidatedFormField(
                     label: l10n.purposeCondition,
-                    hint: 'e.g., Congestive Heart Failure',
+                    hint: l10n.hintPurpose,
                     controller: _purposeController,
                   ),
                   const SizedBox(height: AppSpacingTokens.md),
                   ValidatedTextArea(
                     label: l10n.additionalNotes,
-                    hint:
-                        'Any special instructions, side effects to monitor, or additional information...',
+                    hint: l10n.hintMedicationNotes,
                     controller: _notesController,
                   ),
                   const SizedBox(height: AppSpacingTokens.md),

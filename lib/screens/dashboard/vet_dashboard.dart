@@ -11,6 +11,7 @@ import 'package:pet_circle/stores/invitation_store.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
@@ -378,7 +379,7 @@ class _PetCard extends StatelessWidget {
                   top: AppSpacingTokens.md,
                   right: AppSpacingTokens.sm + 4,
                   child: StatusBadge(
-                    label: data.statusLabel,
+                    label: localizeStatus(data.statusLabel, l10n),
                     color: Color(data.statusColorHex),
                   ),
                 ),
@@ -456,7 +457,7 @@ class _PetCard extends StatelessWidget {
                         child: Padding(
                           padding: const EdgeInsets.only(left: AppSpacingTokens.sm),
                           child: Text(
-                            hasMeasurement ? formatTimeAgo(latest.recordedAt) : l10n.noMeasurementsYet,
+                            hasMeasurement ? formatTimeAgo(latest.recordedAt, l10n) : l10n.noMeasurementsYet,
                             style: AppSemanticTextStyles.caption,
                             overflow: TextOverflow.ellipsis,
                           ),

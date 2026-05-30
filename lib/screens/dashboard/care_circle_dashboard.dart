@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
@@ -128,7 +129,7 @@ class _PetCard extends StatelessWidget {
                 top: 20,
                 right: 16,
                 child: StatusBadge(
-                  label: data.statusLabel,
+                  label: localizeStatus(data.statusLabel, l10n),
                   color: Color(data.statusColorHex),
                 ),
               ),
@@ -168,7 +169,7 @@ class _PetCard extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Text(hasMeasurement ? formatTimeAgo(latest.recordedAt) : l10n.noMeasurementsYet,
+                    Text(hasMeasurement ? formatTimeAgo(latest.recordedAt, l10n) : l10n.noMeasurementsYet,
                         style: AppSemanticTextStyles.caption),
                   ],
                 ),

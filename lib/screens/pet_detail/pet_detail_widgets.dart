@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
@@ -67,6 +69,7 @@ class NoteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacingTokens.md),
       child: Row(
@@ -89,7 +92,7 @@ class NoteCard extends StatelessWidget {
                     ),
                     const SizedBox(width: AppSpacingTokens.sm),
                     Text(
-                      formatTimeAgo(note.createdAt),
+                      formatTimeAgo(note.createdAt, l10n),
                       style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
                     ),
                   ],
@@ -113,6 +116,8 @@ class MemberTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final roleLabel = localizeRole(member.role, l10n);
     return Padding(
       padding: EdgeInsets.only(bottom: AppSpacingTokens.sm + 4),
       child: Row(
@@ -131,13 +136,13 @@ class MemberTile extends StatelessWidget {
                   style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w500),
                 ),
                 Text(
-                  member.roleLabel,
+                  roleLabel,
                   style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
                 ),
               ],
             ),
           ),
-          RoleBadge(role: member.role, label: member.roleLabel),
+          RoleBadge(role: member.role, label: roleLabel),
         ],
       ),
     );

@@ -7,11 +7,12 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep3 extends StatefulWidget {
-  const OnboardingStep3({super.key, this.onBack, this.onNext, this.nextLabel, this.onTargetRateChanged, this.initialTargetRate, this.isNextLoading = false});
+  const OnboardingStep3({super.key, this.onBack, this.onNext, this.nextLabel, this.onClose, this.onTargetRateChanged, this.initialTargetRate, this.isNextLoading = false});
 
   final VoidCallback? onBack;
   final VoidCallback? onNext;
   final String? nextLabel;
+  final VoidCallback? onClose;
   final ValueChanged<int>? onTargetRateChanged;
   final int? initialTargetRate;
   final bool isNextLoading;
@@ -59,6 +60,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
       onBack: widget.onBack,
       onNext: widget.onNext,
       nextLabel: widget.nextLabel,
+      onClose: widget.onClose,
       isNextLoading: widget.isNextLoading,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

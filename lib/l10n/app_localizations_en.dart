@@ -1263,4 +1263,155 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eveningReminder => 'Evening';
+
+  @override
+  String recordingsInPeriod(String petName, int shown, int total) {
+    return '$petName • $shown of $total recordings in this period';
+  }
+
+  @override
+  String recordingsTotal(String petName, int count) {
+    return '$petName • $count recordings';
+  }
+
+  @override
+  String legendNormal(int threshold) {
+    return 'Normal (<$threshold)';
+  }
+
+  @override
+  String legendElevated(int low, int high) {
+    return 'Elevated ($low-$high)';
+  }
+
+  @override
+  String legendAlert(int threshold) {
+    return 'Alert (>$threshold)';
+  }
+
+  @override
+  String get statusNormal => 'Normal';
+
+  @override
+  String get statusElevated => 'Elevated';
+
+  @override
+  String get statusCritical => 'Critical';
+
+  @override
+  String get hintMedicationName => 'e.g., Pimobendan';
+
+  @override
+  String get hintDosage => 'e.g., 5mg';
+
+  @override
+  String get hintPrescribedBy => 'e.g., Dr. Smith, DVM';
+
+  @override
+  String get hintPurpose => 'e.g., Congestive Heart Failure';
+
+  @override
+  String get hintMedicationNotes =>
+      'Any special instructions, side effects to monitor, or additional information...';
+
+  @override
+  String get hintVetEmail => 'vet@clinic.com';
+
+  @override
+  String get hintEmailExample => 'email@example.com';
+
+  @override
+  String get hintThresholdElevated => 'e.g., 30';
+
+  @override
+  String get hintThresholdAlert => 'e.g., 40';
+
+  @override
+  String get hintPetName => 'e.g., Max';
+
+  @override
+  String get hintPetAge => 'e.g., 8';
+
+  @override
+  String get hintPhotoUrl => 'https://...';
+
+  @override
+  String get exportFailedRetry => 'Export failed. Please try again.';
+
+  @override
+  String get exportFailedWithError => 'Export failed. Please try again.';
+
+  @override
+  String get failedToCreatePet => 'Failed to create pet. Please try again.';
+
+  @override
+  String get failedToRemoveMember =>
+      'Failed to remove member. Please try again.';
+
+  @override
+  String get failedToSendInvite => 'Failed to send invite. Please try again.';
+
+  @override
+  String get noActivePet => 'No active pet';
+
+  @override
+  String get signInFailedRetry => 'Sign-in failed. Please try again.';
+
+  @override
+  String get diary => 'Diary';
+
+  @override
+  String timeAgoDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days ago',
+      one: '1 day ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeAgoHours(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeAgoMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes min ago',
+      one: '1 min ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get justNow => 'Just now';
+
+  @override
+  String timeAgoDaysShort(int days) {
+    return '${days}d ago';
+  }
+
+  @override
+  String timeAgoHoursShort(int hours) {
+    return '${hours}h ago';
+  }
+
+  @override
+  String timeAgoMinutesShort(int minutes) {
+    return '${minutes}m ago';
+  }
+
+  @override
+  String get medicationCsvHeader =>
+      'Medication,Dosage,Frequency,Start Date,End Date,Status,Prescribed By,Purpose,Notes';
 }

@@ -349,4 +349,102 @@ void main() {
       expect(restored.petName, original.petName);
     });
   });
+
+  group('AppNotification localization keys', () {
+    AppNotification keyed() => AppNotification(
+          id: 'n-key',
+          title: 'Measurement Complete',
+          body: 'Measurement saved: 12 BPM',
+          titleKey: 'measurementComplete',
+          bodyKey: 'measurementSavedBpm',
+          args: const ['12'],
+          type: NotificationType.measurement,
+          createdAt: DateTime(2025, 1, 1),
+        );
+
+    test('args default to empty list and keys to null', () {
+      final n = _makeNotification();
+      expect(n.titleKey, isNull);
+      expect(n.bodyKey, isNull);
+      expect(n.args, isEmpty);
+    });
+
+    test('stores titleKey, bodyKey and args', () {
+      final n = keyed();
+      expect(n.titleKey, 'measurementComplete');
+      expect(n.bodyKey, 'measurementSavedBpm');
+      expect(n.args, ['12']);
+    });
+
+    test('toFirestore includes keys and args when present', () {
+      final map = keyed().toFirestore();
+      expect(map['titleKey'], 'measurementComplete');
+      expect(map['bodyKey'], 'measurementSavedBpm');
+      expect(map['args'], ['12']);
+    });
+
+    test('toFirestore omits keys and args when absent', () {
+      final map = _makeNotification().toFirestore();
+      expect(map.containsKey('titleKey'), isFalse);
+      expect(map.containsKey('bodyKey'), isFalse);
+      expect(map.containsKey('args'), isFalse);
+    });
+
+    test('fromFirestore restores keys and args', () {
+      final doc = FakeDocumentSnapshot('n-key', {
+        'title': 'Measurement Complete',
+        'body': 'Measurement saved: 12 BPM',
+        'titleKey': 'measurementComplete',
+        'bodyKey': 'measurementSavedBpm',
+        'args': ['12'],
+        'type': 'measurement',
+        'createdAt': Timestamp.fromDate(DateTime(2025, 1, 1)),
+      });
+
+      final n = AppNotification.fromFirestore(doc);
+      expect(n.titleKey, 'measurementComplete');
+      expect(n.bodyKey, 'measurementSavedBpm');
+      expect(n.args, ['12']);
+    });
+
+    test('fromFirestore defaults missing keys to null and args to empty', () {
+      final doc = FakeDocumentSnapshot('n-legacy', {
+        'title': 'Legacy',
+        'body': 'No keys here',
+        'type': 'medication',
+        'createdAt': Timestamp.fromDate(DateTime(2025, 1, 1)),
+      });
+
+      final n = AppNotification.fromFirestore(doc);
+      expect(n.titleKey, isNull);
+      expect(n.bodyKey, isNull);
+      expect(n.args, isEmpty);
+    });
+
+    test('keyed notification roundtrips through Firestore', () {
+      final original = keyed();
+      final doc = FakeDocumentSnapshot('n-key', original.toFirestore());
+      final restored = AppNotification.fromFirestore(doc);
+
+      expect(restored.titleKey, original.titleKey);
+      expect(restored.bodyKey, original.bodyKey);
+      expect(restored.args, original.args);
+    });
+
+    test('copyWith updates keys and args independently', () {
+      final original = _makeNotification();
+      expect(original.copyWith(titleKey: 'medicationAdded').titleKey,
+          'medicationAdded');
+      expect(original.copyWith(bodyKey: 'vetInviteSent').bodyKey,
+          'vetInviteSent');
+      expect(original.copyWith(args: const ['a', 'b']).args, ['a', 'b']);
+    });
+
+    test('copyWith preserves keys and args when not given', () {
+      final copy = keyed().copyWith(isRead: true);
+      expect(copy.titleKey, 'measurementComplete');
+      expect(copy.bodyKey, 'measurementSavedBpm');
+      expect(copy.args, ['12']);
+    });
+  });
 }

@@ -7,6 +7,7 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/utils/formatters.dart';
+import 'package:pet_circle/utils/notification_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/models/app_notification.dart' as notif;
 
@@ -192,6 +193,7 @@ class _AppNotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final localized = localizeNotification(notification, l10n);
 
     final iconColor = switch (notification.type) {
       notif.NotificationType.medication => c.primary,
@@ -245,7 +247,7 @@ class _AppNotificationCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          notification.title,
+                          localized.title,
                           style: AppSemanticTextStyles.body.copyWith(
                             color: c.textPrimary,
                             fontWeight: notification.isRead ? FontWeight.w400 : FontWeight.w600,
@@ -266,7 +268,7 @@ class _AppNotificationCard extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacingTokens.xs),
                   Text(
-                    notification.body,
+                    localized.body,
                     style: AppSemanticTextStyles.caption.copyWith(
                       color: c.textPrimary,
                       fontSize: 12,
@@ -275,7 +277,7 @@ class _AppNotificationCard extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacingTokens.sm),
                   Text(
-                    formatTimeAgoShort(notification.createdAt),
+                    formatTimeAgoShort(notification.createdAt, l10n),
                     style: AppSemanticTextStyles.caption.copyWith(
                       color: c.textPrimary,
                       fontSize: 11,

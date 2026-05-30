@@ -8,6 +8,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 
 import 'add_medication_sheet.dart';
 
@@ -53,10 +54,9 @@ class _MedicationScreenState extends State<MedicationScreen> {
       return v;
     }
 
-    final header =
-        'Medication,Dosage,Frequency,Start Date,End Date,Status,Prescribed By,Purpose,Notes';
+    const header = 'Medication,Dosage,Frequency,Start Date,End Date,Status,Prescribed By,Purpose,Notes';
     final csvLines = meds.map((m) {
-      final status = m.isActive ? l10n.ongoing : l10n.completed;
+      final status = m.isActive ? 'Ongoing' : 'Completed';
       return [
         csvEscape(m.name),
         csvEscape(m.dosage),
@@ -115,8 +115,9 @@ class _MedicationScreenState extends State<MedicationScreen> {
                   SnackBar(content: Text(l10n.medicationLogExported)),
                 );
               } catch (e) {
+                debugPrint('[MedicationScreen] CSV export failed: $e');
                 messenger.showSnackBar(
-                  SnackBar(content: Text('Export failed: $e')),
+                  SnackBar(content: Text(l10n.exportFailedWithError)),
                 );
               }
             },
@@ -334,7 +335,7 @@ class _ActiveMedicationsList extends StatelessWidget {
                             style: AppSemanticTextStyles.body.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: c.textPrimary)),
-                        Text('${med.dosage} • ${med.frequency}',
+                        Text('${med.dosage} • ${localizeFrequency(med.frequency, l10n)}',
                             style: AppSemanticTextStyles.caption
                                 .copyWith(color: c.textPrimary)),
                       ],

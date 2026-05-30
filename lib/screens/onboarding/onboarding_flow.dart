@@ -80,9 +80,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       context.go(AppRoutes.shell());
     } catch (e) {
       if (!mounted) return;
+      debugPrint('[OnboardingFlow] Failed to create pet: $e');
+      final l10n = AppLocalizations.of(context)!;
       setState(() => _isSubmitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to create pet: $e')),
+        SnackBar(content: Text(l10n.failedToCreatePet)),
       );
     }
   }
@@ -99,6 +101,12 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    // Only offer an exit when this flow was pushed onto an existing stack
+    // (i.e. "Add pet" from the dashboard). During mandatory new-user
+    // onboarding the flow is the root, so there is nowhere to pop to.
+    final router = GoRouter.maybeOf(context);
+    final onClose =
+        (router?.canPop() ?? false) ? () => context.pop() : null;
     return PageView(
       controller: _controller,
       physics: const NeverScrollableScrollPhysics(),
@@ -106,6 +114,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         OnboardingStep1(
           onNext: () => _goTo(1),
           nextLabel: l10n.next,
+          onClose: onClose,
           onNameChanged: (name) => _petName = name,
           onBreedChanged: (breed) => _breedAndAge = breed,
           onAgeChanged: (age) => _age = age,
@@ -117,6 +126,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           onBack: () => _goTo(0),
           onNext: () => _goTo(2),
           nextLabel: l10n.next,
+          onClose: onClose,
           onDiagnosisChanged: (diagnosis) => _diagnosis = diagnosis,
           initialDiagnosis: _diagnosis,
         ),
@@ -124,6 +134,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           onBack: () => _goTo(1),
           onNext: _onComplete,
           nextLabel: l10n.complete,
+          onClose: onClose,
           onTargetRateChanged: (rate) => _targetRate = rate,
           initialTargetRate: _targetRate,
           isNextLoading: _isSubmitting,

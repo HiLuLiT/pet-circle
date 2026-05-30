@@ -25,8 +25,8 @@ void main() {
       expect(find.text('Home'), findsOneWidget);
       expect(find.text('Trends'), findsOneWidget);
       expect(find.text('Circle'), findsOneWidget);
-      expect(find.text('Mesure'), findsOneWidget);
-      expect(find.text('Medicine'), findsOneWidget);
+      expect(find.text('Measure'), findsOneWidget);
+      expect(find.text('Medication'), findsOneWidget);
     });
 
     // ── Active state ──────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ void main() {
         BottomNavBar(selectedIndex: 0, onTap: (i) => tappedIndex = i),
       ));
 
-      await tester.tap(find.text('Medicine'));
+      await tester.tap(find.text('Medication'));
       await tester.pump();
       expect(tappedIndex, 4);
     });

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/config/app_config.dart' show appDarkMode;
+import 'package:pet_circle/config/app_config.dart'
+    show appDarkMode, kEnableVisionRR;
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
@@ -157,7 +159,7 @@ class _SettingsContentState extends State<SettingsContent>
                           padding: const EdgeInsets.only(bottom: 12),
                           child: CareCircleItem(
                             email: member.name,
-                            roleLabel: member.roleLabel,
+                            roleLabel: localizeRole(member.role, l10n),
                             roleColor: isOwner ? c.textPrimary : c.primaryLight,
                             statusLabel: l10n.active,
                             statusColor: c.primaryLight,
@@ -261,40 +263,44 @@ class _SettingsContentState extends State<SettingsContent>
                 subtitle: l10n.configureModes,
                 child: Column(
                   children: [
-                    Stack(
-                      children: [
-                        SettingsToggleRow(
-                          label: l10n.visionRRCameraMode,
-                          description: l10n.visionRRDesc,
-                          isOn: settingsStore.visionRREnabled,
-                          onChanged: () async {
-                            await settingsStore.toggleVisionRR();
-                            if (!mounted) return;
-                            setState(() {});
-                          },
-                        ),
-                        Positioned(
-                          top: 8,
-                          right: 80,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: c.error,
-                              borderRadius: AppRadiiTokens.borderRadiusMd,
-                            ),
-                            child: Text(
-                              l10n.comingSoon,
-                              style: AppSemanticTextStyles.caption.copyWith(
-                                color: c.background,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
+                    // VisionRR camera mode is not shipped yet; hidden behind
+                    // kEnableVisionRR (lib/config/app_config.dart).
+                    if (kEnableVisionRR) ...[
+                      Stack(
+                        children: [
+                          SettingsToggleRow(
+                            label: l10n.visionRRCameraMode,
+                            description: l10n.visionRRDesc,
+                            isOn: settingsStore.visionRREnabled,
+                            onChanged: () async {
+                              await settingsStore.toggleVisionRR();
+                              if (!mounted) return;
+                              setState(() {});
+                            },
+                          ),
+                          Positioned(
+                            top: 8,
+                            right: 80,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: c.error,
+                                borderRadius: AppRadiiTokens.borderRadiusMd,
+                              ),
+                              child: Text(
+                                l10n.comingSoon,
+                                style: AppSemanticTextStyles.caption.copyWith(
+                                  color: c.background,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     ConfigureRow(onTap: () => showThresholdDialog(context)),
                   ],
                 ),
@@ -414,28 +420,36 @@ class _MeasurementReminderFrequencyRow extends StatelessWidget {
       3: l10n.frequencyThreePerWeek,
       7: l10n.frequencyDaily,
     };
-    return Row(
+    // Stack the label above the control rather than side-by-side: the
+    // segmented control needs the full row width for the longer localized
+    // segment labels (e.g. Hebrew "2 פעמים בשבוע"). In a side-by-side Row the
+    // control consumed nearly all the width, squeezing the label column until
+    // the label wrapped one character per line.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Text(
-            l10n.measurementReminderFrequency,
-            style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
-          ),
+        Text(
+          l10n.measurementReminderFrequency,
+          style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
         ),
-        SegmentedButton<int>(
-          segments: _options
-              .map((v) => ButtonSegment(value: v, label: Text(labels[v]!)))
-              .toList(),
-          selected: {current},
-          onSelectionChanged: (selected) async {
-            await settingsStore
-                .setMeasurementReminderFrequency(selected.first);
-          },
-          showSelectedIcon: false,
-          style: ButtonStyle(
-            visualDensity: VisualDensity.compact,
-            textStyle: WidgetStatePropertyAll(
-              AppSemanticTextStyles.caption,
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: SegmentedButton<int>(
+            segments: _options
+                .map((v) => ButtonSegment(value: v, label: Text(labels[v]!)))
+                .toList(),
+            selected: {current},
+            onSelectionChanged: (selected) async {
+              await settingsStore
+                  .setMeasurementReminderFrequency(selected.first);
+            },
+            showSelectedIcon: false,
+            style: ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              textStyle: WidgetStatePropertyAll(
+                AppSemanticTextStyles.caption,
+              ),
             ),
           ),
         ),
