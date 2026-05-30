@@ -11,6 +11,7 @@ class OnboardingStep1 extends StatefulWidget {
     super.key,
     this.onNext,
     this.nextLabel,
+    this.onClose,
     this.onNameChanged,
     this.onBreedChanged,
     this.onAgeChanged,
@@ -21,6 +22,7 @@ class OnboardingStep1 extends StatefulWidget {
 
   final VoidCallback? onNext;
   final String? nextLabel;
+  final VoidCallback? onClose;
   final ValueChanged<String>? onNameChanged;
   final ValueChanged<String>? onBreedChanged;
   final ValueChanged<String>? onAgeChanged;
@@ -64,6 +66,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
       progress: 0.33,
       onNext: widget.onNext,
       nextLabel: widget.nextLabel,
+      onClose: widget.onClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -71,7 +74,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
           const SizedBox(height: AppSpacingTokens.md),
           LabeledTextField(
             label: l10n.petName,
-            hintText: 'e.g., Max',
+            hintText: l10n.hintPetName,
             controller: _nameController,
             onChanged: widget.onNameChanged,
           ),
@@ -85,7 +88,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
           const SizedBox(height: AppSpacingTokens.md),
           LabeledTextField(
             label: l10n.ageYears,
-            hintText: 'e.g., 8',
+            hintText: l10n.hintPetAge,
             keyboardType: TextInputType.number,
             controller: _ageController,
             onChanged: widget.onAgeChanged,
@@ -93,7 +96,7 @@ class _OnboardingStep1State extends State<OnboardingStep1>
           const SizedBox(height: AppSpacingTokens.md),
           LabeledTextField(
             label: l10n.photoUrl,
-            hintText: 'https://...',
+            hintText: l10n.hintPhotoUrl,
           ),
         ],
       ),

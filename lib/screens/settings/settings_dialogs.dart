@@ -15,6 +15,7 @@ import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 
 import 'package:pet_circle/screens/settings/settings_content.dart';
 
@@ -220,7 +221,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                       dropdownColor: c.background,
                       style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
                       items: roles
-                          .map((r) => DropdownMenuItem(value: r, child: Text(r)))
+                          .map((r) => DropdownMenuItem(value: r, child: Text(localizeRoleName(r, l10n))))
                           .toList(),
                       onChanged: (v) {
                         if (v != null) setSheetState(() => selectedRole = v);
@@ -261,7 +262,10 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                             AppNotification(
                               id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
                               title: l10n.careCircleUpdated,
+                              titleKey: 'careCircleUpdated',
                               body: l10n.invitationSentTo(email, selectedRole),
+                              bodyKey: 'invitationSentTo',
+                              args: [email, selectedRole],
                               type: NotificationType.careCircle,
                               createdAt: DateTime.now(),
                               petName: activePet.name,
@@ -375,7 +379,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
-                          hintText: 'vet@clinic.com',
+                          hintText: l10n.hintVetEmail,
                           filled: true,
                           fillColor: c.surface,
                           border: OutlineInputBorder(
@@ -582,7 +586,10 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                               AppNotification(
                                 id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
                                 title: l10n.careCircleUpdated,
+                                titleKey: 'careCircleUpdated',
                                 body: l10n.vetInviteSent(email),
+                                bodyKey: 'vetInviteSent',
+                                args: [email],
                                 type: NotificationType.careCircle,
                                 createdAt: DateTime.now(),
                                 petName: activePet.name,
@@ -653,7 +660,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   controller: normalController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    hintText: 'e.g., 30',
+                    hintText: l10n.hintThresholdElevated,
                     filled: true,
                     fillColor: c.surface,
                     border: OutlineInputBorder(
@@ -669,7 +676,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   controller: alertController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    hintText: 'e.g., 40',
+                    hintText: l10n.hintThresholdAlert,
                     filled: true,
                     fillColor: c.surface,
                     border: OutlineInputBorder(

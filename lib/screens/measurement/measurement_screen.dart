@@ -373,7 +373,10 @@ class _ManualModeState extends State<_ManualMode>
                             AppNotification(
                               id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
                               title: l10n.measurementComplete,
+                              titleKey: 'measurementComplete',
                               body: l10n.measurementSavedBpm(bpm),
+                              bodyKey: 'measurementSavedBpm',
+                              args: [bpm.toString()],
                               type: NotificationType.measurement,
                               createdAt: DateTime.now(),
                               petName: petName,

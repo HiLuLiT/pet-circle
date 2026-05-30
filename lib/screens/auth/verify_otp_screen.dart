@@ -119,9 +119,10 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         await FirebaseAuth.instance.signInWithCustomToken(result.token!);
       } catch (e) {
         if (!mounted) return;
+        final l10n = AppLocalizations.of(context)!;
         setState(() {
           _isVerifying = false;
-          _error = 'Sign-in failed. Please try again.';
+          _error = l10n.signInFailedRetry;
         });
         return;
       }

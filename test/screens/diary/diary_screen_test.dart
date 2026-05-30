@@ -36,7 +36,7 @@ void main() {
       await tester.pumpWidget(testApp(const DiaryScreen()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Coming soon'), findsOneWidget);
+      expect(find.text('Coming Soon'), findsOneWidget);
     });
 
     testWidgets('shows menu_book icon', (tester) async {
@@ -68,7 +68,7 @@ void main() {
 
       // Content is still visible
       expect(find.text('Diary'), findsOneWidget);
-      expect(find.text('Coming soon'), findsOneWidget);
+      expect(find.text('Coming Soon'), findsOneWidget);
     });
 
     testWidgets('content is centered on screen', (tester) async {

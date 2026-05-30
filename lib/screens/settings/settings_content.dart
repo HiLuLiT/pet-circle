@@ -5,6 +5,7 @@ import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
@@ -157,7 +158,7 @@ class _SettingsContentState extends State<SettingsContent>
                           padding: const EdgeInsets.only(bottom: 12),
                           child: CareCircleItem(
                             email: member.name,
-                            roleLabel: member.roleLabel,
+                            roleLabel: localizeRole(member.role, l10n),
                             roleColor: isOwner ? c.textPrimary : c.primaryLight,
                             statusLabel: l10n.active,
                             statusColor: c.primaryLight,

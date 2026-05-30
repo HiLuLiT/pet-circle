@@ -16,6 +16,7 @@ class OnboardingShell extends StatelessWidget {
     this.onNext,
     this.nextLabel,
     this.isNextLoading = false,
+    this.onClose,
   });
 
   final String stepLabel;
@@ -26,6 +27,11 @@ class OnboardingShell extends StatelessWidget {
   final VoidCallback? onNext;
   final String? nextLabel;
   final bool isNextLoading;
+
+  /// When non-null, a close (X) button is shown in the header so the user can
+  /// exit the flow (e.g. "Add pet" launched from the dashboard). Left null for
+  /// mandatory new-user onboarding where there is nowhere to go back to.
+  final VoidCallback? onClose;
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +54,19 @@ class OnboardingShell extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (onClose != null)
+                  Align(
+                    alignment: AlignmentDirectional.topEnd,
+                    child: IconButton(
+                      onPressed: isNextLoading ? null : onClose,
+                      icon: const Icon(Icons.close),
+                      tooltip: l10n.close,
+                      color: c.textSecondary,
+                      padding: EdgeInsets.zero,
+                      visualDensity: VisualDensity.compact,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ),
                 _Header(stepLabel: stepLabel, progress: progress, title: title),
                 const SizedBox(height: AppSpacingTokens.xl),
                 Flexible(

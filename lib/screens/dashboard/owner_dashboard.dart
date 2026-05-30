@@ -354,7 +354,7 @@ class _PetCard extends StatelessWidget {
                     ),
                     trailing: Text(
                       hasMeasurement
-                          ? formatTimeAgo(latest.recordedAt)
+                          ? formatTimeAgo(latest.recordedAt, l10n)
                           : l10n.noMeasurementsYet,
                       style: AppSemanticTextStyles.body
                           .copyWith(color: c.textPrimary),

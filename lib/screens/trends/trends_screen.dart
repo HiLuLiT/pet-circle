@@ -12,6 +12,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -94,7 +95,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
               } catch (_) {
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Export failed. Please try again.')),
+                  SnackBar(content: Text(l10n.exportFailedRetry)),
                 );
               }
             },
@@ -178,8 +179,8 @@ class _TrendsScreenState extends State<TrendsScreen> {
               const SizedBox(height: AppSpacingTokens.sm),
               Text(
                 filtered.length < allMeasurements.length
-                    ? '$petName • ${filtered.length} of ${allMeasurements.length} recordings in this period'
-                    : '$petName • ${allMeasurements.length} recordings',
+                    ? l10n.recordingsInPeriod(petName, filtered.length, allMeasurements.length)
+                    : l10n.recordingsTotal(petName, allMeasurements.length),
                 style: AppSemanticTextStyles.body,
               ),
               const SizedBox(height: AppSpacingTokens.md),
@@ -303,7 +304,7 @@ class _TrendsScreenState extends State<TrendsScreen> {
                                 color: statusColor.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(AppRadiiTokens.full),
                               ),
-                              child: Text(status, style: AppSemanticTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: c.textPrimary)),
+                              child: Text(localizeStatus(status, l10n), style: AppSemanticTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: c.textPrimary)),
                             ),
                           ],
                         ),
@@ -411,12 +412,15 @@ class _BadgeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final elevated = settingsStore.elevatedThreshold;
+    final critical = settingsStore.criticalThreshold;
     return Wrap(
       spacing: AppSpacingTokens.sm,
       runSpacing: AppSpacingTokens.sm,
       children: [
-        _LegendBadge(color: c.primaryLight, label: 'Normal (<30)'),
-        _LegendBadge(color: c.warning, label: 'Elevated (30-40)'),
+        _LegendBadge(color: c.primaryLight, label: l10n.legendNormal(elevated)),
+        _LegendBadge(color: c.warning, label: l10n.legendElevated(elevated, critical)),
       ],
     );
   }
@@ -428,7 +432,8 @@ class _BadgeRowSecond extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return _LegendBadge(color: c.error, label: 'Alert (>40)');
+    final l10n = AppLocalizations.of(context)!;
+    return _LegendBadge(color: c.error, label: l10n.legendAlert(settingsStore.criticalThreshold));
   }
 }
 
@@ -696,7 +701,7 @@ class _SrrChart extends StatelessWidget {
                 label: HorizontalLineLabel(
                   show: true,
                   alignment: Alignment.topRight,
-                  labelResolver: (_) => 'Normal (${settingsStore.elevatedThreshold})',
+                  labelResolver: (_) => l10n.legendNormal(settingsStore.elevatedThreshold),
                   style: AppSemanticTextStyles.caption.copyWith(
                     color: labelColor,
                   ),
@@ -710,7 +715,7 @@ class _SrrChart extends StatelessWidget {
                 label: HorizontalLineLabel(
                   show: true,
                   alignment: Alignment.topRight,
-                  labelResolver: (_) => 'Alert (${settingsStore.criticalThreshold})',
+                  labelResolver: (_) => l10n.legendAlert(settingsStore.criticalThreshold),
                   style: AppSemanticTextStyles.caption.copyWith(
                     color: labelColor,
                   ),

@@ -1253,4 +1253,165 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get eveningReminder => 'ערב';
+
+  @override
+  String recordingsInPeriod(String petName, int shown, int total) {
+    return '$petName • $shown מתוך $total מדידות בתקופה זו';
+  }
+
+  @override
+  String recordingsTotal(String petName, int count) {
+    return '$petName • $count מדידות';
+  }
+
+  @override
+  String legendNormal(int threshold) {
+    return 'תקין (<$threshold)';
+  }
+
+  @override
+  String legendElevated(int low, int high) {
+    return 'מוגבר ($low-$high)';
+  }
+
+  @override
+  String legendAlert(int threshold) {
+    return 'התראה (>$threshold)';
+  }
+
+  @override
+  String get statusNormal => 'תקין';
+
+  @override
+  String get statusElevated => 'מוגבר';
+
+  @override
+  String get statusCritical => 'קריטי';
+
+  @override
+  String get hintMedicationName => 'לדוגמה, פימובנדן';
+
+  @override
+  String get hintDosage => 'לדוגמה, 5 מ\"ג';
+
+  @override
+  String get hintPrescribedBy => 'לדוגמה, ד\"ר כהן, וטרינר';
+
+  @override
+  String get hintPurpose => 'לדוגמה, אי ספיקת לב';
+
+  @override
+  String get hintMedicationNotes =>
+      'הוראות מיוחדות, תופעות לוואי לניטור או מידע נוסף...';
+
+  @override
+  String get hintVetEmail => 'vet@clinic.com';
+
+  @override
+  String get hintEmailExample => 'email@example.com';
+
+  @override
+  String get hintThresholdElevated => 'לדוגמה, 30';
+
+  @override
+  String get hintThresholdAlert => 'לדוגמה, 40';
+
+  @override
+  String get hintPetName => 'לדוגמה, מקס';
+
+  @override
+  String get hintPetAge => 'לדוגמה, 8';
+
+  @override
+  String get hintPhotoUrl => 'https://...';
+
+  @override
+  String get exportFailedRetry => 'הייצוא נכשל. אנא נסה שוב.';
+
+  @override
+  String exportFailedWithError(String error) {
+    return 'הייצוא נכשל: $error';
+  }
+
+  @override
+  String failedToCreatePet(String error) {
+    return 'יצירת חיית המחמד נכשלה: $error';
+  }
+
+  @override
+  String failedToRemoveMember(String error) {
+    return 'הסרת החבר נכשלה: $error';
+  }
+
+  @override
+  String failedToSendInvite(String error) {
+    return 'שליחת ההזמנה נכשלה: $error';
+  }
+
+  @override
+  String get noActivePet => 'אין חיית מחמד פעילה';
+
+  @override
+  String get signInFailedRetry => 'ההתחברות נכשלה. אנא נסה שוב.';
+
+  @override
+  String get diary => 'יומן';
+
+  @override
+  String timeAgoDays(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'לפני $days ימים',
+      two: 'לפני יומיים',
+      one: 'לפני יום',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeAgoHours(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'לפני $hours שעות',
+      two: 'לפני שעתיים',
+      one: 'לפני שעה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String timeAgoMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'לפני $minutes דקות',
+      two: 'לפני שתי דקות',
+      one: 'לפני דקה',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get justNow => 'הרגע';
+
+  @override
+  String timeAgoDaysShort(int days) {
+    return 'לפני $days ימ׳';
+  }
+
+  @override
+  String timeAgoHoursShort(int hours) {
+    return 'לפני $hours שע׳';
+  }
+
+  @override
+  String timeAgoMinutesShort(int minutes) {
+    return 'לפני $minutes דק׳';
+  }
+
+  @override
+  String get medicationCsvHeader =>
+      'תרופה,מינון,תדירות,תאריך התחלה,תאריך סיום,סטטוס,נרשם על ידי,מטרה,הערות';
 }

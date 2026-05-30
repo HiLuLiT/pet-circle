@@ -52,7 +52,7 @@ class PetInfoSection extends StatelessWidget {
                 child: InfoTile(
                   icon: Icons.access_time,
                   iconColor: c.primaryLight,
-                  value: hasMeasurement ? formatTimeAgo(latest.recordedAt) : l10n.noMeasurementsYet,
+                  value: hasMeasurement ? formatTimeAgo(latest.recordedAt, l10n) : l10n.noMeasurementsYet,
                   label: l10n.lastMeasured,
                 ),
               ),
@@ -154,7 +154,7 @@ class PetMeasurementHistory extends StatelessWidget {
             children: measurements.take(5).map((m) {
               return Expanded(
                 child: Text(
-                  formatTimeAgo(m.recordedAt).replaceAll(' ago', ''),
+                  formatTimeAgoShort(m.recordedAt, l10n),
                   style: AppSemanticTextStyles.caption.copyWith(fontSize: 9),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,

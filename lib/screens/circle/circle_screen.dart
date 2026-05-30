@@ -10,6 +10,7 @@ import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/user_avatar.dart';
@@ -225,7 +226,7 @@ class _CircleContent extends StatelessWidget {
         debugPrint('[CircleScreen] Remove failed: $e');
         if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to remove member: $e')),
+          SnackBar(content: Text(l10n.failedToRemoveMember(e.toString()))),
         );
       }
     }
@@ -336,7 +337,9 @@ class _MemberTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final isOwnerRole = member.role == CareCircleRole.owner;
+    final roleLabel = localizeRole(member.role, l10n);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacingTokens.md),
@@ -363,7 +366,7 @@ class _MemberTile extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  member.roleLabel,
+                  roleLabel,
                   style: AppSemanticTextStyles.caption.copyWith(
                     color: isOwnerRole ? c.textPrimary : c.textSecondary,
                   ),
@@ -382,7 +385,7 @@ class _MemberTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppRadiiTokens.md),
               ),
               child: Text(
-                member.roleLabel,
+                roleLabel,
                 style: AppSemanticTextStyles.caption.copyWith(
                   color: c.primary,
                   fontSize: 10,
@@ -510,9 +513,10 @@ class _InviteSheetState extends State<_InviteSheet> {
 
     final pet = petStore.activePet;
     if (pet?.id == null) {
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
         _isLoading = false;
-        _error = 'No active pet';
+        _error = l10n.noActivePet;
       });
       return;
     }
@@ -557,9 +561,10 @@ class _InviteSheetState extends State<_InviteSheet> {
     } catch (e) {
       debugPrint('[InviteSheet] Send invite failed: $e');
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
       setState(() {
         _isLoading = false;
-        _error = 'Failed to send invite: $e';
+        _error = l10n.failedToSendInvite(e.toString());
       });
     }
   }
@@ -618,7 +623,7 @@ class _InviteSheetState extends State<_InviteSheet> {
               decoration: InputDecoration(
                 filled: true,
                 fillColor: c.surface,
-                hintText: 'email@example.com',
+                hintText: l10n.hintEmailExample,
                 hintStyle: AppSemanticTextStyles.body.copyWith(color: c.textTertiary),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(AppRadiiTokens.lg),

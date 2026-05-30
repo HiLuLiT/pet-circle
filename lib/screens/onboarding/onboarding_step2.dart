@@ -6,11 +6,12 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep2 extends StatefulWidget {
-  const OnboardingStep2({super.key, this.onBack, this.onNext, this.nextLabel, this.onDiagnosisChanged, this.initialDiagnosis});
+  const OnboardingStep2({super.key, this.onBack, this.onNext, this.nextLabel, this.onClose, this.onDiagnosisChanged, this.initialDiagnosis});
 
   final VoidCallback? onBack;
   final VoidCallback? onNext;
   final String? nextLabel;
+  final VoidCallback? onClose;
   final ValueChanged<String>? onDiagnosisChanged;
   final String? initialDiagnosis;
 
@@ -72,6 +73,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
       onBack: widget.onBack,
       onNext: widget.onNext,
       nextLabel: widget.nextLabel,
+      onClose: widget.onClose,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

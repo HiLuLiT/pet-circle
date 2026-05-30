@@ -8,6 +8,7 @@ import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
@@ -198,6 +199,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
 
   Widget _buildAppBar() {
     final c = AppSemanticColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final access = petStore.accessForPet(_pet);
     return SliverAppBar(
       expandedHeight: 280,
@@ -241,7 +243,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   Row(
                     children: [
                       StatusBadge(
-                        label: _pet.statusLabel,
+                        label: localizeStatus(_pet.statusLabel, l10n),
                         color: Color(_pet.statusColorHex),
                       ),
                     ],

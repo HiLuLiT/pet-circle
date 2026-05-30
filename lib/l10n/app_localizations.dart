@@ -2395,6 +2395,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Evening'**
   String get eveningReminder;
+
+  /// No description provided for @recordingsInPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'{petName} • {shown} of {total} recordings in this period'**
+  String recordingsInPeriod(String petName, int shown, int total);
+
+  /// No description provided for @recordingsTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'{petName} • {count} recordings'**
+  String recordingsTotal(String petName, int count);
+
+  /// No description provided for @legendNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal (<{threshold})'**
+  String legendNormal(int threshold);
+
+  /// No description provided for @legendElevated.
+  ///
+  /// In en, this message translates to:
+  /// **'Elevated ({low}-{high})'**
+  String legendElevated(int low, int high);
+
+  /// No description provided for @legendAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert (>{threshold})'**
+  String legendAlert(int threshold);
+
+  /// No description provided for @statusNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get statusNormal;
+
+  /// No description provided for @statusElevated.
+  ///
+  /// In en, this message translates to:
+  /// **'Elevated'**
+  String get statusElevated;
+
+  /// No description provided for @statusCritical.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical'**
+  String get statusCritical;
+
+  /// No description provided for @hintMedicationName.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Pimobendan'**
+  String get hintMedicationName;
+
+  /// No description provided for @hintDosage.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 5mg'**
+  String get hintDosage;
+
+  /// No description provided for @hintPrescribedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Dr. Smith, DVM'**
+  String get hintPrescribedBy;
+
+  /// No description provided for @hintPurpose.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Congestive Heart Failure'**
+  String get hintPurpose;
+
+  /// No description provided for @hintMedicationNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Any special instructions, side effects to monitor, or additional information...'**
+  String get hintMedicationNotes;
+
+  /// No description provided for @hintVetEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'vet@clinic.com'**
+  String get hintVetEmail;
+
+  /// No description provided for @hintEmailExample.
+  ///
+  /// In en, this message translates to:
+  /// **'email@example.com'**
+  String get hintEmailExample;
+
+  /// No description provided for @hintThresholdElevated.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 30'**
+  String get hintThresholdElevated;
+
+  /// No description provided for @hintThresholdAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 40'**
+  String get hintThresholdAlert;
+
+  /// No description provided for @hintPetName.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., Max'**
+  String get hintPetName;
+
+  /// No description provided for @hintPetAge.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g., 8'**
+  String get hintPetAge;
+
+  /// No description provided for @hintPhotoUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'https://...'**
+  String get hintPhotoUrl;
+
+  /// No description provided for @exportFailedRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed. Please try again.'**
+  String get exportFailedRetry;
+
+  /// No description provided for @exportFailedWithError.
+  ///
+  /// In en, this message translates to:
+  /// **'Export failed: {error}'**
+  String exportFailedWithError(String error);
+
+  /// No description provided for @failedToCreatePet.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create pet: {error}'**
+  String failedToCreatePet(String error);
+
+  /// No description provided for @failedToRemoveMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove member: {error}'**
+  String failedToRemoveMember(String error);
+
+  /// No description provided for @failedToSendInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send invite: {error}'**
+  String failedToSendInvite(String error);
+
+  /// No description provided for @noActivePet.
+  ///
+  /// In en, this message translates to:
+  /// **'No active pet'**
+  String get noActivePet;
+
+  /// No description provided for @signInFailedRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign-in failed. Please try again.'**
+  String get signInFailedRetry;
+
+  /// No description provided for @diary.
+  ///
+  /// In en, this message translates to:
+  /// **'Diary'**
+  String get diary;
+
+  /// No description provided for @timeAgoDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day ago} other{{days} days ago}}'**
+  String timeAgoDays(int days);
+
+  /// No description provided for @timeAgoHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours, plural, =1{1 hour ago} other{{hours} hours ago}}'**
+  String timeAgoHours(int hours);
+
+  /// No description provided for @timeAgoMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, =1{1 min ago} other{{minutes} min ago}}'**
+  String timeAgoMinutes(int minutes);
+
+  /// No description provided for @justNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get justNow;
+
+  /// No description provided for @timeAgoDaysShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d ago'**
+  String timeAgoDaysShort(int days);
+
+  /// No description provided for @timeAgoHoursShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h ago'**
+  String timeAgoHoursShort(int hours);
+
+  /// No description provided for @timeAgoMinutesShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m ago'**
+  String timeAgoMinutesShort(int minutes);
+
+  /// No description provided for @medicationCsvHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication,Dosage,Frequency,Start Date,End Date,Status,Prescribed By,Purpose,Notes'**
+  String get medicationCsvHeader;
 }
 
 class _AppLocalizationsDelegate

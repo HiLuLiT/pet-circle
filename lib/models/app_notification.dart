@@ -18,10 +18,18 @@ class AppNotification {
     this.petName,
     this.route,
     this.petId,
+    this.titleKey,
+    this.bodyKey,
+    this.args = const [],
   });
 
   final String id;
+
+  /// Resolved title text, frozen at creation time. Used as a fallback when
+  /// [titleKey] is null (e.g. server-pushed or legacy notifications).
   final String title;
+
+  /// Resolved body text, frozen at creation time. Fallback for [bodyKey].
   final String body;
   final NotificationType type;
   final DateTime createdAt;
@@ -29,6 +37,16 @@ class AppNotification {
   final String? petName;
   final String? route;
   final String? petId;
+
+  /// Localization key for the title (e.g. `medicationAdded`). When set, the UI
+  /// re-localizes the title at render time so it follows the current language.
+  final String? titleKey;
+
+  /// Localization key for the body (e.g. `measurementSavedBpm`).
+  final String? bodyKey;
+
+  /// Positional arguments for a templated [bodyKey], stored as strings.
+  final List<String> args;
 
   Map<String, dynamic> toFirestore() {
     return {
@@ -40,6 +58,9 @@ class AppNotification {
       'petName': petName,
       if (route != null) 'route': route,
       if (petId != null) 'petId': petId,
+      if (titleKey != null) 'titleKey': titleKey,
+      if (bodyKey != null) 'bodyKey': bodyKey,
+      if (args.isNotEmpty) 'args': args,
     };
   }
 
@@ -55,6 +76,10 @@ class AppNotification {
       petName: data['petName'],
       route: data['route'],
       petId: data['petId'],
+      titleKey: data['titleKey'],
+      bodyKey: data['bodyKey'],
+      args: (data['args'] as List?)?.map((e) => e.toString()).toList() ??
+          const [],
     );
   }
 
@@ -68,6 +93,9 @@ class AppNotification {
     String? petName,
     String? route,
     String? petId,
+    String? titleKey,
+    String? bodyKey,
+    List<String>? args,
   }) {
     return AppNotification(
       id: id ?? this.id,
@@ -79,6 +107,9 @@ class AppNotification {
       petName: petName ?? this.petName,
       route: route ?? this.route,
       petId: petId ?? this.petId,
+      titleKey: titleKey ?? this.titleKey,
+      bodyKey: bodyKey ?? this.bodyKey,
+      args: args ?? this.args,
     );
   }
 

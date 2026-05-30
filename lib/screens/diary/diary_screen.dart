@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 
@@ -13,6 +14,7 @@ class DiaryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final body = Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -20,12 +22,12 @@ class DiaryScreen extends StatelessWidget {
           Icon(Icons.menu_book, size: 48, color: c.textTertiary),
           const SizedBox(height: 16),
           Text(
-            'Diary',
+            l10n.diary,
             style: AppSemanticTextStyles.title3.copyWith(color: c.textPrimary),
           ),
           const SizedBox(height: 8),
           Text(
-            'Coming soon',
+            l10n.comingSoon,
             style:
                 AppSemanticTextStyles.bodyMuted.copyWith(color: c.textSecondary),
           ),

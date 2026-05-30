@@ -4,28 +4,30 @@
 /// previously embedded in model classes. Keeping models pure data means they
 /// remain deterministic and testable.
 
-String formatTimeAgo(DateTime dateTime) {
+import 'package:pet_circle/l10n/app_localizations.dart';
+
+String formatTimeAgo(DateTime dateTime, AppLocalizations l10n) {
   final diff = DateTime.now().difference(dateTime);
   if (diff.inDays > 0) {
-    return '${diff.inDays} day${diff.inDays > 1 ? 's' : ''} ago';
+    return l10n.timeAgoDays(diff.inDays);
   } else if (diff.inHours > 0) {
-    return '${diff.inHours} hour${diff.inHours > 1 ? 's' : ''} ago';
+    return l10n.timeAgoHours(diff.inHours);
   } else if (diff.inMinutes > 0) {
-    return '${diff.inMinutes} min ago';
+    return l10n.timeAgoMinutes(diff.inMinutes);
   }
-  return 'Just now';
+  return l10n.justNow;
 }
 
-String formatTimeAgoShort(DateTime dateTime) {
+String formatTimeAgoShort(DateTime dateTime, AppLocalizations l10n) {
   final diff = DateTime.now().difference(dateTime);
   if (diff.inDays > 0) {
-    return '${diff.inDays}d ago';
+    return l10n.timeAgoDaysShort(diff.inDays);
   } else if (diff.inHours > 0) {
-    return '${diff.inHours}h ago';
+    return l10n.timeAgoHoursShort(diff.inHours);
   } else if (diff.inMinutes > 0) {
-    return '${diff.inMinutes}m ago';
+    return l10n.timeAgoMinutesShort(diff.inMinutes);
   }
-  return 'Just now';
+  return l10n.justNow;
 }
 
 bool isInvitationExpired(DateTime expiresAt) =>
