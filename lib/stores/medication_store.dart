@@ -134,6 +134,11 @@ class MedicationStore extends ChangeNotifier {
     }
   }
 
+  /// All medications across all pets, regardless of active state.
+  List<Medication> get allMedications => List.unmodifiable(
+        _medications.values.expand((meds) => meds).toList(),
+      );
+
   /// Active medications across all pets that are within their restock window.
   List<Medication> getMedicationsNeedingRestock() {
     final result = <Medication>[];

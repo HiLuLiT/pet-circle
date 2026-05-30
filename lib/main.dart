@@ -99,6 +99,33 @@ void main() async {
     }
   };
 
+  // Reconcile restock reminders whenever medications change: schedule OS
+  // notifications for supply-tracked meds and surface an in-app entry for any
+  // medication that has reached its restock window.
+  medicationStore.addListener(() {
+    final l10n = lookupAppLocalizations(appLocale.value);
+    for (final med in medicationStore.getMedicationsNeedingRestock()) {
+      notificationStore.reconcileRestockNotifications(
+        [med],
+        title: l10n.restockNotificationTitle(med.name),
+        body: l10n.restockNotificationBody(
+            med.name, med.restockLeadDays ?? 5),
+      );
+    }
+    if (!kIsWeb) {
+      for (final med in medicationStore.allMedications) {
+        if (med.hasSupplyTracking && med.isActive) {
+          reminderService.scheduleRestockReminder(
+            med,
+            title: l10n.restockNotificationTitle(med.name),
+            body: l10n.restockNotificationBody(
+                med.name, med.restockLeadDays ?? 5),
+          );
+        }
+      }
+    }
+  });
+
   if (!kEnableFirebase) {
     _seedMockStores();
   }

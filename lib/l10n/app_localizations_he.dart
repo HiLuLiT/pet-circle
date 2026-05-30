@@ -1230,29 +1230,36 @@ class AppLocalizationsHe extends AppLocalizations {
   String get totalSupply => 'סה\"כ מלאי';
 
   @override
-  String get currentSupply => 'מלאי נוכחי';
+  String get totalDoses => 'מספר מנות כולל';
 
   @override
-  String get lowSupplyThreshold => 'התראה כאשר נשאר';
+  String get restockLeadDaysLabel => 'תזכורת לפני שייגמר (ימים)';
 
   @override
-  String get dosesLeft => 'מנות נותרו';
+  String get restockButton => 'חידוש מלאי';
 
   @override
-  String lowSupplyAlertTitle(String name) {
-    return 'מלאי נמוך: $name';
+  String restockDialogTitle(String name) {
+    return 'חידוש מלאי עבור $name';
   }
 
   @override
-  String lowSupplyAlertBody(String name, int count) {
-    return '$name עומד להיגמר — נותרו $count מנות';
+  String get restockDialogHint => 'מספר מנות חדש';
+
+  @override
+  String supplyStatus(int count, String date) {
+    return '≈$count מנות נותרו · ייגמר ב-$date';
   }
 
   @override
-  String get markDoseTaken => 'מנה נלקחה';
+  String restockNotificationTitle(String name) {
+    return 'הגיע הזמן לחדש מלאי של $name';
+  }
 
   @override
-  String get doseTakenConfirmation => 'המנה נרשמה';
+  String restockNotificationBody(String name, int days) {
+    return '$name ייגמר בעוד כ-$days ימים — הזמינו מלאי נוסף';
+  }
 
   @override
   String get medicationReminderTimes => 'שעות תזכורת תרופות';

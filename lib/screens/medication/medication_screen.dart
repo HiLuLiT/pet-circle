@@ -1,6 +1,8 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/medication.dart';
+import 'package:pet_circle/services/reminder_service.dart';
 import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
@@ -363,10 +365,13 @@ class _ActiveMedicationsList extends StatelessWidget {
                       if (med.hasSupplyTracking) ...[
                         const SizedBox(height: AppSpacingTokens.xs),
                         Text(
-                          '${med.currentSupply}/${med.totalSupply} ${l10n.dosesLeft}',
+                          l10n.supplyStatus(
+                            med.remainingDoses,
+                            '${med.runOutDate.month}/${med.runOutDate.day}',
+                          ),
                           style: AppSemanticTextStyles.caption.copyWith(
-                            color: med.isLowSupply ? c.error : c.textPrimary,
-                            fontWeight: med.isLowSupply
+                            color: med.needsRestock ? c.error : c.textPrimary,
+                            fontWeight: med.needsRestock
                                 ? FontWeight.w600
                                 : FontWeight.normal,
                           ),
@@ -378,7 +383,7 @@ class _ActiveMedicationsList extends StatelessWidget {
                               .copyWith(color: c.textPrimary)),
                       if (med.isActive && med.hasSupplyTracking) ...[
                         const SizedBox(height: AppSpacingTokens.xs),
-                        _MarkDoseButton(petId: petId, medication: med),
+                        _RestockButton(petId: petId, medication: med),
                       ],
                     ],
                   ),
@@ -392,11 +397,73 @@ class _ActiveMedicationsList extends StatelessWidget {
   }
 }
 
-class _MarkDoseButton extends StatelessWidget {
-  const _MarkDoseButton({required this.petId, required this.medication});
+class _RestockButton extends StatelessWidget {
+  const _RestockButton({required this.petId, required this.medication});
 
   final String petId;
   final Medication medication;
+
+  Future<void> _openRestockDialog(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController(
+      text: medication.totalSupply?.toString() ?? '',
+    );
+    final messenger = ScaffoldMessenger.of(context);
+
+    final newTotal = await showDialog<int>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.restockDialogTitle(medication.name)),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            autofocus: true,
+            decoration: InputDecoration(hintText: l10n.restockDialogHint),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () {
+                final parsed = int.tryParse(controller.text.trim());
+                Navigator.of(dialogContext).pop(parsed);
+              },
+              child: Text(l10n.restockButton),
+            ),
+          ],
+        );
+      },
+    );
+
+    controller.dispose();
+    if (newTotal == null || newTotal <= 0) return;
+
+    final updated = medication.copyWith(
+      totalSupply: newTotal,
+      supplyStartDate: DateTime.now(),
+    );
+    medicationStore.updateMedication(petId, medication.id, updated);
+
+    if (!kIsWeb) {
+      if (updated.hasSupplyTracking && updated.isActive) {
+        ReminderService.instance.scheduleRestockReminder(
+          updated,
+          title: l10n.restockNotificationTitle(updated.name),
+          body: l10n.restockNotificationBody(
+              updated.name, updated.restockLeadDays ?? 5),
+        );
+      } else {
+        ReminderService.instance.cancelRestockReminder(medication.id);
+      }
+    }
+
+    messenger.showSnackBar(
+      SnackBar(content: Text(l10n.restockDialogTitle(updated.name))),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -405,29 +472,7 @@ class _MarkDoseButton extends StatelessWidget {
     return SizedBox(
       height: 28,
       child: TextButton(
-        onPressed: () async {
-          final updated =
-              await medicationStore.markDoseTaken(petId, medication.id);
-          if (!context.mounted) return;
-          if (updated != null) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.doseTakenConfirmation)),
-            );
-            if (updated.isLowSupply) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    l10n.lowSupplyAlertBody(
-                      medication.name,
-                      updated.currentSupply ?? 0,
-                    ),
-                  ),
-                  backgroundColor: c.error,
-                ),
-              );
-            }
-          }
-        },
+        onPressed: () => _openRestockDialog(context),
         style: TextButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
           minimumSize: Size.zero,
@@ -438,7 +483,7 @@ class _MarkDoseButton extends StatelessWidget {
           ),
         ),
         child: Text(
-          l10n.markDoseTaken,
+          l10n.restockButton,
           style: AppSemanticTextStyles.caption.copyWith(
             color: c.primary,
             fontWeight: FontWeight.w600,

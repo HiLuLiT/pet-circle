@@ -1239,29 +1239,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get totalSupply => 'Total Supply';
 
   @override
-  String get currentSupply => 'Current Supply';
+  String get totalDoses => 'Total doses';
 
   @override
-  String get lowSupplyThreshold => 'Low Supply Alert At';
+  String get restockLeadDaysLabel => 'Remind me before running out (days)';
 
   @override
-  String get dosesLeft => 'doses left';
+  String get restockButton => 'Restock';
 
   @override
-  String lowSupplyAlertTitle(String name) {
-    return 'Low Supply: $name';
+  String restockDialogTitle(String name) {
+    return 'Restock $name';
   }
 
   @override
-  String lowSupplyAlertBody(String name, int count) {
-    return '$name is running low — $count doses remaining';
+  String get restockDialogHint => 'New total doses';
+
+  @override
+  String supplyStatus(int count, String date) {
+    return '≈$count doses left · runs out $date';
   }
 
   @override
-  String get markDoseTaken => 'Dose Taken';
+  String restockNotificationTitle(String name) {
+    return 'Time to restock $name';
+  }
 
   @override
-  String get doseTakenConfirmation => 'Dose recorded';
+  String restockNotificationBody(String name, int days) {
+    return '$name runs out in about $days days — order a refill';
+  }
 
   @override
   String get medicationReminderTimes => 'Medication Reminder Times';

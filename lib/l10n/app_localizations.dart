@@ -2354,47 +2354,53 @@ abstract class AppLocalizations {
   /// **'Total Supply'**
   String get totalSupply;
 
-  /// No description provided for @currentSupply.
+  /// No description provided for @totalDoses.
   ///
   /// In en, this message translates to:
-  /// **'Current Supply'**
-  String get currentSupply;
+  /// **'Total doses'**
+  String get totalDoses;
 
-  /// No description provided for @lowSupplyThreshold.
+  /// No description provided for @restockLeadDaysLabel.
   ///
   /// In en, this message translates to:
-  /// **'Low Supply Alert At'**
-  String get lowSupplyThreshold;
+  /// **'Remind me before running out (days)'**
+  String get restockLeadDaysLabel;
 
-  /// No description provided for @dosesLeft.
+  /// No description provided for @restockButton.
   ///
   /// In en, this message translates to:
-  /// **'doses left'**
-  String get dosesLeft;
+  /// **'Restock'**
+  String get restockButton;
 
-  /// No description provided for @lowSupplyAlertTitle.
+  /// No description provided for @restockDialogTitle.
   ///
   /// In en, this message translates to:
-  /// **'Low Supply: {name}'**
-  String lowSupplyAlertTitle(String name);
+  /// **'Restock {name}'**
+  String restockDialogTitle(String name);
 
-  /// No description provided for @lowSupplyAlertBody.
+  /// No description provided for @restockDialogHint.
   ///
   /// In en, this message translates to:
-  /// **'{name} is running low — {count} doses remaining'**
-  String lowSupplyAlertBody(String name, int count);
+  /// **'New total doses'**
+  String get restockDialogHint;
 
-  /// No description provided for @markDoseTaken.
+  /// No description provided for @supplyStatus.
   ///
   /// In en, this message translates to:
-  /// **'Dose Taken'**
-  String get markDoseTaken;
+  /// **'≈{count} doses left · runs out {date}'**
+  String supplyStatus(int count, String date);
 
-  /// No description provided for @doseTakenConfirmation.
+  /// No description provided for @restockNotificationTitle.
   ///
   /// In en, this message translates to:
-  /// **'Dose recorded'**
-  String get doseTakenConfirmation;
+  /// **'Time to restock {name}'**
+  String restockNotificationTitle(String name);
+
+  /// No description provided for @restockNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} runs out in about {days} days — order a refill'**
+  String restockNotificationBody(String name, int days);
 
   /// No description provided for @medicationReminderTimes.
   ///
