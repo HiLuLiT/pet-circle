@@ -550,4 +550,41 @@ void main() {
       expect(store.getActiveMedications('nobody'), isEmpty);
     });
   });
+
+  group('MedicationStore getMedicationsNeedingRestock', () {
+    test('returns only active, due, tracked meds', () {
+      final due = Medication(
+        id: 'due',
+        name: 'A',
+        dosage: '1mg',
+        frequency: 'Twice daily',
+        startDate: DateTime(2026, 1, 1),
+        totalSupply: 60,
+        supplyStartDate: DateTime.now().subtract(const Duration(days: 28)),
+        restockLeadDays: 5,
+      );
+      final fresh = Medication(
+        id: 'fresh',
+        name: 'B',
+        dosage: '1mg',
+        frequency: 'Once daily',
+        startDate: DateTime(2026, 1, 1),
+        totalSupply: 90,
+        supplyStartDate: DateTime.now(),
+        restockLeadDays: 5,
+      );
+      final inactive = due.copyWith(id: 'inactive', isActive: false);
+      store.seed({
+        'p1': [due, fresh, inactive],
+      });
+
+      final result = store.getMedicationsNeedingRestock();
+      expect(result.map((m) => m.id), ['due']);
+    });
+
+    test('returns empty when no meds need restock', () {
+      store.seed({'pet-1': [_makeMedication()]});
+      expect(store.getMedicationsNeedingRestock(), isEmpty);
+    });
+  });
 }
