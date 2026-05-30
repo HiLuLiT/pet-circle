@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+functions/node_modules/
+
+# Build / generated output
+build/
+functions/lib/
+.dart_tool/
+coverage/
+
+# Flutter platform scaffolding (generated, non-source)
+android/
+ios/
+linux/
+macos/
+windows/
+web/
+
+# Non-code assets and graphify's own output
+assets/
+graphify-out/
