@@ -262,7 +262,8 @@ void main() {
       expect(find.text('In-app notifications'), findsOneWidget);
     });
 
-    testWidgets('shows VisionRR coming soon badge', (tester) async {
+    testWidgets('hides VisionRR coming soon badge (feature flag off)',
+        (tester) async {
       tester.view.physicalSize = const Size(600, 1800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -271,7 +272,8 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Coming Soon'), findsOneWidget);
+      // VisionRR is hidden behind kEnableVisionRR until the feature ships.
+      expect(find.text('Coming Soon'), findsNothing);
     });
   });
 

@@ -110,7 +110,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Measurement settings'), findsOneWidget);
-      expect(find.text('VisionRR camera mode'), findsOneWidget);
+      // VisionRR camera mode is hidden behind kEnableVisionRR (not shipped yet).
+      expect(find.text('VisionRR camera mode'), findsNothing);
     });
 
     testWidgets('shows data and privacy section', (tester) async {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pet_circle/config/app_config.dart' show kEnableVisionRR;
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/measurement.dart';
@@ -73,19 +74,25 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                 constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
                 child: Column(
               children: [
-                _TabSelector(
-                  selectedIndex: _selectedTab,
-                  onChanged: (index) => setState(() => _selectedTab = index),
-                ),
-                const SizedBox(height: AppSpacingTokens.xl),
+                // VisionRR camera mode is not shipped yet; when disabled we
+                // skip the manual/vision tab selector and show manual mode
+                // directly. See kEnableVisionRR in lib/config/app_config.dart.
+                if (kEnableVisionRR) ...[
+                  _TabSelector(
+                    selectedIndex: _selectedTab,
+                    onChanged: (index) =>
+                        setState(() => _selectedTab = index),
+                  ),
+                  const SizedBox(height: AppSpacingTokens.xl),
+                ],
                 Expanded(
-                  child: _selectedTab == 0
-                      ? _ManualMode(
+                  child: kEnableVisionRR && _selectedTab == 1
+                      ? const _VisionMode()
+                      : _ManualMode(
                           selectedDuration: _selectedDuration,
                           onDurationChanged: (value) =>
                               setState(() => _selectedDuration = value),
-                        )
-                      : const _VisionMode(),
+                        ),
                 ),
               ],
             ),

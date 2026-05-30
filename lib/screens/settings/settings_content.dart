@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/config/app_config.dart' show appDarkMode;
+import 'package:pet_circle/config/app_config.dart'
+    show appDarkMode, kEnableVisionRR;
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
@@ -262,40 +263,44 @@ class _SettingsContentState extends State<SettingsContent>
                 subtitle: l10n.configureModes,
                 child: Column(
                   children: [
-                    Stack(
-                      children: [
-                        SettingsToggleRow(
-                          label: l10n.visionRRCameraMode,
-                          description: l10n.visionRRDesc,
-                          isOn: settingsStore.visionRREnabled,
-                          onChanged: () async {
-                            await settingsStore.toggleVisionRR();
-                            if (!mounted) return;
-                            setState(() {});
-                          },
-                        ),
-                        Positioned(
-                          top: 8,
-                          right: 80,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: c.error,
-                              borderRadius: AppRadiiTokens.borderRadiusMd,
-                            ),
-                            child: Text(
-                              l10n.comingSoon,
-                              style: AppSemanticTextStyles.caption.copyWith(
-                                color: c.background,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
+                    // VisionRR camera mode is not shipped yet; hidden behind
+                    // kEnableVisionRR (lib/config/app_config.dart).
+                    if (kEnableVisionRR) ...[
+                      Stack(
+                        children: [
+                          SettingsToggleRow(
+                            label: l10n.visionRRCameraMode,
+                            description: l10n.visionRRDesc,
+                            isOn: settingsStore.visionRREnabled,
+                            onChanged: () async {
+                              await settingsStore.toggleVisionRR();
+                              if (!mounted) return;
+                              setState(() {});
+                            },
+                          ),
+                          Positioned(
+                            top: 8,
+                            right: 80,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: c.error,
+                                borderRadius: AppRadiiTokens.borderRadiusMd,
+                              ),
+                              child: Text(
+                                l10n.comingSoon,
+                                style: AppSemanticTextStyles.caption.copyWith(
+                                  color: c.background,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                    ],
                     ConfigureRow(onTap: () => showThresholdDialog(context)),
                   ],
                 ),

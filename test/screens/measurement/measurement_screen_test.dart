@@ -22,7 +22,7 @@ void main() {
       expect(find.byType(MeasurementScreen), findsOneWidget);
     });
 
-    testWidgets('shows manual and vision mode tabs', (tester) async {
+    testWidgets('shows manual mode without the vision mode tab', (tester) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -31,10 +31,9 @@ void main() {
       await tester.pumpWidget(testApp(const MeasurementScreen()));
       await tester.pumpAndSettle();
 
-      // Manual mode tab
-      expect(find.byIcon(Icons.touch_app), findsOneWidget);
-      // Vision mode tab
-      expect(find.byIcon(Icons.videocam_outlined), findsOneWidget);
+      // VisionRR camera mode is hidden behind kEnableVisionRR, so the
+      // manual/vision tab selector is not rendered — manual mode shows directly.
+      expect(find.byIcon(Icons.videocam_outlined), findsNothing);
     });
 
     testWidgets('shows timer duration selector with duration chips',
