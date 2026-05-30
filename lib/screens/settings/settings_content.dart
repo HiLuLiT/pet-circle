@@ -415,28 +415,36 @@ class _MeasurementReminderFrequencyRow extends StatelessWidget {
       3: l10n.frequencyThreePerWeek,
       7: l10n.frequencyDaily,
     };
-    return Row(
+    // Stack the label above the control rather than side-by-side: the
+    // segmented control needs the full row width for the longer localized
+    // segment labels (e.g. Hebrew "2 פעמים בשבוע"). In a side-by-side Row the
+    // control consumed nearly all the width, squeezing the label column until
+    // the label wrapped one character per line.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: Text(
-            l10n.measurementReminderFrequency,
-            style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
-          ),
+        Text(
+          l10n.measurementReminderFrequency,
+          style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
         ),
-        SegmentedButton<int>(
-          segments: _options
-              .map((v) => ButtonSegment(value: v, label: Text(labels[v]!)))
-              .toList(),
-          selected: {current},
-          onSelectionChanged: (selected) async {
-            await settingsStore
-                .setMeasurementReminderFrequency(selected.first);
-          },
-          showSelectedIcon: false,
-          style: ButtonStyle(
-            visualDensity: VisualDensity.compact,
-            textStyle: WidgetStatePropertyAll(
-              AppSemanticTextStyles.caption,
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: SegmentedButton<int>(
+            segments: _options
+                .map((v) => ButtonSegment(value: v, label: Text(labels[v]!)))
+                .toList(),
+            selected: {current},
+            onSelectionChanged: (selected) async {
+              await settingsStore
+                  .setMeasurementReminderFrequency(selected.first);
+            },
+            showSelectedIcon: false,
+            style: ButtonStyle(
+              visualDensity: VisualDensity.compact,
+              textStyle: WidgetStatePropertyAll(
+                AppSemanticTextStyles.caption,
+              ),
             ),
           ),
         ),

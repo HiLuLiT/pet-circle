@@ -16,6 +16,13 @@ import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+/// Locale-independent identifiers for the trends time-range selector.
+///
+/// The selected value is stored as one of these stable enum members rather
+/// than a localized display string, so switching the app locale never leaves
+/// the [DropdownButton] with a value that no longer matches any item.
+enum TrendsPeriod { last24Hours, last3Days, last7Days, last30Days, last90Days, customRange }
+
 class TrendsScreen extends StatefulWidget {
   const TrendsScreen({super.key, this.showScaffold = true});
 
@@ -26,19 +33,44 @@ class TrendsScreen extends StatefulWidget {
 }
 
 class _TrendsScreenState extends State<TrendsScreen> {
-  String? _selectedPeriod;
+  TrendsPeriod _selectedPeriod = TrendsPeriod.last7Days;
 
-  Duration? _periodToDuration(String period, AppLocalizations l10n) {
-    if (period == l10n.last24Hours) return const Duration(hours: 24);
-    if (period == l10n.last3Days) return const Duration(days: 3);
-    if (period == l10n.last7Days) return const Duration(days: 7);
-    if (period == l10n.last30Days) return const Duration(days: 30);
-    if (period == l10n.last90Days) return const Duration(days: 90);
-    return null;
+  String _periodLabel(TrendsPeriod period, AppLocalizations l10n) {
+    switch (period) {
+      case TrendsPeriod.last24Hours:
+        return l10n.last24Hours;
+      case TrendsPeriod.last3Days:
+        return l10n.last3Days;
+      case TrendsPeriod.last7Days:
+        return l10n.last7Days;
+      case TrendsPeriod.last30Days:
+        return l10n.last30Days;
+      case TrendsPeriod.last90Days:
+        return l10n.last90Days;
+      case TrendsPeriod.customRange:
+        return l10n.customRange;
+    }
   }
 
-  List<Measurement> _filterByPeriod(List<Measurement> all, AppLocalizations l10n) {
-    final duration = _periodToDuration(_selectedPeriod ?? l10n.last7Days, l10n);
+  Duration? _periodToDuration(TrendsPeriod period) {
+    switch (period) {
+      case TrendsPeriod.last24Hours:
+        return const Duration(hours: 24);
+      case TrendsPeriod.last3Days:
+        return const Duration(days: 3);
+      case TrendsPeriod.last7Days:
+        return const Duration(days: 7);
+      case TrendsPeriod.last30Days:
+        return const Duration(days: 30);
+      case TrendsPeriod.last90Days:
+        return const Duration(days: 90);
+      case TrendsPeriod.customRange:
+        return null;
+    }
+  }
+
+  List<Measurement> _filterByPeriod(List<Measurement> all) {
+    final duration = _periodToDuration(_selectedPeriod);
     if (duration == null) return all;
     final cutoff = DateTime.now().subtract(duration);
     return all.where((m) => m.recordedAt.isAfter(cutoff)).toList();
@@ -146,20 +178,10 @@ class _TrendsScreenState extends State<TrendsScreen> {
         final l10n = AppLocalizations.of(context)!;
         final c = AppSemanticColors.of(context);
         final access = petStore.accessForActivePet();
-        final periodOptions = [
-          l10n.last24Hours,
-          l10n.last3Days,
-          l10n.last7Days,
-          l10n.last30Days,
-          l10n.last90Days,
-          l10n.customRange,
-        ];
-
-        _selectedPeriod ??= l10n.last7Days;
         final petName = petStore.activePet?.name ?? l10n.petName;
         final petId = petStore.activePet?.id ?? '';
         final allMeasurements = measurementStore.getMeasurements(petId);
-        final filtered = _filterByPeriod(allMeasurements, l10n);
+        final filtered = _filterByPeriod(allMeasurements);
 
         final content = SafeArea(
           child: RefreshIndicator(
@@ -196,12 +218,15 @@ class _TrendsScreenState extends State<TrendsScreen> {
                       borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                     ),
                     child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
+                      child: DropdownButton<TrendsPeriod>(
                         value: _selectedPeriod,
                         icon: const Icon(Icons.keyboard_arrow_down, size: 16),
                         style: AppSemanticTextStyles.body,
-                        items: periodOptions
-                            .map((option) => DropdownMenuItem(value: option, child: Text(option)))
+                        items: TrendsPeriod.values
+                            .map((period) => DropdownMenuItem(
+                                  value: period,
+                                  child: Text(_periodLabel(period, l10n)),
+                                ))
                             .toList(),
                         onChanged: (value) {
                           if (value != null) setState(() => _selectedPeriod = value);
