@@ -6,7 +6,6 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/theme/tokens/typography.dart';
 
@@ -35,7 +34,7 @@ class _LandingScreenState extends State<LandingScreen> {
               Text(
                 l10n.appTitle,
                 style: AppTypography.regularNoneBold.copyWith(
-                  color: AppPrimitives.inkBase,
+                  color: c.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),

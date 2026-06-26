@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 
 /// Displays a user avatar. Shows network image if [imageUrl] is non-empty and
 /// starts with 'http'. Otherwise falls back to initials derived from [name].
@@ -40,7 +39,7 @@ class UserAvatar extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: AppPrimitives.skyWhite, width: 2),
+          border: Border.all(color: c.surface, width: 2),
           color: _hasNetworkImage ? null : c.primaryLight,
         ),
         child: ClipOval(

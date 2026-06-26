@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/breed_search_field.dart';
 
@@ -110,7 +109,7 @@ void main() {
       expect(label.style?.fontWeight, AppSemanticTextStyles.labelSm.fontWeight);
     });
 
-    testWidgets('trigger container uses skyLighter fill', (tester) async {
+    testWidgets('trigger container uses surfaceRecessed fill', (tester) async {
       await tester.pumpWidget(testApp(
         const BreedSearchField(label: 'Breed'),
       ));
@@ -119,7 +118,7 @@ void main() {
           .where((c) {
         final decoration = c.decoration;
         if (decoration is BoxDecoration) {
-          return decoration.color == AppPrimitives.skyLighter;
+          return decoration.color == AppSemanticColors.light.surfaceRecessed;
         }
         return false;
       });

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
 
@@ -78,7 +77,7 @@ void main() {
     });
 
     // ── Theme token tests ───────────────────────────────────────────────────
-    testWidgets('knob is white (AppPrimitives.skyWhite)', (tester) async {
+    testWidgets('knob is white (surface)', (tester) async {
       await tester.pumpWidget(testApp(const TogglePill(isOn: true)));
 
       // The knob is the inner Container with BoxDecoration circle shape
@@ -88,10 +87,10 @@ void main() {
         final d = c.decoration;
         return d is BoxDecoration &&
             d.shape == BoxShape.circle &&
-            d.color == AppPrimitives.skyWhite;
+            d.color == AppSemanticColors.light.surface;
       });
       expect(knob.isNotEmpty, isTrue,
-          reason: 'Knob should use AppPrimitives.skyWhite');
+          reason: 'Knob should use surface color');
     });
 
     testWidgets('uses AppRadiiTokens.borderRadiusFull for track',

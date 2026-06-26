@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/user_avatar.dart';
@@ -75,7 +74,7 @@ class AppHeader extends StatelessWidget {
                     child: Text(
                       petName!,
                       style: AppSemanticTextStyles.bodySm.copyWith(
-                        color: AppPrimitives.inkDarkest,
+                        color: c.textPrimary,
                         fontWeight: FontWeight.w500,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -86,7 +85,7 @@ class AppHeader extends StatelessWidget {
                     Icon(
                       Icons.keyboard_arrow_down,
                       size: 16,
-                      color: AppPrimitives.inkDarkest,
+                      color: c.textPrimary,
                     ),
                   ],
                 ],
@@ -101,12 +100,12 @@ class AppHeader extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: AppPrimitives.skyLight,
+              color: c.divider,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.notifications_none,
-              color: AppPrimitives.inkDarkest,
+              color: c.textPrimary,
               size: 20,
             ),
           ),

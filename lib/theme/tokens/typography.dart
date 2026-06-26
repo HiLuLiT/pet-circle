@@ -13,6 +13,111 @@ class AppTypography {
 
   static const String fontFamily = 'Instrument Sans';
 
+  // ═══════════════════════════════════════════════════════════════════════
+  // Pet Circle v3 (Claude-Design) scale
+  //
+  // 5 sizes: display 34, title 19, body 16, label 14, caption 13.
+  // Use these for new code. Legacy scale below kept for unmigrated widgets.
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // ── PC v3: Display (34px) ───────────────────────────────────────────────
+  static const TextStyle pcDisplayBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 34,
+    fontWeight: FontWeight.w700,
+    height: 40 / 34,
+  );
+
+  // ── PC v3: Title (19px) ─────────────────────────────────────────────────
+  static const TextStyle pcTitleBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 19,
+    fontWeight: FontWeight.w700,
+    height: 24 / 19,
+  );
+  static const TextStyle pcTitleSemibold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 19,
+    fontWeight: FontWeight.w600,
+    height: 24 / 19,
+  );
+
+  // ── PC v3: Body (16px) ──────────────────────────────────────────────────
+  static const TextStyle pcBodyRegular = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    height: 22 / 16,
+  );
+  static const TextStyle pcBodyMedium = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+    height: 22 / 16,
+  );
+  static const TextStyle pcBodySemibold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    height: 22 / 16,
+  );
+  static const TextStyle pcBodyBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+    height: 22 / 16,
+  );
+
+  // ── PC v3: Label (14px) ─────────────────────────────────────────────────
+  static const TextStyle pcLabelRegular = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w400,
+    height: 20 / 14,
+  );
+  static const TextStyle pcLabelMedium = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    height: 20 / 14,
+  );
+  static const TextStyle pcLabelSemibold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    height: 20 / 14,
+  );
+  static const TextStyle pcLabelBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w700,
+    height: 20 / 14,
+  );
+
+  // ── PC v3: Caption (13px) ───────────────────────────────────────────────
+  static const TextStyle pcCaptionRegular = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+    height: 18 / 13,
+  );
+  static const TextStyle pcCaptionMedium = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: FontWeight.w500,
+    height: 18 / 13,
+  );
+  static const TextStyle pcCaptionSemibold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: FontWeight.w600,
+    height: 18 / 13,
+  );
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // Legacy v2 scale (do not use in new code)
+  // ═══════════════════════════════════════════════════════════════════════
+
   // ── Title 1 (48px) ──────────────────────────────────────────────────────
   static const TextStyle title1NormalBold = TextStyle(
     fontFamily: fontFamily,

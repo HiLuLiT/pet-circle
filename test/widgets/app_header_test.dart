@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/widgets/user_avatar.dart';
 
@@ -89,7 +89,7 @@ void main() {
     });
 
     // ── Theme token verification ──────────────────────────────────────────
-    testWidgets('notification bell bg uses skyLight', (tester) async {
+    testWidgets('notification bell bg uses divider', (tester) async {
       await tester.pumpWidget(testApp(
         const AppHeader(userName: 'Alice'),
       ));
@@ -100,21 +100,21 @@ void main() {
           .where((c) {
         final dec = c.decoration;
         if (dec is BoxDecoration && dec.shape == BoxShape.circle) {
-          return dec.color == AppPrimitives.skyLight;
+          return dec.color == AppSemanticColors.light.divider;
         }
         return false;
       });
       expect(containers.isNotEmpty, isTrue,
-          reason: 'Notification bell should use skyLight background');
+          reason: 'Notification bell should use divider background');
     });
 
-    testWidgets('notification icon uses inkDarkest color', (tester) async {
+    testWidgets('notification icon uses textPrimary color', (tester) async {
       await tester.pumpWidget(testApp(
         const AppHeader(userName: 'Alice'),
       ));
 
       final icon = tester.widget<Icon>(find.byIcon(Icons.notifications_none));
-      expect(icon.color, AppPrimitives.inkDarkest);
+      expect(icon.color, AppSemanticColors.light.textPrimary);
     });
   });
 }

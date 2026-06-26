@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
-import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 
 import '../helpers/test_app.dart';
@@ -30,6 +29,18 @@ void main() {
       expect(find.byType(TextButton), findsOneWidget);
     });
 
+    testWidgets('secondary variant renders label text', (tester) async {
+      await tester.pumpWidget(testApp(
+        PrimaryButton(
+          label: 'Secondary',
+          variant: PrimaryButtonVariant.secondary,
+          onPressed: () {},
+        ),
+      ));
+      expect(find.text('Secondary'), findsOneWidget);
+      expect(find.byType(TextButton), findsOneWidget);
+    });
+
     testWidgets('outlined variant renders label text', (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(
@@ -50,13 +61,27 @@ void main() {
         const PrimaryButton(label: 'Disabled', onPressed: null),
       ));
 
-      final button =
-          tester.widget<TextButton>(find.byType(TextButton));
+      final button = tester.widget<TextButton>(find.byType(TextButton));
       expect(button.onPressed, isNull);
 
       await tester.tap(find.byType(TextButton));
       await tester.pump();
       expect(tapped, isFalse);
+    });
+
+    testWidgets('disabled button uses spec disabled bg/fg colors',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        const PrimaryButton(label: 'Disabled', onPressed: null),
+      ));
+
+      final button = tester.widget<TextButton>(find.byType(TextButton));
+      // Disabled bg matches the React spec (#E2DED5).
+      final bg = button.style?.backgroundColor?.resolve({});
+      expect(bg, const Color(0xFFE2DED5));
+
+      final text = tester.widget<Text>(find.text('Disabled'));
+      expect(text.style?.color, const Color(0xFFA7A2AE));
     });
 
     testWidgets('renders icon when provided', (tester) async {
@@ -100,31 +125,33 @@ void main() {
     });
 
     // ── Theme token tests ───────────────────────────────────────────────────
-    testWidgets('uses semantic button text style', (tester) async {
+    testWidgets('label uses 16px / 700 weight for filled variant',
+        (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(label: 'Token', onPressed: () {}),
       ));
 
       final text = tester.widget<Text>(find.text('Token'));
-      expect(text.style?.fontSize, AppSemanticTextStyles.button.fontSize);
-      expect(text.style?.fontWeight, AppSemanticTextStyles.button.fontWeight);
+      expect(text.style?.fontSize, 16);
+      expect(text.style?.fontWeight, FontWeight.w700);
     });
 
-    testWidgets('default border radius is 48', (tester) async {
+    testWidgets('label uses 16px / 600 weight for outlined (tertiary) variant',
+        (tester) async {
       await tester.pumpWidget(testApp(
-        PrimaryButton(label: 'Radius', onPressed: () {}),
+        PrimaryButton(
+          label: 'Tertiary',
+          variant: PrimaryButtonVariant.outlined,
+          onPressed: () {},
+        ),
       ));
 
-      final button =
-          tester.widget<TextButton>(find.byType(TextButton));
-      final shape = button.style?.shape?.resolve({}) as RoundedRectangleBorder;
-      expect(
-        shape.borderRadius,
-        BorderRadius.circular(48),
-      );
+      final text = tester.widget<Text>(find.text('Tertiary'));
+      expect(text.style?.fontSize, 16);
+      expect(text.style?.fontWeight, FontWeight.w600);
     });
 
-    testWidgets('filled variant uses primary bg and onPrimary fg',
+    testWidgets('filled variant uses ink bg and white fg (PC v3 spec)',
         (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(
@@ -134,16 +161,35 @@ void main() {
         ),
       ));
 
-      final button =
-          tester.widget<TextButton>(find.byType(TextButton));
+      final button = tester.widget<TextButton>(find.byType(TextButton));
       final bgColor = button.style?.backgroundColor?.resolve({});
-      expect(bgColor, AppSemanticColors.light.primary);
+      // Light theme onSurface = pcInk (#161616).
+      expect(bgColor, AppPrimitives.pcInk);
 
       final text = tester.widget<Text>(find.text('Filled'));
-      expect(text.style?.color, AppSemanticColors.light.onPrimary);
+      // Light theme surface = pcSurface (white).
+      expect(text.style?.color, AppSemanticColors.light.surface);
     });
 
-    testWidgets('outlined variant uses primary border at full opacity',
+    testWidgets('secondary variant uses purpleTile bg and ink fg',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        PrimaryButton(
+          label: 'Secondary',
+          variant: PrimaryButtonVariant.secondary,
+          onPressed: () {},
+        ),
+      ));
+
+      final button = tester.widget<TextButton>(find.byType(TextButton));
+      final bgColor = button.style?.backgroundColor?.resolve({});
+      expect(bgColor, AppPrimitives.pcPurpleTile);
+
+      final text = tester.widget<Text>(find.text('Secondary'));
+      expect(text.style?.color, AppPrimitives.pcInk);
+    });
+
+    testWidgets('outlined variant uses surface bg, hairline border, ink fg',
         (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(
@@ -153,31 +199,37 @@ void main() {
         ),
       ));
 
-      final button =
-          tester.widget<TextButton>(find.byType(TextButton));
+      final button = tester.widget<TextButton>(find.byType(TextButton));
+      final bgColor = button.style?.backgroundColor?.resolve({});
+      expect(bgColor, AppSemanticColors.light.surface);
+
       final side = button.style?.side?.resolve({});
       expect(side, isNotNull);
-      expect(side!.color, AppSemanticColors.light.primary);
+      expect(side!.color, AppPrimitives.pcHairline);
+      expect(side.width, 1.0);
+
+      final text = tester.widget<Text>(find.text('Outlined'));
+      expect(text.style?.color, AppPrimitives.pcInk);
     });
 
-    // ── Figma padding spec: px-32 py-16 ─────────────────────────────────────
-    testWidgets('uses Figma button padding (horizontal 32, vertical 16)',
+    // ── Layout spec: 56h, 26 horizontal padding ─────────────────────────────
+    testWidgets('uses Figma button padding (horizontal 26) and height 56',
         (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(label: 'Padded', onPressed: () {}),
       ));
 
-      final button =
-          tester.widget<TextButton>(find.byType(TextButton));
+      final button = tester.widget<TextButton>(find.byType(TextButton));
       final padding = button.style?.padding?.resolve({}) as EdgeInsets;
-      expect(padding.left, AppSpacingTokens.xl); // 32
-      expect(padding.right, AppSpacingTokens.xl); // 32
-      expect(padding.top, AppSpacingTokens.md); // 16
-      expect(padding.bottom, AppSpacingTokens.md); // 16
+      expect(padding.left, 26);
+      expect(padding.right, 26);
+
+      final fixed = button.style?.fixedSize?.resolve({});
+      expect(fixed?.height, 56);
     });
 
     // ── Custom foreground color ─────────────────────────────────────────────
-    testWidgets('foregroundColor overrides default text + border color',
+    testWidgets('foregroundColor overrides default text color',
         (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(
@@ -190,10 +242,6 @@ void main() {
 
       final text = tester.widget<Text>(find.text('Custom'));
       expect(text.style?.color, Colors.red);
-
-      final button = tester.widget<TextButton>(find.byType(TextButton));
-      final side = button.style?.side?.resolve({});
-      expect(side!.color, Colors.red);
     });
 
     // ── Trailing icon ───────────────────────────────────────────────────────
@@ -213,15 +261,12 @@ void main() {
     });
 
     // ── Figma shrink-0 compliance (no Flutter default inflation) ────────────
-    testWidgets('minimumSize is zero and tapTargetSize is shrinkWrap',
-        (tester) async {
+    testWidgets('tapTargetSize is shrinkWrap', (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(label: 'Compact', fullWidth: false, onPressed: () {}),
       ));
 
       final button = tester.widget<TextButton>(find.byType(TextButton));
-      final minSize = button.style?.minimumSize?.resolve({});
-      expect(minSize, Size.zero);
       expect(button.style?.tapTargetSize, MaterialTapTargetSize.shrinkWrap);
     });
 

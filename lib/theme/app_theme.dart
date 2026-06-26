@@ -5,6 +5,7 @@ import 'package:pet_circle/theme/tokens/colors.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Theme builders — wire design tokens into Flutter ThemeData.
+// As of Pet Circle v3 (Claude-Design palette), the light theme uses pcBg/pcPurple.
 // ═══════════════════════════════════════════════════════════════════════════════
 
 /// Returns the Instrument Sans text theme, falling back to the default text
@@ -23,53 +24,53 @@ ThemeData buildAppTheme() {
   final baseTextTheme = _instrumentSansTextTheme();
   return ThemeData(
     brightness: Brightness.light,
-    scaffoldBackgroundColor: AppPrimitives.skyWhite,
+    scaffoldBackgroundColor: AppPrimitives.pcBg,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: AppPrimitives.primaryBase,
-      primary: AppPrimitives.primaryBase,
-      surface: AppPrimitives.skyWhite,
+      seedColor: AppPrimitives.pcPurple,
+      primary: AppPrimitives.pcPurple,
+      surface: AppPrimitives.pcSurface,
     ),
     textTheme: baseTextTheme.copyWith(
       headlineSmall: const TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w700,
-        color: AppPrimitives.inkDarkest,
+        color: AppPrimitives.pcInk,
         height: 32 / 24,
       ),
       titleLarge: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
-        color: AppPrimitives.inkDarkest,
+        color: AppPrimitives.pcInk,
         height: 1.0,
       ),
       bodyMedium: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: AppPrimitives.inkBase,
+        color: AppPrimitives.pcInk,
         height: 24 / 16,
       ),
-      bodySmall: TextStyle(
+      bodySmall: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: AppPrimitives.inkLight,
+        color: AppPrimitives.pcInkSecondary,
         height: 24 / 16,
       ),
       labelSmall: const TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        color: AppPrimitives.inkBase,
+        color: AppPrimitives.pcInkSecondary,
         height: 1.0,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: AppPrimitives.skyLighter,
+      fillColor: AppPrimitives.pcRecessed,
       contentPadding: const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 8,
       ),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
     ),
@@ -81,54 +82,54 @@ ThemeData buildDarkTheme() {
   final baseTextTheme = _instrumentSansTextTheme(ThemeData.dark().textTheme);
   return ThemeData(
     brightness: Brightness.dark,
-    scaffoldBackgroundColor: const Color(0xFF1A1A1A),
+    scaffoldBackgroundColor: AppPrimitives.pcDarkBg,
     colorScheme: ColorScheme.fromSeed(
-      seedColor: AppPrimitives.primaryBase,
+      seedColor: AppPrimitives.pcPurple,
       brightness: Brightness.dark,
-      primary: AppPrimitives.primaryBase,
-      surface: const Color(0xFF1A1A1A),
+      primary: AppPrimitives.pcPurpleTile,
+      surface: AppPrimitives.pcDarkSurface,
     ),
     textTheme: baseTextTheme.copyWith(
       headlineSmall: const TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w700,
-        color: Color(0xFFF5E6E0),
+        color: AppPrimitives.pcDarkOnSurface,
         height: 32 / 24,
       ),
       titleLarge: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w700,
-        color: Color(0xFFF5E6E0),
+        color: AppPrimitives.pcDarkOnSurface,
         height: 1.0,
       ),
       bodyMedium: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: Color(0xFFF5E6E0),
+        color: AppPrimitives.pcDarkOnSurface,
         height: 24 / 16,
       ),
       bodySmall: const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.w400,
-        color: Color(0xFFB0B0B0),
+        color: AppPrimitives.pcDarkOnSurfaceMuted,
         height: 24 / 16,
       ),
       labelSmall: const TextStyle(
         fontSize: 12,
         fontWeight: FontWeight.w400,
-        color: Color(0xFFF5E6E0),
+        color: AppPrimitives.pcDarkOnSurface,
         height: 1.0,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFF2A2420),
+      fillColor: AppPrimitives.pcDarkRecessed,
       contentPadding: const EdgeInsets.symmetric(
         horizontal: 16,
         vertical: 8,
       ),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         borderSide: BorderSide.none,
       ),
     ),

@@ -24,14 +24,17 @@ class NeumorphicCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    final cardRadius = radius ?? AppRadiiTokens.borderRadiusLg;
+    // PC v3 card radius (18). Callers may still override via [radius].
+    final cardRadius = radius ?? AppRadiiTokens.borderRadiusCard;
     return Container(
       margin: margin,
       padding: padding,
       decoration: BoxDecoration(
-        color: color ?? c.surface,
+        // Inner (recessed/inset) cards sit on a recessed surface and cast no
+        // drop shadow; raised cards use the small elevation shadow.
+        color: color ?? (inner ? c.surfaceRecessed : c.surface),
         borderRadius: cardRadius,
-        boxShadow: inner ? AppShadowTokens.small : AppShadowTokens.small,
+        boxShadow: inner ? const [] : AppShadowTokens.small,
       ),
       child: child,
     );

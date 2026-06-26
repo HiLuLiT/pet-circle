@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/widgets/user_avatar.dart';
 
 import '../helpers/test_app.dart';
@@ -108,7 +107,7 @@ void main() {
       expect(container.isNotEmpty, isTrue);
     });
 
-    testWidgets('border color is skyWhite', (tester) async {
+    testWidgets('border color is surface', (tester) async {
       await tester.pumpWidget(testApp(
         const UserAvatar(name: 'AB'),
       ));
@@ -119,7 +118,7 @@ void main() {
         if (decoration is BoxDecoration) {
           final border = decoration.border;
           if (border is Border) {
-            return border.top.color == AppPrimitives.skyWhite;
+            return border.top.color == AppSemanticColors.light.surface;
           }
         }
         return false;

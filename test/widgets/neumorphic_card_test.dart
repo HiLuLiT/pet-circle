@@ -96,7 +96,7 @@ void main() {
       expect(decoration.boxShadow, AppShadowTokens.small);
     });
 
-    testWidgets('default radius uses AppRadiiTokens.borderRadiusLg',
+    testWidgets('default radius uses AppRadiiTokens.borderRadiusCard (PC v3)',
         (tester) async {
       await tester.pumpWidget(testApp(
         const NeumorphicCard(child: Text('Radius')),
@@ -104,7 +104,7 @@ void main() {
 
       final container = tester.widget<Container>(find.byType(Container).last);
       final decoration = container.decoration as BoxDecoration;
-      expect(decoration.borderRadius, AppRadiiTokens.borderRadiusLg);
+      expect(decoration.borderRadius, AppRadiiTokens.borderRadiusCard);
     });
 
     // ── Interaction test (card is non-interactive, but verify child) ────────

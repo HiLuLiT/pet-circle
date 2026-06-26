@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class BreedItem {
@@ -254,7 +253,7 @@ class _BreedSearchFieldState extends State<BreedSearchField>
             height: 36,
             padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 4),
             decoration: BoxDecoration(
-              color: AppPrimitives.skyLighter,
+              color: c.surfaceRecessed,
               borderRadius: AppRadiiTokens.borderRadiusLg,
             ),
             child: Row(
@@ -264,7 +263,7 @@ class _BreedSearchFieldState extends State<BreedSearchField>
                   child: Text(
                     _selected ?? 'e.g., Golden Retriever',
                     style: AppSemanticTextStyles.body.copyWith(
-                      color: _selected == null ? AppPrimitives.skyDark : c.textPrimary,
+                      color: _selected == null ? c.textTertiary : c.textPrimary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -284,7 +283,7 @@ class _BreedSearchFieldState extends State<BreedSearchField>
           Container(
             margin: const EdgeInsets.only(top: 8),
             decoration: BoxDecoration(
-              color: AppPrimitives.skyWhite,
+              color: c.surface,
               borderRadius: AppRadiiTokens.borderRadiusLg,
             ),
             child: Column(
@@ -300,12 +299,12 @@ class _BreedSearchFieldState extends State<BreedSearchField>
                       decoration: InputDecoration(
                         hintText: l10n.searchBreeds,
                         hintStyle: AppSemanticTextStyles.body.copyWith(
-                          color: AppPrimitives.skyDark,
+                          color: c.textTertiary,
                         ),
                         prefixIcon: Icon(Icons.search, size: 18, color: c.textTertiary),
                         prefixIconConstraints: const BoxConstraints(minWidth: 36),
                         filled: true,
-                        fillColor: AppPrimitives.skyLightest,
+                        fillColor: c.surfaceRecessed,
                         border: OutlineInputBorder(
                           borderRadius: AppRadiiTokens.borderRadiusLg,
                           borderSide: BorderSide.none,
