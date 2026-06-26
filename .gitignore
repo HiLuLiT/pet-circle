@@ -67,7 +67,5 @@ ios/Runner/GoogleService-Info.plist
 macos/Runner/GoogleService-Info.plist
 lib/firebase_options.dart
 
-# graphify local internals (not source-controlled — rebuilt locally)
-graphify-out/cache/
-graphify-out/.graphify_root
-graphify-out/.graphify_labels.json
+# graphify outputs (rebuilt locally on every checkout; not source-controlled)
+graphify-out/
