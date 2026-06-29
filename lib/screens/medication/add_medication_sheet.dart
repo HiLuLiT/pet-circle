@@ -10,6 +10,7 @@ import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 
 import 'medication_form_widgets.dart';
 
@@ -384,28 +385,21 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: TextButton.styleFrom(
-                          backgroundColor: c.background,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadiiTokens.full)),
+                      Flexible(
+                        child: PrimaryButton(
+                          label: l10n.cancel,
+                          variant: PrimaryButtonVariant.outlined,
+                          fullWidth: false,
+                          onPressed: () => Navigator.of(context).pop(),
                         ),
-                        child: Text(l10n.cancel),
                       ),
                       const SizedBox(width: AppSpacingTokens.sm),
-                      TextButton(
-                        onPressed: _save,
-                        style: TextButton.styleFrom(
-                          backgroundColor: c.primary,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadiiTokens.full)),
-                        ),
-                        child: Text(
-                          _isEditing ? l10n.save : l10n.addMedication,
-                          style: TextStyle(color: c.surface),
+                      Flexible(
+                        child: PrimaryButton(
+                          label: _isEditing ? l10n.save : l10n.addMedication,
+                          variant: PrimaryButtonVariant.filled,
+                          fullWidth: false,
+                          onPressed: _save,
                         ),
                       ),
                     ],

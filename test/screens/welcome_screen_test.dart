@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/screens/auth/create_account_screen.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 
 import '../helpers/ignore_overflow_errors.dart';
 import '../helpers/test_http_overrides.dart';
@@ -71,7 +72,7 @@ void main() {
     testWidgets('shows "Send email code" button', (tester) async {
       await _pumpWelcome(tester);
 
-      final button = find.widgetWithText(ElevatedButton, 'Send email code');
+      final button = find.widgetWithText(PrimaryButton, 'Send email code');
       expect(button, findsOneWidget);
     });
 

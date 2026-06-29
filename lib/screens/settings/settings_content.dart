@@ -14,6 +14,7 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/screens/settings/settings_widgets.dart';
 import 'package:pet_circle/screens/settings/settings_care_circle_widgets.dart';
 import 'package:pet_circle/screens/settings/settings_dialogs.dart';
+import 'package:pet_circle/widgets/round_icon_button.dart';
 
 /// Push notification categories
 /// - Medicine reminders: upcoming doses, missed doses
@@ -89,23 +90,13 @@ class _SettingsContentState extends State<SettingsContent>
                   ),
                 ),
                 if (widget.onClose != null)
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
+                  RoundIconButton(
+                    icon: const Icon(Icons.close),
+                    variant: RoundIconButtonVariant.ghost,
+                    size: 36,
+                    iconSize: 24,
                     onTap: widget.onClose,
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: c.surface,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: c.background, width: 2),
-                      ),
-                      child: Icon(
-                        Icons.keyboard_arrow_down,
-                        color: c.textPrimary,
-                        size: 24,
-                      ),
-                    ),
+                    semanticLabel: l10n.close,
                   ),
               ],
             ),

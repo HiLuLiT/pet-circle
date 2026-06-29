@@ -16,6 +16,7 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
+import 'package:pet_circle/widgets/round_icon_button.dart';
 
 const _bpmIconAsset = 'assets/figma/bpm_icon.svg';
 const _careCircleIconAsset = 'assets/figma/care_circle_icon.svg';
@@ -213,7 +214,12 @@ class OwnerDashboard extends StatelessWidget {
                       variant: PrimaryButtonVariant.outlined,
                       fullWidth: false,
                       onPressed: () => context.push(AppRoutes.onboarding),
-                      trailingIcon: _AddPetIcon(),
+                      trailingIcon: const RoundIconButton(
+                        icon: Icon(Icons.add),
+                        variant: RoundIconButtonVariant.ghost,
+                        size: 24,
+                        iconSize: 16,
+                      ),
                     ),
                   ),
 
@@ -231,23 +237,6 @@ class OwnerDashboard extends StatelessWidget {
       return Container(color: c.surface, child: content);
     }
     return Scaffold(backgroundColor: c.surface, body: content);
-  }
-}
-
-/// Circled plus icon for the "Add another pet" button.
-class _AddPetIcon extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return Container(
-      width: 24,
-      height: 24,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: c.primary, width: 1.5),
-      ),
-      child: Icon(Icons.add, size: 16, color: c.primary),
-    );
   }
 }
 

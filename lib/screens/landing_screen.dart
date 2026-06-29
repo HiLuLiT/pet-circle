@@ -8,6 +8,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/theme/tokens/typography.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 
 /// Marketing landing (Figma Welcome 181:789). [AppRoutes.welcome] `/`.
 class LandingScreen extends StatefulWidget {
@@ -59,23 +60,11 @@ class _LandingScreenState extends State<LandingScreen> {
                 padding: const EdgeInsets.only(
                   bottom: AppSpacingTokens.lg,
                 ),
-                child: TextButton(
+                child: PrimaryButton(
+                  label: l10n.getStarted,
+                  variant: PrimaryButtonVariant.filled,
+                  fullWidth: false,
                   onPressed: () => context.push(AppRoutes.signup),
-                  style: TextButton.styleFrom(
-                    backgroundColor: c.surface,
-                    foregroundColor: c.textPrimary,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacingTokens.xl,
-                      vertical: AppSpacingTokens.md,
-                    ),
-                    shape: const StadiumBorder(),
-                  ),
-                  child: Text(
-                    l10n.getStarted,
-                    style: AppSemanticTextStyles.button.copyWith(
-                      color: c.textPrimary,
-                    ),
-                  ),
                 ),
               ),
             ],

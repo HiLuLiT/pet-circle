@@ -10,6 +10,8 @@ import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
+import 'package:pet_circle/widgets/social_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -31,6 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _handleLogin() async {
+    if (_isLoading) return;
     if (!_formKey.currentState!.validate()) return;
 
     setState(() {
@@ -230,35 +233,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                   const SizedBox(height: AppSpacingTokens.lg),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _handleLogin,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: c.primary,
-                        foregroundColor: c.onPrimary,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(AppRadiiTokens.xl),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: c.onPrimary,
-                              ),
-                            )
-                          : Text(
-                              l10n.login,
-                              style: AppSemanticTextStyles.button.copyWith(
-                                color: c.onPrimary,
-                              ),
+                  PrimaryButton(
+                    label: l10n.login,
+                    // Keep onPressed live during loading so the filled (ink)
+                    // background stays visible behind the white spinner;
+                    // re-entry is guarded inside _handleLogin.
+                    onPressed: _handleLogin,
+                    child: _isLoading
+                        ? SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: c.onPrimary,
                             ),
-                    ),
+                          )
+                        : null,
                   ),
                   const SizedBox(height: AppSpacingTokens.xl),
                   Row(
@@ -279,13 +269,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                   const SizedBox(height: AppSpacingTokens.md),
-                  _SocialButton(
+                  SocialButton(
                     icon: Image.asset(AppAssets.googleLogo, width: 20, height: 20),
                     label: l10n.continueWithGoogle,
                     onTap: _isLoading ? null : _handleGoogleSignIn,
                   ),
                   const SizedBox(height: AppSpacingTokens.md),
-                  _SocialButton(
+                  SocialButton(
                     icon: Icon(Icons.apple, size: 20, color: c.textPrimary),
                     label: l10n.continueWithApple,
                     onTap: _isLoading ? null : _handleAppleSignIn,
@@ -315,56 +305,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  const _SocialButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final Widget icon;
-  final String label;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return SizedBox(
-      width: double.infinity,
-      height: 48,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          side: BorderSide(color: c.divider),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-          ),
-          backgroundColor: c.surface,
-          elevation: 0,
-        ).copyWith(
-          shadowColor: WidgetStatePropertyAll(
-            Colors.black.withValues(alpha: 0.05),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            icon,
-            const SizedBox(width: AppSpacingTokens.sm + 4),
-            Text(
-              label,
-              style: AppSemanticTextStyles.body.copyWith(
-                color: c.textPrimary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
         ),
       ),
     );

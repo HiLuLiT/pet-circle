@@ -281,5 +281,169 @@ void main() {
 
       expect(find.text('Custom Child'), findsOneWidget);
     });
+
+    // ── link variant (Figma 442:8683) ────────────────────────────────────────
+    group('link variant', () {
+      testWidgets('renders label text with no background and no 56h fixedSize',
+          (tester) async {
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Learn more',
+            variant: PrimaryButtonVariant.link,
+            onPressed: () {},
+          ),
+        ));
+
+        expect(find.text('Learn more'), findsOneWidget);
+
+        final button = tester.widget<TextButton>(find.byType(TextButton));
+        // Transparent background — no filled surface.
+        expect(button.style?.backgroundColor?.resolve({}), Colors.transparent);
+        // No fixed 56h height (intrinsic sizing).
+        expect(button.style?.fixedSize?.resolve({}), isNull);
+        // No horizontal padding.
+        final padding = button.style?.padding?.resolve({}) as EdgeInsets;
+        expect(padding, EdgeInsets.zero);
+      });
+
+      testWidgets('label uses SemiBold 14 ink text', (tester) async {
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Skip',
+            variant: PrimaryButtonVariant.link,
+            onPressed: () {},
+          ),
+        ));
+
+        final text = tester.widget<Text>(find.text('Skip'));
+        expect(text.style?.fontSize, 14);
+        expect(text.style?.fontWeight, FontWeight.w600);
+        // Light theme onSurface = pcInk.
+        expect(text.style?.color, AppPrimitives.pcInk);
+      });
+
+      testWidgets('renders optional leading and trailing icons',
+          (tester) async {
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Next',
+            variant: PrimaryButtonVariant.link,
+            icon: Icons.arrow_back,
+            trailingIcon: const Icon(Icons.arrow_forward),
+            onPressed: () {},
+          ),
+        ));
+
+        expect(find.text('Next'), findsOneWidget);
+        expect(find.byIcon(Icons.arrow_back), findsOneWidget);
+        expect(find.byIcon(Icons.arrow_forward), findsOneWidget);
+      });
+
+      testWidgets('is intrinsic (not full-width) by default', (tester) async {
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Link',
+            variant: PrimaryButtonVariant.link,
+            onPressed: () {},
+          ),
+        ));
+
+        final sizedBoxes = tester.widgetList<SizedBox>(find.byType(SizedBox));
+        final fullWidth = sizedBoxes.where((sb) => sb.width == double.infinity);
+        expect(fullWidth.isEmpty, isTrue);
+      });
+    });
+
+    // ── miniPrimary variant (Figma 474:2550) ─────────────────────────────────
+    group('miniPrimary variant', () {
+      testWidgets('renders purple bg, white text, and 24x12 padding',
+          (tester) async {
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Done',
+            variant: PrimaryButtonVariant.miniPrimary,
+            onPressed: () {},
+          ),
+        ));
+
+        expect(find.text('Done'), findsOneWidget);
+
+        final button = tester.widget<TextButton>(find.byType(TextButton));
+        // Light theme primary = pcPurple.
+        expect(button.style?.backgroundColor?.resolve({}),
+            AppSemanticColors.light.primary);
+
+        // Padding 24 horizontal / 12 vertical.
+        final padding = button.style?.padding?.resolve({}) as EdgeInsets;
+        expect(padding.left, 24);
+        expect(padding.right, 24);
+        expect(padding.top, 12);
+        expect(padding.bottom, 12);
+
+        // Not the fixed 56h height.
+        expect(button.style?.fixedSize?.resolve({}), isNull);
+
+        final text = tester.widget<Text>(find.text('Done'));
+        // Light theme onPrimary = pcSurface (white).
+        expect(text.style?.color, AppSemanticColors.light.onPrimary);
+      });
+
+      testWidgets('label uses SemiBold 14', (tester) async {
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Save',
+            variant: PrimaryButtonVariant.miniPrimary,
+            onPressed: () {},
+          ),
+        ));
+
+        final text = tester.widget<Text>(find.text('Save'));
+        expect(text.style?.fontSize, 14);
+        expect(text.style?.fontWeight, FontWeight.w600);
+      });
+
+      testWidgets('is not full-width by default', (tester) async {
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Compact',
+            variant: PrimaryButtonVariant.miniPrimary,
+            onPressed: () {},
+          ),
+        ));
+
+        final sizedBoxes = tester.widgetList<SizedBox>(find.byType(SizedBox));
+        final fullWidth = sizedBoxes.where((sb) => sb.width == double.infinity);
+        expect(fullWidth.isEmpty, isTrue);
+      });
+
+      testWidgets('renders optional trailing icon', (tester) async {
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Go',
+            variant: PrimaryButtonVariant.miniPrimary,
+            trailingIcon: const Icon(Icons.chevron_right),
+            onPressed: () {},
+          ),
+        ));
+
+        expect(find.text('Go'), findsOneWidget);
+        expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+      });
+
+      testWidgets('calls onPressed when tapped', (tester) async {
+        var callCount = 0;
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Tap',
+            variant: PrimaryButtonVariant.miniPrimary,
+            onPressed: () => callCount++,
+          ),
+        ));
+
+        await tester.tap(find.text('Tap'));
+        await tester.pump();
+        expect(callCount, 1);
+      });
+    });
   });
 }

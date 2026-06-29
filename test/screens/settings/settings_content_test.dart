@@ -48,7 +48,7 @@ void main() {
       expect(find.text('Manage your PetBreath preferences'), findsOneWidget);
     });
 
-    testWidgets('shows close chevron when onClose callback provided', (tester) async {
+    testWidgets('shows close button when onClose callback provided', (tester) async {
       suppressOverflowErrors();
       _setTallView(tester);
       var closed = false;
@@ -57,19 +57,19 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      final chevron = find.byIcon(Icons.keyboard_arrow_down);
-      expect(chevron, findsOneWidget);
-      await tester.tap(chevron);
+      final closeIcon = find.byIcon(Icons.close);
+      expect(closeIcon, findsOneWidget);
+      await tester.tap(closeIcon);
       expect(closed, isTrue);
     });
 
-    testWidgets('does not show close chevron when onClose is null', (tester) async {
+    testWidgets('does not show close button when onClose is null', (tester) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.keyboard_arrow_down), findsNothing);
+      expect(find.byIcon(Icons.close), findsNothing);
     });
 
     testWidgets('shows appearance section', (tester) async {
