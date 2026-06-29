@@ -57,6 +57,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.statusActiveBg,
     required this.statusActiveDot,
     required this.statusActiveText,
+    required this.statusInvitedBg,
+    required this.statusInvitedText,
   });
 
   final Color primary;
@@ -104,6 +106,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color statusActiveBg;
   final Color statusActiveDot;
   final Color statusActiveText;
+  // Invited (yellow) — pending invitation pill; no dot.
+  final Color statusInvitedBg;
+  final Color statusInvitedText;
 
   // ── Light theme (Pet Circle v3 / Claude-Design) ──────────────────────────
   static const light = AppSemanticColors(
@@ -151,6 +156,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     statusActiveBg: AppPrimitives.pcStatusActiveBg,
     statusActiveDot: AppPrimitives.pcStatusActiveDot,
     statusActiveText: AppPrimitives.pcStatusActiveText,
+    statusInvitedBg: AppPrimitives.yellowLightest,
+    statusInvitedText: AppPrimitives.yellowDarkest,
   );
 
   // ── Dark theme (inverted) ────────────────────────────────────────────────
@@ -199,6 +206,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     statusActiveBg: AppPrimitives.pcStatusActiveBg,
     statusActiveDot: AppPrimitives.pcStatusActiveDot,
     statusActiveText: AppPrimitives.pcStatusActiveText,
+    statusInvitedBg: AppPrimitives.yellowLightest,
+    statusInvitedText: AppPrimitives.yellowDarkest,
   );
 
   /// Convenience accessor. Falls back to [light] when no theme extension is
@@ -253,6 +262,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? statusActiveBg,
     Color? statusActiveDot,
     Color? statusActiveText,
+    Color? statusInvitedBg,
+    Color? statusInvitedText,
   }) {
     return AppSemanticColors(
       primary: primary ?? this.primary,
@@ -299,6 +310,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       statusActiveBg: statusActiveBg ?? this.statusActiveBg,
       statusActiveDot: statusActiveDot ?? this.statusActiveDot,
       statusActiveText: statusActiveText ?? this.statusActiveText,
+      statusInvitedBg: statusInvitedBg ?? this.statusInvitedBg,
+      statusInvitedText: statusInvitedText ?? this.statusInvitedText,
     );
   }
 
@@ -364,6 +377,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       statusActiveDot: Color.lerp(statusActiveDot, other.statusActiveDot, t)!,
       statusActiveText:
           Color.lerp(statusActiveText, other.statusActiveText, t)!,
+      statusInvitedBg: Color.lerp(statusInvitedBg, other.statusInvitedBg, t)!,
+      statusInvitedText:
+          Color.lerp(statusInvitedText, other.statusInvitedText, t)!,
     );
   }
 }

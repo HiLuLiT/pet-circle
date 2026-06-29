@@ -11,7 +11,8 @@ import 'package:pet_circle/theme/tokens/typography.dart';
 ///   * [elevated] — butter family    (warning / "Elevated")
 ///   * [alert]    — blush family     (danger  / "Alert")
 ///   * [active]   — mint family      (success / "Active") — *no dot*
-enum StatusBadgeStatus { normal, elevated, alert, active }
+///   * [invited]  — yellow family    (pending / "Invited") — *no dot*
+enum StatusBadgeStatus { normal, elevated, alert, active, invited }
 
 /// Pill-shaped status chip — Pet Circle v3 / Claude-Design palette.
 ///
@@ -77,8 +78,9 @@ class StatusBadge extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // No dot for the "active" variant — matches React StatusChip.
-          if (effectiveStatus != StatusBadgeStatus.active) ...[
+          // No dot for the "active" / "invited" variants — matches React
+          // StatusChip / Pills "Invited".
+          if (_hasDot(effectiveStatus)) ...[
             Container(
               width: 9,
               height: 9,
@@ -94,6 +96,13 @@ class StatusBadge extends StatelessWidget {
       ),
     );
   }
+
+  // ── Dot visibility ───────────────────────────────────────────────────────
+
+  /// Whether this variant renders a leading dot. The [active] and [invited]
+  /// variants are dot-less (matching the React StatusChip / Pills "Invited").
+  static bool _hasDot(StatusBadgeStatus s) =>
+      s != StatusBadgeStatus.active && s != StatusBadgeStatus.invited;
 
   // ── Status inference ─────────────────────────────────────────────────────
 
@@ -158,6 +167,8 @@ class StatusBadge extends StatelessWidget {
         return c.statusAlertBg;
       case StatusBadgeStatus.active:
         return c.statusActiveBg;
+      case StatusBadgeStatus.invited:
+        return c.statusInvitedBg;
     }
   }
 
@@ -170,6 +181,10 @@ class StatusBadge extends StatelessWidget {
       case StatusBadgeStatus.alert:
         return c.statusAlertDot;
       case StatusBadgeStatus.active:
+        return c.statusActiveDot;
+      case StatusBadgeStatus.invited:
+        // Invited has no dot; this is never rendered. Reuse the active dot to
+        // keep the switch exhaustive.
         return c.statusActiveDot;
     }
   }
@@ -184,6 +199,8 @@ class StatusBadge extends StatelessWidget {
         return c.statusAlertText;
       case StatusBadgeStatus.active:
         return c.statusActiveText;
+      case StatusBadgeStatus.invited:
+        return c.statusInvitedText;
     }
   }
 }

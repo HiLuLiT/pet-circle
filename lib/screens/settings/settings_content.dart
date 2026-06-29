@@ -162,7 +162,6 @@ class _SettingsContentState extends State<SettingsContent>
                             roleLabel: localizeRole(member.role, l10n),
                             roleColor: isOwner ? c.textPrimary : c.primaryLight,
                             statusLabel: l10n.active,
-                            statusColor: c.primaryLight,
                             onRemove: canManageActivePet
                                 ? () => confirmRemoveMember(context, activePet.name, member.name)
                                 : null,

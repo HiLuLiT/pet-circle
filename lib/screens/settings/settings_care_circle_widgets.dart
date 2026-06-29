@@ -4,6 +4,7 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/status_badge.dart';
 
 import 'package:pet_circle/screens/settings/settings_widgets.dart'
     show settingsInviteAsset, settingsTrashAsset, settingsConfigureAsset;
@@ -52,7 +53,7 @@ class CareCircleItem extends StatelessWidget {
     required this.roleLabel,
     required this.roleColor,
     required this.statusLabel,
-    required this.statusColor,
+    this.status = StatusBadgeStatus.active,
     this.onRemove,
   });
 
@@ -60,7 +61,11 @@ class CareCircleItem extends StatelessWidget {
   final String roleLabel;
   final Color roleColor;
   final String statusLabel;
-  final Color statusColor;
+
+  /// Status family for the member's status pill. Defaults to [active] since
+  /// listed care-circle members are active; pass [StatusBadgeStatus.invited]
+  /// for pending members.
+  final StatusBadgeStatus status;
   final VoidCallback? onRemove;
 
   @override
@@ -99,10 +104,9 @@ class CareCircleItem extends StatelessWidget {
                           : c.background,
                     ),
                     const SizedBox(width: 4),
-                    _Badge(
+                    StatusBadge(
                       label: statusLabel,
-                      backgroundColor: statusColor,
-                      textColor: c.textPrimary,
+                      status: status,
                     ),
                   ],
                 ),

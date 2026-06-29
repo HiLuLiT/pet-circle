@@ -13,6 +13,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
+import 'package:pet_circle/widgets/filter_chip.dart';
 
 class MeasurementScreen extends StatefulWidget {
   const MeasurementScreen({super.key, this.showScaffold = true});
@@ -273,6 +274,9 @@ class _ManualModeState extends State<_ManualMode>
 
   void _stopTimer() {
     _timer?.cancel();
+    // Guard against a periodic-tick callback that fires concurrently with
+    // dispose() — Timer.cancel() does not interrupt an in-flight callback.
+    if (!mounted) return;
 
     // Calculate BPM: (taps / duration) * 60
     final bpm = (_tapCount / widget.selectedDuration * 60).round();
@@ -483,22 +487,34 @@ class _ManualModeState extends State<_ManualMode>
               const SizedBox(height: AppSpacingTokens.md),
               Row(
                 children: [
-                  _DurationChip(
-                    label: l10n.duration15s,
-                    selected: widget.selectedDuration == 15,
-                    onTap: _isRunning ? null : () => widget.onDurationChanged(15),
+                  Expanded(
+                    child: AppFilterChip(
+                      label: l10n.duration15s,
+                      selected: widget.selectedDuration == 15,
+                      onTap: _isRunning
+                          ? null
+                          : () => widget.onDurationChanged(15),
+                    ),
                   ),
                   const SizedBox(width: AppSpacingTokens.md),
-                  _DurationChip(
-                    label: l10n.duration30s,
-                    selected: widget.selectedDuration == 30,
-                    onTap: _isRunning ? null : () => widget.onDurationChanged(30),
+                  Expanded(
+                    child: AppFilterChip(
+                      label: l10n.duration30s,
+                      selected: widget.selectedDuration == 30,
+                      onTap: _isRunning
+                          ? null
+                          : () => widget.onDurationChanged(30),
+                    ),
                   ),
                   const SizedBox(width: AppSpacingTokens.md),
-                  _DurationChip(
-                    label: l10n.duration60s,
-                    selected: widget.selectedDuration == 60,
-                    onTap: _isRunning ? null : () => widget.onDurationChanged(60),
+                  Expanded(
+                    child: AppFilterChip(
+                      label: l10n.duration60s,
+                      selected: widget.selectedDuration == 60,
+                      onTap: _isRunning
+                          ? null
+                          : () => widget.onDurationChanged(60),
+                    ),
                   ),
                 ],
               ),
@@ -620,43 +636,6 @@ class _ManualModeState extends State<_ManualMode>
         ),
       ],
     ),
-    );
-  }
-}
-
-class _DurationChip extends StatelessWidget {
-  const _DurationChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 60,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: selected ? c.primaryLight : c.surface,
-            borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-          ),
-          child: Text(
-            label,
-            style: AppSemanticTextStyles.body.copyWith(
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-              color: c.textPrimary,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

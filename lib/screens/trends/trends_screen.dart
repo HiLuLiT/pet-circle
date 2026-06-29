@@ -15,6 +15,7 @@ import 'package:pet_circle/utils/csv_export_helper.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/app_dropdown.dart';
+import 'package:pet_circle/widgets/status_badge.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 /// Locale-independent identifiers for the trends time-range selector.
@@ -315,6 +316,11 @@ class _TrendsScreenState extends State<TrendsScreen>
                   final dateStr = '${m.recordedAt.month}/${m.recordedAt.day} ${m.recordedAt.hour}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
                   final status = settingsStore.classifyStatus(m.bpm);
                   final statusColor = status == 'Normal' ? c.primaryLight : status == 'Elevated' ? c.warning : c.error;
+                  final badgeStatus = status == 'Normal'
+                      ? StatusBadgeStatus.normal
+                      : status == 'Elevated'
+                          ? StatusBadgeStatus.elevated
+                          : StatusBadgeStatus.alert;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm),
                     child: Dismissible(
@@ -358,13 +364,9 @@ class _TrendsScreenState extends State<TrendsScreen>
                                 ],
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: statusColor.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(AppRadiiTokens.full),
-                              ),
-                              child: Text(localizeStatus(status, l10n), style: AppSemanticTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: c.textPrimary)),
+                            StatusBadge(
+                              label: localizeStatus(status, l10n),
+                              status: badgeStatus,
                             ),
                           ],
                         ),

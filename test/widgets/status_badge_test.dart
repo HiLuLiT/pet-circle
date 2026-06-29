@@ -137,6 +137,61 @@ void main() {
       expect(dots, isEmpty);
     });
 
+    // ── Invited variant (yellow, no dot) ─────────────────────────────────────
+    testWidgets('renders label for invited variant', (tester) async {
+      await tester.pumpWidget(testApp(
+        const StatusBadge(
+          label: 'Invited',
+          status: StatusBadgeStatus.invited,
+        ),
+      ));
+      expect(find.text('Invited'), findsOneWidget);
+    });
+
+    testWidgets('invited variant uses statusInvitedBg background',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        const StatusBadge(
+          label: 'Invited',
+          status: StatusBadgeStatus.invited,
+        ),
+      ));
+      final pill = _pillContainer(tester);
+      final decoration = pill.decoration as BoxDecoration;
+      expect(decoration.color, AppSemanticColors.light.statusInvitedBg);
+    });
+
+    testWidgets('invited variant uses statusInvitedText text color',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        const StatusBadge(
+          label: 'Invited',
+          status: StatusBadgeStatus.invited,
+        ),
+      ));
+      final text = tester.widget<Text>(find.text('Invited'));
+      expect(text.style?.color, AppSemanticColors.light.statusInvitedText);
+    });
+
+    testWidgets('omits dot for invited variant', (tester) async {
+      await tester.pumpWidget(testApp(
+        const StatusBadge(
+          label: 'Invited',
+          status: StatusBadgeStatus.invited,
+        ),
+      ));
+      final dots = tester
+          .widgetList<Container>(find.descendant(
+            of: find.byType(StatusBadge),
+            matching: find.byType(Container),
+          ))
+          .where((c) {
+        final d = c.decoration;
+        return d is BoxDecoration && d.shape == BoxShape.circle;
+      });
+      expect(dots, isEmpty);
+    });
+
     // ── State tests (label text) ────────────────────────────────────────────
     testWidgets('renders label text', (tester) async {
       await tester.pumpWidget(testApp(

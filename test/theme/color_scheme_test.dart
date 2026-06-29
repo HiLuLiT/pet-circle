@@ -180,6 +180,16 @@ void main() {
           equals(AppPrimitives.pcStatusActiveBg),
         );
       });
+      test('statusInvited nest (yellow, no dot)', () {
+        expect(
+          AppSemanticColors.light.statusInvitedBg,
+          equals(AppPrimitives.yellowLightest),
+        );
+        expect(
+          AppSemanticColors.light.statusInvitedText,
+          equals(AppPrimitives.yellowDarkest),
+        );
+      });
     });
 
     group('dark constant', () {
@@ -400,6 +410,8 @@ void main() {
         expect(colors.statusElevatedBg, isNotNull);
         expect(colors.statusAlertBg, isNotNull);
         expect(colors.statusActiveBg, isNotNull);
+        expect(colors.statusInvitedBg, isNotNull);
+        expect(colors.statusInvitedText, isNotNull);
       });
     });
   });

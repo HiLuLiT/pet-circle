@@ -9,6 +9,7 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
+import 'package:pet_circle/widgets/status_badge.dart';
 
 import 'add_medication_sheet.dart';
 
@@ -344,23 +345,11 @@ class _ActiveMedicationsList extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacingTokens.sm, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: med.isActive
-                              ? c.primaryLight.withValues(alpha: 0.2)
-                              : c.background,
-                          borderRadius:
-                              BorderRadius.circular(AppRadiiTokens.full),
-                        ),
-                        child: Text(
-                          med.isActive ? l10n.active : l10n.done,
-                          style: AppSemanticTextStyles.caption.copyWith(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: c.textPrimary),
-                        ),
+                      StatusBadge(
+                        label: med.isActive ? l10n.active : l10n.done,
+                        status: med.isActive
+                            ? StatusBadgeStatus.active
+                            : StatusBadgeStatus.normal,
                       ),
                       const SizedBox(height: AppSpacingTokens.xs),
                       Text(dateStr,
