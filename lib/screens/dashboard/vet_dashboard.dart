@@ -18,6 +18,8 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
 import 'package:pet_circle/widgets/pet_card.dart';
+import 'package:pet_circle/widgets/responsive_grid.dart';
+import 'package:pet_circle/widgets/summary_card.dart';
 
 class VetDashboard extends StatefulWidget {
   const VetDashboard({super.key, this.showScaffold = true});
@@ -140,7 +142,7 @@ class _VetDashboardState extends State<VetDashboard> {
                     style: AppSemanticTextStyles.bodyMuted,
                   ),
                   const SizedBox(height: AppSpacingTokens.lg),
-                  _ResponsiveGrid(
+                  ResponsiveGrid(
                     maxCrossAxisCount: 3,
                     minItemWidth: 280,
                     children: pets
@@ -155,24 +157,24 @@ class _VetDashboardState extends State<VetDashboard> {
                         .toList(),
                   ),
                   const SizedBox(height: AppSpacingTokens.lg),
-                  _ResponsiveGrid(
+                  ResponsiveGrid(
                     maxCrossAxisCount: 3,
                     minItemWidth: 280,
                     childAspectRatio: 3.3,
                     children: [
-                      _SummaryCard(
+                      SummaryCard(
                         iconColor: c.primaryLight.withValues(alpha: 0.15),
                         icon: Icons.check_circle_outline,
                         value: '$normalCount',
                         label: l10n.normalStatus,
                       ),
-                      _SummaryCard(
+                      SummaryCard(
                         iconColor: c.error.withValues(alpha: 0.15),
                         icon: Icons.warning_amber_outlined,
                         value: '$elevatedCount',
                         label: l10n.needAttention,
                       ),
-                      _SummaryCard(
+                      SummaryCard(
                         iconColor: c.primaryLight.withValues(alpha: 0.1),
                         icon: Icons.bar_chart,
                         value: '${measurementStore.thisWeekCount}',
@@ -432,95 +434,6 @@ class _OwnerLabel extends StatelessWidget {
         ),
         Icon(Icons.chevron_right, size: 18, color: c.textPrimary),
       ],
-    );
-  }
-}
-
-// ── Summary Card ──
-
-class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({
-    required this.iconColor,
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-
-  final Color iconColor;
-  final IconData icon;
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return NeumorphicCard(
-      radius: BorderRadius.circular(AppRadiiTokens.md),
-      padding: const EdgeInsets.all(AppSpacingTokens.lg),
-      child: Row(
-        children: [
-          Container(
-            height: 48,
-            width: 48,
-            decoration: BoxDecoration(
-              color: iconColor,
-              borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
-            ),
-            child: Center(
-              child: Icon(icon, size: 24, color: c.textPrimary),
-            ),
-          ),
-          const SizedBox(width: AppSpacingTokens.md),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                value,
-                style:
-                    AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
-              ),
-              Text(label, style: AppSemanticTextStyles.bodyMuted),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ── Responsive Grid ──
-
-class _ResponsiveGrid extends StatelessWidget {
-  const _ResponsiveGrid({
-    required this.children,
-    required this.minItemWidth,
-    required this.maxCrossAxisCount,
-    this.childAspectRatio = 0.85,
-  });
-
-  final List<Widget> children;
-  final double minItemWidth;
-  final int maxCrossAxisCount;
-  final double childAspectRatio;
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final count =
-            (width / minItemWidth).floor().clamp(1, maxCrossAxisCount);
-        return GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: count,
-          crossAxisSpacing: AppSpacingTokens.lg,
-          mainAxisSpacing: AppSpacingTokens.lg,
-          childAspectRatio: childAspectRatio,
-          children: children,
-        );
-      },
     );
   }
 }

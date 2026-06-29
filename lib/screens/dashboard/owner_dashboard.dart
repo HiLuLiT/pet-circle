@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
-import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet_access.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
@@ -13,6 +12,7 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
+import 'package:pet_circle/widgets/avatar_stack.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/pet_card.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
@@ -295,7 +295,10 @@ class _OwnerPetCard extends StatelessWidget {
                   ),
                 ],
               ),
-              _AvatarStack(avatars: data.careCircle),
+              AvatarStack(
+                avatars: data.careCircle,
+                borderColor: c.primaryLightest,
+              ),
             ],
           ),
           const SizedBox(height: AppSpacingTokens.lg),
@@ -320,107 +323,6 @@ class _OwnerPetCard extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Overlapping avatar stack for care circle members.
-class _AvatarStack extends StatelessWidget {
-  const _AvatarStack({required this.avatars});
-
-  final List<CareCircleMember> avatars;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    const double avatarSize = 24;
-    const double overlap = 8;
-    final count = avatars.length;
-    if (count == 0) return const SizedBox.shrink();
-
-    return SizedBox(
-      height: avatarSize,
-      width: avatarSize + (count - 1) * (avatarSize - overlap) + 8,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          for (var i = 0; i < count; i++)
-            Positioned(
-              right: 8 + i * (avatarSize - overlap),
-              child: _AvatarCircle(
-                member: avatars[i],
-                size: avatarSize,
-                borderColor: c.primaryLightest,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Single avatar circle — shows image or initials.
-class _AvatarCircle extends StatelessWidget {
-  const _AvatarCircle({
-    required this.member,
-    required this.size,
-    required this.borderColor,
-  });
-
-  final CareCircleMember member;
-  final double size;
-  final Color borderColor;
-
-  String get _initials {
-    final parts = member.name.trim().split(' ');
-    if (parts.length >= 2) {
-      return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-    }
-    return member.name.isNotEmpty
-        ? member.name.substring(0, member.name.length.clamp(0, 2)).toUpperCase()
-        : '?';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    final hasImage = member.avatarUrl.startsWith('http');
-
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(color: borderColor, width: 1.5),
-        color: hasImage ? null : c.primary,
-      ),
-      child: ClipOval(
-        child: hasImage
-            ? Image.network(
-                member.avatarUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, e, s) => Center(
-                  child: Text(
-                    _initials,
-                    style: TextStyle(
-                      color: c.onPrimary,
-                      fontSize: size * 0.42,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                ),
-              )
-            : Center(
-                child: Text(
-                  _initials,
-                  style: TextStyle(
-                    color: c.onPrimary,
-                    fontSize: size * 0.42,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
       ),
     );
   }
