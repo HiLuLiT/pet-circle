@@ -9,6 +9,7 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
+import 'package:pet_circle/widgets/app_card.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 
 import 'add_medication_sheet.dart';
@@ -375,14 +376,14 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacingTokens.lg),
-      decoration: BoxDecoration(
-        color: c.background,
-        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
+      child: AppCard(
+        variant: AppCardVariant.tile,
+        tileColor: c.background,
+        padding: const EdgeInsets.all(AppSpacingTokens.lg),
+        child: child,
       ),
-      child: child,
     );
   }
 }

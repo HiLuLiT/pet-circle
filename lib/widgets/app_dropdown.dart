@@ -57,8 +57,12 @@ class AppDropdown extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppSemanticTextStyles.labelSm),
-        const SizedBox(height: AppSpacingTokens.sm),
+        // Omit the label row entirely when no label is given, so callers that
+        // pass an empty string (e.g. an inline picker) don't get a dead 8px gap.
+        if (label.isNotEmpty) ...[
+          Text(label, style: AppSemanticTextStyles.labelSm),
+          const SizedBox(height: AppSpacingTokens.sm),
+        ],
         _Trigger(
           value: value,
           placeholder: placeholder,

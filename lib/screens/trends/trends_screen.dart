@@ -14,6 +14,7 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
+import 'package:pet_circle/widgets/app_card.dart';
 import 'package:pet_circle/widgets/app_dropdown.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -457,12 +458,10 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return Container(
+    return AppCard(
+      variant: AppCardVariant.tile,
+      tileColor: c.background,
       padding: const EdgeInsets.all(AppSpacingTokens.lg),
-      decoration: BoxDecoration(
-        color: c.background,
-        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
-      ),
       child: child,
     );
   }
