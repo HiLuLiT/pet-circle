@@ -5,7 +5,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 ///
 /// Implements the PC v3 / Claude-Design palette toggle:
 /// - On  : background = `AppSemanticColors.of(context).accentPurpleTile`
-/// - Off : background = `#E0DCD2` (state-specific off color)
+/// - Off : background = `#E8E4D8` (Butter/Cream, per Figma Toggle `465:3781`)
 /// - Knob: 22x22 white circle, animated 200ms between `left: 3` and `left: 21`
 /// - Disabled: wrapped in `Opacity(0.5)` and ignores taps
 ///
@@ -34,7 +34,7 @@ class AppToggle extends StatelessWidget {
   static const double _knobSize = 22;
   static const double _knobInset = 3;
   static const double _knobOnLeft = _width - _knobSize - _knobInset; // 21
-  static const Color _offColor = Color(0xFFE0DCD2);
+  static const Color _offColor = Color(0xFFE8E4D8);
   static const Duration _duration = Duration(milliseconds: 200);
   static const Curve _curve = Curves.easeInOut;
 

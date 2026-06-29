@@ -25,7 +25,7 @@ void main() {
       expect(decoration.color, AppSemanticColors.light.accentPurpleTile);
     });
 
-    testWidgets('value: false uses 0xFFE0DCD2 off background',
+    testWidgets('value: false uses 0xFFE8E4D8 off background',
         (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: false)));
 
@@ -33,7 +33,7 @@ void main() {
         find.byType(AnimatedContainer),
       );
       final decoration = container.decoration as BoxDecoration;
-      expect(decoration.color, const Color(0xFFE0DCD2));
+      expect(decoration.color, const Color(0xFFE8E4D8));
     });
 
     // ── Size & shape ────────────────────────────────────────────────────────
