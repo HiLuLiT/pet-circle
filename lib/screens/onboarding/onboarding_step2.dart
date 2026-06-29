@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/app_dropdown.dart';
+import 'package:pet_circle/widgets/note_callout.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep2 extends StatefulWidget {
@@ -65,7 +65,6 @@ class _OnboardingStep2State extends State<OnboardingStep2>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppSemanticColors.of(context);
     super.build(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
@@ -103,26 +102,9 @@ class _OnboardingStep2State extends State<OnboardingStep2>
             },
           ),
           const SizedBox(height: AppSpacingTokens.md),
-          Container(
-            padding: const EdgeInsets.all(AppSpacingTokens.md),
-            decoration: BoxDecoration(
-              color: c.surface,
-              borderRadius: AppRadiiTokens.borderRadiusLg,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.note,
-                  style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: AppSpacingTokens.xs),
-                Text(
-                  l10n.diagnosisNote,
-                  style: AppSemanticTextStyles.body,
-                ),
-              ],
-            ),
+          NoteCallout(
+            title: l10n.note,
+            body: l10n.diagnosisNote,
           ),
         ],
       ),
