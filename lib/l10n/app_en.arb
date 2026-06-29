@@ -159,6 +159,8 @@
   "failedToSendEmail": "Failed to send email",
 
   "bpm": "BPM",
+  "petCardSubtitle": "{breed} · SPR {bpm} bpm",
+  "@petCardSubtitle": { "placeholders": { "breed": { "type": "String" }, "bpm": { "type": "int" } } },
   "clinicOverview": "Clinic Overview",
   "patientsInYourCare": "{count} patients in your care",
   "@patientsInYourCare": { "placeholders": { "count": { "type": "int" } } },

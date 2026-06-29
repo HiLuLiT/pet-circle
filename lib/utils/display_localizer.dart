@@ -1,5 +1,6 @@
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
+import 'package:pet_circle/widgets/status_badge.dart';
 
 /// Render-time localization for values that are stored in English in the data
 /// model (so logic/comparison stays stable) but should be displayed in the
@@ -43,6 +44,21 @@ String localizeStatus(String status, AppLocalizations l10n) {
       return l10n.statusCritical;
     default:
       return status;
+  }
+}
+
+/// Maps a pet status label (`Normal` / `Elevated` / `Critical`) to the
+/// [StatusBadgeStatus] family used by [StatusBadge]. Unknown values fall back
+/// to [StatusBadgeStatus.alert] (matching the existing `Elevated`/`Critical`
+/// treatment used elsewhere in the app).
+StatusBadgeStatus statusBadgeStatusFor(String statusLabel) {
+  switch (statusLabel) {
+    case 'Normal':
+      return StatusBadgeStatus.normal;
+    case 'Elevated':
+      return StatusBadgeStatus.elevated;
+    default:
+      return StatusBadgeStatus.alert;
   }
 }
 

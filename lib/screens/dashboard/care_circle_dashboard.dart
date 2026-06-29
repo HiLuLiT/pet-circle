@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
-import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet.dart';
@@ -14,7 +13,7 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
-import 'package:pet_circle/widgets/status_badge.dart';
+import 'package:pet_circle/widgets/pet_card.dart';
 
 class CareCircleDashboard extends StatelessWidget {
   const CareCircleDashboard({super.key});
@@ -41,7 +40,7 @@ class CareCircleDashboard extends StatelessWidget {
                       minItemWidth: 280,
                       children: pets
                           .map(
-                            (pet) => _PetCard(
+                            (pet) => _CareCirclePetCard(
                               data: pet,
                               onTap: () => context.go(
                                 AppRoutes.shell(tab: 2),
@@ -89,8 +88,12 @@ class CareCircleDashboard extends StatelessWidget {
   }
 }
 
-class _PetCard extends StatelessWidget {
-  const _PetCard({required this.data, this.onTap});
+/// Care-circle-context adapter around the shared [PetCard].
+///
+/// Adds the patient subtitle (breed · SPR bpm) and the care-circle label +
+/// avatar stack (footer slot) while delegating the base layout to [PetCard].
+class _CareCirclePetCard extends StatelessWidget {
+  const _CareCirclePetCard({required this.data, this.onTap});
 
   final Pet data;
   final VoidCallback? onTap;
@@ -102,98 +105,29 @@ class _PetCard extends StatelessWidget {
     final latestFromStore = measurementStore.latestForPet(data.id ?? '');
     final latest = latestFromStore ?? data.latestMeasurement;
     final hasMeasurement = latest.bpm > 0;
-    return GestureDetector(
+    final subtitle = hasMeasurement
+        ? l10n.petCardSubtitle(data.breedAndAge, latest.bpm)
+        : data.breedAndAge;
+
+    return PetCard(
+      name: data.name,
+      subtitle: subtitle,
+      status: statusBadgeStatusFor(data.statusLabel),
+      statusLabel: localizeStatus(data.statusLabel, l10n),
+      media: ClipOval(child: DogPhoto(endpoint: data.imageUrl)),
       onTap: onTap,
-      child: NeumorphicCard(
-        radius: BorderRadius.circular(AppRadiiTokens.md),
-        child: Column(
+      footer: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Stack(
+          Row(
             children: [
-              Container(
-                height: 192,
-                width: double.infinity,
-                  decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [c.primaryLight.withValues(alpha: 0.2), Colors.transparent],
-                  ),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.md)),
-                  child: DogPhoto(endpoint: data.imageUrl),
-                ),
-              ),
-              Positioned(
-                top: 20,
-                right: 16,
-                child: StatusBadge(
-                  label: localizeStatus(data.statusLabel, l10n),
-                  color: Color(data.statusColorHex),
-                ),
-              ),
+              Icon(Icons.group, size: 12, color: c.textPrimary),
+              const SizedBox(width: 6),
+              Text(l10n.careCircle, style: AppSemanticTextStyles.caption),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(data.name,
-                    style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
-                const SizedBox(height: 4),
-                Text(data.breedAndAge, style: AppSemanticTextStyles.bodyMuted),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        NeumorphicCard(
-                          inner: true,
-                          color: c.surface,
-                          padding: const EdgeInsets.all(12),
-                          child: Icon(Icons.favorite_border,
-                              size: 20, color: c.textPrimary),
-                        ),
-                        const SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(hasMeasurement ? '${latest.bpm}' : '--',
-                                style: AppSemanticTextStyles.headingLg
-                                    .copyWith(color: c.textPrimary)),
-                            Text(l10n.bpm, style: AppSemanticTextStyles.caption),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Text(hasMeasurement ? formatTimeAgo(latest.recordedAt, l10n) : l10n.noMeasurementsYet,
-                        style: AppSemanticTextStyles.caption),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Divider(color: c.primaryLight.withValues(alpha: 0.15), height: 1),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(Icons.group, size: 12, color: c.textPrimary),
-                        const SizedBox(width: 6),
-                        Text(l10n.careCircle, style: AppSemanticTextStyles.caption),
-                      ],
-                    ),
-                    _AvatarStack(avatars: data.careCircle),
-                  ],
-                ),
-              ],
-            ),
-          ),
+          _AvatarStack(avatars: data.careCircle),
         ],
-        ),
       ),
     );
   }

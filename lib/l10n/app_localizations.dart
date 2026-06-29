@@ -1004,6 +1004,12 @@ abstract class AppLocalizations {
   /// **'BPM'**
   String get bpm;
 
+  /// No description provided for @petCardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{breed} · SPR {bpm} bpm'**
+  String petCardSubtitle(String breed, int bpm);
+
   /// No description provided for @clinicOverview.
   ///
   /// In en, this message translates to:

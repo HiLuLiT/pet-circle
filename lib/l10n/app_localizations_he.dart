@@ -478,6 +478,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get bpm => 'BPM';
 
   @override
+  String petCardSubtitle(String breed, int bpm) {
+    return '$breed · SPR $bpm bpm';
+  }
+
+  @override
   String get clinicOverview => 'סקירת מרפאה';
 
   @override

@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
-import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/pet_access.dart';
@@ -11,14 +10,14 @@ import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
-import 'package:pet_circle/theme/tokens/typography.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
+import 'package:pet_circle/widgets/pet_card.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/round_icon_button.dart';
 
-const _bpmIconAsset = 'assets/figma/bpm_icon.svg';
 const _careCircleIconAsset = 'assets/figma/care_circle_icon.svg';
 
 class OwnerDashboard extends StatelessWidget {
@@ -135,7 +134,7 @@ class OwnerDashboard extends StatelessWidget {
     final petCards = pets.map((pet) {
       return Builder(builder: (context) {
         final access = petStore.accessForPet(pet);
-        return _PetCard(
+        return _OwnerPetCard(
           data: pet,
           access: access,
           onLongPress: access.canDeletePet
@@ -240,13 +239,13 @@ class OwnerDashboard extends StatelessWidget {
   }
 }
 
-/// Pet card — Figma node 196:4191.
+/// Owner-context adapter around the shared [PetCard].
 ///
-/// Layout: flex-col, gap-24, items-center, p-24, rounded-16, bg primaryLightest.
-/// Content section (avatar + name/breed + rows) is full-width, left-aligned.
-/// Button group is content-sized, centered by the card's items-center.
-class _PetCard extends StatelessWidget {
-  const _PetCard({
+/// Composes the base [PetCard] (Figma node 442:8872) with the owner-specific
+/// footer: the care-circle avatar stack and the Trends / Measure action
+/// buttons. Long-press (delete) and tap callbacks are forwarded to [PetCard].
+class _OwnerPetCard extends StatelessWidget {
+  const _OwnerPetCard({
     required this.data,
     required this.onMeasure,
     required this.onTrends,
@@ -267,185 +266,59 @@ class _PetCard extends StatelessWidget {
     final latestFromStore = measurementStore.latestForPet(data.id ?? '');
     final latest = latestFromStore ?? data.latestMeasurement;
     final hasMeasurement = latest.bpm > 0;
+    final subtitle = hasMeasurement
+        ? l10n.petCardSubtitle(data.breedAndAge, latest.bpm)
+        : data.breedAndAge;
 
-    return GestureDetector(
+    return PetCard(
+      name: data.name,
+      subtitle: subtitle,
+      status: statusBadgeStatusFor(data.statusLabel),
+      statusLabel: localizeStatus(data.statusLabel, l10n),
+      media: ClipOval(child: DogPhoto(endpoint: data.imageUrl)),
       onLongPress: onLongPress,
-      child: Container(
-        decoration: BoxDecoration(
-          color: c.primaryLightest,
-          borderRadius: AppRadiiTokens.borderRadiusLg,
-        ),
-        padding: const EdgeInsets.all(AppSpacingTokens.lg),
-        child: Column(
-          // Figma: items-center on card — centers the button group
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Content section — full-width, left-aligned
-            SizedBox(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      footer: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Care-circle row — icon + label + overlapping avatar stack.
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
                 children: [
-                  // Pet avatar — circular 80px
-                  SizedBox(
-                    width: 80,
-                    height: 80,
-                    child: ClipOval(
-                      child: DogPhoto(endpoint: data.imageUrl),
-                    ),
-                  ),
-
-                  const SizedBox(height: AppSpacingTokens.lg),
-
-                  // Pet name — Figma: 18px Bold, line-height 18px (largeNoneBold)
+                  SvgPicture.asset(_careCircleIconAsset, width: 24, height: 24),
+                  const SizedBox(width: AppSpacingTokens.xs),
                   Text(
-                    data.name,
-                    style: AppTypography.largeNoneBold
-                        .copyWith(color: c.textPrimary),
-                  ),
-                  const SizedBox(height: AppSpacingTokens.sm),
-                  // Breed — Figma: 16px Regular, line-height 24px
-                  Text(
-                    data.breedAndAge,
+                    l10n.careCircle,
                     style: AppSemanticTextStyles.body
                         .copyWith(color: c.textPrimary),
                   ),
-
-                  const SizedBox(height: AppSpacingTokens.lg),
-
-                  // BPM row — Figma: border-b white, pb-12, gap-12
-                  _InfoRow(
-                    leading: Container(
-                      width: 32,
-                      height: 32,
-                      decoration: BoxDecoration(
-                        color: c.surface,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          _bpmIconAsset,
-                          width: 16,
-                          height: 16,
-                        ),
-                      ),
-                    ),
-                    leadingGap: AppSpacingTokens.md - 4, // 12px
-                    title: Text(
-                      hasMeasurement ? '${latest.bpm}' : '--',
-                      style: AppSemanticTextStyles.headingLg
-                          .copyWith(color: c.textPrimary),
-                    ),
-                    subtitle: Text(
-                      l10n.bpm,
-                      style: AppSemanticTextStyles.body
-                          .copyWith(color: c.textPrimary),
-                    ),
-                    trailing: Text(
-                      hasMeasurement
-                          ? formatTimeAgo(latest.recordedAt, l10n)
-                          : l10n.noMeasurementsYet,
-                      style: AppSemanticTextStyles.body
-                          .copyWith(color: c.textPrimary),
-                    ),
-                    borderColor: c.surface,
-                  ),
-
-                  const SizedBox(height: AppSpacingTokens.md),
-
-                  // Care circle row — Figma: border-b white, pb-12, gap-4
-                  _InfoRow(
-                    leading: SvgPicture.asset(
-                      _careCircleIconAsset,
-                      width: 24,
-                      height: 24,
-                    ),
-                    leadingGap: AppSpacingTokens.xs, // 4px
-                    title: Text(
-                      l10n.careCircle,
-                      style: AppSemanticTextStyles.body
-                          .copyWith(color: c.textPrimary),
-                    ),
-                    trailing: _AvatarStack(avatars: data.careCircle),
-                    borderColor: c.surface,
-                  ),
                 ],
               ),
-            ),
-
-            const SizedBox(height: AppSpacingTokens.lg),
-
-            // Button group — Figma: flex, gap-16, content-sized, centered
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                PrimaryButton(
-                  label: l10n.trends,
-                  variant: PrimaryButtonVariant.outlined,
-                  fullWidth: false,
-                  onPressed: onTrends,
-                ),
-                const SizedBox(width: AppSpacingTokens.md),
-                if (onMeasure != null)
-                  PrimaryButton(
-                    label: l10n.measure,
-                    variant: PrimaryButtonVariant.filled,
-                    fullWidth: false,
-                    onPressed: onMeasure!,
-                  ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Reusable info row with border-bottom — used for BPM and care circle rows.
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.leading,
-    required this.leadingGap,
-    required this.title,
-    this.subtitle,
-    required this.trailing,
-    required this.borderColor,
-  });
-
-  final Widget leading;
-  final double leadingGap;
-  final Widget title;
-  final Widget? subtitle;
-  final Widget trailing;
-  final Color borderColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(bottom: AppSpacingTokens.md - 4), // 12px
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: borderColor, width: 1),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              leading,
-              SizedBox(width: leadingGap),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  title,
-                  if (subtitle != null) subtitle!,
-                ],
-              ),
+              _AvatarStack(avatars: data.careCircle),
             ],
           ),
-          trailing,
+          const SizedBox(height: AppSpacingTokens.lg),
+          // Action buttons — Trends + Measure.
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              PrimaryButton(
+                label: l10n.trends,
+                variant: PrimaryButtonVariant.outlined,
+                fullWidth: false,
+                onPressed: onTrends,
+              ),
+              const SizedBox(width: AppSpacingTokens.md),
+              if (onMeasure != null)
+                PrimaryButton(
+                  label: l10n.measure,
+                  variant: PrimaryButtonVariant.filled,
+                  fullWidth: false,
+                  onPressed: onMeasure!,
+                ),
+            ],
+          ),
         ],
       ),
     );
@@ -527,7 +400,7 @@ class _AvatarCircle extends StatelessWidget {
             ? Image.network(
                 member.avatarUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Center(
+                errorBuilder: (_, e, s) => Center(
                   child: Text(
                     _initials,
                     style: TextStyle(
