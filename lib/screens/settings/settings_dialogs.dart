@@ -216,12 +216,15 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   options: roles.map((r) => localizeRoleName(r, l10n)).toList(),
                   onTap: () => setSheetState(() => isRoleOpen = !isRoleOpen),
                   onOptionSelected: (label) {
-                    final match = roles.firstWhere(
-                      (r) => localizeRoleName(r, l10n) == label,
-                      orElse: () => selectedRole,
-                    );
+                    // Map the localized label back to its canonical role by
+                    // position — same list, same order as `options` — mirroring
+                    // the AppDropdown adoption in medication_form_widgets.dart.
+                    final index = roles
+                        .map((r) => localizeRoleName(r, l10n))
+                        .toList()
+                        .indexOf(label);
                     setSheetState(() {
-                      selectedRole = match;
+                      if (index >= 0) selectedRole = roles[index];
                       isRoleOpen = false;
                     });
                   },
