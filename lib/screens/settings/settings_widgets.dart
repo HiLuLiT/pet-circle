@@ -6,7 +6,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/app_card.dart';
-import 'package:pet_circle/widgets/toggle_pill.dart';
+import 'package:pet_circle/widgets/app_toggle.dart';
 
 const settingsShareAsset = 'assets/figma/settings_share.svg';
 const settingsDownAsset = 'assets/figma/settings_down.svg';
@@ -145,9 +145,9 @@ class SettingsToggleRow extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: onChanged,
-            child: TogglePill(isOn: isOn),
+          AppToggle(
+            value: isOn,
+            onChanged: onChanged == null ? null : (_) => onChanged!(),
           ),
         ],
       ),

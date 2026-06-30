@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/screens/settings/settings_content.dart';
 import 'package:pet_circle/screens/settings/settings_widgets.dart';
 import 'package:pet_circle/screens/settings/settings_care_circle_widgets.dart';
-import 'package:pet_circle/widgets/toggle_pill.dart';
+import 'package:pet_circle/widgets/app_toggle.dart';
 
 import '../../helpers/helpers.dart';
 import '../../helpers/ignore_overflow_errors.dart';
@@ -165,13 +165,13 @@ void main() {
       expect(find.byType(SettingsToggleRow), findsAtLeast(4));
     });
 
-    testWidgets('renders TogglePill for each toggle row', (tester) async {
+    testWidgets('renders AppToggle for each toggle row', (tester) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      expect(find.byType(TogglePill), findsAtLeast(4));
+      expect(find.byType(AppToggle), findsAtLeast(4));
     });
   });
 

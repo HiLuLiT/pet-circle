@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/screens/settings/settings_widgets.dart';
-import 'package:pet_circle/widgets/toggle_pill.dart';
+import 'package:pet_circle/widgets/app_toggle.dart';
 
 import '../../helpers/helpers.dart';
 import '../../helpers/ignore_overflow_errors.dart';
@@ -97,7 +97,7 @@ void main() {
       expect(find.text('Enable push notifications'), findsOneWidget);
     });
 
-    testWidgets('renders TogglePill', (tester) async {
+    testWidgets('renders AppToggle', (tester) async {
       suppressOverflowErrors();
       await tester.pumpWidget(testApp(
         const SettingsToggleRow(
@@ -107,7 +107,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.byType(TogglePill), findsOneWidget);
+      expect(find.byType(AppToggle), findsOneWidget);
     });
 
     testWidgets('calls onChanged when tapped', (tester) async {
@@ -122,7 +122,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(GestureDetector).last);
+      await tester.tap(find.byType(AppToggle));
       expect(changed, isTrue);
     });
   });

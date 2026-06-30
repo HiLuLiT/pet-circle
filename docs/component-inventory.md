@@ -469,7 +469,7 @@ Screen-adoption counts below are from a `grep` of each widget across `lib/screen
 | members `442:8935` | `MemberTile` (pet_detail_widgets:111) | Also `_MemberTile` circle:326, `_AvatarStack` ×2 — converge | 🟠 |
 | notification-new `465:4434` | `NotificationCard` | **0 screens.** Converge `_AppNotificationCard` messages:174 (unread state) | 🟡 |
 | notification-read `465:4454` | `NotificationCard` (read state) | Same — `_AppNotificationCard` read state | 🟡 |
-| icon-toggle `474:939` | `SettingsToggleRow` (settings_widgets:86) + `AppToggle` | Feature-local row; `AppToggle` unused (🟡) | 🟠 |
+| icon-toggle `474:939` | `SettingsToggleRow` (settings_widgets:86) + `AppToggle` | `SettingsToggleRow` now renders `AppToggle` for binary on/off settings | ✅ |
 | reminder `469:982` | `ReminderCard` (medication_form_widgets:204) | Feature-local; also medication time rows | 🟠 |
 | icon-text-status `465:3733` | — | Medication rows in `_ActiveMedicationsList`/`_SectionCard` medication:264/381 | 🔴 |
 | text-status `474:1815` | `_Badge` (settings_care_circle:136) | Guest/member status rows; feature-local | 🟠 |
@@ -487,7 +487,7 @@ Screen-adoption counts below are from a `grep` of each widget across `lib/screen
 ### Standalone components
 | Figma component (node) | Flutter widget | App usage / inline to converge | Status |
 |---|---|---|---|
-| Toggle `465:3781` (On/Off) | `AppToggle` | **0 screens.** `TogglePill` (segmented, different) used in 2 screens; converge on/off toggles | 🟡 |
+| Toggle `465:3781` (On/Off) | `AppToggle` | Adopted in settings via `SettingsToggleRow`. `TogglePill` (segmented) remains for the medication reminder card | ✅ |
 | Tag Button `465:3786` | `AppFilterChip` / — | `_DurationChip` measurement:627; selectable tag | 🟠 |
 | Selection Card `465:3765` | `RadioCard` | **0 screens.** Converge `_TargetOption` onboarding_step3:162, `_RoleButton` role_selection:99 | 🟡 |
 | Pet Card `442:8872` | — (3 divergent copies) | `_PetCard` owner:259 / vet:338 / care_circle:92 — converge to one widget | 🟠 |
