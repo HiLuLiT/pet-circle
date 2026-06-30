@@ -46,8 +46,8 @@ void main() {
       expect(icon.icon, Icons.error_outline);
     });
 
-    // ── Background uses the warm-cream surfaceRecessed token ────────────────
-    testWidgets('uses the surfaceRecessed (cream) background token',
+    // ── Background uses the warm-cream accentButterCream token ──────────────
+    testWidgets('uses the accentButterCream (#E8E4D8) background token',
         (tester) async {
       await tester.pumpWidget(testApp(
         const NoteCallout(title: 'Note:', body: 'Body'),
@@ -55,7 +55,7 @@ void main() {
 
       final container = tester.widget<Container>(find.byType(Container).first);
       final decoration = container.decoration as BoxDecoration;
-      expect(decoration.color, AppSemanticColors.light.surfaceRecessed);
+      expect(decoration.color, AppSemanticColors.light.accentButterCream);
     });
 
     // ── Radius 12 ───────────────────────────────────────────────────────────

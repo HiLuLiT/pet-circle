@@ -35,6 +35,9 @@ class AppPrimitives {
 
   static const Color pcButter = Color(0xFFD98E40);
   static const Color pcButterTile = Color(0xFFF0EC93);
+  // Candy/Butter/Cream — warm cream tile (#E8E4D8). Distinct from the bright
+  // yellow [pcButterTile]; used for the toggle off-track and note callouts.
+  static const Color pcButterCream = Color(0xFFE8E4D8);
 
   static const Color pcBlush = Color(0xFFDD6593);
   static const Color pcBlushTile = Color(0xFFF8DCE6);

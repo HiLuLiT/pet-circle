@@ -41,6 +41,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.accentPeriwinkleChip,
     required this.accentButter,
     required this.accentButterTile,
+    required this.accentButterCream,
     required this.accentBlush,
     required this.accentBlushTile,
     required this.accentMint,
@@ -90,6 +91,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color accentPeriwinkleChip;
   final Color accentButter;
   final Color accentButterTile;
+  /// Warm cream tile (#E8E4D8) — toggle off-track, note callouts. Theme-
+  /// independent, like the other accent tiles.
+  final Color accentButterCream;
   final Color accentBlush;
   final Color accentBlushTile;
   final Color accentMint;
@@ -140,6 +144,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     accentPeriwinkleChip: AppPrimitives.pcPeriwinkleChip,
     accentButter: AppPrimitives.pcButter,
     accentButterTile: AppPrimitives.pcButterTile,
+    accentButterCream: AppPrimitives.pcButterCream,
     accentBlush: AppPrimitives.pcBlush,
     accentBlushTile: AppPrimitives.pcBlushTile,
     accentMint: AppPrimitives.pcMint,
@@ -190,6 +195,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     accentPeriwinkleChip: AppPrimitives.pcPeriwinkleChip,
     accentButter: AppPrimitives.pcButter,
     accentButterTile: AppPrimitives.pcButterTile,
+    accentButterCream: AppPrimitives.pcButterCream,
     accentBlush: AppPrimitives.pcBlush,
     accentBlushTile: AppPrimitives.pcBlushTile,
     accentMint: AppPrimitives.pcMint,
@@ -246,6 +252,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? accentPeriwinkleChip,
     Color? accentButter,
     Color? accentButterTile,
+    Color? accentButterCream,
     Color? accentBlush,
     Color? accentBlushTile,
     Color? accentMint,
@@ -294,6 +301,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       accentPeriwinkleChip: accentPeriwinkleChip ?? this.accentPeriwinkleChip,
       accentButter: accentButter ?? this.accentButter,
       accentButterTile: accentButterTile ?? this.accentButterTile,
+      accentButterCream: accentButterCream ?? this.accentButterCream,
       accentBlush: accentBlush ?? this.accentBlush,
       accentBlushTile: accentBlushTile ?? this.accentBlushTile,
       accentMint: accentMint ?? this.accentMint,
@@ -354,6 +362,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       accentButter: Color.lerp(accentButter, other.accentButter, t)!,
       accentButterTile:
           Color.lerp(accentButterTile, other.accentButterTile, t)!,
+      accentButterCream:
+          Color.lerp(accentButterCream, other.accentButterCream, t)!,
       accentBlush: Color.lerp(accentBlush, other.accentBlush, t)!,
       accentBlushTile:
           Color.lerp(accentBlushTile, other.accentBlushTile, t)!,

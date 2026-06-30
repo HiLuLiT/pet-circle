@@ -129,6 +129,22 @@ void main() {
           equals(AppPrimitives.pcButter),
         );
       });
+      test('accentButterCream is pcButterCream (#E8E4D8)', () {
+        expect(
+          AppSemanticColors.light.accentButterCream,
+          equals(AppPrimitives.pcButterCream),
+        );
+        expect(
+          AppPrimitives.pcButterCream,
+          equals(const Color(0xFFE8E4D8)),
+        );
+      });
+      test('accentButterCream is theme-independent (dark == light)', () {
+        expect(
+          AppSemanticColors.dark.accentButterCream,
+          equals(AppSemanticColors.light.accentButterCream),
+        );
+      });
       test('accentBlush is pcBlush', () {
         expect(
           AppSemanticColors.light.accentBlush,
@@ -404,6 +420,7 @@ void main() {
         expect(colors.accentPurple, isNotNull);
         expect(colors.accentPeriwinkle, isNotNull);
         expect(colors.accentButter, isNotNull);
+        expect(colors.accentButterCream, isNotNull);
         expect(colors.accentBlush, isNotNull);
         expect(colors.accentMint, isNotNull);
         expect(colors.statusNormalBg, isNotNull);

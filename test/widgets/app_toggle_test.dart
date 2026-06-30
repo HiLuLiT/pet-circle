@@ -25,7 +25,7 @@ void main() {
       expect(decoration.color, AppSemanticColors.light.accentPurpleTile);
     });
 
-    testWidgets('value: false uses 0xFFE8E4D8 off background',
+    testWidgets('value: false uses accentButterCream (#E8E4D8) off background',
         (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: false)));
 
@@ -33,6 +33,8 @@ void main() {
         find.byType(AnimatedContainer),
       );
       final decoration = container.decoration as BoxDecoration;
+      expect(decoration.color, AppSemanticColors.light.accentButterCream);
+      // Token resolves to the Candy/Butter/Cream primitive.
       expect(decoration.color, const Color(0xFFE8E4D8));
     });
 

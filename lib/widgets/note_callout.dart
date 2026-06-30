@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../theme/semantic/color_scheme.dart';
 import '../theme/semantic/text_theme.dart';
+import '../theme/tokens/colors.dart';
 import '../theme/tokens/spacing.dart';
 
 /// Informational "note" callout following the Pet Circle v3 / Claude-Design
@@ -12,9 +13,9 @@ import '../theme/tokens/spacing.dart';
 /// secondary-colored body paragraph.
 ///
 /// Spec mapping:
-/// - Background `Candy/Butter/Cream` (#E8E4D8) → closest semantic token
-///   [AppSemanticColors.surfaceRecessed] (warm cream). The bright
-///   `accentButterTile` token is yellow and intentionally not used.
+/// - Background `Candy/Butter/Cream` (#E8E4D8) → semantic token
+///   [AppSemanticColors.accentButterCream]. The bright `accentButterTile`
+///   token is yellow and intentionally not used.
 /// - Radius 12 → [AppRadiiTokens.borderRadiusField] sentinel is 14; the spec
 ///   value 12 is honoured directly via [BorderRadius.circular].
 /// - Padding 16 → [EdgeInsets.all] (16).
@@ -60,7 +61,7 @@ class NoteCallout extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacingTokens.md),
       decoration: BoxDecoration(
-        color: colors.surfaceRecessed,
+        color: colors.accentButterCream,
         borderRadius: BorderRadius.circular(_radius),
       ),
       child: Column(
@@ -72,7 +73,9 @@ class NoteCallout extends StatelessWidget {
               Icon(
                 icon,
                 size: _iconSize,
-                color: colors.onSurface,
+                // Fixed dark ink to match the title/body on the always-cream
+                // tile; theme-adaptive onSurface would be illegible in dark.
+                color: AppPrimitives.pcInk,
               ),
               const SizedBox(width: AppSpacingTokens.sm),
               Expanded(
