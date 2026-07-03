@@ -1,0 +1,311 @@
+# Pet Circle — Figma Design System Rules
+
+> Rules for implementing Figma designs using the Figma MCP server. Covers component organization, styling conventions, design tokens, asset handling, and the required Figma-to-code workflow for this Flutter/Dart pet health monitoring app.
+
+## Project Overview
+
+Pet Circle is a **Flutter/Dart** cross-platform app (iOS, Android, Web, Desktop) for pet health monitoring. It uses the **PC v3 (Claude-Design) system** — a warm, flat, candy-pastel design language with centralized design tokens aligned to Figma variables. Typography is **Instrument Sans**.
+
+> For the full token layer and component catalog, see [design-system-enforcement.md](design-system-enforcement.md) — that file is the single source of truth and always applies. This file covers the Figma-specific workflow and asset handling only.
+
+## Figma MCP Integration Rules
+
+These rules define how to translate Figma inputs into code for this project and must be followed for every Figma-driven change.
+
+### Design System source of truth
+
+**https://www.figma.com/design/ApTk87wJXejOTzVtEnFJMw/Pet-circle?node-id=402-1191** — the canonical component/token catalog (buttons, inputs, cards, badges, colors, radii, type scale). This is component-first: before implementing ANY screen or component from Figma, check this node for the matching component/token. If the app's shared widget or token diverges from this spec, fix the shared widget/token FIRST, then build the screen on top of it. Never let a screen invent a one-off style that contradicts the DS node.
+
+### Required Flow (do not skip)
+
+0. Consult the DS node above for the canonical component(s)/token(s) this task touches; reconcile app code to it first if it diverges
+1. Run `get_design_context` first to fetch the structured representation for the exact node(s)
+2. If the response is too large or truncated, run `get_metadata` to get the high-level node map, then re-fetch only the required node(s) with `get_design_context`
+3. Run `get_screenshot` for a visual reference of the node variant being implemented
+4. Only after you have both `get_design_context` and `get_screenshot`, download any assets needed and start implementation
+5. Translate the output (usually React + Tailwind) into **Flutter widgets and Dart code** using this project's conventions, tokens, and architecture
+6. Validate against Figma for 1:1 look and behavior before marking complete
+
+### Implementation Rules
+
+- IMPORTANT: Treat the Figma MCP output (React + Tailwind) as a **representation of design and behavior**, not as final code
+- IMPORTANT: Translate all React components to **Flutter StatelessWidget / StatefulWidget** classes
+- IMPORTANT: Replace Tailwind utility classes with the project's design tokens (`AppSemanticColors`, `AppSpacingTokens`, `AppRadiiTokens`, `AppSemanticTextStyles`, `AppShadowTokens`)
+- Reuse existing widgets from `lib/widgets/` instead of duplicating functionality
+- Use the project's color system, typography scale, and spacing tokens consistently
+- Respect existing routing (`app_routes.dart`), state management, and data-fetch patterns
+- Strive for 1:1 visual parity with the Figma design
+- Validate the final UI against the Figma screenshot for both look and behavior
+
+---
+
+## Component Organization
+
+### Directory Structure
+
+```
+lib/
+├── widgets/          # Reusable UI components (buttons, cards, inputs, etc.)
+├── screens/          # Screen-level components, organized by feature
+│   ├── auth/
+│   ├── dashboard/
+│   ├── measurement/
+│   ├── medication/
+│   ├── messages/
+│   ├── onboarding/
+│   ├── pet_detail/
+│   ├── settings/
+│   └── trends/
+├── models/           # Data models (Pet, User, Measurement, Medication, etc.)
+├── stores/           # ChangeNotifier stores (pet, measurement, note, medication, etc.)
+├── services/         # Business logic (auth_service, user_service)
+├── providers/        # State providers
+├── theme/            # Design tokens and theme configuration
+│   ├── app_theme.dart    # Colors, spacing, typography, shadows, radii
+│   └── app_assets.dart   # Asset path constants
+├── data/             # Mock/demo data
+└── l10n/             # Localization files (English, Hebrew)
+```
+
+### Placement Rules
+
+- IMPORTANT: Place new **reusable UI components** in `lib/widgets/`
+- IMPORTANT: Place new **screen components** in `lib/screens/<feature>/`
+- Place new **data models** in `lib/models/`
+- Place new **services** in `lib/services/`
+- Place new **asset constants** in `lib/theme/app_assets.dart`
+
+### Existing Widgets (check before creating new ones)
+
+See the full component catalog (all shared widgets, grouped by category, with key API params) in [design-system-enforcement.md](design-system-enforcement.md). Always search `lib/widgets/` before creating a new UI primitive.
+
+---
+
+## Design Tokens
+
+Tokens live under `lib/theme/tokens/` (primitives) and `lib/theme/semantic/` (semantic layer). **Never hardcode colors, spacing, radii, or typography values.** Full reference (exact fields, values, and usage rules) is in [design-system-enforcement.md](design-system-enforcement.md) — summary:
+
+- Colors: `AppSemanticColors.of(context)` (never `AppColorsTheme`, removed)
+- Typography: `AppSemanticTextStyles.*`, font = Instrument Sans (never `AppTextStyles`, removed)
+- Spacing: `AppSpacingTokens.*` (PC v3 `pc*` scale preferred; legacy scale still exists)
+- Radius: `AppRadiiTokens.*` (PC v3 `pcField`/`pcCard`/`pcTile`/`pcPill`; never raw `BorderRadius.circular(N)`)
+- Shadows: `AppShadowTokens.small/medium/large` (flat elevation — neumorphic shadows are gone)
+
+---
+
+## Component Patterns
+
+### Widget Architecture
+
+- IMPORTANT: Prefer `StatelessWidget` unless local mutable state is required
+- IMPORTANT: All widgets must use `const` constructors with `super.key`
+- Use `final` for all widget fields
+- Mark required props with `required`; optional props use nullable types (`Type?`)
+
+```dart
+class MyWidget extends StatelessWidget {
+  const MyWidget({
+    super.key,
+    required this.label,
+    this.onTap,
+  });
+
+  final String label;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppSemanticColors.of(context);
+    // ...
+  }
+}
+```
+
+### Naming Conventions
+
+- **Files:** `snake_case.dart` (e.g., `primary_button.dart`)
+- **Classes:** `PascalCase` (e.g., `PrimaryButton`)
+- **Private helpers:** Prefix with `_` (e.g., `_NavItem`)
+- **Properties:** `camelCase` (e.g., `onPressed`, `backgroundColor`)
+
+### Composition
+
+- Prefer **composition over inheritance** — compose widgets from smaller widgets
+- Use private helper widgets (prefixed with `_`) for internal sub-components
+- One public widget per file; private helpers may coexist in the same file
+
+### Import Conventions
+
+- Use package imports: `import 'package:pet_circle/widgets/primary_button.dart';`
+- No barrel files — import each widget directly
+- Group imports: Flutter SDK, third-party packages, project imports
+
+---
+
+## Styling Approach
+
+### Button System
+
+`PrimaryButton` supports five variants via `PrimaryButtonVariant`:
+
+```dart
+// Filled (default): purple bg, white text — primary actions
+PrimaryButton(label: 'Sign up', onPressed: () {})
+
+// Outlined/Tertiary: transparent bg, ink text, 1px ink border — secondary actions
+PrimaryButton(label: 'Cancel', variant: PrimaryButtonVariant.outlined, onPressed: () {})
+
+// Secondary: purple-tile bg, ink text
+PrimaryButton(label: 'Skip', variant: PrimaryButtonVariant.secondary, onPressed: () {})
+
+// Link: transparent, intrinsic-width, ink text — inline text actions
+PrimaryButton(label: 'Forgot password?', variant: PrimaryButtonVariant.link, onPressed: () {})
+
+// Mini primary: purple bg, white text, compact padding
+PrimaryButton(label: 'Retry', variant: PrimaryButtonVariant.miniPrimary, onPressed: () {})
+```
+
+- IMPORTANT: Always use `PrimaryButton` for buttons — do not create custom `ElevatedButton` instances inline
+
+### Dropdown Pattern
+
+Use `AppDropdown` for labeled dropdown selectors (e.g., breed, role, diagnosis):
+
+```dart
+AppDropdown(
+  label: 'Breed',
+  value: selectedBreed,
+  onTap: _toggleDropdown,
+  isOpen: _isOpen,
+  chevronController: _chevronController,
+)
+```
+
+### Settings Row Pattern
+
+Use `SettingsRow` for settings-style list items with icon + title + trailing action:
+
+```dart
+SettingsRow(
+  iconAsset: 'assets/figma/settings_moon.svg',
+  title: 'Dark mode',
+  description: 'Toggle dark theme',
+  trailing: TogglePill(isOn: isDark),
+  onTap: toggleDarkMode,
+)
+```
+
+### PC v3 Design Language
+
+Warm, flat, candy-pastel language (per the Figma "Design System" page). Key characteristics:
+- Flat surfaces, minimal/soft elevation (`AppShadowTokens.small` — no neumorphic dual-shadows)
+- Rounded corners (`AppRadiiTokens.pcCard` = 16 default for cards)
+- Warm cream background, ink text, five candy accent families (purple/periwinkle/butter/blush/mint)
+- Pill-shaped inputs and buttons (`AppRadiiTokens.pcPill`)
+- Recolorable breed mascots (`Mascot` widget) as a signature illustration element
+
+### Applying Styles
+
+```dart
+AppCard(
+  padding: const EdgeInsets.all(AppSpacingTokens.pcMd),
+  child: Text('Hello', style: AppSemanticTextStyles.body),
+)
+```
+
+### Global Theme
+
+- Light theme: `buildAppTheme()` in `app_theme.dart`
+- Dark theme: `buildDarkTheme()` in `app_theme.dart`
+- Font: **Instrument Sans**
+- Input fields: Filled, pill/field-radius, no visible border
+
+### Responsive Patterns
+
+- Use `LayoutBuilder` to calculate responsive grid columns based on available width
+- Use `MediaQuery.of(context)` for keyboard-aware layouts
+- No predefined breakpoints; responsive behavior is dynamic
+
+---
+
+## Asset Handling
+
+### Asset Storage
+
+- SVG and image assets: `assets/figma/` directory
+- Asset path constants: `lib/theme/app_assets.dart` (`AppAssets` class)
+- Asset declaration: `pubspec.yaml` under `flutter.assets`
+
+### Using Assets
+
+```dart
+// SVG
+SvgPicture.asset(AppAssets.welcomeGraphic, width: 248, height: 248);
+
+// Raster image
+Image.asset(AppAssets.petPlaceholder, width: 64, height: 64, fit: BoxFit.cover);
+
+// Wrapped with error handling
+AppImage(assetPath: 'assets/figma/pet.png', width: 100, height: 100);
+```
+
+### Figma MCP Asset Rules
+
+- IMPORTANT: If the Figma MCP server returns a localhost source for an image or SVG, **use that source directly**
+- IMPORTANT: **DO NOT** import/add new icon packages — all assets should come from the Figma payload or existing `assets/figma/` directory
+- IMPORTANT: **DO NOT** use or create placeholders if a localhost source is provided
+- Store downloaded assets in `assets/figma/`
+- Add a constant in `AppAssets` for every new asset
+- Register new asset paths in `pubspec.yaml` if adding new asset directories
+
+### Icon System
+
+Two icon systems are in use:
+
+1. **SVG icons** (custom): Stored in `assets/figma/`, rendered with `flutter_svg`
+   - Navigation: `nav_home.svg`, `nav_heartbeat.svg`, `nav_heart.svg`, `nav_message.svg`
+   - Settings: `settings_chevron.svg`, `settings_configure.svg`, etc.
+
+2. **Material Icons** (built-in): Referenced via `Icons.<name>` or string constants in `AppAssets`
+   - Usage: `Icon(Icons.favorite_border, color: c.error)`
+
+- Prefer SVG icons from Figma for custom graphics; use Material Icons only for standard UI affordances
+
+---
+
+## Localization
+
+- Localization files: `lib/l10n/` (ARB format)
+- Supported locales: English (`en`), Hebrew (`he`)
+- Access strings via `AppLocalizations.of(context)!.<key>`
+- IMPORTANT: All user-facing strings should use localization — do not hardcode display text
+
+---
+
+## Project-Specific Conventions
+
+### State Management
+
+- Global `ChangeNotifier` stores for shared state (7 stores in `lib/stores/`)
+- `ValueNotifier` for global preferences (locale, dark mode)
+- `ListenableBuilder` for reactive UI rebuilds
+- See [state-management.md](state-management.md) for full patterns and store registry
+
+### Authentication
+
+- Firebase Auth flows exist in `lib/screens/auth/` and `lib/providers/auth_provider.dart`; toggled via `kEnableFirebase` in `main.dart`
+
+### Routing
+
+- Route constants defined in `lib/app_routes.dart`
+- Navigation via `MaterialPageRoute` and `Navigator`
+
+### Charting
+
+- Uses `syncfusion_flutter_charts` for data visualization
+
+### Dark Mode
+
+- Fully supported via the `AppSemanticColors` `ThemeExtension`
+- IMPORTANT: Always use `AppSemanticColors.of(context)` for colors in widgets to ensure dark mode compatibility
+- Text styles may need a `.copyWith(color: c.textPrimary)` override for dark mode

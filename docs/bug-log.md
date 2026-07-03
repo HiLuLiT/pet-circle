@@ -532,6 +532,24 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-028: Settings dialogs rendered field labels twice ("Display Name" shown twice)
+
+**Found during:** Automated test suite run after migrating settings dialogs' text inputs to the shared `appInputDecoration()` helper (design-system reconciliation pass)
+**Severity:** Medium (visual duplication, no functional break, but confusing)
+**Status:** Fixed
+
+**Symptom:** In `showEditProfileDialog`, the "Display Name" and "Profile Photo URL" fields rendered their label text twice — once as the Material floating `labelText` and once as the `hintText` placeholder inside the field, since both were set to the same string.
+
+**Root cause:** `appInputDecoration(context, hintText: ...)` required a non-null `hintText`. When adopting it for fields that use a floating `labelText` instead of a placeholder (via `.copyWith(labelText: ...)`), the same string was passed as both `hintText` and `labelText`, so Flutter's `InputDecoration` displayed both simultaneously.
+
+**Fix:** Made `hintText` an optional named parameter on `appInputDecoration()` (default `null`) so `labelText`-only call sites can omit it. Updated the two affected fields in `showEditProfileDialog` to call `appInputDecoration(context).copyWith(labelText: ...)`.
+
+**Files changed:**
+- `lib/widgets/app_input_decoration.dart`
+- `lib/screens/settings/settings_dialogs.dart`
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

@@ -263,7 +263,7 @@ Slide-up drawer (opened by tapping the user avatar):
 - Locale switching via settings
 - RTL layout support for Hebrew
 - All user-facing strings localized via `AppLocalizations`
-- Enforced by cursor rule: no hardcoded strings in widgets
+- Enforced by [`.claude/rules/design-system-enforcement.md`](../.claude/rules/design-system-enforcement.md): no hardcoded strings in widgets
 
 ### 4.12 Dark Mode
 
@@ -275,7 +275,7 @@ Slide-up drawer (opened by tapping the user avatar):
 
 ## 5. Design System
 
-Centralized in `lib/theme/app_theme.dart`. Enforced by always-apply cursor rule (`design-system-enforcement.mdc`).
+Centralized in `lib/theme/app_theme.dart`. Enforced by the [`.claude/rules/design-system-enforcement.md`](../.claude/rules/design-system-enforcement.md) project rule (always loaded).
 
 ### 5.1 Color Palette
 
@@ -450,7 +450,7 @@ Centralized in `lib/theme/app_theme.dart`. Enforced by always-apply cursor rule 
 - [x] Settings drawer (appearance, notifications, measurement, data, about)
 - [x] Dark mode
 - [x] i18n (English, Hebrew) — enforced, no hardcoded strings
-- [x] Design system with centralized tokens — enforced via cursor rule
+- [x] Design system with centralized tokens — enforced via [`.claude/rules/design-system-enforcement.md`](../.claude/rules/design-system-enforcement.md)
 
 ### Phase 2 — Backend & Persistence (Next)
 - [ ] Enable Firebase Auth in production (`kEnableFirebase = true`)
@@ -489,15 +489,15 @@ Firebase integration is controlled by `kEnableFirebase` in `main.dart`. When `fa
 
 ### 8.2 State Management
 
-Uses global `ChangeNotifier` stores (7 stores) instantiated as top-level singletons and seeded from mock data at startup. Screens access stores directly via imports and rebuild using `ListenableBuilder`. This pattern is documented in `state-management.mdc`.
+Uses global `ChangeNotifier` stores (7 stores) instantiated as top-level singletons and seeded from mock data at startup. Screens access stores directly via imports and rebuild using `ListenableBuilder`. This pattern is documented in [`.claude/rules/state-management.md`](../.claude/rules/state-management.md).
 
 When `kEnableFirebase` is enabled, stores will be updated to load from Firestore and listen to streams — the screen-facing API will not change.
 
 ### 8.3 Design System Enforcement
 
-Two cursor rules enforce consistency:
-- `figma-design-system.mdc` — comprehensive design token reference and Figma workflow
-- `design-system-enforcement.mdc` (always-apply) — mandatory checklist: tokens, components, i18n
+Two project rules (`.claude/rules/`, always loaded into context) enforce consistency:
+- [`figma-design-system.md`](../.claude/rules/figma-design-system.md) — comprehensive design token reference and Figma workflow
+- [`design-system-enforcement.md`](../.claude/rules/design-system-enforcement.md) — mandatory checklist: tokens, components, i18n
 
 ### 8.4 Offline-First Architecture (Phase 2)
 
