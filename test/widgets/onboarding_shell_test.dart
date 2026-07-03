@@ -43,9 +43,10 @@ void main() {
       expect(find.text('Add your pet'), findsOneWidget);
     });
 
-    testWidgets('displays step label', (tester) async {
+    testWidgets('does not display step label (dropped per current DS spec)',
+        (tester) async {
       await tester.pumpWidget(buildShell(stepLabel: 'Step 2 of 4'));
-      expect(find.text('Step 2 of 4'), findsOneWidget);
+      expect(find.text('Step 2 of 4'), findsNothing);
     });
 
     testWidgets('displays child content', (tester) async {
@@ -64,13 +65,13 @@ void main() {
 
     testWidgets('shows back button when onBack is provided', (tester) async {
       await tester.pumpWidget(buildShell(onBack: () {}));
-      // "Back" is the localised label
-      expect(find.text('Back'), findsOneWidget);
+      // Back is now an icon-only RoundIconButton (no text label).
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
     });
 
     testWidgets('hides back button when onBack is null', (tester) async {
       await tester.pumpWidget(buildShell());
-      expect(find.text('Back'), findsNothing);
+      expect(find.byIcon(Icons.arrow_back), findsNothing);
     });
 
     testWidgets('shows loading spinner when isNextLoading is true',
@@ -102,31 +103,23 @@ void main() {
         onNext: () {},
       ));
 
-      await tester.tap(find.text('Back'));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pump();
       expect(tapped, isTrue);
     });
 
     // ── Theme token verification ──────────────────────────────────────────
-    testWidgets('title uses title2 style', (tester) async {
+    testWidgets('title uses pcDisplay style (Display/M, DS spec)',
+        (tester) async {
       await tester.pumpWidget(buildShell(title: 'Setup'));
 
       final titleWidget = tester.widget<Text>(find.text('Setup'));
-      expect(titleWidget.style?.fontSize, AppSemanticTextStyles.title2.fontSize);
-      expect(
-          titleWidget.style?.fontWeight, AppSemanticTextStyles.title2.fontWeight);
+      expect(titleWidget.style?.fontSize, AppSemanticTextStyles.pcDisplay.fontSize);
+      expect(titleWidget.style?.fontWeight,
+          AppSemanticTextStyles.pcDisplay.fontWeight);
     });
 
-    testWidgets('step label uses caption style with secondary color',
-        (tester) async {
-      await tester.pumpWidget(buildShell(stepLabel: 'Step 3 of 4'));
-
-      final label = tester.widget<Text>(find.text('Step 3 of 4'));
-      expect(label.style?.fontSize, AppSemanticTextStyles.caption.fontSize);
-      expect(label.style?.color, AppSemanticColors.light.textSecondary);
-    });
-
-    testWidgets('progress bar uses divider bg and primary foreground',
+    testWidgets('progress bar uses surface (white) bg and primary foreground',
         (tester) async {
       await tester.pumpWidget(buildShell(progress: 0.5));
 
@@ -134,12 +127,13 @@ void main() {
       final containers =
           tester.widgetList<Container>(find.byType(Container)).toList();
 
-      // The progress bar background should use divider color
+      // The progress bar background should use surface (white) color per the
+      // DS spec (Figma node 402:1861 shows bg-white for the track).
       final bgContainer = containers.where((c) {
-        return c.color == AppSemanticColors.light.divider;
+        return c.color == AppSemanticColors.light.surface;
       });
       expect(bgContainer.isNotEmpty, isTrue,
-          reason: 'Progress bar bg should use divider color');
+          reason: 'Progress bar bg should use surface color');
 
       // The progress bar foreground should use primary color
       final fgContainer = containers.where((c) {

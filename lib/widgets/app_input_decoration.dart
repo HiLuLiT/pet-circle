@@ -14,9 +14,14 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 /// [hintText] is optional — omit it for call sites that use a Material
 /// floating [InputDecoration.labelText] instead (via `.copyWith(labelText:
 /// ...)`), since setting both to the same string renders the string twice.
+///
+/// [prefixIcon] renders a leading 24x24 icon per the DS "Input / Text input
+/// with icon" variant (node 465:3736): content padding becomes `pl12 pr16
+/// py16` (vs `p16` with no icon) with an 8px gap between the icon and text.
 InputDecoration appInputDecoration(
   BuildContext context, {
   String? hintText,
+  Widget? prefixIcon,
 }) {
   final c = AppSemanticColors.of(context);
   final radius = BorderRadius.circular(AppRadiiTokens.pcField);
@@ -43,7 +48,18 @@ InputDecoration appInputDecoration(
     fillColor: c.surface,
     hintText: hintText,
     hintStyle: AppSemanticTextStyles.pcBody.copyWith(color: c.textTertiary),
-    contentPadding: const EdgeInsets.all(16),
+    contentPadding: prefixIcon == null
+        ? const EdgeInsets.all(16)
+        : const EdgeInsets.fromLTRB(0, 16, 16, 16),
+    prefixIcon: prefixIcon == null
+        ? null
+        : Padding(
+            padding: const EdgeInsets.only(left: 12, right: 8),
+            child: SizedBox(width: 24, height: 24, child: prefixIcon),
+          ),
+    prefixIconConstraints: prefixIcon == null
+        ? null
+        : const BoxConstraints(minWidth: 0, minHeight: 0),
     border: noBorder,
     enabledBorder: noBorder,
     focusedBorder: focusBorder,

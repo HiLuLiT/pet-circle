@@ -26,6 +26,7 @@ class LabeledTextField extends StatelessWidget {
     this.keyboardType,
     this.controller,
     this.onChanged,
+    this.prefixIcon,
   });
 
   final String label;
@@ -33,6 +34,10 @@ class LabeledTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
+
+  /// Optional leading icon (per the DS "Input with icon" variant) — rendered
+  /// at 24x24 with an 8px gap before the field text.
+  final Widget? prefixIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +63,7 @@ class LabeledTextField extends StatelessWidget {
             decoration: appInputDecoration(
               context,
               hintText: hintText,
+              prefixIcon: prefixIcon,
             ).copyWith(
               isDense: false,
               constraints: const BoxConstraints(minHeight: 54),

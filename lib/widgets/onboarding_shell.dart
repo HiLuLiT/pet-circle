@@ -4,6 +4,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
+import 'package:pet_circle/widgets/round_icon_button.dart';
 
 class OnboardingShell extends StatelessWidget {
   const OnboardingShell({
@@ -19,6 +20,10 @@ class OnboardingShell extends StatelessWidget {
     this.onClose,
   });
 
+  /// Kept for API compatibility with existing call sites — the current DS
+  /// spec (Figma nodes 402:1861 "Step 1", 402:1880 "Step 2") drops the
+  /// "Step X of Y" text entirely in favor of the progress bar alone, so this
+  /// is accepted but no longer rendered.
   final String stepLabel;
   final double progress;
   final String title;
@@ -38,133 +43,119 @@ class OnboardingShell extends StatelessWidget {
     final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: c.surface,
+      backgroundColor: c.background,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 430),
-            child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.lg),
-            padding: const EdgeInsets.all(AppSpacingTokens.xl),
-            decoration: BoxDecoration(
-              color: c.background,
-              borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(32, 8, 32, 0),
+              child: _ProgressBar(progress: progress),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (onClose != null)
-                  Align(
-                    alignment: AlignmentDirectional.topEnd,
-                    child: IconButton(
-                      onPressed: isNextLoading ? null : onClose,
-                      icon: const Icon(Icons.close),
-                      tooltip: l10n.close,
-                      color: c.textSecondary,
-                      padding: EdgeInsets.zero,
-                      visualDensity: VisualDensity.compact,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ),
-                _Header(stepLabel: stepLabel, progress: progress, title: title),
-                const SizedBox(height: AppSpacingTokens.xl),
-                Flexible(
-                  child: SingleChildScrollView(
-                    child: child,
-                  ),
-                ),
-                const SizedBox(height: AppSpacingTokens.lg),
-                Row(
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(32, 36, 32, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (onBack != null)
-                      Expanded(
-                        child: PrimaryButton(
-                          label: l10n.back,
-                          backgroundColor: c.surface,
-                          foregroundColor: c.textPrimary,
-                          onPressed: isNextLoading ? null : onBack,
+                    if (onClose != null)
+                      Align(
+                        alignment: AlignmentDirectional.topEnd,
+                        child: IconButton(
+                          onPressed: isNextLoading ? null : onClose,
+                          icon: const Icon(Icons.close),
+                          tooltip: l10n.close,
+                          color: c.textSecondary,
+                          padding: EdgeInsets.zero,
+                          visualDensity: VisualDensity.compact,
+                          constraints: const BoxConstraints(),
                         ),
                       ),
-                    if (onBack != null && (onNext != null || isNextLoading))
-                      const SizedBox(width: AppSpacingTokens.sm),
-                    if (onNext != null || isNextLoading)
-                      Expanded(
-                        child: isNextLoading
-                            ? PrimaryButton(
-                                label: '',
-                                onPressed: null,
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: c.onPrimary,
-                                  ),
-                                ),
-                              )
-                            : PrimaryButton(
-                                label: nextLabel ?? l10n.done,
-                                onPressed: onNext,
-                              ),
+                    Text(
+                      title,
+                      style: AppSemanticTextStyles.pcDisplay.copyWith(
+                        color: c.textPrimary,
                       ),
+                    ),
+                    const SizedBox(height: AppSpacingTokens.pcLg + 2),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: child,
+                      ),
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
-          ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(32, AppSpacingTokens.pcMd, 32, 32),
+              child: Row(
+                children: [
+                  if (onBack != null) ...[
+                    RoundIconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      variant: RoundIconButtonVariant.ghost,
+                      iconSize: 24,
+                      semanticLabel: l10n.back,
+                      onTap: isNextLoading ? null : onBack,
+                    ),
+                    const SizedBox(width: AppSpacingTokens.sm + 4),
+                  ],
+                  if (onNext != null || isNextLoading)
+                    Expanded(
+                      child: isNextLoading
+                          ? PrimaryButton(
+                              label: '',
+                              onPressed: null,
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: c.onPrimary,
+                                ),
+                              ),
+                            )
+                          : PrimaryButton(
+                              label: nextLabel ?? l10n.done,
+                              onPressed: onNext,
+                            ),
+                    ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({
-    required this.stepLabel,
-    required this.progress,
-    required this.title,
-  });
+/// Thin pill progress bar per Figma node 402:1861 — white track, purple
+/// fill, height 4 (distinct from the shared `ProgressBar` widget's default
+/// styling, since the DS onboarding spec fixes bg/height precisely).
+class _ProgressBar extends StatelessWidget {
+  const _ProgressBar({required this.progress});
 
-  final String stepLabel;
   final double progress;
-  final String title;
 
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(title, style: AppSemanticTextStyles.title2),
-            ),
-            Text(
-              stepLabel,
-              style: AppSemanticTextStyles.caption.copyWith(
-                color: c.textSecondary,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacingTokens.sm + 4),
-        ClipRRect(
-          borderRadius: AppRadiiTokens.borderRadiusFull,
-          child: Container(
-            height: AppSpacingTokens.sm,
-            color: c.divider,
-            child: Align(
-              alignment: AlignmentDirectional.centerStart,
-              child: FractionallySizedBox(
-                widthFactor: progress,
-                child: Container(color: c.primary),
-              ),
-            ),
+    return ClipRRect(
+      borderRadius: AppRadiiTokens.borderRadiusFull,
+      child: Container(
+        height: 4,
+        color: c.surface,
+        child: Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: FractionallySizedBox(
+            widthFactor: progress.clamp(0.0, 1.0),
+            child: Container(color: c.primary),
           ),
         ),
-      ],
+      ),
     );
   }
 }
