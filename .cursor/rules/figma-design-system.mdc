@@ -8,7 +8,9 @@ alwaysApply: false
 
 ## Project Overview
 
-Pet Circle is a **Flutter/Dart** cross-platform app (iOS, Android, Web, Desktop) for pet health monitoring. It uses a **neumorphic design system** with centralized design tokens aligned to Figma variables. Typography is powered by **Google Fonts (Inter)**.
+Pet Circle is a **Flutter/Dart** cross-platform app (iOS, Android, Web, Desktop) for pet health monitoring. It uses the **PC v3 (Claude-Design) system** — a warm, flat, candy-pastel design language with centralized design tokens aligned to Figma variables. Typography is **Instrument Sans**.
+
+> For the full token layer and component catalog, see `design-system-enforcement.mdc` — that file is the single source of truth and is always applied. This file covers the Figma-specific workflow and asset handling only.
 
 ## Figma MCP Integration Rules
 
@@ -27,7 +29,7 @@ These rules define how to translate Figma inputs into code for this project and 
 
 - IMPORTANT: Treat the Figma MCP output (React + Tailwind) as a **representation of design and behavior**, not as final code
 - IMPORTANT: Translate all React components to **Flutter StatelessWidget / StatefulWidget** classes
-- IMPORTANT: Replace Tailwind utility classes with the project's design tokens (`AppColors`, `AppSpacing`, `AppRadii`, `AppTextStyles`, `AppShadows`)
+- IMPORTANT: Replace Tailwind utility classes with the project's design tokens (`AppSemanticColors`, `AppSpacingTokens`, `AppRadiiTokens`, `AppSemanticTextStyles`, `AppShadowTokens`)
 - Reuse existing widgets from `lib/widgets/` instead of duplicating functionality
 - Use the project's color system, typography scale, and spacing tokens consistently
 - Respect existing routing (`app_routes.dart`), state management, and data-fetch patterns
@@ -74,104 +76,19 @@ lib/
 
 ### Existing Widgets (check before creating new ones)
 
-| Widget | File | Purpose |
-|--------|------|---------|
-| `PrimaryButton` | `lib/widgets/primary_button.dart` | Full-width button (filled/outlined variants) |
-| `RoundIconButton` | `lib/widgets/round_icon_button.dart` | Circular icon button |
-| `NeumorphicCard` | `lib/widgets/neumorphic_card.dart` | Card with neumorphic shadows |
-| `LabeledTextField` | `lib/widgets/labeled_text_field.dart` | Text field with label |
-| `BreedSearchField` | `lib/widgets/breed_search_field.dart` | Searchable breed dropdown (148 breeds, live filter) |
-| `AppDropdown` | `lib/widgets/app_dropdown.dart` | Label + dropdown selector with chevron |
-| `SettingsRow` | `lib/widgets/settings_row.dart` | Settings row (icon + title + trailing) |
-| `AppHeader` | `lib/widgets/app_header.dart` | Header with avatar, pet switcher chip, notification bell |
-| `BottomNavBar` | `lib/widgets/bottom_nav_bar.dart` | Tab bar: Home, Trends, Measure, Medication |
-| `StatusBadge` | `lib/widgets/status_badge.dart` | Colored status badge |
-| `TogglePill` | `lib/widgets/toggle_pill.dart` | Pill-shaped toggle |
-| `UserAvatar` | `lib/widgets/user_avatar.dart` | User avatar with fallback |
-| `DogPhoto` | `lib/widgets/dog_photo.dart` | Pet photo with fallback |
-| `AppImage` | `lib/widgets/app_image.dart` | Image with error handling |
-| `OnboardingShell` | `lib/widgets/onboarding_shell.dart` | Onboarding layout with Back/Next buttons |
+See the full component catalog (all 28 shared widgets, grouped by category, with key API params) in `design-system-enforcement.mdc`. Always search `lib/widgets/` before creating a new UI primitive.
 
 ---
 
 ## Design Tokens
 
-All tokens are centralized in `lib/theme/app_theme.dart`. IMPORTANT: Never hardcode colors, spacing, or typography values — always use the token classes.
+Tokens live under `lib/theme/tokens/` (primitives) and `lib/theme/semantic/` (semantic layer). **Never hardcode colors, spacing, radii, or typography values.** Full reference (exact fields, values, and usage rules) is in `design-system-enforcement.mdc` — summary:
 
-### Colors — `AppColors` (9 Figma primitive tokens)
-
-```dart
-AppColors.white       // #FFFFFF — backgrounds, card surfaces
-AppColors.offWhite    // #F8F1E7 — warm background, scaffold
-AppColors.lightYellow // #FFECB7 — accent highlights
-AppColors.chocolate   // #402A24 — primary text, buttons
-AppColors.pink        // #FFC2B5 — soft accent, decorative
-AppColors.cherry      // #E64E60 — alerts, warnings, errors
-AppColors.lightBlue   // #75ACFF — info, secondary accent
-AppColors.blue        // #146FD9 — links, interactive elements
-AppColors.black       // #000000 — rare, inverted contexts
-```
-
-- IMPORTANT: **Never hardcode hex colors.** Always use `AppColors.<token>` or the theme-aware `AppColorsTheme.of(context).<token>`.
-- IMPORTANT: For **dark mode support**, always use `AppColorsTheme.of(context)` in widget `build()` methods:
-  ```dart
-  final c = AppColorsTheme.of(context);
-  // Then use: c.white, c.chocolate, c.lightBlue, etc.
-  ```
-- Deprecated aliases exist (`burgundy`, `textPrimary`, `accentBlue`, etc.) — do **not** use them in new code.
-
-### Spacing — `AppSpacing`
-
-```dart
-AppSpacing.xs  //  4.0
-AppSpacing.sm  //  8.0
-AppSpacing.md  // 16.0
-AppSpacing.lg  // 24.0
-AppSpacing.xl  // 32.0
-```
-
-- Use `EdgeInsets` with spacing tokens: `EdgeInsets.all(AppSpacing.md)`
-- Use `SizedBox(height: AppSpacing.sm)` for vertical gaps
-
-### Border Radius — `AppRadii`
-
-```dart
-AppRadii.xs      //  4px — progress bars, small indicators
-AppRadii.sm      //  8px — chips, small rounded containers
-AppRadii.small   // 12px — cards, input containers, badges
-AppRadii.medium  // 16px — section cards, settings cards
-AppRadii.large   // 20px — large containers, tab selectors
-AppRadii.full    // 100px — circular elements (avatars, round buttons)
-AppRadii.pill    // 999px — fully rounded (buttons, inputs, toggles)
-```
-
-- IMPORTANT: **Never use `BorderRadius.circular(N)` with a raw number.** Always use `const BorderRadius.all(AppRadii.<token>)`.
-- For partial radii: `const BorderRadius.vertical(top: AppRadii.medium)`
-
-### Typography — `AppTextStyles`
-
-```dart
-AppTextStyles.heading1   // 28px, w600, chocolate
-AppTextStyles.heading2   // 24px, w600, chocolate
-AppTextStyles.heading3   // 18px, w600, chocolate
-AppTextStyles.body       // 14px, w400, chocolate
-AppTextStyles.bodyMuted  // 14px, w400, chocolate (apply reduced opacity)
-AppTextStyles.caption    // 12px, w400, chocolate
-AppTextStyles.badge      // 12px, w600, white
-AppTextStyles.button     // 16px, w600, white
-```
-
-- Override color for dark mode: `AppTextStyles.heading1.copyWith(color: c.chocolate)`
-- For muted text: `.copyWith(color: c.chocolate.withValues(alpha: 0.5))`
-
-### Shadows — `AppShadows` (neumorphic)
-
-```dart
-AppShadows.neumorphicOuter  // raised card effect
-AppShadows.neumorphicInner  // inset/pressed effect
-```
-
-- Apply via `BoxDecoration(boxShadow: AppShadows.neumorphicOuter)`
+- Colors: `AppSemanticColors.of(context)` (never `AppColorsTheme`, removed)
+- Typography: `AppSemanticTextStyles.*`, font = Instrument Sans (never `AppTextStyles`, removed)
+- Spacing: `AppSpacingTokens.*` (PC v3 `pc*` scale preferred; legacy scale still exists)
+- Radius: `AppRadiiTokens.*` (PC v3 `pcField`/`pcCard`/`pcTile`/`pcPill`; never raw `BorderRadius.circular(N)`)
+- Shadows: `AppShadowTokens.small/medium/large` (flat elevation — neumorphic shadows are gone)
 
 ---
 
@@ -197,7 +114,7 @@ class MyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppColorsTheme.of(context);
+    final c = AppSemanticColors.of(context);
     // ...
   }
 }
@@ -228,21 +145,26 @@ class MyWidget extends StatelessWidget {
 
 ### Button System
 
-`PrimaryButton` supports two variants via `PrimaryButtonVariant`:
+`PrimaryButton` supports five variants via `PrimaryButtonVariant`:
 
 ```dart
-// Filled (default): chocolate bg, white text
+// Filled (default): ink bg, white text — primary actions
 PrimaryButton(label: 'Sign up', onPressed: () {})
 
-// Outlined: white bg, chocolate text, subtle border
+// Outlined: surface bg, ink text, hairline border — secondary actions
 PrimaryButton(label: 'Cancel', variant: PrimaryButtonVariant.outlined, onPressed: () {})
 
-// Smaller action buttons: adjust minHeight and borderRadius
-PrimaryButton(label: 'Measure', minHeight: 42, borderRadius: 100, onPressed: () {})
+// Secondary: purple-tile bg, ink text
+PrimaryButton(label: 'Skip', variant: PrimaryButtonVariant.secondary, onPressed: () {})
+
+// Link: transparent, intrinsic-width, ink text — inline text actions
+PrimaryButton(label: 'Forgot password?', variant: PrimaryButtonVariant.link, onPressed: () {})
+
+// Mini primary: purple bg, white text, compact padding
+PrimaryButton(label: 'Retry', variant: PrimaryButtonVariant.miniPrimary, onPressed: () {})
 ```
 
 - IMPORTANT: Always use `PrimaryButton` for buttons — do not create custom `ElevatedButton` instances inline
-- Use `variant: PrimaryButtonVariant.filled` for primary actions, `.outlined` for secondary
 
 ### Dropdown Pattern
 
@@ -272,25 +194,21 @@ SettingsRow(
 )
 ```
 
-### Neumorphic Design System
+### PC v3 Design Language
 
-This project uses a custom **neumorphic** design language. Key characteristics:
-- Soft raised/inset shadows (`AppShadows.neumorphicOuter` / `neumorphicInner`)
-- Rounded corners (`AppRadii.medium` default for cards)
-- Warm color palette (off-white backgrounds, chocolate text)
-- Pill-shaped inputs and buttons (`AppRadii.pill`)
+Warm, flat, candy-pastel language (per the Figma "Design System" page). Key characteristics:
+- Flat surfaces, minimal/soft elevation (`AppShadowTokens.small` — no neumorphic dual-shadows)
+- Rounded corners (`AppRadiiTokens.pcCard` = 18 default for cards)
+- Warm cream background, ink text, five candy accent families (purple/periwinkle/butter/blush/mint)
+- Pill-shaped inputs and buttons (`AppRadiiTokens.pcPill`)
+- Recolorable breed mascots (`Mascot` widget) as a signature illustration element
 
 ### Applying Styles
 
 ```dart
-Container(
-  padding: const EdgeInsets.all(AppSpacing.md),
-  decoration: BoxDecoration(
-    color: c.white,
-    borderRadius: const BorderRadius.all(AppRadii.medium),
-    boxShadow: AppShadows.neumorphicOuter,
-  ),
-  child: Text('Hello', style: AppTextStyles.body),
+AppCard(
+  padding: const EdgeInsets.all(AppSpacingTokens.pcMd),
+  child: Text('Hello', style: AppSemanticTextStyles.body),
 )
 ```
 
@@ -298,8 +216,8 @@ Container(
 
 - Light theme: `buildAppTheme()` in `app_theme.dart`
 - Dark theme: `buildDarkTheme()` in `app_theme.dart`
-- Font: Google Fonts **Inter** (via `google_fonts` package)
-- Input fields: Filled, pill-shaped, no visible border
+- Font: **Instrument Sans**
+- Input fields: Filled, pill/field-radius, no visible border
 
 ### Responsive Patterns
 
@@ -348,7 +266,7 @@ Two icon systems are in use:
    - Settings: `settings_chevron.svg`, `settings_configure.svg`, etc.
 
 2. **Material Icons** (built-in): Referenced via `Icons.<name>` or string constants in `AppAssets`
-   - Usage: `Icon(Icons.favorite_border, color: c.cherry)`
+   - Usage: `Icon(Icons.favorite_border, color: c.error)`
 
 - Prefer SVG icons from Figma for custom graphics; use Material Icons only for standard UI affordances
 
@@ -388,6 +306,6 @@ Two icon systems are in use:
 
 ### Dark Mode
 
-- Fully supported via `AppColorsTheme` extension
-- IMPORTANT: Always use `AppColorsTheme.of(context)` for colors in widgets to ensure dark mode compatibility
-- Text styles may need `.copyWith(color: c.chocolate)` override for dark mode
+- Fully supported via the `AppSemanticColors` `ThemeExtension`
+- IMPORTANT: Always use `AppSemanticColors.of(context)` for colors in widgets to ensure dark mode compatibility
+- Text styles may need a `.copyWith(color: c.textPrimary)` override for dark mode
