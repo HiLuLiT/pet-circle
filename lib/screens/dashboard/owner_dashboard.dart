@@ -171,11 +171,26 @@ class OwnerDashboard extends StatelessWidget {
                 children: [
                   const SizedBox(height: AppSpacingTokens.lg),
 
-                  // Title — Figma: Title2 (32px bold)
-                  Text(
-                    l10n.myPets,
-                    style: AppSemanticTextStyles.title2
-                        .copyWith(color: c.textPrimary),
+                  // Title row — Figma node 407:3528: Heading/H2 (20px bold)
+                  // + inline "Add pet" link button (circle-plus icon).
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.myPets,
+                        style: AppSemanticTextStyles.headingH2
+                            .copyWith(color: c.textPrimary),
+                      ),
+                      PrimaryButton(
+                        label: l10n.addPet,
+                        variant: PrimaryButtonVariant.link,
+                        onPressed: () => context.push(AppRoutes.onboarding),
+                        trailingIcon: Icon(
+                          Icons.add_circle_outline,
+                          color: c.textPrimary,
+                        ),
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: AppSpacingTokens.lg),

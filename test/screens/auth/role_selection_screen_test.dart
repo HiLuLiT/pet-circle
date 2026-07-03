@@ -94,22 +94,29 @@ void main() {
       expect(find.text("I'm a pet owner"), findsOneWidget);
     });
 
-    testWidgets('renders two TextButton role options', (tester) async {
+    testWidgets('renders two tappable role cards', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(_roleSelectionApp());
       await tester.pumpAndSettle();
 
-      expect(find.byType(TextButton), findsNWidgets(2));
+      // DS alignment: the role options are now InkWell-based cards, not
+      // TextButtons.
+      expect(find.byType(InkWell), findsNWidgets(2));
     });
 
-    testWidgets('role buttons show favorite_border icons', (tester) async {
+    testWidgets('role cards show role-specific icons', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(_roleSelectionApp());
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.favorite_border), findsNWidgets(2));
+      // DS alignment: each role card now has a distinct icon instead of a
+      // shared favorite_border icon — vet uses medical_services_outlined,
+      // owner uses pets. Both cards also show a trailing arrow_forward.
+      expect(find.byIcon(Icons.medical_services_outlined), findsOneWidget);
+      expect(find.byIcon(Icons.pets), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_forward), findsNWidgets(2));
     });
 
     testWidgets('veterinarian button is tappable', (tester) async {
@@ -118,11 +125,14 @@ void main() {
       await tester.pumpWidget(_roleSelectionApp());
       await tester.pumpAndSettle();
 
-      final vetButton = find.widgetWithText(TextButton, "I'm a veterinarian");
-      expect(vetButton, findsOneWidget);
+      final vetCard = find.ancestor(
+        of: find.text("I'm a veterinarian"),
+        matching: find.byType(InkWell),
+      );
+      expect(vetCard, findsOneWidget);
 
-      final widget = tester.widget<TextButton>(vetButton);
-      expect(widget.onPressed, isNotNull);
+      final widget = tester.widget<InkWell>(vetCard);
+      expect(widget.onTap, isNotNull);
     });
 
     testWidgets('pet owner button is tappable', (tester) async {
@@ -131,11 +141,14 @@ void main() {
       await tester.pumpWidget(_roleSelectionApp());
       await tester.pumpAndSettle();
 
-      final ownerButton = find.widgetWithText(TextButton, "I'm a pet owner");
-      expect(ownerButton, findsOneWidget);
+      final ownerCard = find.ancestor(
+        of: find.text("I'm a pet owner"),
+        matching: find.byType(InkWell),
+      );
+      expect(ownerCard, findsOneWidget);
 
-      final widget = tester.widget<TextButton>(ownerButton);
-      expect(widget.onPressed, isNotNull);
+      final widget = tester.widget<InkWell>(ownerCard);
+      expect(widget.onTap, isNotNull);
     });
 
     testWidgets('tapping vet button navigates away (kEnableFirebase=false)',

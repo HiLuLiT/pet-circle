@@ -110,6 +110,12 @@ abstract class AppLocalizations {
   /// **'A smarter way to care for your pet.'**
   String get welcomeTagline;
 
+  /// No description provided for @landingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Track breathing, log daily life, and keep your whole care circle in sync.'**
+  String get landingSubtitle;
+
   /// No description provided for @signUp.
   ///
   /// In en, this message translates to:
@@ -182,6 +188,12 @@ abstract class AppLocalizations {
   /// **'Pet\'s Name'**
   String get petName;
 
+  /// No description provided for @petDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Pet details'**
+  String get petDetails;
+
   /// No description provided for @breed.
   ///
   /// In en, this message translates to:
@@ -200,6 +212,18 @@ abstract class AppLocalizations {
   /// **'Age (years)'**
   String get ageYears;
 
+  /// No description provided for @weightKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight (kg)'**
+  String get weightKg;
+
+  /// No description provided for @hintPetWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 5'**
+  String get hintPetWeight;
+
   /// No description provided for @photoUrl.
   ///
   /// In en, this message translates to:
@@ -209,7 +233,7 @@ abstract class AppLocalizations {
   /// No description provided for @medicalInformation.
   ///
   /// In en, this message translates to:
-  /// **'Medical Information'**
+  /// **'Medical information'**
   String get medicalInformation;
 
   /// No description provided for @diagnosis.
@@ -224,6 +248,24 @@ abstract class AppLocalizations {
   /// **'Diagnosis (Optional)'**
   String get diagnosisOptional;
 
+  /// No description provided for @diagnosisLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Diagnosis'**
+  String get diagnosisLabel;
+
+  /// No description provided for @optionalSuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'(optional)'**
+  String get optionalSuffix;
+
+  /// No description provided for @diagnosisHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Moderate Degenerative Mitral Valve Disease'**
+  String get diagnosisHint;
+
   /// No description provided for @selectDiagnosis.
   ///
   /// In en, this message translates to:
@@ -235,6 +277,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Additional Notes'**
   String get additionalNotes;
+
+  /// No description provided for @tellUsHowYoullUsePetCircle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us how you\'ll use Pet Circle so we can tailor your experience.'**
+  String get tellUsHowYoullUsePetCircle;
+
+  /// No description provided for @monitorPatientsAndCollaborate.
+  ///
+  /// In en, this message translates to:
+  /// **'Monitor patients & collaborate'**
+  String get monitorPatientsAndCollaborate;
+
+  /// No description provided for @trackMyOwnPetsHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Track my own pet\'s health'**
+  String get trackMyOwnPetsHealth;
 
   /// No description provided for @targetRespiratoryRate.
   ///
@@ -254,10 +314,16 @@ abstract class AppLocalizations {
   /// **'Normal Range'**
   String get normalRange;
 
+  /// No description provided for @mostPopular.
+  ///
+  /// In en, this message translates to:
+  /// **'Most popular'**
+  String get mostPopular;
+
   /// No description provided for @normalRangeLabel.
   ///
   /// In en, this message translates to:
-  /// **'30 BPM (Standard)'**
+  /// **'30 BPM'**
   String get normalRangeLabel;
 
   /// No description provided for @standardRateDescription.
@@ -380,6 +446,12 @@ abstract class AppLocalizations {
   /// **'Dark mode'**
   String get darkMode;
 
+  /// No description provided for @switchToADarkerTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to a darker theme'**
+  String get switchToADarkerTheme;
+
   /// No description provided for @language.
   ///
   /// In en, this message translates to:
@@ -410,6 +482,12 @@ abstract class AppLocalizations {
   /// **'Invite'**
   String get invite;
 
+  /// No description provided for @inviteAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite another'**
+  String get inviteAnother;
+
   /// No description provided for @notifications.
   ///
   /// In en, this message translates to:
@@ -425,13 +503,13 @@ abstract class AppLocalizations {
   /// No description provided for @pushNotifications.
   ///
   /// In en, this message translates to:
-  /// **'In-app notifications'**
+  /// **'In-app notification'**
   String get pushNotifications;
 
   /// No description provided for @pushNotificationsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Show reminders and care updates inside the app'**
+  /// **'Show reminders and updates'**
   String get pushNotificationsDesc;
 
   /// No description provided for @emergencyAlerts.
@@ -1088,10 +1166,16 @@ abstract class AppLocalizations {
   /// **'Note:'**
   String get note;
 
+  /// No description provided for @noteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get noteLabel;
+
   /// No description provided for @diagnosisNote.
   ///
   /// In en, this message translates to:
-  /// **'This information is used to set appropriate monitoring thresholds and is shared only with your care circle.'**
+  /// **'This is used to set appropriate monitoring thresholds and is shared only with your care circle.'**
   String get diagnosisNote;
 
   /// No description provided for @inviteYourCareCircle.
@@ -1148,11 +1232,89 @@ abstract class AppLocalizations {
   /// **'Measure respiratory rate'**
   String get measureRespiratoryRate;
 
+  /// No description provided for @target.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get target;
+
+  /// No description provided for @underBpm.
+  ///
+  /// In en, this message translates to:
+  /// **'Under {threshold}'**
+  String underBpm(int threshold);
+
+  /// No description provided for @lastReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Last reading'**
+  String get lastReading;
+
+  /// No description provided for @measurementHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Watch your pet\'s chest rise while they rest, and tap once for each breath.'**
+  String get measurementHint;
+
+  /// No description provided for @elapsedSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s'**
+  String elapsedSeconds(int seconds);
+
+  /// No description provided for @withinNormalRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Within normal range'**
+  String get withinNormalRange;
+
+  /// No description provided for @elevatedRangeReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Elevated reading'**
+  String get elevatedRangeReading;
+
+  /// No description provided for @alertRangeReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert — seek advice'**
+  String get alertRangeReading;
+
+  /// No description provided for @breathsPerMin.
+  ///
+  /// In en, this message translates to:
+  /// **'Breaths per min.'**
+  String get breathsPerMin;
+
   /// No description provided for @unreadNotifications.
   ///
   /// In en, this message translates to:
   /// **'{count} unread'**
   String unreadNotifications(int count);
+
+  /// No description provided for @markAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all read'**
+  String get markAllRead;
+
+  /// No description provided for @noNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get noNotifications;
+
+  /// No description provided for @notificationsSectionNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get notificationsSectionNew;
+
+  /// No description provided for @notificationsSectionEarlier.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier'**
+  String get notificationsSectionEarlier;
 
   /// No description provided for @elevatedRespiratoryRate.
   ///
@@ -1202,6 +1364,24 @@ abstract class AppLocalizations {
   /// **'Average SRR'**
   String get averageSrr;
 
+  /// No description provided for @avgBpm.
+  ///
+  /// In en, this message translates to:
+  /// **'avg BPM'**
+  String get avgBpm;
+
+  /// No description provided for @readingRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading range'**
+  String get readingRange;
+
+  /// No description provided for @readingsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Readings'**
+  String get readingsLabel;
+
   /// No description provided for @sevenDayTrend.
   ///
   /// In en, this message translates to:
@@ -1223,7 +1403,7 @@ abstract class AppLocalizations {
   /// No description provided for @srrOverTime.
   ///
   /// In en, this message translates to:
-  /// **'Sleeping Respiratory Rate (SRR) Over Time'**
+  /// **'Sleeping respiratory rate'**
   String get srrOverTime;
 
   /// No description provided for @medicationTimeline.
@@ -2177,14 +2357,20 @@ abstract class AppLocalizations {
   /// No description provided for @login.
   ///
   /// In en, this message translates to:
-  /// **'Login'**
+  /// **'Log in'**
   String get login;
 
   /// No description provided for @enterDetailsToLogin.
   ///
   /// In en, this message translates to:
-  /// **'Enter your details to login.'**
+  /// **'Enter your details to log in.'**
   String get enterDetailsToLogin;
+
+  /// No description provided for @welcomeBackToLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get welcomeBackToLogin;
 
   /// No description provided for @enterVerificationCode.
   ///
@@ -2417,19 +2603,19 @@ abstract class AppLocalizations {
   /// No description provided for @legendNormal.
   ///
   /// In en, this message translates to:
-  /// **'Normal (<{threshold})'**
+  /// **'Normal ≤{threshold}'**
   String legendNormal(int threshold);
 
   /// No description provided for @legendElevated.
   ///
   /// In en, this message translates to:
-  /// **'Elevated ({low}-{high})'**
+  /// **'Elevated {low}-{high}'**
   String legendElevated(int low, int high);
 
   /// No description provided for @legendAlert.
   ///
   /// In en, this message translates to:
-  /// **'Alert (>{threshold})'**
+  /// **'Alert >{threshold}'**
   String legendAlert(int threshold);
 
   /// No description provided for @statusNormal.

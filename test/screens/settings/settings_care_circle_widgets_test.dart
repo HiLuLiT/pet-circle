@@ -25,7 +25,9 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Invite'), findsOneWidget);
+      // DS alignment: InviteButton now renders the full-width secondary
+      // PrimaryButton labeled "Invite another" (l10n.inviteAnother).
+      expect(find.text('Invite another'), findsOneWidget);
     });
 
     testWidgets('calls onTap when tapped', (tester) async {
@@ -117,7 +119,7 @@ void main() {
   // ConfigureRow
   // ---------------------------------------------------------------------------
   group('ConfigureRow', () {
-    testWidgets('renders alert thresholds label and configure button', (tester) async {
+    testWidgets('renders alert thresholds label', (tester) async {
       suppressOverflowErrors();
       tester.view.physicalSize = const Size(600, 900);
       tester.view.devicePixelRatio = 1.0;
@@ -129,8 +131,10 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
+      // DS alignment: ConfigureRow is now a single tappable row (icon tile +
+      // title/description) with no separate "Configure" button — the whole
+      // row opens the threshold dialog.
       expect(find.text('Alert thresholds'), findsOneWidget);
-      expect(find.text('Configure'), findsOneWidget);
     });
 
     testWidgets('renders BPM customization description', (tester) async {
@@ -148,7 +152,7 @@ void main() {
       expect(find.text('Customize BPM ranges for alerts'), findsOneWidget);
     });
 
-    testWidgets('calls onTap when configure button tapped', (tester) async {
+    testWidgets('calls onTap when row tapped', (tester) async {
       suppressOverflowErrors();
       tester.view.physicalSize = const Size(600, 900);
       tester.view.devicePixelRatio = 1.0;
@@ -161,7 +165,8 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Configure'));
+      // The whole row (no separate "Configure" button anymore) is tappable.
+      await tester.tap(find.text('Alert thresholds'));
       expect(tapped, isTrue);
     });
   });

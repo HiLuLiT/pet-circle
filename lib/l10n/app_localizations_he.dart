@@ -15,6 +15,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get welcomeTagline => 'דרך חכמה יותר לטפל בחיית המחמד שלך.';
 
   @override
+  String get landingSubtitle =>
+      'עקבו אחר הנשימה, תעדו את השגרה היומית, ושמרו על כל מעגל הטיפול שלכם מסונכרן.';
+
+  @override
   String get signUp => 'הרשמה';
 
   @override
@@ -56,6 +60,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get petName => 'שם חיית המחמד';
 
   @override
+  String get petDetails => 'פרטי חיית המחמד';
+
+  @override
   String get breed => 'גזע';
 
   @override
@@ -63,6 +70,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get ageYears => 'גיל (שנים)';
+
+  @override
+  String get weightKg => 'משקל (ק\"ג)';
+
+  @override
+  String get hintPetWeight => 'לדוגמה, 5';
 
   @override
   String get photoUrl => 'כתובת תמונה (אופציונלי)';
@@ -77,10 +90,29 @@ class AppLocalizationsHe extends AppLocalizations {
   String get diagnosisOptional => 'אבחנה (אופציונלי)';
 
   @override
+  String get diagnosisLabel => 'אבחנה';
+
+  @override
+  String get optionalSuffix => '(אופציונלי)';
+
+  @override
+  String get diagnosisHint => 'לדוגמה: מחלת מסתם מיטרלי ניוונית בינונית';
+
+  @override
   String get selectDiagnosis => 'בחר אבחנה';
 
   @override
   String get additionalNotes => 'הערות נוספות';
+
+  @override
+  String get tellUsHowYoullUsePetCircle =>
+      'ספרו לנו איך תשתמשו ב-Pet Circle כדי שנוכל להתאים לכם את החוויה.';
+
+  @override
+  String get monitorPatientsAndCollaborate => 'מעקב אחר מטופלים ושיתוף פעולה';
+
+  @override
+  String get trackMyOwnPetsHealth => 'מעקב אחר בריאות חיית המחמד שלי';
 
   @override
   String get targetRespiratoryRate => 'הגדרת קצב נשימה יעד';
@@ -92,7 +124,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get normalRange => 'טווח תקין';
 
   @override
-  String get normalRangeLabel => '30 BPM (סטנדרטי)';
+  String get mostPopular => 'הפופולרי ביותר';
+
+  @override
+  String get normalRangeLabel => '30 נשימות לדקה';
 
   @override
   String get standardRateDescription => 'מומלץ לרוב הכלבים';
@@ -155,6 +190,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get darkMode => 'מצב כהה';
 
   @override
+  String get switchToADarkerTheme => 'עבור/י לערכת נושא כהה יותר';
+
+  @override
   String get language => 'שפה';
 
   @override
@@ -170,17 +208,19 @@ class AppLocalizationsHe extends AppLocalizations {
   String get invite => 'הזמנה';
 
   @override
+  String get inviteAnother => 'הזמן/י עוד';
+
+  @override
   String get notifications => 'התראות';
 
   @override
   String get manageAlerts => 'ניהול התראות ותזכורות';
 
   @override
-  String get pushNotifications => 'התראות בתוך האפליקציה';
+  String get pushNotifications => 'התראה באפליקציה';
 
   @override
-  String get pushNotificationsDesc =>
-      'הצגת תזכורות ועדכוני מעגל טיפול בתוך האפליקציה';
+  String get pushNotificationsDesc => 'הצג/י תזכורות ועדכונים';
 
   @override
   String get emergencyAlerts => 'התראות חירום';
@@ -527,8 +567,11 @@ class AppLocalizationsHe extends AppLocalizations {
   String get note => 'הערה:';
 
   @override
+  String get noteLabel => 'הערה';
+
+  @override
   String get diagnosisNote =>
-      'מידע זה משמש להגדרת ספי ניטור מתאימים ומשותף רק עם מעגל הטיפול שלך.';
+      'מידע זה משמש לקביעת ספי ניטור מתאימים ומשותף רק עם מעגל הטיפול שלך.';
 
   @override
   String get inviteYourCareCircle => 'הזמן את מעגל הטיפול שלך';
@@ -562,9 +605,53 @@ class AppLocalizationsHe extends AppLocalizations {
   String get measureRespiratoryRate => 'מדידת קצב נשימה';
 
   @override
+  String get target => 'יעד';
+
+  @override
+  String underBpm(int threshold) {
+    return 'מתחת ל-$threshold';
+  }
+
+  @override
+  String get lastReading => 'מדידה אחרונה';
+
+  @override
+  String get measurementHint =>
+      'עקבו אחר עליית בית החזה של חיית המחמד שלכם במנוחה, והקישו פעם אחת על כל נשימה.';
+
+  @override
+  String elapsedSeconds(int seconds) {
+    return '$seconds שנ׳';
+  }
+
+  @override
+  String get withinNormalRange => 'בטווח התקין';
+
+  @override
+  String get elevatedRangeReading => 'מדידה גבוהה';
+
+  @override
+  String get alertRangeReading => 'התרעה — פנו לייעוץ';
+
+  @override
+  String get breathsPerMin => 'נשימות לדקה';
+
+  @override
   String unreadNotifications(int count) {
     return '$count שלא נקראו';
   }
+
+  @override
+  String get markAllRead => 'סמן הכול כנקרא';
+
+  @override
+  String get noNotifications => 'אין התראות עדיין';
+
+  @override
+  String get notificationsSectionNew => 'חדש';
+
+  @override
+  String get notificationsSectionEarlier => 'קודם לכן';
 
   @override
   String get elevatedRespiratoryRate => 'קצב נשימה מוגבר';
@@ -593,6 +680,15 @@ class AppLocalizationsHe extends AppLocalizations {
   String get averageSrr => 'ממוצע SRR';
 
   @override
+  String get avgBpm => 'ממוצע BPM';
+
+  @override
+  String get readingRange => 'טווח קריאות';
+
+  @override
+  String get readingsLabel => 'קריאות';
+
+  @override
   String get sevenDayTrend => 'מגמת 7 ימים';
 
   @override
@@ -602,7 +698,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get activeTreatments => 'טיפולים פעילים';
 
   @override
-  String get srrOverTime => 'קצב נשימה בשינה (SRR) לאורך זמן';
+  String get srrOverTime => 'קצב נשימה בשינה';
 
   @override
   String get medicationTimeline => 'ציר זמן תרופות';
@@ -1139,6 +1235,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get enterDetailsToLogin => 'הכנס את הפרטים שלך כדי להתחבר.';
 
   @override
+  String get welcomeBackToLogin => 'ברוך שובך';
+
+  @override
   String get enterVerificationCode => 'בדוק את האימייל';
 
   @override
@@ -1271,17 +1370,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String legendNormal(int threshold) {
-    return 'תקין (<$threshold)';
+    return 'תקין ≤$threshold';
   }
 
   @override
   String legendElevated(int low, int high) {
-    return 'מוגבר ($low-$high)';
+    return 'מוגבר $low-$high';
   }
 
   @override
   String legendAlert(int threshold) {
-    return 'התראה (>$threshold)';
+    return 'התראה >$threshold';
   }
 
   @override

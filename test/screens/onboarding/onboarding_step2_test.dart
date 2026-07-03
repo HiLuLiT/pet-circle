@@ -24,7 +24,8 @@ void main() {
       expect(find.byType(OnboardingStep2), findsOneWidget);
     });
 
-    testWidgets('shows "Step 2 of 3" label', (tester) async {
+    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)',
+        (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(
@@ -32,10 +33,10 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Step 2 of 3'), findsOneWidget);
+      expect(find.text('Step 2 of 3'), findsNothing);
     });
 
-    testWidgets('shows diagnosis dropdown trigger', (tester) async {
+    testWidgets('shows diagnosis text field with placeholder hint', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(
@@ -43,11 +44,16 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // The dropdown trigger shows "Select diagnosis" as placeholder
-      expect(find.text('Select diagnosis'), findsOneWidget);
+      // DS alignment: the diagnosis dropdown was replaced with a free-text
+      // TextField; its hint text is l10n.diagnosisHint.
+      expect(
+        find.text('e.g. Moderate Degenerative Mitral Valve Disease'),
+        findsOneWidget,
+      );
+      expect(find.byType(TextField), findsOneWidget);
     });
 
-    testWidgets('shows "Diagnosis (Optional)" label', (tester) async {
+    testWidgets('shows "Diagnosis" label with "(optional)" suffix', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(
@@ -55,10 +61,14 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Diagnosis (Optional)'), findsOneWidget);
+      // DS alignment: "Diagnosis (Optional)" is now two separate Text
+      // widgets — l10n.diagnosisLabel ("Diagnosis") and l10n.optionalSuffix
+      // ("(optional)").
+      expect(find.text('Diagnosis'), findsOneWidget);
+      expect(find.text('(optional)'), findsOneWidget);
     });
 
-    testWidgets('shows "Medical Information" heading', (tester) async {
+    testWidgets('shows "Medical information" heading', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(
@@ -66,7 +76,8 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Medical Information'), findsOneWidget);
+      // l10n copy consolidation: heading casing changed to sentence case.
+      expect(find.text('Medical information'), findsOneWidget);
     });
 
     testWidgets('shows Back button when onBack is provided', (tester) async {
@@ -81,7 +92,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Back'), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
     });
 
     testWidgets('shows Next button when onNext is provided', (tester) async {
@@ -112,7 +123,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Back'));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();
 
       expect(backCalled, isTrue);
@@ -137,26 +148,7 @@ void main() {
       expect(nextCalled, isTrue);
     });
 
-    testWidgets('tapping dropdown trigger opens diagnosis list',
-        (tester) async {
-      suppressOverflowErrors();
-
-      await tester.pumpWidget(testApp(
-        const OnboardingStep2(),
-      ));
-      await tester.pumpAndSettle();
-
-      // Tap the dropdown trigger (contains "Select diagnosis" text)
-      await tester.tap(find.text('Select diagnosis'));
-      await tester.pumpAndSettle();
-
-      // Diagnosis options should now be visible
-      expect(find.text('Diagnosis 01'), findsOneWidget);
-      expect(find.text('Diagnosis 02'), findsOneWidget);
-      expect(find.text('Diagnosis 03'), findsOneWidget);
-    });
-
-    testWidgets('selecting a diagnosis calls onDiagnosisChanged',
+    testWidgets('typing in the diagnosis field calls onDiagnosisChanged',
         (tester) async {
       suppressOverflowErrors();
 
@@ -168,20 +160,14 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // Open dropdown
-      await tester.tap(find.text('Select diagnosis'));
+      // DS alignment: diagnosis is now free text, not a dropdown selection.
+      await tester.enterText(find.byType(TextField), 'Heart murmur');
       await tester.pumpAndSettle();
 
-      // Scroll to make the diagnosis option visible, then tap it
-      await tester.ensureVisible(find.text('Diagnosis 01'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Diagnosis 01'));
-      await tester.pumpAndSettle();
-
-      expect(selectedDiagnosis, 'Diagnosis 01');
+      expect(selectedDiagnosis, 'Heart murmur');
     });
 
-    testWidgets('selecting a diagnosis updates the displayed text',
+    testWidgets('typing in the diagnosis field updates the displayed text',
         (tester) async {
       suppressOverflowErrors();
 
@@ -192,20 +178,11 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // Open dropdown
-      await tester.tap(find.text('Select diagnosis'));
+      await tester.enterText(find.byType(TextField), 'Heart murmur');
       await tester.pumpAndSettle();
 
-      // Scroll to make the diagnosis option visible, then tap it
-      await tester.ensureVisible(find.text('Diagnosis 01'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Diagnosis 01'));
-      await tester.pumpAndSettle();
-
-      // The dropdown trigger should now show the selected diagnosis
-      expect(find.text('Diagnosis 01'), findsOneWidget);
-      // "Select diagnosis" placeholder should be gone
-      expect(find.text('Select diagnosis'), findsNothing);
+      // The TextField now shows the entered value.
+      expect(find.text('Heart murmur'), findsOneWidget);
     });
 
     testWidgets('shows note section about diagnosis data', (tester) async {
@@ -216,7 +193,8 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Note:'), findsOneWidget);
+      // l10n copy consolidation: NoteCallout title is now "Note" (no colon).
+      expect(find.text('Note'), findsOneWidget);
     });
 
     testWidgets('shows OnboardingShell wrapper', (tester) async {
@@ -241,7 +219,7 @@ void main() {
       expect(find.text('Setup pet profile'), findsOneWidget);
     });
 
-    testWidgets('initialDiagnosis pre-selects dropdown value', (tester) async {
+    testWidgets('initialDiagnosis pre-fills the text field', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(
@@ -251,9 +229,9 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // The pre-selected diagnosis should appear instead of placeholder
+      // DS alignment: the diagnosis field is free text now, so the initial
+      // value pre-fills the TextField's controller.
       expect(find.text('Diagnosis 03'), findsOneWidget);
-      expect(find.text('Select diagnosis'), findsNothing);
     });
   });
 }

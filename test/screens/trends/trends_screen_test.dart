@@ -91,7 +91,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Export'), findsOneWidget);
-      expect(find.byIcon(Icons.file_download), findsOneWidget);
+      // DS alignment: the export button icon is now the outlined variant.
+      expect(find.byIcon(Icons.file_download_outlined), findsOneWidget);
     });
 
     testWidgets('shows chart legend badges', (tester) async {
@@ -103,9 +104,11 @@ void main() {
       await tester.pumpWidget(testApp(const TrendsScreen()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Normal (<30)'), findsOneWidget);
-      expect(find.text('Elevated (30-40)'), findsOneWidget);
-      expect(find.text('Alert (>40)'), findsOneWidget);
+      // DS alignment: legend copy now uses the legendNormal/legendElevated/
+      // legendAlert l10n keys with default thresholds 30/40.
+      expect(find.text('Normal ≤30'), findsOneWidget);
+      expect(find.text('Elevated 30-40'), findsOneWidget);
+      expect(find.text('Alert >40'), findsOneWidget);
     });
 
     // Regression: the period selector used to store its value as a localized

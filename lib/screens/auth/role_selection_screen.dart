@@ -52,43 +52,62 @@ class RoleSelectionScreen extends StatelessWidget {
         : l10n.chooseYourRole;
 
     return Scaffold(
-      backgroundColor: c.surface,
+      backgroundColor: c.background,
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 430),
-            child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.lg),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  greeting,
-                  style: AppSemanticTextStyles.title3.copyWith(
-                    color: c.textPrimary,
-                    letterSpacing: -0.96,
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(32, 24, 32, 40),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 393),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: c.primaryGhost,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.person_outline, size: 36, color: c.primary),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 93),
-                _RoleButton(
-                  label: l10n.imAVeterinarian,
-                  backgroundColor: c.primary,
-                  textColor: c.onPrimary,
-                  iconColor: c.onPrimary,
-                  onTap: () => _handleRoleSelect(context, AppUserRole.vet),
-                ),
-                const SizedBox(height: 12),
-                _RoleButton(
-                  label: l10n.imAPetOwner,
-                  backgroundColor: c.primaryLight,
-                  textColor: c.textPrimary,
-                  iconColor: c.textPrimary,
-                  onTap: () => _handleRoleSelect(context, AppUserRole.owner),
-                ),
-              ],
+                  const SizedBox(height: AppSpacingTokens.pcLg),
+                  Text(
+                    greeting,
+                    style: AppSemanticTextStyles.headingH1.copyWith(
+                      color: c.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacingTokens.pcXs + 2),
+                  Text(
+                    l10n.tellUsHowYoullUsePetCircle,
+                    style: AppSemanticTextStyles.labelLRegular.copyWith(
+                      color: c.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacingTokens.pcXl),
+                  _RoleCard(
+                    tileColor: c.accentPurpleTile,
+                    iconBackgroundColor: c.accentPurple,
+                    icon: Icons.medical_services_outlined,
+                    title: l10n.imAVeterinarian,
+                    subtitle: l10n.monitorPatientsAndCollaborate,
+                    onTap: () => _handleRoleSelect(context, AppUserRole.vet),
+                  ),
+                  const SizedBox(height: AppSpacingTokens.pcSm + 2),
+                  _RoleCard(
+                    tileColor: c.accentButterTile,
+                    iconBackgroundColor: c.accentButter,
+                    icon: Icons.pets,
+                    title: l10n.imAPetOwner,
+                    subtitle: l10n.trackMyOwnPetsHealth,
+                    onTap: () => _handleRoleSelect(context, AppUserRole.owner),
+                  ),
+                ],
+              ),
             ),
-          ),
           ),
         ),
       ),
@@ -96,49 +115,82 @@ class RoleSelectionScreen extends StatelessWidget {
   }
 }
 
-class _RoleButton extends StatelessWidget {
-  const _RoleButton({
-    required this.label,
-    required this.backgroundColor,
-    required this.textColor,
-    required this.iconColor,
+class _RoleCard extends StatelessWidget {
+  const _RoleCard({
+    required this.tileColor,
+    required this.iconBackgroundColor,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
     required this.onTap,
   });
 
-  final String label;
-  final Color backgroundColor;
-  final Color textColor;
-  final Color iconColor;
+  final Color tileColor;
+  final Color iconBackgroundColor;
+  final IconData icon;
+  final String title;
+  final String subtitle;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 58,
-      width: double.infinity,
-      child: TextButton(
-        onPressed: onTap,
-        style: TextButton.styleFrom(
-          backgroundColor: backgroundColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: AppRadiiTokens.borderRadiusFull,
+    final c = AppSemanticColors.of(context);
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.pcCard),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(AppSpacingTokens.pcMd + 2),
+          decoration: BoxDecoration(
+            color: tileColor,
+            borderRadius: BorderRadius.circular(AppRadiiTokens.pcCard),
           ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.favorite_border, color: iconColor, size: 24),
-            const SizedBox(width: AppSpacingTokens.sm),
-            Text(
-              label,
-              style: AppSemanticTextStyles.body.copyWith(
-                color: textColor,
-                fontSize: 24,
-                fontWeight: FontWeight.w500,
-                letterSpacing: -0.96,
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: iconBackgroundColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 20, color: c.onPrimary),
               ),
-            ),
-          ],
+              const SizedBox(width: AppSpacingTokens.pcSm + 2),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      title,
+                      style: AppSemanticTextStyles.pcBodySemibold.copyWith(
+                        color: c.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      subtitle,
+                      style: AppSemanticTextStyles.labelSRegular.copyWith(
+                        color: c.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: c.background,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.arrow_forward, size: 20, color: c.textPrimary),
+              ),
+            ],
+          ),
         ),
       ),
     );

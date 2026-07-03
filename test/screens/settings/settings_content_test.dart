@@ -57,7 +57,9 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      final closeIcon = find.byIcon(Icons.close);
+      // DS alignment: the close affordance is now a collapse chevron
+      // (Icons.keyboard_arrow_up), not a literal "X" close icon.
+      final closeIcon = find.byIcon(Icons.keyboard_arrow_up);
       expect(closeIcon, findsOneWidget);
       await tester.tap(closeIcon);
       expect(closed, isTrue);
@@ -69,7 +71,7 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.close), findsNothing);
+      expect(find.byIcon(Icons.keyboard_arrow_up), findsNothing);
     });
 
     testWidgets('shows appearance section', (tester) async {
@@ -99,7 +101,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Notifications'), findsOneWidget);
-      expect(find.text('In-app notifications'), findsOneWidget);
+      // l10n copy consolidation: pushNotifications is now singular.
+      expect(find.text('In-app notification'), findsOneWidget);
       expect(find.text('Emergency alerts'), findsOneWidget);
     });
 
@@ -142,8 +145,9 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
+      // DS alignment: Sign Out is now a plain PrimaryButton pill (no
+      // logout icon) with a tomato background.
       expect(find.text('Sign Out'), findsOneWidget);
-      expect(find.byIcon(Icons.logout), findsOneWidget);
     });
 
     testWidgets('renders multiple SettingsCard widgets', (tester) async {

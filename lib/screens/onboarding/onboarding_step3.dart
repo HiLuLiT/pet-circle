@@ -67,23 +67,27 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.targetRespiratoryRate, style: AppSemanticTextStyles.headingLg),
+          Text(
+            l10n.targetRespiratoryRate,
+            style: AppSemanticTextStyles.headingH2.copyWith(color: c.textPrimary),
+          ),
           const SizedBox(height: AppSpacingTokens.sm),
           Text(
             l10n.targetRateDescription,
-            style: AppSemanticTextStyles.body,
+            style: AppSemanticTextStyles.labelLRegular.copyWith(color: c.textSecondary),
           ),
           const SizedBox(height: AppSpacingTokens.md),
           RadioCard(
             title: l10n.normalRangeLabel,
             description: l10n.standardRateDescription,
+            badge: l10n.mostPopular,
             selected: _selected == '30',
             onTap: () {
               setState(() => _selected = '30');
               widget.onTargetRateChanged?.call(30);
             },
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacingTokens.pcSm),
           RadioCard(
             title: l10n.elevatedRangeLabel,
             description: l10n.elevatedRateDescription,
@@ -93,7 +97,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
               widget.onTargetRateChanged?.call(35);
             },
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacingTokens.pcSm),
           RadioCard(
             title: l10n.customRate,
             selected: _selected == 'custom',
@@ -121,9 +125,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
                         context,
                         hintText: l10n.enterBpm,
                       ),
-                      style: AppSemanticTextStyles.body.copyWith(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
+                      style: AppSemanticTextStyles.pcBodyBold.copyWith(
                         color: c.textPrimary,
                       ),
                     ),
@@ -131,8 +133,7 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
                   const SizedBox(width: AppSpacingTokens.sm),
                   Text(
                     l10n.bpm,
-                    style: AppSemanticTextStyles.body.copyWith(
-                      fontWeight: FontWeight.w600,
+                    style: AppSemanticTextStyles.pcBodyBold.copyWith(
                       color: c.textPrimary,
                     ),
                   ),

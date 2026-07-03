@@ -121,45 +121,42 @@ class _LoginScreenState extends State<LoginScreen> {
     final c = AppSemanticColors.of(context);
 
     return Scaffold(
-      backgroundColor: c.surface,
+      backgroundColor: c.background,
       body: SafeArea(
-        child: Center(
+        child: Align(
+          alignment: Alignment.topCenter,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacingTokens.xl,
-              vertical: AppSpacingTokens.xl,
-            ),
+            padding: const EdgeInsets.fromLTRB(32, 48, 32, 32),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 393),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(height: AppSpacingTokens.xl),
                   Container(
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: c.primaryLightest,
+                      color: c.primaryGhost,
                       shape: BoxShape.circle,
                     ),
                     child: Icon(Icons.person_outline, size: 36, color: c.primary),
                   ),
-                  const SizedBox(height: AppSpacingTokens.lg),
+                  const SizedBox(height: AppSpacingTokens.sm + 4),
                   Text(
-                    l10n.login,
-                    style: AppSemanticTextStyles.title3.copyWith(
+                    l10n.welcomeBackToLogin,
+                    style: AppSemanticTextStyles.headingH1.copyWith(
                       color: c.textPrimary,
                     ),
                   ),
                   const SizedBox(height: AppSpacingTokens.sm),
                   Text(
                     l10n.enterDetailsToLogin,
-                    style: AppSemanticTextStyles.body.copyWith(
-                      color: c.textPrimary,
+                    style: AppSemanticTextStyles.labelLRegular.copyWith(
+                      color: c.textSecondary,
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: AppSpacingTokens.xl),
+                  const SizedBox(height: AppSpacingTokens.pcXl),
                   Form(
                     key: _formKey,
                     child: Column(
@@ -167,12 +164,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Text(
                           l10n.emailAddress,
-                          style: AppSemanticTextStyles.body.copyWith(
-                            fontWeight: FontWeight.w500,
+                          style: AppSemanticTextStyles.labelMSemibold.copyWith(
                             color: c.textPrimary,
                           ),
                         ),
-                        const SizedBox(height: AppSpacingTokens.sm),
+                        const SizedBox(height: AppSpacingTokens.sm + 4),
                         TextFormField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -181,7 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             context,
                             hintText: l10n.enterYourEmail,
                           ),
-                          style: AppSemanticTextStyles.body,
+                          style: AppSemanticTextStyles.pcBody,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return l10n.pleaseEnterEmail;
@@ -193,81 +189,79 @@ class _LoginScreenState extends State<LoginScreen> {
                           },
                           onFieldSubmitted: (_) => _handleLogin(),
                         ),
+                        if (_error != null) ...[
+                          const SizedBox(height: AppSpacingTokens.sm),
+                          Text(
+                            _error!,
+                            style: AppSemanticTextStyles.caption.copyWith(
+                              color: c.error,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: AppSpacingTokens.sm + 4),
+                        PrimaryButton(
+                          label: l10n.login,
+                          // Keep onPressed live during loading so the filled
+                          // (purple) background stays visible behind the
+                          // white spinner; re-entry is guarded inside
+                          // _handleLogin.
+                          onPressed: _handleLogin,
+                          child: _isLoading
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: c.onPrimary,
+                                  ),
+                                )
+                              : null,
+                        ),
                       ],
                     ),
                   ),
-                  if (_error != null) ...[
-                    const SizedBox(height: AppSpacingTokens.sm),
-                    Text(
-                      _error!,
-                      style: AppSemanticTextStyles.caption.copyWith(
-                        color: c.error,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: AppSpacingTokens.lg),
-                  PrimaryButton(
-                    label: l10n.login,
-                    // Keep onPressed live during loading so the filled (ink)
-                    // background stays visible behind the white spinner;
-                    // re-entry is guarded inside _handleLogin.
-                    onPressed: _handleLogin,
-                    child: _isLoading
-                        ? SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: c.onPrimary,
-                            ),
-                          )
-                        : null,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.xl),
+                  const SizedBox(height: AppSpacingTokens.md + 4),
                   Row(
                     children: [
-                      Expanded(child: Divider(color: c.divider)),
+                      Expanded(child: Divider(color: c.textTertiary)),
                       Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: AppSpacingTokens.sm + 4,
                         ),
                         child: Text(
                           l10n.or,
-                          style: AppSemanticTextStyles.caption.copyWith(
-                            color: c.textSecondary,
+                          style: AppSemanticTextStyles.captionMedium.copyWith(
+                            color: c.textTertiary,
                           ),
                         ),
                       ),
-                      Expanded(child: Divider(color: c.divider)),
+                      Expanded(child: Divider(color: c.textTertiary)),
                     ],
                   ),
-                  const SizedBox(height: AppSpacingTokens.md),
+                  const SizedBox(height: AppSpacingTokens.md + 4),
                   SocialButton(
                     icon: Image.asset(AppAssets.googleLogo, width: 20, height: 20),
                     label: l10n.continueWithGoogle,
                     onTap: _isLoading ? null : _handleGoogleSignIn,
                   ),
-                  const SizedBox(height: AppSpacingTokens.md),
+                  const SizedBox(height: AppSpacingTokens.sm + 4),
                   SocialButton(
                     icon: Icon(Icons.apple, size: 20, color: c.textPrimary),
                     label: l10n.continueWithApple,
                     onTap: _isLoading ? null : _handleAppleSignIn,
                   ),
-                  const SizedBox(height: AppSpacingTokens.xl),
+                  const SizedBox(height: AppSpacingTokens.lg),
                   TextButton(
                     onPressed: _isLoading ? null : () => context.push(AppRoutes.signup),
                     child: Text.rich(
                       TextSpan(
                         text: '${l10n.dontHaveAccount} ',
-                        style: AppSemanticTextStyles.caption.copyWith(
-                          color: c.textSecondary,
-                        ),
+                        style: AppSemanticTextStyles.pcLabelMuted,
                         children: [
                           TextSpan(
                             text: l10n.signUp,
-                            style: AppSemanticTextStyles.caption.copyWith(
-                              color: c.info,
-                              decoration: TextDecoration.underline,
+                            style: AppSemanticTextStyles.pcLabelBold.copyWith(
+                              color: c.primary,
                             ),
                           ),
                         ],

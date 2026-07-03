@@ -22,14 +22,13 @@ void main() {
       expect(find.byType(LoginScreen), findsOneWidget);
     });
 
-    testWidgets('shows "Login" heading', (tester) async {
+    testWidgets('shows "Welcome back" heading', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const LoginScreen()));
       await tester.pumpAndSettle();
 
-      // The Login text appears both as the heading and on the button.
-      expect(find.text('Login'), findsAtLeastNWidgets(1));
+      expect(find.text('Welcome back'), findsOneWidget);
     });
 
     testWidgets('shows email input field', (tester) async {
@@ -43,15 +42,14 @@ void main() {
       expect(find.text('Email address'), findsOneWidget);
     });
 
-    testWidgets('shows "Login" button', (tester) async {
+    testWidgets('shows "Log in" button', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const LoginScreen()));
       await tester.pumpAndSettle();
 
       expect(find.byType(PrimaryButton), findsOneWidget);
-      // The PrimaryButton contains "Login" text.
-      expect(find.text('Login'), findsAtLeastNWidgets(1));
+      expect(find.text('Log in'), findsOneWidget);
     });
 
     testWidgets('shows "Continue with Google" button', (tester) async {
@@ -155,7 +153,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(
-        find.text('Enter your details to login.'),
+        find.text('Enter your details to log in.'),
         findsOneWidget,
       );
     });

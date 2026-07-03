@@ -15,6 +15,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcomeTagline => 'A smarter way to care for your pet.';
 
   @override
+  String get landingSubtitle =>
+      'Track breathing, log daily life, and keep your whole care circle in sync.';
+
+  @override
   String get signUp => 'Sign up';
 
   @override
@@ -56,6 +60,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get petName => 'Pet\'s Name';
 
   @override
+  String get petDetails => 'Pet details';
+
+  @override
   String get breed => 'Breed';
 
   @override
@@ -65,10 +72,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ageYears => 'Age (years)';
 
   @override
+  String get weightKg => 'Weight (kg)';
+
+  @override
+  String get hintPetWeight => 'e.g. 5';
+
+  @override
   String get photoUrl => 'Photo URL (Optional)';
 
   @override
-  String get medicalInformation => 'Medical Information';
+  String get medicalInformation => 'Medical information';
 
   @override
   String get diagnosis => 'Diagnosis';
@@ -77,10 +90,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get diagnosisOptional => 'Diagnosis (Optional)';
 
   @override
+  String get diagnosisLabel => 'Diagnosis';
+
+  @override
+  String get optionalSuffix => '(optional)';
+
+  @override
+  String get diagnosisHint => 'e.g. Moderate Degenerative Mitral Valve Disease';
+
+  @override
   String get selectDiagnosis => 'Select diagnosis';
 
   @override
   String get additionalNotes => 'Additional Notes';
+
+  @override
+  String get tellUsHowYoullUsePetCircle =>
+      'Tell us how you\'ll use Pet Circle so we can tailor your experience.';
+
+  @override
+  String get monitorPatientsAndCollaborate => 'Monitor patients & collaborate';
+
+  @override
+  String get trackMyOwnPetsHealth => 'Track my own pet\'s health';
 
   @override
   String get targetRespiratoryRate => 'Set Target Respiratory Rate';
@@ -93,7 +125,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get normalRange => 'Normal Range';
 
   @override
-  String get normalRangeLabel => '30 BPM (Standard)';
+  String get mostPopular => 'Most popular';
+
+  @override
+  String get normalRangeLabel => '30 BPM';
 
   @override
   String get standardRateDescription => 'Recommended for most dogs';
@@ -156,6 +191,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get darkMode => 'Dark mode';
 
   @override
+  String get switchToADarkerTheme => 'Switch to a darker theme';
+
+  @override
   String get language => 'Language';
 
   @override
@@ -171,17 +209,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invite => 'Invite';
 
   @override
+  String get inviteAnother => 'Invite another';
+
+  @override
   String get notifications => 'Notifications';
 
   @override
   String get manageAlerts => 'Manage alerts and reminders';
 
   @override
-  String get pushNotifications => 'In-app notifications';
+  String get pushNotifications => 'In-app notification';
 
   @override
-  String get pushNotificationsDesc =>
-      'Show reminders and care updates inside the app';
+  String get pushNotificationsDesc => 'Show reminders and updates';
 
   @override
   String get emergencyAlerts => 'Emergency alerts';
@@ -529,8 +569,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get note => 'Note:';
 
   @override
+  String get noteLabel => 'Note';
+
+  @override
   String get diagnosisNote =>
-      'This information is used to set appropriate monitoring thresholds and is shared only with your care circle.';
+      'This is used to set appropriate monitoring thresholds and is shared only with your care circle.';
 
   @override
   String get inviteYourCareCircle => 'Invite Your Care Circle';
@@ -564,9 +607,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get measureRespiratoryRate => 'Measure respiratory rate';
 
   @override
+  String get target => 'Target';
+
+  @override
+  String underBpm(int threshold) {
+    return 'Under $threshold';
+  }
+
+  @override
+  String get lastReading => 'Last reading';
+
+  @override
+  String get measurementHint =>
+      'Watch your pet\'s chest rise while they rest, and tap once for each breath.';
+
+  @override
+  String elapsedSeconds(int seconds) {
+    return '${seconds}s';
+  }
+
+  @override
+  String get withinNormalRange => 'Within normal range';
+
+  @override
+  String get elevatedRangeReading => 'Elevated reading';
+
+  @override
+  String get alertRangeReading => 'Alert — seek advice';
+
+  @override
+  String get breathsPerMin => 'Breaths per min.';
+
+  @override
   String unreadNotifications(int count) {
     return '$count unread';
   }
+
+  @override
+  String get markAllRead => 'Mark all read';
+
+  @override
+  String get noNotifications => 'No notifications yet';
+
+  @override
+  String get notificationsSectionNew => 'New';
+
+  @override
+  String get notificationsSectionEarlier => 'Earlier';
 
   @override
   String get elevatedRespiratoryRate => 'Elevated Respiratory Rate';
@@ -595,6 +682,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get averageSrr => 'Average SRR';
 
   @override
+  String get avgBpm => 'avg BPM';
+
+  @override
+  String get readingRange => 'Reading range';
+
+  @override
+  String get readingsLabel => 'Readings';
+
+  @override
   String get sevenDayTrend => '7-Day Trend';
 
   @override
@@ -604,7 +700,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get activeTreatments => 'Active treatments';
 
   @override
-  String get srrOverTime => 'Sleeping Respiratory Rate (SRR) Over Time';
+  String get srrOverTime => 'Sleeping respiratory rate';
 
   @override
   String get medicationTimeline => 'Medication Timeline';
@@ -1142,10 +1238,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get continueWithApple => 'Continue with Apple';
 
   @override
-  String get login => 'Login';
+  String get login => 'Log in';
 
   @override
-  String get enterDetailsToLogin => 'Enter your details to login.';
+  String get enterDetailsToLogin => 'Enter your details to log in.';
+
+  @override
+  String get welcomeBackToLogin => 'Welcome back';
 
   @override
   String get enterVerificationCode => 'Check your email';
@@ -1281,17 +1380,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String legendNormal(int threshold) {
-    return 'Normal (<$threshold)';
+    return 'Normal ≤$threshold';
   }
 
   @override
   String legendElevated(int low, int high) {
-    return 'Elevated ($low-$high)';
+    return 'Elevated $low-$high';
   }
 
   @override
   String legendAlert(int threshold) {
-    return 'Alert (>$threshold)';
+    return 'Alert >$threshold';
   }
 
   @override

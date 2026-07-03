@@ -49,18 +49,15 @@ class SettingsCard extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: AppSemanticTextStyles.headingLg.copyWith(
+                      style: AppSemanticTextStyles.headingH2.copyWith(
                         color: c.textPrimary,
-                        letterSpacing: -0.54,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       subtitle,
-                      style: AppSemanticTextStyles.body.copyWith(
-                        color: c.textPrimary,
-                        fontSize: 14,
-                        letterSpacing: -0.15,
+                      style: AppSemanticTextStyles.labelSRegular.copyWith(
+                        color: c.textTertiary,
                       ),
                     ),
                   ],
@@ -87,6 +84,7 @@ class SettingsToggleRow extends StatelessWidget {
     required this.isOn,
     this.description,
     this.iconAsset,
+    this.iconTileColor,
     this.onChanged,
   });
 
@@ -94,6 +92,11 @@ class SettingsToggleRow extends StatelessWidget {
   final String? description;
   final bool isOn;
   final String? iconAsset;
+
+  /// Background color for the circular icon tile behind [iconAsset] (e.g.
+  /// `c.accentPeriwinkleTile` for Dark mode, `c.accentBlushTile` for
+  /// VisionRR). Ignored when [iconAsset] is null.
+  final Color? iconTileColor;
   final VoidCallback? onChanged;
 
   @override
@@ -103,7 +106,7 @@ class SettingsToggleRow extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: c.background,
-        borderRadius: AppRadiiTokens.borderRadiusSm,
+        borderRadius: AppRadiiTokens.borderRadiusCard,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -112,8 +115,18 @@ class SettingsToggleRow extends StatelessWidget {
             child: Row(
               children: [
                 if (iconAsset != null) ...[
-                  SvgPicture.asset(iconAsset!, width: 16, height: 16),
-                  const SizedBox(width: 8),
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: iconTileColor ?? c.accentPeriwinkleTile,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: SvgPicture.asset(iconAsset!, width: 24, height: 24),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
                 ],
                 Expanded(
                   child: Column(
@@ -121,22 +134,14 @@ class SettingsToggleRow extends StatelessWidget {
                     children: [
                       Text(
                         label,
-                        style: AppSemanticTextStyles.body.copyWith(
+                        style: AppSemanticTextStyles.labelLSemibold.copyWith(
                           color: c.textPrimary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.31,
                         ),
                       ),
                       if (description != null) ...[
-                        const SizedBox(height: 4),
                         Text(
                           description!,
-                          style: AppSemanticTextStyles.caption.copyWith(
-                            color: c.textPrimary,
-                            fontSize: 12,
-                            height: 1.3,
-                          ),
+                          style: AppSemanticTextStyles.pcLabelMuted,
                         ),
                       ],
                     ],
@@ -172,47 +177,47 @@ class LanguageRow extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: c.background,
-          borderRadius: AppRadiiTokens.borderRadiusLg,
+          borderRadius: AppRadiiTokens.borderRadiusField,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                SvgPicture.asset(settingsGlobeAsset, width: 16, height: 16),
-                const SizedBox(width: 8),
-                Text(
-                  l10n.language,
-                  style: AppSemanticTextStyles.body.copyWith(
-                    color: c.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.31,
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: c.primaryLight,
-                borderRadius: AppRadiiTokens.borderRadiusSm,
-              ),
+            Expanded(
               child: Row(
                 children: [
-                  Text(
-                    currentLanguageName,
-                    style: AppSemanticTextStyles.body.copyWith(
-                      color: c.textPrimary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: c.accentMintTile,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: SvgPicture.asset(settingsGlobeAsset, width: 24, height: 24),
                     ),
                   ),
-                  const SizedBox(width: 6),
-                  SvgPicture.asset(settingsChevronAsset, width: 16, height: 16),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.language,
+                          style: AppSemanticTextStyles.labelLSemibold.copyWith(
+                            color: c.textPrimary,
+                          ),
+                        ),
+                        Text(
+                          currentLanguageName,
+                          style: AppSemanticTextStyles.pcLabelMuted,
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
+            Icon(Icons.keyboard_arrow_down, color: c.textTertiary, size: 24),
           ],
         ),
       ),

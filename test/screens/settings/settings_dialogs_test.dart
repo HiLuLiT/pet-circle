@@ -299,7 +299,9 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Configure'));
+      // DS alignment: ConfigureRow is now a single tappable row — there is
+      // no separate "Configure" button, so tap the row's title instead.
+      await tester.tap(find.text('Alert thresholds'));
       await tester.pumpAndSettle();
 
       expect(find.text('Configure Alert Thresholds'), findsOneWidget);
@@ -313,7 +315,7 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Configure'));
+      await tester.tap(find.text('Alert thresholds'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Cancel'));
@@ -328,7 +330,7 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Configure'));
+      await tester.tap(find.text('Alert thresholds'));
       await tester.pumpAndSettle();
 
       // Verify both text fields are present and the sheet is open
@@ -343,7 +345,7 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Configure'));
+      await tester.tap(find.text('Alert thresholds'));
       await tester.pumpAndSettle();
 
       // Sheet is open with both text fields

@@ -25,7 +25,8 @@ void main() {
       expect(find.byType(OnboardingStep3), findsOneWidget);
     });
 
-    testWidgets('shows "Step 3 of 3" label', (tester) async {
+    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)',
+        (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(
@@ -33,7 +34,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Step 3 of 3'), findsOneWidget);
+      expect(find.text('Step 3 of 3'), findsNothing);
     });
 
     testWidgets('shows target respiratory rate heading', (tester) async {
@@ -61,7 +62,7 @@ void main() {
       );
     });
 
-    testWidgets('shows 30 BPM (Standard) option', (tester) async {
+    testWidgets('shows 30 BPM option with a "Most popular" badge', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(
@@ -69,7 +70,10 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('30 BPM (Standard)'), findsOneWidget);
+      // DS alignment: the "(Standard)" suffix moved out of the title into a
+      // separate RadioCard badge pill (l10n.mostPopular).
+      expect(find.text('30 BPM'), findsOneWidget);
+      expect(find.text('Most popular'), findsOneWidget);
     });
 
     testWidgets('shows 35 BPM option', (tester) async {
@@ -103,12 +107,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Exactly one RadioCard is selected, and it is the 30 BPM option.
+      // DS alignment: the title is now just "30 BPM"; "(Standard)" moved to
+      // a separate badge ("Most popular").
       final selectedCards = tester
           .widgetList<RadioCard>(find.byType(RadioCard))
           .where((card) => card.selected)
           .toList();
       expect(selectedCards, hasLength(1));
-      expect(selectedCards.single.title, '30 BPM (Standard)');
+      expect(selectedCards.single.title, '30 BPM');
+      expect(selectedCards.single.badge, 'Most popular');
     });
 
     testWidgets('shows OnboardingShell wrapper', (tester) async {
@@ -166,7 +173,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('30 BPM (Standard)'));
+      await tester.tap(find.text('30 BPM'));
       await tester.pumpAndSettle();
 
       expect(selectedRate, 30);
@@ -230,7 +237,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Back'), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
     });
 
     testWidgets('shows Done button when onNext is provided with nextLabel',
@@ -263,7 +270,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Back'));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();
 
       expect(backCalled, isTrue);
