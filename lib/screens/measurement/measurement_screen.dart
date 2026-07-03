@@ -13,6 +13,9 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
+import 'package:pet_circle/widgets/filter_chip.dart';
+import 'package:pet_circle/widgets/progress_bar.dart';
+import 'package:pet_circle/widgets/segmented_control.dart';
 
 class MeasurementScreen extends StatefulWidget {
   const MeasurementScreen({super.key, this.showScaffold = true});
@@ -75,13 +78,19 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                 child: Column(
               children: [
                 // VisionRR camera mode is not shipped yet; when disabled we
-                // skip the manual/vision tab selector and show manual mode
-                // directly. See kEnableVisionRR in lib/config/app_config.dart.
+                // skip the manual/vision mode selector and show manual mode
+                // directly. The segmented control only appears when there is
+                // a second mode to switch to. See kEnableVisionRR in
+                // lib/config/app_config.dart.
                 if (kEnableVisionRR) ...[
-                  _TabSelector(
-                    selectedIndex: _selectedTab,
-                    onChanged: (index) =>
-                        setState(() => _selectedTab = index),
+                  AppSegmentedControl(
+                    options: [l10n.manualMode, l10n.visionRRMode],
+                    value: _selectedTab == 1
+                        ? l10n.visionRRMode
+                        : l10n.manualMode,
+                    onChanged: (label) => setState(
+                      () => _selectedTab = label == l10n.visionRRMode ? 1 : 0,
+                    ),
                   ),
                   const SizedBox(height: AppSpacingTokens.xl),
                 ],
@@ -110,93 +119,6 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
           body: content,
         );
       },
-    );
-  }
-}
-
-class _TabSelector extends StatelessWidget {
-  const _TabSelector({
-    required this.selectedIndex,
-    required this.onChanged,
-  });
-
-  final int selectedIndex;
-  final ValueChanged<int> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    return Container(
-      padding: const EdgeInsets.all(AppSpacingTokens.xs),
-      decoration: BoxDecoration(
-        color: c.background,
-        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
-      ),
-      child: Row(
-        children: [
-          _TabButton(
-            icon: Icons.touch_app,
-            label: l10n.manualMode,
-            selected: selectedIndex == 0,
-            onTap: () => onChanged(0),
-          ),
-          _TabButton(
-            icon: Icons.videocam_outlined,
-            label: l10n.visionRRMode,
-            selected: selectedIndex == 1,
-            onTap: () => onChanged(1),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TabButton extends StatelessWidget {
-  const _TabButton({
-    required this.icon,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 29,
-          padding: EdgeInsets.symmetric(vertical: AppSpacingTokens.xs + 2),
-          decoration: BoxDecoration(
-            color: selected ? c.surface : Colors.transparent,
-            borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(icon,
-                  size: 16,
-                  color: c.textPrimary),
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: AppSemanticTextStyles.caption.copyWith(
-                  fontWeight: FontWeight.w500,
-                  color: c.textPrimary,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -273,6 +195,9 @@ class _ManualModeState extends State<_ManualMode>
 
   void _stopTimer() {
     _timer?.cancel();
+    // Guard against a periodic-tick callback that fires concurrently with
+    // dispose() — Timer.cancel() does not interrupt an in-flight callback.
+    if (!mounted) return;
 
     // Calculate BPM: (taps / duration) * 60
     final bpm = (_tapCount / widget.selectedDuration * 60).round();
@@ -483,22 +408,34 @@ class _ManualModeState extends State<_ManualMode>
               const SizedBox(height: AppSpacingTokens.md),
               Row(
                 children: [
-                  _DurationChip(
-                    label: l10n.duration15s,
-                    selected: widget.selectedDuration == 15,
-                    onTap: _isRunning ? null : () => widget.onDurationChanged(15),
+                  Expanded(
+                    child: AppFilterChip(
+                      label: l10n.duration15s,
+                      selected: widget.selectedDuration == 15,
+                      onTap: _isRunning
+                          ? null
+                          : () => widget.onDurationChanged(15),
+                    ),
                   ),
                   const SizedBox(width: AppSpacingTokens.md),
-                  _DurationChip(
-                    label: l10n.duration30s,
-                    selected: widget.selectedDuration == 30,
-                    onTap: _isRunning ? null : () => widget.onDurationChanged(30),
+                  Expanded(
+                    child: AppFilterChip(
+                      label: l10n.duration30s,
+                      selected: widget.selectedDuration == 30,
+                      onTap: _isRunning
+                          ? null
+                          : () => widget.onDurationChanged(30),
+                    ),
                   ),
                   const SizedBox(width: AppSpacingTokens.md),
-                  _DurationChip(
-                    label: l10n.duration60s,
-                    selected: widget.selectedDuration == 60,
-                    onTap: _isRunning ? null : () => widget.onDurationChanged(60),
+                  Expanded(
+                    child: AppFilterChip(
+                      label: l10n.duration60s,
+                      selected: widget.selectedDuration == 60,
+                      onTap: _isRunning
+                          ? null
+                          : () => widget.onDurationChanged(60),
+                    ),
                   ),
                 ],
               ),
@@ -527,32 +464,7 @@ class _ManualModeState extends State<_ManualMode>
                 ),
               ),
               const SizedBox(height: AppSpacingTokens.sm),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final width = constraints.maxWidth;
-                  return Stack(
-                    alignment: AlignmentDirectional.centerStart,
-                    children: [
-                      Container(
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: c.textPrimary.withValues(alpha: 0.08),
-                          borderRadius: BorderRadius.circular(AppRadiiTokens.full),
-                        ),
-                      ),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        height: 8,
-                        width: width * progress,
-                        decoration: BoxDecoration(
-                          color: c.primaryLight,
-                          borderRadius: BorderRadius.circular(AppRadiiTokens.full),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
+              ProgressBar(value: progress),
               const SizedBox(height: AppSpacingTokens.md),
               GestureDetector(
                 onTap: _onTap,
@@ -620,43 +532,6 @@ class _ManualModeState extends State<_ManualMode>
         ),
       ],
     ),
-    );
-  }
-}
-
-class _DurationChip extends StatelessWidget {
-  const _DurationChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          height: 60,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: selected ? c.primaryLight : c.surface,
-            borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-          ),
-          child: Text(
-            label,
-            style: AppSemanticTextStyles.body.copyWith(
-              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-              color: c.textPrimary,
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

@@ -62,6 +62,10 @@ app.*.map.json
 
 # Firebase config files (contain API keys)
 android/app/google-services.json
+android/app/google-services.json.bak.*
 ios/Runner/GoogleService-Info.plist
 macos/Runner/GoogleService-Info.plist
 lib/firebase_options.dart
+
+# graphify outputs (rebuilt locally on every checkout; not source-controlled)
+graphify-out/

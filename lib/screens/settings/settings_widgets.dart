@@ -5,7 +5,8 @@ import 'package:pet_circle/config/app_config.dart' show appLocale;
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
-import 'package:pet_circle/widgets/toggle_pill.dart';
+import 'package:pet_circle/widgets/app_card.dart';
+import 'package:pet_circle/widgets/app_toggle.dart';
 
 const settingsShareAsset = 'assets/figma/settings_share.svg';
 const settingsDownAsset = 'assets/figma/settings_down.svg';
@@ -33,11 +34,7 @@ class SettingsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        color: c.surface,
-        borderRadius: AppRadiiTokens.borderRadiusLg,
-      ),
+    return AppCard(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,9 +145,9 @@ class SettingsToggleRow extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: onChanged,
-            child: TogglePill(isOn: isOn),
+          AppToggle(
+            value: isOn,
+            onChanged: onChanged == null ? null : (_) => onChanged!(),
           ),
         ],
       ),

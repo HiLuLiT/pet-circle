@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 
 import '../helpers/test_app.dart';
@@ -30,24 +29,23 @@ void main() {
     });
 
     // ── Active state ──────────────────────────────────────────────────────
-    testWidgets('active tab uses primary color', (tester) async {
+    testWidgets('active tab uses onSurface (ink) color', (tester) async {
       await tester.pumpWidget(testApp(
         BottomNavBar(selectedIndex: 0, onTap: (_) {}),
       ));
 
-      // The "Home" label text should use the primary color.
       final homeLabel = tester.widget<Text>(find.text('Home'));
-      expect(homeLabel.style?.color, AppSemanticColors.light.primary);
+      expect(homeLabel.style?.color, AppSemanticColors.light.onSurface);
     });
 
-    testWidgets('inactive tab uses inkLight color', (tester) async {
+    testWidgets('inactive tab uses textTertiary color', (tester) async {
       await tester.pumpWidget(testApp(
         BottomNavBar(selectedIndex: 0, onTap: (_) {}),
       ));
 
       // "Trends" is not selected (index 1, selected is 0)
       final trendsLabel = tester.widget<Text>(find.text('Trends'));
-      expect(trendsLabel.style?.color, AppPrimitives.inkLight);
+      expect(trendsLabel.style?.color, AppSemanticColors.light.textTertiary);
     });
 
     testWidgets('selecting index 2 highlights Circle tab', (tester) async {
@@ -56,10 +54,10 @@ void main() {
       ));
 
       final diaryLabel = tester.widget<Text>(find.text('Circle'));
-      expect(diaryLabel.style?.color, AppSemanticColors.light.primary);
+      expect(diaryLabel.style?.color, AppSemanticColors.light.onSurface);
 
       final homeLabel = tester.widget<Text>(find.text('Home'));
-      expect(homeLabel.style?.color, AppPrimitives.inkLight);
+      expect(homeLabel.style?.color, AppSemanticColors.light.textTertiary);
     });
 
     // ── Interaction ───────────────────────────────────────────────────────
@@ -102,7 +100,7 @@ void main() {
     });
 
     // ── Theme token verification ──────────────────────────────────────────
-    testWidgets('background is white', (tester) async {
+    testWidgets('background is translucent surface', (tester) async {
       await tester.pumpWidget(testApp(
         BottomNavBar(selectedIndex: 0, onTap: (_) {}),
       ));
@@ -113,8 +111,10 @@ void main() {
           matching: find.byType(Container).first,
         ),
       );
-      final decoration = container.decoration as BoxDecoration;
-      expect(decoration.color, AppPrimitives.skyWhite);
+      expect(
+        container.color,
+        AppSemanticColors.light.surface.withValues(alpha: 0.92),
+      );
     });
   });
 }

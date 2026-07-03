@@ -1,9 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 
+/// Labeled text field — Pet Circle v3 / Claude-Design palette port of the
+/// React `TextInput` component.
+///
+/// Visuals (per Figma TextInput):
+///   - Height 54
+///   - Background = `surface` (white)
+///   - Radius = `AppRadiiTokens.pcField` (14)
+///   - Padding 0px vertical, 16px horizontal
+///   - Text style = `AppSemanticTextStyles.pcBody` (16px Instrument Sans, ink)
+///   - Border = 1px `hairline` on enabled/idle
+///   - Focus = 3px `accentPurple` ring (approximating the React focus shadow)
 class LabeledTextField extends StatelessWidget {
   const LabeledTextField({
     super.key,
@@ -23,6 +33,18 @@ class LabeledTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
+    final fieldRadius = BorderRadius.circular(AppRadiiTokens.pcField);
+
+    final idleBorder = OutlineInputBorder(
+      borderRadius: fieldRadius,
+      borderSide: BorderSide(color: c.hairline, width: 1),
+    );
+
+    final focusBorder = OutlineInputBorder(
+      borderRadius: fieldRadius,
+      borderSide: BorderSide(color: c.accentPurple, width: 3),
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -31,28 +53,31 @@ class LabeledTextField extends StatelessWidget {
           style: AppSemanticTextStyles.labelSm,
         ),
         const SizedBox(height: AppSpacingTokens.sm),
-        SizedBox(
-          height: 36,
+        ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 54),
           child: TextField(
             controller: controller,
             onChanged: onChanged,
             keyboardType: keyboardType,
+            style: AppSemanticTextStyles.pcBody.copyWith(
+              color: c.textPrimary,
+            ),
             decoration: InputDecoration(
               filled: true,
-              fillColor: AppPrimitives.skyLighter,
+              fillColor: c.surface,
               hintText: hintText,
-              hintStyle: AppSemanticTextStyles.body.copyWith(
-                color: AppPrimitives.skyDark,
+              hintStyle: AppSemanticTextStyles.pcBody.copyWith(
+                color: c.textTertiary,
               ),
-              border: OutlineInputBorder(
-                borderRadius: AppRadiiTokens.borderRadiusLg,
-                borderSide: BorderSide.none,
+              isDense: false,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 0,
               ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 4, vertical: AppSpacingTokens.xs),
-            ),
-            style: AppSemanticTextStyles.body.copyWith(
-              color: c.textPrimary,
+              constraints: const BoxConstraints(minHeight: 54),
+              border: idleBorder,
+              enabledBorder: idleBorder,
+              focusedBorder: focusBorder,
             ),
           ),
         ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/screens/auth/login_screen.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
+import 'package:pet_circle/widgets/social_button.dart';
 
 import '../../helpers/ignore_overflow_errors.dart';
 import '../../helpers/mock_stores.dart';
@@ -47,8 +49,8 @@ void main() {
       await tester.pumpWidget(testApp(const LoginScreen()));
       await tester.pumpAndSettle();
 
-      expect(find.byType(ElevatedButton), findsOneWidget);
-      // The ElevatedButton contains "Login" text.
+      expect(find.byType(PrimaryButton), findsOneWidget);
+      // The PrimaryButton contains "Login" text.
       expect(find.text('Login'), findsAtLeastNWidgets(1));
     });
 
@@ -77,7 +79,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap the Login button without entering an email
-      await tester.tap(find.byType(ElevatedButton));
+      await tester.tap(find.byType(PrimaryButton));
       await tester.pumpAndSettle();
 
       // Validator returns "Please enter your email" for empty input
@@ -94,7 +96,7 @@ void main() {
       await tester.enterText(find.byType(TextFormField), 'user@example.com');
 
       // Tap the Login button
-      await tester.tap(find.byType(ElevatedButton));
+      await tester.tap(find.byType(PrimaryButton));
       await tester.pumpAndSettle();
 
       // No validation errors should appear
@@ -112,7 +114,7 @@ void main() {
       await tester.enterText(find.byType(TextFormField), 'not-an-email');
 
       // Tap the Login button
-      await tester.tap(find.byType(ElevatedButton));
+      await tester.tap(find.byType(PrimaryButton));
       await tester.pumpAndSettle();
 
       // Validator returns "Enter a valid email" for invalid format
@@ -165,13 +167,13 @@ void main() {
       await tester.pumpAndSettle();
 
       final googleButton = find.widgetWithText(
-        OutlinedButton,
+        SocialButton,
         'Continue with Google',
       );
       expect(googleButton, findsOneWidget);
 
-      final widget = tester.widget<OutlinedButton>(googleButton);
-      expect(widget.onPressed, isNotNull);
+      final widget = tester.widget<SocialButton>(googleButton);
+      expect(widget.onTap, isNotNull);
     });
 
     testWidgets('Apple button is tappable (not disabled)', (tester) async {
@@ -181,13 +183,13 @@ void main() {
       await tester.pumpAndSettle();
 
       final appleButton = find.widgetWithText(
-        OutlinedButton,
+        SocialButton,
         'Continue with Apple',
       );
       expect(appleButton, findsOneWidget);
 
-      final widget = tester.widget<OutlinedButton>(appleButton);
-      expect(widget.onPressed, isNotNull);
+      final widget = tester.widget<SocialButton>(appleButton);
+      expect(widget.onTap, isNotNull);
     });
 
     testWidgets('Apple button has Apple icon', (tester) async {
@@ -199,16 +201,16 @@ void main() {
       expect(find.byIcon(Icons.apple), findsOneWidget);
     });
 
-    testWidgets('login button is ElevatedButton', (tester) async {
+    testWidgets('login button is PrimaryButton', (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const LoginScreen()));
       await tester.pumpAndSettle();
 
-      final loginButton = find.byType(ElevatedButton);
+      final loginButton = find.byType(PrimaryButton);
       expect(loginButton, findsOneWidget);
 
-      final widget = tester.widget<ElevatedButton>(loginButton);
+      final widget = tester.widget<PrimaryButton>(loginButton);
       expect(widget.onPressed, isNotNull);
     });
   });

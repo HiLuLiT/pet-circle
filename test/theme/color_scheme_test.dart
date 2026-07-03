@@ -7,88 +7,219 @@ import '../helpers/test_app.dart';
 
 void main() {
   group('AppSemanticColors', () {
-    group('light constant', () {
-      test('primary is AppPrimitives.primaryBase', () {
-        expect(AppSemanticColors.light.primary, equals(AppPrimitives.primaryBase));
+    group('light constant (PC v3 / Claude-Design palette)', () {
+      test('primary is pcPurple', () {
+        expect(AppSemanticColors.light.primary, equals(AppPrimitives.pcPurple));
       });
 
-      test('onPrimary is white', () {
-        expect(AppSemanticColors.light.onPrimary, equals(AppPrimitives.skyWhite));
+      test('onPrimary is pcSurface (white)', () {
+        expect(
+          AppSemanticColors.light.onPrimary,
+          equals(AppPrimitives.pcSurface),
+        );
       });
 
-      test('primaryLight is AppPrimitives.primaryLight', () {
+      test('primaryLight is pcPurpleTile', () {
         expect(
           AppSemanticColors.light.primaryLight,
-          equals(AppPrimitives.primaryLight),
+          equals(AppPrimitives.pcPurpleTile),
         );
       });
 
-      test('primaryLightest is AppPrimitives.primaryLightest', () {
+      test('primaryLightest is pcRecessed', () {
         expect(
           AppSemanticColors.light.primaryLightest,
-          equals(AppPrimitives.primaryLightest),
+          equals(AppPrimitives.pcRecessed),
         );
       });
 
-      test('surface is white', () {
-        expect(AppSemanticColors.light.surface, equals(AppPrimitives.skyWhite));
+      test('surface is pcSurface', () {
+        expect(
+          AppSemanticColors.light.surface,
+          equals(AppPrimitives.pcSurface),
+        );
       });
 
-      test('background is skyLightest', () {
+      test('background is pcBg (warm)', () {
         expect(
           AppSemanticColors.light.background,
-          equals(AppPrimitives.skyLightest),
+          equals(AppPrimitives.pcBg),
         );
       });
 
-      test('error is redBase', () {
-        expect(AppSemanticColors.light.error, equals(AppPrimitives.redBase));
+      test('error is pcBlush', () {
+        expect(AppSemanticColors.light.error, equals(AppPrimitives.pcBlush));
       });
 
-      test('success is greenBase', () {
-        expect(AppSemanticColors.light.success, equals(AppPrimitives.greenBase));
+      test('success is pcMint', () {
+        expect(AppSemanticColors.light.success, equals(AppPrimitives.pcMint));
       });
 
-      test('warning is yellowBase', () {
-        expect(AppSemanticColors.light.warning, equals(AppPrimitives.yellowBase));
+      test('warning is pcButter', () {
+        expect(AppSemanticColors.light.warning, equals(AppPrimitives.pcButter));
       });
 
-      test('info is blueBase', () {
-        expect(AppSemanticColors.light.info, equals(AppPrimitives.blueBase));
+      test('info is pcPeriwinkle', () {
+        expect(AppSemanticColors.light.info, equals(AppPrimitives.pcPeriwinkle));
       });
 
-      test('textPrimary is inkDarkest', () {
+      test('textPrimary is pcInk', () {
         expect(
           AppSemanticColors.light.textPrimary,
-          equals(AppPrimitives.inkDarkest),
+          equals(AppPrimitives.pcInk),
         );
       });
 
-      test('textSecondary is inkLight', () {
+      test('textSecondary is pcInkSecondary', () {
         expect(
           AppSemanticColors.light.textSecondary,
-          equals(AppPrimitives.inkLight),
+          equals(AppPrimitives.pcInkSecondary),
         );
       });
 
-      test('divider is skyLight', () {
-        expect(AppSemanticColors.light.divider, equals(AppPrimitives.skyLight));
+      test('textTertiary is pcInkTertiary', () {
+        expect(
+          AppSemanticColors.light.textTertiary,
+          equals(AppPrimitives.pcInkTertiary),
+        );
       });
 
-      test('disabled is skyBase', () {
-        expect(AppSemanticColors.light.disabled, equals(AppPrimitives.skyBase));
+      test('divider is pcHairline', () {
+        expect(AppSemanticColors.light.divider, equals(AppPrimitives.pcHairline));
+      });
+
+      test('disabled is pcInkTertiary', () {
+        expect(
+          AppSemanticColors.light.disabled,
+          equals(AppPrimitives.pcInkTertiary),
+        );
+      });
+
+      test('hairline is pcHairline', () {
+        expect(
+          AppSemanticColors.light.hairline,
+          equals(AppPrimitives.pcHairline),
+        );
+      });
+
+      test('surfaceRecessed is pcRecessed', () {
+        expect(
+          AppSemanticColors.light.surfaceRecessed,
+          equals(AppPrimitives.pcRecessed),
+        );
+      });
+    });
+
+    group('light constant — accents', () {
+      test('accentPurple is pcPurple', () {
+        expect(
+          AppSemanticColors.light.accentPurple,
+          equals(AppPrimitives.pcPurple),
+        );
+      });
+      test('accentPeriwinkle is pcPeriwinkle', () {
+        expect(
+          AppSemanticColors.light.accentPeriwinkle,
+          equals(AppPrimitives.pcPeriwinkle),
+        );
+      });
+      test('accentButter is pcButter', () {
+        expect(
+          AppSemanticColors.light.accentButter,
+          equals(AppPrimitives.pcButter),
+        );
+      });
+      test('accentButterCream is pcButterCream (#E8E4D8)', () {
+        expect(
+          AppSemanticColors.light.accentButterCream,
+          equals(AppPrimitives.pcButterCream),
+        );
+        expect(
+          AppPrimitives.pcButterCream,
+          equals(const Color(0xFFE8E4D8)),
+        );
+      });
+      test('accentButterCream is theme-independent (dark == light)', () {
+        expect(
+          AppSemanticColors.dark.accentButterCream,
+          equals(AppSemanticColors.light.accentButterCream),
+        );
+      });
+      test('accentBlush is pcBlush', () {
+        expect(
+          AppSemanticColors.light.accentBlush,
+          equals(AppPrimitives.pcBlush),
+        );
+      });
+      test('accentMint is pcMint', () {
+        expect(
+          AppSemanticColors.light.accentMint,
+          equals(AppPrimitives.pcMint),
+        );
+      });
+    });
+
+    group('light constant — status', () {
+      test('statusNormal nest', () {
+        expect(
+          AppSemanticColors.light.statusNormalBg,
+          equals(AppPrimitives.pcStatusNormalBg),
+        );
+        expect(
+          AppSemanticColors.light.statusNormalDot,
+          equals(AppPrimitives.pcStatusNormalDot),
+        );
+        expect(
+          AppSemanticColors.light.statusNormalText,
+          equals(AppPrimitives.pcStatusNormalText),
+        );
+      });
+      test('statusElevated nest', () {
+        expect(
+          AppSemanticColors.light.statusElevatedBg,
+          equals(AppPrimitives.pcStatusElevatedBg),
+        );
+        expect(
+          AppSemanticColors.light.statusElevatedDot,
+          equals(AppPrimitives.pcStatusElevatedDot),
+        );
+      });
+      test('statusAlert nest', () {
+        expect(
+          AppSemanticColors.light.statusAlertBg,
+          equals(AppPrimitives.pcStatusAlertBg),
+        );
+      });
+      test('statusActive nest', () {
+        expect(
+          AppSemanticColors.light.statusActiveBg,
+          equals(AppPrimitives.pcStatusActiveBg),
+        );
+      });
+      test('statusInvited nest (yellow, no dot)', () {
+        expect(
+          AppSemanticColors.light.statusInvitedBg,
+          equals(AppPrimitives.yellowLightest),
+        );
+        expect(
+          AppSemanticColors.light.statusInvitedText,
+          equals(AppPrimitives.yellowDarkest),
+        );
       });
     });
 
     group('dark constant', () {
-      test('primary is primaryLight (brighter for dark theme)', () {
-        expect(AppSemanticColors.dark.primary, equals(AppPrimitives.primaryLight));
+      test('primary is pcPurpleTile (lighter for dark theme)', () {
+        expect(
+          AppSemanticColors.dark.primary,
+          equals(AppPrimitives.pcPurpleTile),
+        );
       });
 
-      test('onPrimary is inkDarkest', () {
+      test('onPrimary is pcInk', () {
         expect(
           AppSemanticColors.dark.onPrimary,
-          equals(AppPrimitives.inkDarkest),
+          equals(AppPrimitives.pcInk),
         );
       });
 
@@ -103,18 +234,18 @@ void main() {
         );
       });
 
-      test('error is redLight', () {
-        expect(AppSemanticColors.dark.error, equals(AppPrimitives.redLight));
+      test('error is pcBlush', () {
+        expect(AppSemanticColors.dark.error, equals(AppPrimitives.pcBlush));
       });
 
-      test('success is greenLight', () {
-        expect(AppSemanticColors.dark.success, equals(AppPrimitives.greenLight));
+      test('success is pcMint', () {
+        expect(AppSemanticColors.dark.success, equals(AppPrimitives.pcMint));
       });
 
-      test('textPrimary is skyLightest', () {
+      test('textPrimary is pcSurface', () {
         expect(
           AppSemanticColors.dark.textPrimary,
-          equals(AppPrimitives.skyLightest),
+          equals(AppPrimitives.pcSurface),
         );
       });
     });
@@ -160,6 +291,17 @@ void main() {
         expect(copy.primary, equals(newPrimary));
         expect(copy.error, equals(newError));
         expect(copy.success, equals(AppSemanticColors.light.success));
+      });
+
+      test('copyWith preserves PC v3 accent fields', () {
+        final copy = AppSemanticColors.light.copyWith(
+          primary: const Color(0xFF112233),
+        );
+        expect(copy.accentMint, equals(AppSemanticColors.light.accentMint));
+        expect(
+          copy.statusActiveBg,
+          equals(AppSemanticColors.light.statusActiveBg),
+        );
       });
     });
 
@@ -213,7 +355,7 @@ void main() {
         )));
 
         expect(resolved, isNotNull);
-        expect(resolved!.primary, equals(AppPrimitives.primaryBase));
+        expect(resolved!.primary, equals(AppPrimitives.pcPurple));
       });
 
       testWidgets('resolves dark theme extension from context', (tester) async {
@@ -230,7 +372,7 @@ void main() {
         ));
 
         expect(resolved, isNotNull);
-        expect(resolved!.primary, equals(AppPrimitives.primaryLight));
+        expect(resolved!.primary, equals(AppPrimitives.pcPurpleTile));
       });
 
       testWidgets('light theme primary differs from dark theme primary (static check)',
@@ -272,6 +414,21 @@ void main() {
         expect(colors.textSecondary, isNotNull);
         expect(colors.textTertiary, isNotNull);
         expect(colors.textDisabled, isNotNull);
+        // PC v3 additions
+        expect(colors.surfaceRecessed, isNotNull);
+        expect(colors.hairline, isNotNull);
+        expect(colors.accentPurple, isNotNull);
+        expect(colors.accentPeriwinkle, isNotNull);
+        expect(colors.accentButter, isNotNull);
+        expect(colors.accentButterCream, isNotNull);
+        expect(colors.accentBlush, isNotNull);
+        expect(colors.accentMint, isNotNull);
+        expect(colors.statusNormalBg, isNotNull);
+        expect(colors.statusElevatedBg, isNotNull);
+        expect(colors.statusAlertBg, isNotNull);
+        expect(colors.statusActiveBg, isNotNull);
+        expect(colors.statusInvitedBg, isNotNull);
+        expect(colors.statusInvitedText, isNotNull);
       });
     });
   });

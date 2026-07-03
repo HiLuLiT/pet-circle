@@ -31,6 +31,34 @@ class MockHttpOverrides extends HttpOverrides {
   }
 }
 
+/// HTTP overrides that make every request fail immediately. Use to
+/// deterministically exercise `Image.network` `errorBuilder` paths in tests
+/// instead of relying on a real network call failing within a `pump()`.
+///
+/// Usage:
+/// ```dart
+/// HttpOverrides.global = FailingHttpOverrides();
+/// // ... pumpAndSettle ...
+/// HttpOverrides.global = null;
+/// ```
+class FailingHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) => _FailingHttpClient();
+}
+
+class _FailingHttpClient implements HttpClient {
+  @override
+  Future<HttpClientRequest> getUrl(Uri url) => Future.error(
+      const SocketException('FailingHttpOverrides: network disabled'));
+
+  @override
+  Future<HttpClientRequest> openUrl(String method, Uri url) => Future.error(
+      const SocketException('FailingHttpOverrides: network disabled'));
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
 class _MockHttpClient implements HttpClient {
   @override
   bool autoUncompress = true;

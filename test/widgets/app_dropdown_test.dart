@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/app_dropdown.dart';
 
@@ -33,22 +32,38 @@ void main() {
       expect(find.text('Large'), findsOneWidget);
     });
 
-    testWidgets('displays empty string when value is null', (tester) async {
+    testWidgets('displays placeholder when value is null', (tester) async {
       await tester.pumpWidget(testApp(
-        AppDropdown(label: 'Size', value: null, onTap: () {}),
+        AppDropdown(
+          label: 'Size',
+          value: null,
+          placeholder: 'Choose…',
+          onTap: () {},
+        ),
       ));
-      // The empty text widget should exist inside the Row
-      expect(find.text(''), findsOneWidget);
+      expect(find.text('Choose…'), findsOneWidget);
     });
 
-    testWidgets('shows chevron icon', (tester) async {
+    testWidgets('shows chevron-down icon when closed', (tester) async {
       await tester.pumpWidget(testApp(
         AppDropdown(label: 'Size', value: null, onTap: () {}),
       ));
       expect(find.byIcon(Icons.keyboard_arrow_down), findsOneWidget);
     });
 
-    // ── Interaction test ────────────────────────────────────────────────────
+    testWidgets('shows chevron-up icon when open', (tester) async {
+      await tester.pumpWidget(testApp(
+        AppDropdown(
+          label: 'Size',
+          value: 'Small',
+          isOpen: true,
+          onTap: () {},
+        ),
+      ));
+      expect(find.byIcon(Icons.keyboard_arrow_up), findsOneWidget);
+    });
+
+    // ── Interaction tests ───────────────────────────────────────────────────
     testWidgets('calls onTap when tapped', (tester) async {
       var tapped = false;
       await tester.pumpWidget(testApp(
@@ -57,6 +72,55 @@ void main() {
 
       await tester.tap(find.text('Small'));
       expect(tapped, isTrue);
+    });
+
+    testWidgets('renders option list when open with options', (tester) async {
+      await tester.pumpWidget(testApp(
+        AppDropdown(
+          label: 'Size',
+          value: 'Medium',
+          isOpen: true,
+          options: const ['Small', 'Medium', 'Large'],
+          onTap: () {},
+          onOptionSelected: (_) {},
+        ),
+      ));
+      expect(find.text('Small'), findsOneWidget);
+      expect(find.text('Medium'), findsWidgets); // trigger + option
+      expect(find.text('Large'), findsOneWidget);
+    });
+
+    testWidgets(
+      'does not render option list when closed',
+      (tester) async {
+        await tester.pumpWidget(testApp(
+          AppDropdown(
+            label: 'Size',
+            value: null,
+            options: const ['Small', 'Medium', 'Large'],
+            onTap: () {},
+          ),
+        ));
+        expect(find.text('Small'), findsNothing);
+        expect(find.text('Large'), findsNothing);
+      },
+    );
+
+    testWidgets('calls onOptionSelected when option tapped', (tester) async {
+      String? picked;
+      await tester.pumpWidget(testApp(
+        AppDropdown(
+          label: 'Size',
+          value: null,
+          isOpen: true,
+          options: const ['Small', 'Medium', 'Large'],
+          onTap: () {},
+          onOptionSelected: (v) => picked = v,
+        ),
+      ));
+
+      await tester.tap(find.text('Large'));
+      expect(picked, 'Large');
     });
 
     // ── Theme token tests ───────────────────────────────────────────────────
@@ -70,20 +134,19 @@ void main() {
       expect(label.style?.fontWeight, AppSemanticTextStyles.labelSm.fontWeight);
     });
 
-    testWidgets('container uses skyLighter fill', (tester) async {
+    testWidgets('trigger uses surface fill (pc v3)', (tester) async {
       await tester.pumpWidget(testApp(
         AppDropdown(label: 'L', value: 'V', onTap: () {}),
       ));
 
-      final container = tester.widgetList<Container>(find.byType(Container))
+      final surfaceColor = AppSemanticColors.light.surface;
+      final hit = tester
+          .widgetList<Container>(find.byType(Container))
           .where((c) {
-        final decoration = c.decoration;
-        if (decoration is BoxDecoration) {
-          return decoration.color == AppPrimitives.skyLighter;
-        }
-        return false;
+        final d = c.decoration;
+        return d is BoxDecoration && d.color == surfaceColor;
       });
-      expect(container.isNotEmpty, isTrue);
+      expect(hit.isNotEmpty, isTrue);
     });
 
     testWidgets('chevron icon uses textSecondary color', (tester) async {
@@ -95,31 +158,67 @@ void main() {
       expect(icon.color, AppSemanticColors.light.textSecondary);
     });
 
-    testWidgets('null value text uses skyDark color', (tester) async {
+    testWidgets('placeholder text uses textTertiary color', (tester) async {
       await tester.pumpWidget(testApp(
-        AppDropdown(label: 'L', value: null, onTap: () {}),
+        AppDropdown(
+          label: 'L',
+          value: null,
+          placeholder: 'Pick one',
+          onTap: () {},
+        ),
       ));
 
-      // When value is null, displayed text is empty string with skyDark color
-      final texts = tester.widgetList<Text>(find.byType(Text));
-      final valueText = texts.where((t) => t.data == '').firstOrNull;
-      expect(valueText?.style?.color, AppPrimitives.skyDark);
+      final text = tester.widget<Text>(find.text('Pick one'));
+      expect(text.style?.color, AppSemanticColors.light.textTertiary);
     });
 
-    testWidgets('border radius is lg (16)', (tester) async {
+    testWidgets('selected value text uses onSurface color', (tester) async {
+      await tester.pumpWidget(testApp(
+        AppDropdown(label: 'L', value: 'Picked', onTap: () {}),
+      ));
+
+      final text = tester.widget<Text>(find.text('Picked'));
+      expect(text.style?.color, AppSemanticColors.light.onSurface);
+    });
+
+    testWidgets('trigger border radius is pcField (14)', (tester) async {
       await tester.pumpWidget(testApp(
         AppDropdown(label: 'L', value: 'V', onTap: () {}),
       ));
 
-      final container = tester.widgetList<Container>(find.byType(Container))
+      final hit = tester
+          .widgetList<Container>(find.byType(Container))
           .where((c) {
-        final decoration = c.decoration;
-        if (decoration is BoxDecoration) {
-          return decoration.borderRadius == AppRadiiTokens.borderRadiusLg;
-        }
-        return false;
+        final d = c.decoration;
+        return d is BoxDecoration &&
+            d.borderRadius == AppRadiiTokens.borderRadiusField;
       });
-      expect(container.isNotEmpty, isTrue);
+      expect(hit.isNotEmpty, isTrue);
     });
+
+    testWidgets(
+      'selected option uses accentPeriwinkleChip background',
+      (tester) async {
+        await tester.pumpWidget(testApp(
+          AppDropdown(
+            label: 'L',
+            value: 'Medium',
+            isOpen: true,
+            options: const ['Small', 'Medium', 'Large'],
+            onTap: () {},
+            onOptionSelected: (_) {},
+          ),
+        ));
+
+        final chipColor = AppSemanticColors.light.accentPeriwinkleChip;
+        final hit = tester
+            .widgetList<Container>(find.byType(Container))
+            .where((c) {
+          final d = c.decoration;
+          return d is BoxDecoration && d.color == chipColor;
+        });
+        expect(hit.isNotEmpty, isTrue);
+      },
+    );
   });
 }

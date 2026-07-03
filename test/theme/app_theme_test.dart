@@ -20,16 +20,16 @@ void main() {
       expect(theme.brightness, equals(Brightness.light));
     });
 
-    test('scaffold background color is white', () {
-      expect(theme.scaffoldBackgroundColor, equals(AppPrimitives.skyWhite));
+    test('scaffold background color is pcBg (warm)', () {
+      expect(theme.scaffoldBackgroundColor, equals(AppPrimitives.pcBg));
     });
 
-    test('primary color is primaryBase', () {
-      expect(theme.colorScheme.primary, equals(AppPrimitives.primaryBase));
+    test('primary color is pcPurple', () {
+      expect(theme.colorScheme.primary, equals(AppPrimitives.pcPurple));
     });
 
-    test('color scheme surface is white', () {
-      expect(theme.colorScheme.surface, equals(AppPrimitives.skyWhite));
+    test('color scheme surface is pcSurface', () {
+      expect(theme.colorScheme.surface, equals(AppPrimitives.pcSurface));
     });
 
     test('contains AppSemanticColors extension', () {
@@ -80,10 +80,10 @@ void main() {
         expect(theme.inputDecorationTheme.filled, isTrue);
       });
 
-      test('fill color is skyLighter', () {
+      test('fill color is pcRecessed', () {
         expect(
           theme.inputDecorationTheme.fillColor,
-          equals(AppPrimitives.skyLighter),
+          equals(AppPrimitives.pcRecessed),
         );
       });
 
@@ -94,10 +94,10 @@ void main() {
         );
       });
 
-      test('border has borderRadius of 16', () {
+      test('border has borderRadius of 14 (PC v3 field radius)', () {
         final border =
             theme.inputDecorationTheme.border as OutlineInputBorder;
-        expect(border.borderRadius, equals(BorderRadius.circular(16)));
+        expect(border.borderRadius, equals(BorderRadius.circular(14)));
       });
 
       test('border side is none', () {
@@ -171,10 +171,10 @@ void main() {
         );
       });
 
-      test('border is OutlineInputBorder with radius 16', () {
+      test('border is OutlineInputBorder with radius 14 (PC v3)', () {
         final border =
             theme.inputDecorationTheme.border as OutlineInputBorder;
-        expect(border.borderRadius, equals(BorderRadius.circular(16)));
+        expect(border.borderRadius, equals(BorderRadius.circular(14)));
       });
     });
   });
@@ -232,7 +232,7 @@ void main() {
           home: Builder(
             builder: (context) {
               final colors = AppSemanticColors.of(context);
-              expect(colors.primary, equals(AppPrimitives.primaryBase));
+              expect(colors.primary, equals(AppPrimitives.pcPurple));
               return const SizedBox();
             },
           ),
@@ -247,7 +247,7 @@ void main() {
           home: Builder(
             builder: (context) {
               final colors = AppSemanticColors.of(context);
-              expect(colors.primary, equals(AppPrimitives.primaryLight));
+              expect(colors.primary, equals(AppPrimitives.pcPurpleTile));
               return const SizedBox();
             },
           ),

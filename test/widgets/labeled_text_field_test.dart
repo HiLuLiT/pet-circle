@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/labeled_text_field.dart';
 
@@ -60,7 +60,7 @@ void main() {
       expect(changedValue, 'hello');
     });
 
-    // ── Theme token tests ───────────────────────────────────────────────────
+    // ── Theme token tests (PC v3 / Claude-Design) ───────────────────────────
     testWidgets('label uses semantic labelSm style', (tester) async {
       await tester.pumpWidget(testApp(
         const LabeledTextField(label: 'Label', hintText: 'hint'),
@@ -71,35 +71,94 @@ void main() {
       expect(label.style?.fontWeight, AppSemanticTextStyles.labelSm.fontWeight);
     });
 
-    testWidgets('input fill color is skyLighter', (tester) async {
+    testWidgets('input fill color is semantic surface', (tester) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(testApp(
+        Builder(builder: (ctx) {
+          capturedContext = ctx;
+          return const LabeledTextField(label: 'F', hintText: 'h');
+        }),
+      ));
+
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(
+        textField.decoration?.fillColor,
+        AppSemanticColors.of(capturedContext).surface,
+      );
+    });
+
+    testWidgets('hint text color is semantic textTertiary', (tester) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(testApp(
+        Builder(builder: (ctx) {
+          capturedContext = ctx;
+          return const LabeledTextField(label: 'F', hintText: 'placeholder');
+        }),
+      ));
+
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(
+        textField.decoration?.hintStyle?.color,
+        AppSemanticColors.of(capturedContext).textTertiary,
+      );
+    });
+
+    testWidgets('border radius is pcField (14)', (tester) async {
       await tester.pumpWidget(testApp(
         const LabeledTextField(label: 'F', hintText: 'h'),
       ));
 
       final textField = tester.widget<TextField>(find.byType(TextField));
-      expect(textField.decoration?.fillColor, AppPrimitives.skyLighter);
-    });
-
-    testWidgets('hint text color is skyDark', (tester) async {
-      await tester.pumpWidget(testApp(
-        const LabeledTextField(label: 'F', hintText: 'placeholder'),
-      ));
-
-      final textField = tester.widget<TextField>(find.byType(TextField));
-      expect(textField.decoration?.hintStyle?.color, AppPrimitives.skyDark);
-    });
-
-    testWidgets('border radius is 16 (AppRadiiTokens.lg)', (tester) async {
-      await tester.pumpWidget(testApp(
-        const LabeledTextField(label: 'F', hintText: 'h'),
-      ));
-
-      final textField = tester.widget<TextField>(find.byType(TextField));
-      final border = textField.decoration?.border as OutlineInputBorder;
+      final border = textField.decoration?.enabledBorder as OutlineInputBorder;
       expect(
         border.borderRadius,
-        AppRadiiTokens.borderRadiusLg,
+        BorderRadius.circular(AppRadiiTokens.pcField),
       );
+    });
+
+    testWidgets('enabled border is 1px hairline', (tester) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(testApp(
+        Builder(builder: (ctx) {
+          capturedContext = ctx;
+          return const LabeledTextField(label: 'F', hintText: 'h');
+        }),
+      ));
+
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      final border = textField.decoration?.enabledBorder as OutlineInputBorder;
+      expect(border.borderSide.width, 1);
+      expect(
+        border.borderSide.color,
+        AppSemanticColors.of(capturedContext).hairline,
+      );
+    });
+
+    testWidgets('focused border is 3px accentPurple ring', (tester) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(testApp(
+        Builder(builder: (ctx) {
+          capturedContext = ctx;
+          return const LabeledTextField(label: 'F', hintText: 'h');
+        }),
+      ));
+
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      final border = textField.decoration?.focusedBorder as OutlineInputBorder;
+      expect(border.borderSide.width, 3);
+      expect(
+        border.borderSide.color,
+        AppSemanticColors.of(capturedContext).accentPurple,
+      );
+    });
+
+    testWidgets('input style uses pcBody (16px Instrument Sans)', (tester) async {
+      await tester.pumpWidget(testApp(
+        const LabeledTextField(label: 'F', hintText: 'h'),
+      ));
+
+      final textField = tester.widget<TextField>(find.byType(TextField));
+      expect(textField.style?.fontSize, AppSemanticTextStyles.pcBody.fontSize);
     });
 
     testWidgets('spacing between label and field is sm (8)', (tester) async {

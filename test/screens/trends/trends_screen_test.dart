@@ -49,6 +49,38 @@ void main() {
       expect(find.text('Last 7 days'), findsOneWidget);
     });
 
+    testWidgets('opening the period dropdown and selecting updates the value',
+        (tester) async {
+      tester.view.physicalSize = const Size(600, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const TrendsScreen()));
+      await tester.pumpAndSettle();
+
+      // Closed: only the trigger shows the current value, the other options
+      // are not rendered yet.
+      expect(find.text('Last 7 days'), findsOneWidget);
+      expect(find.text('Last 24 hours'), findsNothing);
+
+      // Tap the trigger to open the inline option list.
+      await tester.tap(find.text('Last 7 days'));
+      await tester.pumpAndSettle();
+
+      // The selected option now appears in both the trigger and the open
+      // list, and the other options become visible.
+      expect(find.text('Last 24 hours'), findsOneWidget);
+
+      // Select a different period; the list closes and the trigger updates.
+      await tester.tap(find.text('Last 24 hours'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Last 24 hours'), findsOneWidget);
+      // The previously-selected label is no longer shown anywhere.
+      expect(find.text('Last 7 days'), findsNothing);
+    });
+
     testWidgets('shows export button', (tester) async {
       tester.view.physicalSize = const Size(600, 1400);
       tester.view.devicePixelRatio = 1.0;

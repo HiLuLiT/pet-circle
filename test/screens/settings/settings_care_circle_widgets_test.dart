@@ -58,7 +58,6 @@ void main() {
           roleLabel: 'Admin',
           roleColor: Colors.purple,
           statusLabel: 'Active',
-          statusColor: Colors.green,
         ),
       ));
       await tester.pumpAndSettle();
@@ -82,7 +81,6 @@ void main() {
           roleLabel: 'Member',
           roleColor: Colors.blue,
           statusLabel: 'Active',
-          statusColor: Colors.green,
           onRemove: () => removeCalled = true,
         ),
       ));
@@ -106,7 +104,6 @@ void main() {
           roleLabel: 'Viewer',
           roleColor: Colors.grey,
           statusLabel: 'Active',
-          statusColor: Colors.green,
           onRemove: null,
         ),
       ));

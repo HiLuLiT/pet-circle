@@ -14,6 +14,9 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
+import 'package:pet_circle/widgets/app_card.dart';
+import 'package:pet_circle/widgets/app_dropdown.dart';
+import 'package:pet_circle/widgets/status_badge.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 /// Locale-independent identifiers for the trends time-range selector.
@@ -32,8 +35,52 @@ class TrendsScreen extends StatefulWidget {
   State<TrendsScreen> createState() => _TrendsScreenState();
 }
 
-class _TrendsScreenState extends State<TrendsScreen> {
+class _TrendsScreenState extends State<TrendsScreen>
+    with SingleTickerProviderStateMixin {
   TrendsPeriod _selectedPeriod = TrendsPeriod.last7Days;
+  bool _isPeriodOpen = false;
+  late final AnimationController _chevronController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 200),
+  );
+
+  @override
+  void dispose() {
+    _chevronController.dispose();
+    super.dispose();
+  }
+
+  void _togglePeriodOpen() {
+    setState(() {
+      _isPeriodOpen = !_isPeriodOpen;
+      if (_isPeriodOpen) {
+        _chevronController.forward();
+      } else {
+        _chevronController.reverse();
+      }
+    });
+  }
+
+  /// Maps a localized display label back to its canonical [TrendsPeriod].
+  ///
+  /// Returns `null` when no period matches the label (e.g. after a locale
+  /// switch races an interaction); callers ignore unmatched labels.
+  TrendsPeriod? _periodForLabel(String label, AppLocalizations l10n) {
+    for (final period in TrendsPeriod.values) {
+      if (_periodLabel(period, l10n) == label) return period;
+    }
+    return null;
+  }
+
+  void _selectPeriodLabel(String label, AppLocalizations l10n) {
+    final period = _periodForLabel(label, l10n);
+    if (period == null) return;
+    setState(() {
+      _selectedPeriod = period;
+      _isPeriodOpen = false;
+      _chevronController.reverse();
+    });
+  }
 
   String _periodLabel(TrendsPeriod period, AppLocalizations l10n) {
     switch (period) {
@@ -210,28 +257,18 @@ class _TrendsScreenState extends State<TrendsScreen> {
                 spacing: AppSpacingTokens.sm,
                 runSpacing: AppSpacingTokens.sm + 4,
                 children: [
-                  Container(
-                    height: 40,
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 4),
-                    decoration: BoxDecoration(
-                      color: c.background,
-                      borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-                    ),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<TrendsPeriod>(
-                        value: _selectedPeriod,
-                        icon: const Icon(Icons.keyboard_arrow_down, size: 16),
-                        style: AppSemanticTextStyles.body,
-                        items: TrendsPeriod.values
-                            .map((period) => DropdownMenuItem(
-                                  value: period,
-                                  child: Text(_periodLabel(period, l10n)),
-                                ))
-                            .toList(),
-                        onChanged: (value) {
-                          if (value != null) setState(() => _selectedPeriod = value);
-                        },
-                      ),
+                  SizedBox(
+                    width: 220,
+                    child: AppDropdown(
+                      label: '',
+                      value: _periodLabel(_selectedPeriod, l10n),
+                      onTap: _togglePeriodOpen,
+                      isOpen: _isPeriodOpen,
+                      chevronController: _chevronController,
+                      options: TrendsPeriod.values
+                          .map((period) => _periodLabel(period, l10n))
+                          .toList(),
+                      onOptionSelected: (label) => _selectPeriodLabel(label, l10n),
                     ),
                   ),
                   GestureDetector(
@@ -280,6 +317,11 @@ class _TrendsScreenState extends State<TrendsScreen> {
                   final dateStr = '${m.recordedAt.month}/${m.recordedAt.day} ${m.recordedAt.hour}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
                   final status = settingsStore.classifyStatus(m.bpm);
                   final statusColor = status == 'Normal' ? c.primaryLight : status == 'Elevated' ? c.warning : c.error;
+                  final badgeStatus = status == 'Normal'
+                      ? StatusBadgeStatus.normal
+                      : status == 'Elevated'
+                          ? StatusBadgeStatus.elevated
+                          : StatusBadgeStatus.alert;
                   return Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm),
                     child: Dismissible(
@@ -323,13 +365,9 @@ class _TrendsScreenState extends State<TrendsScreen> {
                                 ],
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: statusColor.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(AppRadiiTokens.full),
-                              ),
-                              child: Text(localizeStatus(status, l10n), style: AppSemanticTextStyles.caption.copyWith(fontSize: 11, fontWeight: FontWeight.w600, color: c.textPrimary)),
+                            StatusBadge(
+                              label: localizeStatus(status, l10n),
+                              status: badgeStatus,
                             ),
                           ],
                         ),
@@ -420,12 +458,10 @@ class _SectionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return Container(
+    return AppCard(
+      variant: AppCardVariant.tile,
+      tileColor: c.background,
       padding: const EdgeInsets.all(AppSpacingTokens.lg),
-      decoration: BoxDecoration(
-        color: c.background,
-        borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
-      ),
       child: child,
     );
   }

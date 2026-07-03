@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
-import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/widgets/round_icon_button.dart';
 
 import '../helpers/test_app.dart';
@@ -12,7 +11,7 @@ void main() {
     testWidgets('renders without error', (tester) async {
       await tester.pumpWidget(testApp(
         RoundIconButton(
-          icon: const Icon(Icons.add, size: 16),
+          icon: const Icon(Icons.add),
           onTap: () {},
         ),
       ));
@@ -35,20 +34,21 @@ void main() {
     testWidgets('renders with custom backgroundColor', (tester) async {
       await tester.pumpWidget(testApp(
         RoundIconButton(
-          icon: const Icon(Icons.add, size: 16),
+          icon: const Icon(Icons.add),
           backgroundColor: Colors.red,
           onTap: () {},
         ),
       ));
 
-      // Find the inner decorated Container with the color
-      final containers =
-          tester.widgetList<Container>(find.byType(Container)).toList();
-      final decorated = containers.where((c) {
-        final d = c.decoration;
-        return d is BoxDecoration && d.color == Colors.red;
-      });
-      expect(decorated.isNotEmpty, isTrue);
+      final decorations = tester
+          .widgetList<Ink>(find.byType(Ink))
+          .map((w) => w.decoration)
+          .whereType<ShapeDecoration>();
+      expect(
+        decorations.any((d) => d.color == Colors.red),
+        isTrue,
+        reason: 'Custom backgroundColor should override variant default',
+      );
     });
 
     // ── State tests ─────────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ void main() {
       var tapped = false;
       await tester.pumpWidget(testApp(
         RoundIconButton(
-          icon: const Icon(Icons.add, size: 16),
+          icon: const Icon(Icons.add),
           onTap: null,
         ),
       ));
@@ -70,7 +70,7 @@ void main() {
     testWidgets('enabled state shows InkWell', (tester) async {
       await tester.pumpWidget(testApp(
         RoundIconButton(
-          icon: const Icon(Icons.add, size: 16),
+          icon: const Icon(Icons.add),
           onTap: () {},
         ),
       ));
@@ -82,7 +82,7 @@ void main() {
       var callCount = 0;
       await tester.pumpWidget(testApp(
         RoundIconButton(
-          icon: const Icon(Icons.add, size: 16),
+          icon: const Icon(Icons.add),
           onTap: () => callCount++,
         ),
       ));
@@ -92,35 +92,101 @@ void main() {
       expect(callCount, 1);
     });
 
-    // ── Theme token tests ───────────────────────────────────────────────────
-    testWidgets('default bg is AppPrimitives.skyLight', (tester) async {
+    // ── Theme token tests (PC v3) ───────────────────────────────────────────
+    testWidgets('primary variant default bg is semantic onSurface (ink)',
+        (tester) async {
+      late BuildContext capturedContext;
       await tester.pumpWidget(testApp(
-        RoundIconButton(
-          icon: const Icon(Icons.add, size: 16),
-          onTap: () {},
+        Builder(
+          builder: (context) {
+            capturedContext = context;
+            return RoundIconButton(
+              icon: const Icon(Icons.add),
+              onTap: () {},
+            );
+          },
         ),
       ));
 
-      final containers =
-          tester.widgetList<Container>(find.byType(Container)).toList();
-      final withSkyLight = containers.where((c) {
-        final d = c.decoration;
-        return d is BoxDecoration && d.color == AppPrimitives.skyLight;
-      });
-      expect(withSkyLight.isNotEmpty, isTrue,
-          reason: 'Default bg should be AppPrimitives.skyLight');
+      final expectedBg = AppSemanticColors.of(capturedContext).onSurface;
+      final decorations = tester
+          .widgetList<Ink>(find.byType(Ink))
+          .map((w) => w.decoration)
+          .whereType<ShapeDecoration>();
+      expect(
+        decorations.any((d) => d.color == expectedBg),
+        isTrue,
+        reason:
+            'Primary variant default bg should be semantic onSurface token',
+      );
+    });
+
+    testWidgets('ghost variant uses semantic surface bg with hairline border',
+        (tester) async {
+      late BuildContext capturedContext;
+      await tester.pumpWidget(testApp(
+        Builder(
+          builder: (context) {
+            capturedContext = context;
+            return RoundIconButton(
+              icon: const Icon(Icons.add),
+              variant: RoundIconButtonVariant.ghost,
+              onTap: () {},
+            );
+          },
+        ),
+      ));
+
+      final colors = AppSemanticColors.of(capturedContext);
+      final decorations = tester
+          .widgetList<Ink>(find.byType(Ink))
+          .map((w) => w.decoration)
+          .whereType<ShapeDecoration>()
+          .toList();
+
+      final ghostMatch = decorations.firstWhere(
+        (d) => d.color == colors.surface,
+        orElse: () => throw StateError(
+          'Expected an Ink with ShapeDecoration coloured surface',
+        ),
+      );
+      final shape = ghostMatch.shape;
+      expect(shape, isA<CircleBorder>());
+      expect((shape as CircleBorder).side.color, colors.hairline);
+      expect(shape.side.width, 1);
     });
 
     testWidgets('uses full border radius for InkWell', (tester) async {
       await tester.pumpWidget(testApp(
         RoundIconButton(
-          icon: const Icon(Icons.add, size: 16),
+          icon: const Icon(Icons.add),
           onTap: () {},
         ),
       ));
 
       final inkWell = tester.widget<InkWell>(find.byType(InkWell));
-      expect(inkWell.borderRadius, AppRadiiTokens.borderRadiusFull);
+      expect(inkWell.customBorder, isA<CircleBorder>());
+    });
+
+    // ── Sizing ─────────────────────────────────────────────────────────────
+    testWidgets('defaults to 54x54 (PC v3 spec)', (tester) async {
+      await tester.pumpWidget(testApp(
+        RoundIconButton(
+          icon: const Icon(Icons.add),
+          onTap: () {},
+        ),
+      ));
+
+      final sized = tester.widget<SizedBox>(
+        find
+            .descendant(
+              of: find.byType(InkWell),
+              matching: find.byType(SizedBox),
+            )
+            .first,
+      );
+      expect(sized.height, 54);
+      expect(sized.width, 54);
     });
   });
 }

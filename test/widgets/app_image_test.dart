@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/app_image.dart';
 
@@ -64,7 +64,7 @@ void main() {
     });
 
     // ── Theme token tests ───────────────────────────────────────────────────
-    testWidgets('fallback bg is skyLightest', (tester) async {
+    testWidgets('fallback bg is surfaceRecessed', (tester) async {
       await tester.pumpWidget(testApp(
         const AppImage.asset(
           'assets/nonexistent.png',
@@ -78,14 +78,14 @@ void main() {
           .where((c) {
         final decoration = c.decoration;
         if (decoration is BoxDecoration) {
-          return decoration.color == AppPrimitives.skyLightest;
+          return decoration.color == AppSemanticColors.light.surfaceRecessed;
         }
         return false;
       });
       expect(containers.isNotEmpty, isTrue);
     });
 
-    testWidgets('fallback icon color is skyDark', (tester) async {
+    testWidgets('fallback icon color is textTertiary', (tester) async {
       await tester.pumpWidget(testApp(
         const AppImage.asset(
           'assets/nonexistent.png',
@@ -98,7 +98,7 @@ void main() {
       final icon = tester.widget<Icon>(
         find.byIcon(Icons.image_not_supported_outlined),
       );
-      expect(icon.color, AppPrimitives.skyDark);
+      expect(icon.color, AppSemanticColors.light.textTertiary);
     });
 
     testWidgets('fallback border radius is lg (16)', (tester) async {

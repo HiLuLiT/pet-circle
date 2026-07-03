@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/screens/settings/settings_content.dart';
 import 'package:pet_circle/theme/app_theme.dart';
+import 'package:pet_circle/widgets/app_dropdown.dart';
 
 import '../../helpers/helpers.dart';
 import '../../helpers/ignore_overflow_errors.dart';
@@ -542,8 +543,8 @@ void main() {
       await tester.tap(inviteButton.first);
       await tester.pumpAndSettle();
 
-      // The invite sheet has a DropdownButton for selecting the role
-      expect(find.byType(DropdownButton<String>), findsOneWidget);
+      // The invite sheet has an AppDropdown for selecting the role
+      expect(find.byType(AppDropdown), findsOneWidget);
       // 'Member' text appears at least once (in the dropdown selected value)
       expect(find.text('Member'), findsAtLeast(1));
     });
@@ -584,18 +585,24 @@ void main() {
       await tester.tap(inviteButton.first);
       await tester.pumpAndSettle();
 
-      // Open the dropdown
-      await tester.tap(find.byType(DropdownButton<String>));
+      // Open the inline AppDropdown by tapping its trigger (shows 'Member').
+      // Scope to the AppDropdown subtree — 'Member' also appears as a care-circle
+      // member role label behind the modal sheet.
+      final dropdown = find.byType(AppDropdown);
+      await tester.tap(find.descendant(of: dropdown, matching: find.text('Member')));
       await tester.pumpAndSettle();
 
-      // Admin option should appear in the dropdown menu
-      final adminOption = find.text('Admin');
-      if (adminOption.evaluate().isNotEmpty) {
-        await tester.tap(adminOption.last);
-        await tester.pumpAndSettle();
-        // The dropdown now shows Admin as selected
-        expect(find.text('Admin'), findsOneWidget);
-      }
+      // The 'Admin' option now appears in the inline option list.
+      final adminOption = find.descendant(of: dropdown, matching: find.text('Admin'));
+      expect(adminOption, findsWidgets);
+      await tester.tap(adminOption.last);
+      await tester.pumpAndSettle();
+
+      // The dropdown now shows Admin as the selected value.
+      expect(
+        find.descendant(of: dropdown, matching: find.text('Admin')),
+        findsOneWidget,
+      );
     });
   });
 

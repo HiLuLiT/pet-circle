@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/screens/dashboard/care_circle_dashboard.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/widgets/pet_card.dart';
 import '../../helpers/ignore_overflow_errors.dart';
 import '../../helpers/mock_stores.dart';
 import '../../helpers/test_app.dart';
@@ -76,7 +77,7 @@ void main() {
       }
     });
 
-    testWidgets('shows BPM label on pet cards', (tester) async {
+    testWidgets('renders a PetCard per clinic pet', (tester) async {
       suppressOverflowErrors();
       tester.view.physicalSize = const Size(430, 932);
       tester.view.devicePixelRatio = 1.0;
@@ -88,7 +89,7 @@ void main() {
 
       final pets = petStore.allClinicPets;
       if (pets.isNotEmpty) {
-        expect(find.text('BPM'), findsWidgets);
+        expect(find.byType(PetCard), findsWidgets);
       }
     });
   });

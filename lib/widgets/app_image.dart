@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class AppImage extends StatelessWidget {
@@ -43,15 +43,16 @@ class _Fallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppSemanticColors.of(context);
     return Container(
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: AppPrimitives.skyLightest,
+        color: colors.surfaceRecessed,
         borderRadius: AppRadiiTokens.borderRadiusLg,
       ),
       alignment: Alignment.center,
-      child: Icon(icon, color: AppPrimitives.skyDark, size: 20),
+      child: Icon(icon, color: colors.textTertiary, size: 20),
     );
   }
 }

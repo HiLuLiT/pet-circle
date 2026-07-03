@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/screens/settings/settings_content.dart';
 import 'package:pet_circle/screens/settings/settings_widgets.dart';
 import 'package:pet_circle/screens/settings/settings_care_circle_widgets.dart';
-import 'package:pet_circle/widgets/toggle_pill.dart';
+import 'package:pet_circle/widgets/app_toggle.dart';
 
 import '../../helpers/helpers.dart';
 import '../../helpers/ignore_overflow_errors.dart';
@@ -48,7 +48,7 @@ void main() {
       expect(find.text('Manage your PetBreath preferences'), findsOneWidget);
     });
 
-    testWidgets('shows close chevron when onClose callback provided', (tester) async {
+    testWidgets('shows close button when onClose callback provided', (tester) async {
       suppressOverflowErrors();
       _setTallView(tester);
       var closed = false;
@@ -57,19 +57,19 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      final chevron = find.byIcon(Icons.keyboard_arrow_down);
-      expect(chevron, findsOneWidget);
-      await tester.tap(chevron);
+      final closeIcon = find.byIcon(Icons.close);
+      expect(closeIcon, findsOneWidget);
+      await tester.tap(closeIcon);
       expect(closed, isTrue);
     });
 
-    testWidgets('does not show close chevron when onClose is null', (tester) async {
+    testWidgets('does not show close button when onClose is null', (tester) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.keyboard_arrow_down), findsNothing);
+      expect(find.byIcon(Icons.close), findsNothing);
     });
 
     testWidgets('shows appearance section', (tester) async {
@@ -165,13 +165,13 @@ void main() {
       expect(find.byType(SettingsToggleRow), findsAtLeast(4));
     });
 
-    testWidgets('renders TogglePill for each toggle row', (tester) async {
+    testWidgets('renders AppToggle for each toggle row', (tester) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      expect(find.byType(TogglePill), findsAtLeast(4));
+      expect(find.byType(AppToggle), findsAtLeast(4));
     });
   });
 

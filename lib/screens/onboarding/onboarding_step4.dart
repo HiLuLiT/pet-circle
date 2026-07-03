@@ -6,6 +6,7 @@ import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/app_dropdown.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 enum _VetLookupState { idle, loading, foundVet, notVet, notFound }
@@ -126,6 +127,14 @@ class _OnboardingStep4State extends State<OnboardingStep4>
         _chevronController.reverse();
       }
     });
+  }
+
+  void _selectRole(String role) {
+    setState(() {
+      _selectedRole = role;
+      _roleOpen = false;
+    });
+    _chevronController.reverse();
   }
 
   void _addToCareCircle() {
@@ -429,53 +438,9 @@ class _OnboardingStep4State extends State<OnboardingStep4>
           isOpen: _roleOpen,
           chevronController: _chevronController,
           onTap: _toggleRoleDropdown,
+          options: _roles,
+          onOptionSelected: _selectRole,
         ),
-        if (_roleOpen)
-          Container(
-            margin: const EdgeInsets.only(top: AppSpacingTokens.sm),
-            padding: const EdgeInsets.symmetric(vertical: AppSpacingTokens.sm),
-            decoration: BoxDecoration(
-              color: c.surface,
-              borderRadius: AppRadiiTokens.borderRadiusLg,
-            ),
-            child: Column(
-              children: _roles.map((role) {
-                final isSelected = role == _selectedRole;
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedRole = role;
-                      _roleOpen = false;
-                    });
-                    _chevronController.reverse();
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: AppSpacingTokens.sm,
-                      vertical: AppSpacingTokens.xs,
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: AppSpacingTokens.sm,
-                    ),
-                    decoration: BoxDecoration(
-                      color:
-                          isSelected ? c.primaryLightest : Colors.transparent,
-                      borderRadius: AppRadiiTokens.borderRadiusLg,
-                    ),
-                    child: Text(
-                      role,
-                      style: AppSemanticTextStyles.body.copyWith(
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w400,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
         const SizedBox(height: 12),
         SizedBox(
           height: 48,
@@ -770,6 +735,10 @@ class _InputRow extends StatelessWidget {
   }
 }
 
+/// Care-circle role selector. Thin wrapper over the shared [AppDropdown]
+/// design-system widget: it forwards the label, current value, open state,
+/// chevron animation, options, and selection callback. The open/close state
+/// and selection are owned by the parent (see [_OnboardingStep4State]).
 class _SelectRow extends StatelessWidget {
   const _SelectRow({
     required this.label,
@@ -777,6 +746,8 @@ class _SelectRow extends StatelessWidget {
     required this.onTap,
     required this.isOpen,
     required this.chevronController,
+    required this.options,
+    required this.onOptionSelected,
   });
 
   final String label;
@@ -784,48 +755,19 @@ class _SelectRow extends StatelessWidget {
   final VoidCallback onTap;
   final bool isOpen;
   final AnimationController chevronController;
+  final List<String> options;
+  final ValueChanged<String> onOptionSelected;
 
   @override
   Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label,
-            style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w500)),
-        const SizedBox(height: AppSpacingTokens.sm),
-        GestureDetector(
-          onTap: onTap,
-          child: Container(
-            height: 48,
-            decoration: BoxDecoration(
-              color: c.surface,
-              borderRadius: AppRadiiTokens.borderRadiusSm,
-              border: Border.all(color: c.divider),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(value, style: AppSemanticTextStyles.body),
-                RotationTransition(
-                  turns: Tween(begin: 0.0, end: 0.5).animate(
-                    CurvedAnimation(
-                      parent: chevronController,
-                      curve: Curves.easeInOut,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.keyboard_arrow_down,
-                    color: c.textPrimary,
-                    size: 18,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
+    return AppDropdown(
+      label: label,
+      value: value,
+      onTap: onTap,
+      isOpen: isOpen,
+      chevronController: chevronController,
+      options: options,
+      onOptionSelected: onOptionSelected,
     );
   }
 }

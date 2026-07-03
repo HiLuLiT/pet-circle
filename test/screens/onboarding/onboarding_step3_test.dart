@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step3.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
+import 'package:pet_circle/widgets/radio_card.dart';
 
 import '../../helpers/ignore_overflow_errors.dart';
 import '../../helpers/mock_stores.dart';
@@ -101,8 +102,13 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // The 30 BPM option should have the check icon (selected state)
-      expect(find.byIcon(Icons.check), findsOneWidget);
+      // Exactly one RadioCard is selected, and it is the 30 BPM option.
+      final selectedCards = tester
+          .widgetList<RadioCard>(find.byType(RadioCard))
+          .where((card) => card.selected)
+          .toList();
+      expect(selectedCards, hasLength(1));
+      expect(selectedCards.single.title, '30 BPM (Standard)');
     });
 
     testWidgets('shows OnboardingShell wrapper', (tester) async {
@@ -291,8 +297,13 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      // The check icon should still appear once (for the 35 BPM option now)
-      expect(find.byIcon(Icons.check), findsOneWidget);
+      // Exactly one RadioCard is selected, and it is the 35 BPM option now.
+      final selectedCards = tester
+          .widgetList<RadioCard>(find.byType(RadioCard))
+          .where((card) => card.selected)
+          .toList();
+      expect(selectedCards, hasLength(1));
+      expect(selectedCards.single.title, '35 BPM');
     });
 
     testWidgets('shows standard rate description', (tester) async {

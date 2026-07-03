@@ -5,6 +5,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
+import 'package:pet_circle/widgets/radio_card.dart';
 
 class OnboardingStep3 extends StatefulWidget {
   const OnboardingStep3({super.key, this.onBack, this.onNext, this.nextLabel, this.onClose, this.onTargetRateChanged, this.initialTargetRate, this.isNextLoading = false});
@@ -72,9 +73,9 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
             style: AppSemanticTextStyles.body,
           ),
           const SizedBox(height: AppSpacingTokens.md),
-          _TargetOption(
+          RadioCard(
             title: l10n.normalRangeLabel,
-            subtitle: l10n.standardRateDescription,
+            description: l10n.standardRateDescription,
             selected: _selected == '30',
             onTap: () {
               setState(() => _selected = '30');
@@ -82,9 +83,9 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
             },
           ),
           const SizedBox(height: 12),
-          _TargetOption(
+          RadioCard(
             title: l10n.elevatedRangeLabel,
-            subtitle: l10n.elevatedRateDescription,
+            description: l10n.elevatedRateDescription,
             selected: _selected == '35',
             onTap: () {
               setState(() => _selected = '35');
@@ -92,9 +93,8 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
             },
           ),
           const SizedBox(height: 12),
-          _TargetOption(
+          RadioCard(
             title: l10n.customRate,
-            subtitle: null,
             selected: _selected == 'custom',
             onTap: () => setState(() => _selected = 'custom'),
           ),
@@ -154,94 +154,6 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
               ),
             ),
         ],
-      ),
-    );
-  }
-}
-
-class _TargetOption extends StatelessWidget {
-  const _TargetOption({
-    required this.title,
-    required this.subtitle,
-    required this.selected,
-    this.onTap,
-  });
-
-  final String title;
-  final String? subtitle;
-  final bool selected;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return InkWell(
-      onTap: onTap,
-      borderRadius: AppRadiiTokens.borderRadiusLg,
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacingTokens.md,
-          vertical: AppSpacingTokens.md,
-        ),
-        decoration: BoxDecoration(
-          color: selected ? c.primaryLightest : c.surface,
-          borderRadius: AppRadiiTokens.borderRadiusLg,
-          border: Border.all(
-            color: selected ? c.primary : c.divider,
-            width: selected ? 2 : 1,
-          ),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              width: 20,
-              height: 20,
-              margin: const EdgeInsets.only(top: 2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: selected ? c.primary : c.surface,
-                border: Border.all(
-                  color: selected ? c.primary : c.divider,
-                  width: 2,
-                ),
-              ),
-              child: selected
-                  ? const Center(
-                      child: Icon(
-                        Icons.check,
-                        size: 14,
-                        color: Colors.white,
-                      ),
-                    )
-                  : null,
-            ),
-            const SizedBox(width: AppSpacingTokens.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: AppSemanticTextStyles.body.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: c.textPrimary,
-                    ),
-                  ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: AppSpacingTokens.xs),
-                    Text(
-                      subtitle!,
-                      style: AppSemanticTextStyles.caption.copyWith(
-                        color: c.textSecondary,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

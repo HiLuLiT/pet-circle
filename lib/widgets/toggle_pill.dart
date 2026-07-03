@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
-import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 
 class TogglePill extends StatelessWidget {
@@ -31,8 +30,8 @@ class TogglePill extends StatelessWidget {
         child: Container(
           width: 31,
           height: 31,
-          decoration: const BoxDecoration(
-            color: AppPrimitives.skyWhite,
+          decoration: BoxDecoration(
+            color: c.surface,
             shape: BoxShape.circle,
           ),
         ),

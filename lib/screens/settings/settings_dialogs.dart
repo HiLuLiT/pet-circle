@@ -16,6 +16,8 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
+import 'package:pet_circle/widgets/app_dropdown.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 
 import 'package:pet_circle/screens/settings/settings_content.dart';
 
@@ -172,6 +174,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
     final emailController = TextEditingController();
     String selectedRole = 'Member';
     final roles = ['Admin', 'Member', 'Viewer'];
+    bool isRoleOpen = false;
     bool isSending = false;
     showModalBottomSheet(
       context: context,
@@ -206,28 +209,25 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(l10n.role, style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w700)),
-                const SizedBox(height: AppSpacingTokens.sm),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    color: c.surface,
-                    borderRadius: AppRadiiTokens.borderRadiusSm,
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: selectedRole,
-                      isExpanded: true,
-                      dropdownColor: c.background,
-                      style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
-                      items: roles
-                          .map((r) => DropdownMenuItem(value: r, child: Text(localizeRoleName(r, l10n))))
-                          .toList(),
-                      onChanged: (v) {
-                        if (v != null) setSheetState(() => selectedRole = v);
-                      },
-                    ),
-                  ),
+                AppDropdown(
+                  label: l10n.role,
+                  value: localizeRoleName(selectedRole, l10n),
+                  isOpen: isRoleOpen,
+                  options: roles.map((r) => localizeRoleName(r, l10n)).toList(),
+                  onTap: () => setSheetState(() => isRoleOpen = !isRoleOpen),
+                  onOptionSelected: (label) {
+                    // Map the localized label back to its canonical role by
+                    // position — same list, same order as `options` — mirroring
+                    // the AppDropdown adoption in medication_form_widgets.dart.
+                    final index = roles
+                        .map((r) => localizeRoleName(r, l10n))
+                        .toList()
+                        .indexOf(label);
+                    setSheetState(() {
+                      if (index >= 0) selectedRole = roles[index];
+                      isRoleOpen = false;
+                    });
+                  },
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -390,40 +390,30 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                       ),
                     ),
                     const SizedBox(width: AppSpacingTokens.sm),
-                    SizedBox(
-                      height: 48,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: c.primary,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: AppRadiiTokens.borderRadiusSm,
-                          ),
-                        ),
-                        onPressed: state == 1 ? null : () async {
-                          final email = emailController.text.trim();
-                          if (email.isEmpty) return;
-                          setSheetState(() { state = 1; errorMessage = null; });
+                    PrimaryButton(
+                      label: l10n.lookUpVet,
+                      fullWidth: false,
+                      onPressed: state == 1 ? null : () async {
+                        final email = emailController.text.trim();
+                        if (email.isEmpty) return;
+                        setSheetState(() { state = 1; errorMessage = null; });
 
-                          if (!kEnableFirebase) {
-                            setSheetState(() { state = 4; foundVet = null; });
-                            return;
-                          }
+                        if (!kEnableFirebase) {
+                          setSheetState(() { state = 4; foundVet = null; });
+                          return;
+                        }
 
-                          final vet = await userStore.findVetByEmail(email);
-                          if (vet != null) {
-                            setSheetState(() { state = 2; foundVet = vet; });
-                            return;
-                          }
-                          final user = await userStore.findUserByEmail(email);
-                          setSheetState(() {
-                            foundVet = null;
-                            state = user != null ? 3 : 4;
-                          });
-                        },
-                        child: Text(l10n.lookUpVet,
-                            style: AppSemanticTextStyles.caption.copyWith(color: c.background)),
-                      ),
+                        final vet = await userStore.findVetByEmail(email);
+                        if (vet != null) {
+                          setSheetState(() { state = 2; foundVet = vet; });
+                          return;
+                        }
+                        final user = await userStore.findUserByEmail(email);
+                        setSheetState(() {
+                          foundVet = null;
+                          state = user != null ? 3 : 4;
+                        });
+                      },
                     ),
                   ],
                 ),

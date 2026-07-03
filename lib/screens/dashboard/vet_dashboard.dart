@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/utils/responsive_utils.dart';
-import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/invitation.dart';
 import 'package:pet_circle/models/pet.dart';
@@ -18,7 +17,9 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/neumorphic_card.dart';
-import 'package:pet_circle/widgets/status_badge.dart';
+import 'package:pet_circle/widgets/pet_card.dart';
+import 'package:pet_circle/widgets/responsive_grid.dart';
+import 'package:pet_circle/widgets/summary_card.dart';
 
 class VetDashboard extends StatefulWidget {
   const VetDashboard({super.key, this.showScaffold = true});
@@ -141,12 +142,12 @@ class _VetDashboardState extends State<VetDashboard> {
                     style: AppSemanticTextStyles.bodyMuted,
                   ),
                   const SizedBox(height: AppSpacingTokens.lg),
-                  _ResponsiveGrid(
+                  ResponsiveGrid(
                     maxCrossAxisCount: 3,
                     minItemWidth: 280,
                     children: pets
                         .map(
-                          (pet) => _PetCard(
+                          (pet) => _VetPetCard(
                             data: pet,
                             onTap: () => context.push(
                               AppRoutes.petDetail(pet.id ?? ''),
@@ -156,24 +157,24 @@ class _VetDashboardState extends State<VetDashboard> {
                         .toList(),
                   ),
                   const SizedBox(height: AppSpacingTokens.lg),
-                  _ResponsiveGrid(
+                  ResponsiveGrid(
                     maxCrossAxisCount: 3,
                     minItemWidth: 280,
                     childAspectRatio: 3.3,
                     children: [
-                      _SummaryCard(
+                      SummaryCard(
                         iconColor: c.primaryLight.withValues(alpha: 0.15),
                         icon: Icons.check_circle_outline,
                         value: '$normalCount',
                         label: l10n.normalStatus,
                       ),
-                      _SummaryCard(
+                      SummaryCard(
                         iconColor: c.error.withValues(alpha: 0.15),
                         icon: Icons.warning_amber_outlined,
                         value: '$elevatedCount',
                         label: l10n.needAttention,
                       ),
-                      _SummaryCard(
+                      SummaryCard(
                         iconColor: c.primaryLight.withValues(alpha: 0.1),
                         icon: Icons.bar_chart,
                         value: '${measurementStore.thisWeekCount}',
@@ -335,171 +336,37 @@ class _PendingRequestsSection extends StatelessWidget {
 
 // ── Pet Card ──
 
-class _PetCard extends StatelessWidget {
-  const _PetCard({required this.data, this.onTap});
+/// Vet-context adapter around the shared [PetCard].
+///
+/// Adds the patient subtitle (breed · SPR bpm), the "view only" badge
+/// (trailing slot) and the owner label (footer slot) while delegating the base
+/// layout to [PetCard].
+class _VetPetCard extends StatelessWidget {
+  const _VetPetCard({required this.data, this.onTap});
 
   final Pet data;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
     final latestFromStore = measurementStore.latestForPet(data.id ?? '');
     final latest = latestFromStore ?? data.latestMeasurement;
     final hasMeasurement = latest.bpm > 0;
-    return GestureDetector(
+    final subtitle = hasMeasurement
+        ? l10n.petCardSubtitle(data.breedAndAge, latest.bpm)
+        : data.breedAndAge;
+
+    return PetCard(
+      name: data.name,
+      subtitle: subtitle,
+      status: statusBadgeStatusFor(data.statusLabel),
+      statusLabel: localizeStatus(data.statusLabel, l10n),
+      media: ClipOval(child: DogPhoto(endpoint: data.imageUrl)),
       onTap: onTap,
-      child: NeumorphicCard(
-        radius: BorderRadius.circular(AppRadiiTokens.md),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                Container(
-                  height: 180,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        c.primaryLight.withValues(alpha: 0.2),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                  child: ClipRRect(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.md)),
-                    child: DogPhoto(endpoint: data.imageUrl),
-                  ),
-                ),
-                Positioned(
-                  top: AppSpacingTokens.md,
-                  right: AppSpacingTokens.sm + 4,
-                  child: StatusBadge(
-                    label: localizeStatus(data.statusLabel, l10n),
-                    color: Color(data.statusColorHex),
-                  ),
-                ),
-                Positioned(
-                  top: AppSpacingTokens.md,
-                  left: AppSpacingTokens.sm + 4,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacingTokens.sm,
-                        vertical: AppSpacingTokens.xs),
-                    decoration: BoxDecoration(
-                      color: c.textPrimary.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.visibility, size: 12, color: c.background),
-                        const SizedBox(width: AppSpacingTokens.xs),
-                        Text(
-                          l10n.viewOnly,
-                          style: AppSemanticTextStyles.caption.copyWith(
-                            color: c.background,
-                            fontSize: 10,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.all(AppSpacingTokens.md + 4),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    data.name,
-                    style:
-                        AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
-                  ),
-                  const SizedBox(height: AppSpacingTokens.xs),
-                  Text(data.breedAndAge, style: AppSemanticTextStyles.bodyMuted),
-                  const SizedBox(height: AppSpacingTokens.md),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          NeumorphicCard(
-                            inner: true,
-                            color: c.surface,
-                            padding: const EdgeInsets.all(AppSpacingTokens.sm + 2),
-                            child: Icon(Icons.favorite_border,
-                                size: 18, color: c.textPrimary),
-                          ),
-                          const SizedBox(width: AppSpacingTokens.sm + 2),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                hasMeasurement ? '${latest.bpm}' : '--',
-                                style: AppSemanticTextStyles.headingLg
-                                    .copyWith(color: c.textPrimary),
-                              ),
-                              Text(l10n.bpm,
-                                  style: AppSemanticTextStyles.caption),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Flexible(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: AppSpacingTokens.sm),
-                          child: Text(
-                            hasMeasurement ? formatTimeAgo(latest.recordedAt, l10n) : l10n.noMeasurementsYet,
-                            style: AppSemanticTextStyles.caption,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacingTokens.sm + 6),
-                  Divider(
-                      color: c.primaryLight.withValues(alpha: 0.15),
-                      height: 1),
-                  const SizedBox(height: AppSpacingTokens.sm + 2),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Flexible(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.person_outline,
-                                size: 14, color: c.textPrimary),
-                            const SizedBox(width: AppSpacingTokens.xs + 2),
-                            Flexible(
-                              child: Text(
-                                l10n.ownerLabel(_getOwnerName(
-                                    data.careCircle, l10n.unknown)),
-                                style: AppSemanticTextStyles.caption,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Icon(Icons.chevron_right,
-                          size: 18, color: c.textPrimary),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      trailing: const _ViewOnlyBadge(),
+      footer: _OwnerLabel(
+        name: _getOwnerName(data.careCircle, l10n.unknown),
       ),
     );
   }
@@ -511,52 +378,32 @@ class _PetCard extends StatelessWidget {
   }
 }
 
-// ── Summary Card ──
-
-class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({
-    required this.iconColor,
-    required this.icon,
-    required this.value,
-    required this.label,
-  });
-
-  final Color iconColor;
-  final IconData icon;
-  final String value;
-  final String label;
+/// "View only" pill overlay for vet patient cards.
+class _ViewOnlyBadge extends StatelessWidget {
+  const _ViewOnlyBadge();
 
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    return NeumorphicCard(
-      radius: BorderRadius.circular(AppRadiiTokens.md),
-      padding: const EdgeInsets.all(AppSpacingTokens.lg),
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacingTokens.sm, vertical: AppSpacingTokens.xs),
+      decoration: BoxDecoration(
+        color: c.textPrimary.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
+      ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            height: 48,
-            width: 48,
-            decoration: BoxDecoration(
-              color: iconColor,
-              borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
+          Icon(Icons.visibility, size: 12, color: c.background),
+          const SizedBox(width: AppSpacingTokens.xs),
+          Text(
+            l10n.viewOnly,
+            style: AppSemanticTextStyles.caption.copyWith(
+              color: c.background,
+              fontSize: 10,
             ),
-            child: Center(
-              child: Icon(icon, size: 24, color: c.textPrimary),
-            ),
-          ),
-          const SizedBox(width: AppSpacingTokens.md),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                value,
-                style:
-                    AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
-              ),
-              Text(label, style: AppSemanticTextStyles.bodyMuted),
-            ],
           ),
         ],
       ),
@@ -564,38 +411,29 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-// ── Responsive Grid ──
+/// Owner-name row shown in the footer of a vet patient card.
+class _OwnerLabel extends StatelessWidget {
+  const _OwnerLabel({required this.name});
 
-class _ResponsiveGrid extends StatelessWidget {
-  const _ResponsiveGrid({
-    required this.children,
-    required this.minItemWidth,
-    required this.maxCrossAxisCount,
-    this.childAspectRatio = 0.85,
-  });
-
-  final List<Widget> children;
-  final double minItemWidth;
-  final int maxCrossAxisCount;
-  final double childAspectRatio;
+  final String name;
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final width = constraints.maxWidth;
-        final count =
-            (width / minItemWidth).floor().clamp(1, maxCrossAxisCount);
-        return GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: count,
-          crossAxisSpacing: AppSpacingTokens.lg,
-          mainAxisSpacing: AppSpacingTokens.lg,
-          childAspectRatio: childAspectRatio,
-          children: children,
-        );
-      },
+    final c = AppSemanticColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
+      children: [
+        Icon(Icons.person_outline, size: 14, color: c.textPrimary),
+        const SizedBox(width: AppSpacingTokens.xs + 2),
+        Expanded(
+          child: Text(
+            l10n.ownerLabel(name),
+            style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+        Icon(Icons.chevron_right, size: 18, color: c.textPrimary),
+      ],
     );
   }
 }

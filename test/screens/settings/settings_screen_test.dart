@@ -130,9 +130,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.keyboard_arrow_down), findsOneWidget);
+      expect(find.byIcon(Icons.close), findsOneWidget);
       // Tap the close button.
-      await tester.tap(find.byIcon(Icons.keyboard_arrow_down));
+      await tester.tap(find.byIcon(Icons.close));
       await tester.pumpAndSettle();
       expect(closeCalled, isTrue);
     });
@@ -147,7 +147,7 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.keyboard_arrow_down), findsNothing);
+      expect(find.byIcon(Icons.close), findsNothing);
     });
   });
 

@@ -1,11 +1,80 @@
 import 'package:flutter/material.dart';
 
-/// Primitive color tokens from the v2 design system.
+/// Primitive color tokens.
+///
+/// Two palettes live here:
+/// 1. **Pet Circle v3** (Claude-Design palette) — the current design language.
+///    Use the `pc*` prefixed primitives below for new code.
+/// 2. **Legacy v2** — kept for backward compatibility with widgets/screens that
+///    haven't migrated yet. Will be removed once all usages are gone.
 ///
 /// Every color in the app should reference one of these constants.
 /// Semantic mapping lives in [AppSemanticColors].
 class AppPrimitives {
   AppPrimitives._();
+
+  // ── PC v3: Ink (Text) ────────────────────────────────────────────────────
+  static const Color pcInk = Color(0xFF161616);
+  static const Color pcInkSecondary = Color(0xFF595959);
+  static const Color pcInkTertiary = Color(0xFF9A9A9A);
+
+  // ── PC v3: Surfaces ──────────────────────────────────────────────────────
+  static const Color pcBg = Color(0xFFF7F4EC);
+  static const Color pcSurface = Color(0xFFFFFFFF);
+  static const Color pcRecessed = Color(0xFFEFEBE1);
+  static const Color pcHairline = Color(0xFFECE7DD);
+
+  // ── PC v3: Brand (Purple) ────────────────────────────────────────────────
+  static const Color pcPurple = Color(0xFF7E5CE0);
+  static const Color pcPurpleTile = Color(0xFFC3AEF0);
+
+  // ── PC v3: Accents ───────────────────────────────────────────────────────
+  static const Color pcPeriwinkle = Color(0xFF6485DB);
+  static const Color pcPeriwinkleTile = Color(0xFFD2DCF5);
+  static const Color pcPeriwinkleChip = Color(0xFFCDD8F5);
+
+  static const Color pcButter = Color(0xFFD98E40);
+  static const Color pcButterTile = Color(0xFFF0EC93);
+  // Candy/Butter/Cream — warm cream tile (#E8E4D8). Distinct from the bright
+  // yellow [pcButterTile]; used for the toggle off-track and note callouts.
+  static const Color pcButterCream = Color(0xFFE8E4D8);
+
+  static const Color pcBlush = Color(0xFFDD6593);
+  static const Color pcBlushTile = Color(0xFFF8DCE6);
+
+  static const Color pcMint = Color(0xFF46A05F);
+  static const Color pcMintTile = Color(0xFFC2E8C8);
+
+  // ── PC v3: Status — Normal (periwinkle) ──────────────────────────────────
+  static const Color pcStatusNormalBg = Color(0xFFECEAF7);
+  static const Color pcStatusNormalDot = Color(0xFF6485DB);
+  static const Color pcStatusNormalText = Color(0xFF4A56B0);
+
+  // ── PC v3: Status — Elevated (amber) ─────────────────────────────────────
+  static const Color pcStatusElevatedBg = Color(0xFFF6ECCF);
+  static const Color pcStatusElevatedDot = Color(0xFFD98E40);
+  static const Color pcStatusElevatedText = Color(0xFF8A6420);
+
+  // ── PC v3: Status — Alert (blush) ────────────────────────────────────────
+  static const Color pcStatusAlertBg = Color(0xFFFBE0DC);
+  static const Color pcStatusAlertDot = Color(0xFFDD6593);
+  static const Color pcStatusAlertText = Color(0xFFB14C77);
+
+  // ── PC v3: Status — Active (mint) ────────────────────────────────────────
+  static const Color pcStatusActiveBg = Color(0xFFD7EECB);
+  static const Color pcStatusActiveDot = Color(0xFF2F6B3E);
+  static const Color pcStatusActiveText = Color(0xFF2F6B3E);
+
+  // ── PC v3: Dark-mode surfaces (warm-tinted) ──────────────────────────────
+  static const Color pcDarkBg = Color(0xFF1A1A1A);
+  static const Color pcDarkSurface = Color(0xFF1A1A1A);
+  static const Color pcDarkRecessed = Color(0xFF2A2420);
+  static const Color pcDarkOnSurface = Color(0xFFF5E6E0);
+  static const Color pcDarkOnSurfaceMuted = Color(0xFFB0B0B0);
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // Legacy v2 palette (kept for compatibility — do not use in new code)
+  // ═════════════════════════════════════════════════════════════════════════
 
   // ── Ink (Text / UI) ──────────────────────────────────────────────────────
   static const Color inkLighter = Color(0xFF72777A);

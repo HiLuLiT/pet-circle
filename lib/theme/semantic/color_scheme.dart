@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import '../tokens/colors.dart';
 
 /// Semantic color tokens that map primitive [AppPrimitives] values to
-/// UI roles (primary, surface, error, etc.).
+/// UI roles (primary, surface, error, accents, status, etc.).
 ///
 /// Usage: `AppSemanticColors.of(context).primary`
+///
+/// As of Pet Circle v3 (Claude-Design palette), the light theme points at
+/// the `pc*` primitives. The dark theme is a sensible inverted mapping.
 @immutable
 class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   const AppSemanticColors({
@@ -28,6 +31,35 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.textSecondary,
     required this.textTertiary,
     required this.textDisabled,
+    // ── PC v3 additions ───────────────────────────────────────────────────
+    required this.surfaceRecessed,
+    required this.hairline,
+    required this.accentPurple,
+    required this.accentPurpleTile,
+    required this.accentPeriwinkle,
+    required this.accentPeriwinkleTile,
+    required this.accentPeriwinkleChip,
+    required this.accentButter,
+    required this.accentButterTile,
+    required this.accentButterCream,
+    required this.accentBlush,
+    required this.accentBlushTile,
+    required this.accentMint,
+    required this.accentMintTile,
+    required this.statusNormalBg,
+    required this.statusNormalDot,
+    required this.statusNormalText,
+    required this.statusElevatedBg,
+    required this.statusElevatedDot,
+    required this.statusElevatedText,
+    required this.statusAlertBg,
+    required this.statusAlertDot,
+    required this.statusAlertText,
+    required this.statusActiveBg,
+    required this.statusActiveDot,
+    required this.statusActiveText,
+    required this.statusInvitedBg,
+    required this.statusInvitedText,
   });
 
   final Color primary;
@@ -49,56 +81,146 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color textSecondary;
   final Color textTertiary;
   final Color textDisabled;
+  // ── PC v3 additions ────────────────────────────────────────────────────
+  final Color surfaceRecessed;
+  final Color hairline;
+  final Color accentPurple;
+  final Color accentPurpleTile;
+  final Color accentPeriwinkle;
+  final Color accentPeriwinkleTile;
+  final Color accentPeriwinkleChip;
+  final Color accentButter;
+  final Color accentButterTile;
+  /// Warm cream tile (#E8E4D8) — toggle off-track, note callouts. Theme-
+  /// independent, like the other accent tiles.
+  final Color accentButterCream;
+  final Color accentBlush;
+  final Color accentBlushTile;
+  final Color accentMint;
+  final Color accentMintTile;
+  final Color statusNormalBg;
+  final Color statusNormalDot;
+  final Color statusNormalText;
+  final Color statusElevatedBg;
+  final Color statusElevatedDot;
+  final Color statusElevatedText;
+  final Color statusAlertBg;
+  final Color statusAlertDot;
+  final Color statusAlertText;
+  final Color statusActiveBg;
+  final Color statusActiveDot;
+  final Color statusActiveText;
+  // Invited (yellow) — pending invitation pill; no dot.
+  final Color statusInvitedBg;
+  final Color statusInvitedText;
 
-  // ── Light theme ──────────────────────────────────────────────────────────
+  // ── Light theme (Pet Circle v3 / Claude-Design) ──────────────────────────
   static const light = AppSemanticColors(
-    primary: AppPrimitives.primaryBase,
-    onPrimary: AppPrimitives.skyWhite,
-    primaryLight: AppPrimitives.primaryLight,
-    primaryLightest: AppPrimitives.primaryLightest,
-    surface: AppPrimitives.skyWhite,
-    onSurface: AppPrimitives.inkDarkest,
-    background: AppPrimitives.skyLightest,
-    onBackground: AppPrimitives.inkDarkest,
-    error: AppPrimitives.redBase,
-    onError: AppPrimitives.skyWhite,
-    success: AppPrimitives.greenBase,
-    warning: AppPrimitives.yellowBase,
-    info: AppPrimitives.blueBase,
-    divider: AppPrimitives.skyLight,
-    disabled: AppPrimitives.skyBase,
-    textPrimary: AppPrimitives.inkDarkest,
-    textSecondary: AppPrimitives.inkLight,
-    textTertiary: AppPrimitives.inkLighter,
-    textDisabled: AppPrimitives.skyDark,
+    primary: AppPrimitives.pcPurple,
+    onPrimary: AppPrimitives.pcSurface,
+    primaryLight: AppPrimitives.pcPurpleTile,
+    primaryLightest: AppPrimitives.pcRecessed,
+    surface: AppPrimitives.pcSurface,
+    onSurface: AppPrimitives.pcInk,
+    background: AppPrimitives.pcBg,
+    onBackground: AppPrimitives.pcInk,
+    error: AppPrimitives.pcBlush,
+    onError: AppPrimitives.pcSurface,
+    success: AppPrimitives.pcMint,
+    warning: AppPrimitives.pcButter,
+    info: AppPrimitives.pcPeriwinkle,
+    divider: AppPrimitives.pcHairline,
+    disabled: AppPrimitives.pcInkTertiary,
+    textPrimary: AppPrimitives.pcInk,
+    textSecondary: AppPrimitives.pcInkSecondary,
+    textTertiary: AppPrimitives.pcInkTertiary,
+    textDisabled: AppPrimitives.pcInkTertiary,
+    surfaceRecessed: AppPrimitives.pcRecessed,
+    hairline: AppPrimitives.pcHairline,
+    accentPurple: AppPrimitives.pcPurple,
+    accentPurpleTile: AppPrimitives.pcPurpleTile,
+    accentPeriwinkle: AppPrimitives.pcPeriwinkle,
+    accentPeriwinkleTile: AppPrimitives.pcPeriwinkleTile,
+    accentPeriwinkleChip: AppPrimitives.pcPeriwinkleChip,
+    accentButter: AppPrimitives.pcButter,
+    accentButterTile: AppPrimitives.pcButterTile,
+    accentButterCream: AppPrimitives.pcButterCream,
+    accentBlush: AppPrimitives.pcBlush,
+    accentBlushTile: AppPrimitives.pcBlushTile,
+    accentMint: AppPrimitives.pcMint,
+    accentMintTile: AppPrimitives.pcMintTile,
+    statusNormalBg: AppPrimitives.pcStatusNormalBg,
+    statusNormalDot: AppPrimitives.pcStatusNormalDot,
+    statusNormalText: AppPrimitives.pcStatusNormalText,
+    statusElevatedBg: AppPrimitives.pcStatusElevatedBg,
+    statusElevatedDot: AppPrimitives.pcStatusElevatedDot,
+    statusElevatedText: AppPrimitives.pcStatusElevatedText,
+    statusAlertBg: AppPrimitives.pcStatusAlertBg,
+    statusAlertDot: AppPrimitives.pcStatusAlertDot,
+    statusAlertText: AppPrimitives.pcStatusAlertText,
+    statusActiveBg: AppPrimitives.pcStatusActiveBg,
+    statusActiveDot: AppPrimitives.pcStatusActiveDot,
+    statusActiveText: AppPrimitives.pcStatusActiveText,
+    statusInvitedBg: AppPrimitives.yellowLightest,
+    statusInvitedText: AppPrimitives.yellowDarkest,
   );
 
-  // ── Dark theme ───────────────────────────────────────────────────────────
+  // ── Dark theme (inverted) ────────────────────────────────────────────────
   static const dark = AppSemanticColors(
-    primary: AppPrimitives.primaryLight,
-    onPrimary: AppPrimitives.inkDarkest,
-    primaryLight: AppPrimitives.primaryLighter,
-    primaryLightest: AppPrimitives.primaryDark,
+    primary: AppPrimitives.pcPurpleTile,
+    onPrimary: AppPrimitives.pcInk,
+    primaryLight: AppPrimitives.pcPurpleTile,
+    primaryLightest: AppPrimitives.inkDarker,
     surface: AppPrimitives.inkDarker,
-    onSurface: AppPrimitives.skyLightest,
+    onSurface: AppPrimitives.pcSurface,
     background: AppPrimitives.inkDarkest,
-    onBackground: AppPrimitives.skyLightest,
-    error: AppPrimitives.redLight,
-    onError: AppPrimitives.inkDarkest,
-    success: AppPrimitives.greenLight,
-    warning: AppPrimitives.yellowLight,
-    info: AppPrimitives.blueLight,
+    onBackground: AppPrimitives.pcSurface,
+    error: AppPrimitives.pcBlush,
+    onError: AppPrimitives.pcInk,
+    success: AppPrimitives.pcMint,
+    warning: AppPrimitives.pcButter,
+    info: AppPrimitives.pcPeriwinkle,
     divider: AppPrimitives.inkBase,
     disabled: AppPrimitives.inkDark,
-    textPrimary: AppPrimitives.skyLightest,
+    textPrimary: AppPrimitives.pcSurface,
     textSecondary: AppPrimitives.skyDark,
     textTertiary: AppPrimitives.skyBase,
     textDisabled: AppPrimitives.inkLighter,
+    surfaceRecessed: AppPrimitives.inkDark,
+    hairline: AppPrimitives.inkBase,
+    accentPurple: AppPrimitives.pcPurple,
+    accentPurpleTile: AppPrimitives.pcPurpleTile,
+    accentPeriwinkle: AppPrimitives.pcPeriwinkle,
+    accentPeriwinkleTile: AppPrimitives.pcPeriwinkleTile,
+    accentPeriwinkleChip: AppPrimitives.pcPeriwinkleChip,
+    accentButter: AppPrimitives.pcButter,
+    accentButterTile: AppPrimitives.pcButterTile,
+    accentButterCream: AppPrimitives.pcButterCream,
+    accentBlush: AppPrimitives.pcBlush,
+    accentBlushTile: AppPrimitives.pcBlushTile,
+    accentMint: AppPrimitives.pcMint,
+    accentMintTile: AppPrimitives.pcMintTile,
+    statusNormalBg: AppPrimitives.pcStatusNormalBg,
+    statusNormalDot: AppPrimitives.pcStatusNormalDot,
+    statusNormalText: AppPrimitives.pcStatusNormalText,
+    statusElevatedBg: AppPrimitives.pcStatusElevatedBg,
+    statusElevatedDot: AppPrimitives.pcStatusElevatedDot,
+    statusElevatedText: AppPrimitives.pcStatusElevatedText,
+    statusAlertBg: AppPrimitives.pcStatusAlertBg,
+    statusAlertDot: AppPrimitives.pcStatusAlertDot,
+    statusAlertText: AppPrimitives.pcStatusAlertText,
+    statusActiveBg: AppPrimitives.pcStatusActiveBg,
+    statusActiveDot: AppPrimitives.pcStatusActiveDot,
+    statusActiveText: AppPrimitives.pcStatusActiveText,
+    statusInvitedBg: AppPrimitives.yellowLightest,
+    statusInvitedText: AppPrimitives.yellowDarkest,
   );
 
-  /// Convenience accessor.
+  /// Convenience accessor. Falls back to [light] when no theme extension is
+  /// present (e.g. a bare `MaterialApp()` in a widget test) instead of
+  /// throwing on the null-check operator.
   static AppSemanticColors of(BuildContext context) =>
-      Theme.of(context).extension<AppSemanticColors>()!;
+      Theme.of(context).extension<AppSemanticColors>() ?? light;
 
   @override
   AppSemanticColors copyWith({
@@ -121,6 +243,34 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? textSecondary,
     Color? textTertiary,
     Color? textDisabled,
+    Color? surfaceRecessed,
+    Color? hairline,
+    Color? accentPurple,
+    Color? accentPurpleTile,
+    Color? accentPeriwinkle,
+    Color? accentPeriwinkleTile,
+    Color? accentPeriwinkleChip,
+    Color? accentButter,
+    Color? accentButterTile,
+    Color? accentButterCream,
+    Color? accentBlush,
+    Color? accentBlushTile,
+    Color? accentMint,
+    Color? accentMintTile,
+    Color? statusNormalBg,
+    Color? statusNormalDot,
+    Color? statusNormalText,
+    Color? statusElevatedBg,
+    Color? statusElevatedDot,
+    Color? statusElevatedText,
+    Color? statusAlertBg,
+    Color? statusAlertDot,
+    Color? statusAlertText,
+    Color? statusActiveBg,
+    Color? statusActiveDot,
+    Color? statusActiveText,
+    Color? statusInvitedBg,
+    Color? statusInvitedText,
   }) {
     return AppSemanticColors(
       primary: primary ?? this.primary,
@@ -142,6 +292,34 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       textSecondary: textSecondary ?? this.textSecondary,
       textTertiary: textTertiary ?? this.textTertiary,
       textDisabled: textDisabled ?? this.textDisabled,
+      surfaceRecessed: surfaceRecessed ?? this.surfaceRecessed,
+      hairline: hairline ?? this.hairline,
+      accentPurple: accentPurple ?? this.accentPurple,
+      accentPurpleTile: accentPurpleTile ?? this.accentPurpleTile,
+      accentPeriwinkle: accentPeriwinkle ?? this.accentPeriwinkle,
+      accentPeriwinkleTile: accentPeriwinkleTile ?? this.accentPeriwinkleTile,
+      accentPeriwinkleChip: accentPeriwinkleChip ?? this.accentPeriwinkleChip,
+      accentButter: accentButter ?? this.accentButter,
+      accentButterTile: accentButterTile ?? this.accentButterTile,
+      accentButterCream: accentButterCream ?? this.accentButterCream,
+      accentBlush: accentBlush ?? this.accentBlush,
+      accentBlushTile: accentBlushTile ?? this.accentBlushTile,
+      accentMint: accentMint ?? this.accentMint,
+      accentMintTile: accentMintTile ?? this.accentMintTile,
+      statusNormalBg: statusNormalBg ?? this.statusNormalBg,
+      statusNormalDot: statusNormalDot ?? this.statusNormalDot,
+      statusNormalText: statusNormalText ?? this.statusNormalText,
+      statusElevatedBg: statusElevatedBg ?? this.statusElevatedBg,
+      statusElevatedDot: statusElevatedDot ?? this.statusElevatedDot,
+      statusElevatedText: statusElevatedText ?? this.statusElevatedText,
+      statusAlertBg: statusAlertBg ?? this.statusAlertBg,
+      statusAlertDot: statusAlertDot ?? this.statusAlertDot,
+      statusAlertText: statusAlertText ?? this.statusAlertText,
+      statusActiveBg: statusActiveBg ?? this.statusActiveBg,
+      statusActiveDot: statusActiveDot ?? this.statusActiveDot,
+      statusActiveText: statusActiveText ?? this.statusActiveText,
+      statusInvitedBg: statusInvitedBg ?? this.statusInvitedBg,
+      statusInvitedText: statusInvitedText ?? this.statusInvitedText,
     );
   }
 
@@ -169,6 +347,49 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
       textTertiary: Color.lerp(textTertiary, other.textTertiary, t)!,
       textDisabled: Color.lerp(textDisabled, other.textDisabled, t)!,
+      surfaceRecessed:
+          Color.lerp(surfaceRecessed, other.surfaceRecessed, t)!,
+      hairline: Color.lerp(hairline, other.hairline, t)!,
+      accentPurple: Color.lerp(accentPurple, other.accentPurple, t)!,
+      accentPurpleTile:
+          Color.lerp(accentPurpleTile, other.accentPurpleTile, t)!,
+      accentPeriwinkle:
+          Color.lerp(accentPeriwinkle, other.accentPeriwinkle, t)!,
+      accentPeriwinkleTile:
+          Color.lerp(accentPeriwinkleTile, other.accentPeriwinkleTile, t)!,
+      accentPeriwinkleChip:
+          Color.lerp(accentPeriwinkleChip, other.accentPeriwinkleChip, t)!,
+      accentButter: Color.lerp(accentButter, other.accentButter, t)!,
+      accentButterTile:
+          Color.lerp(accentButterTile, other.accentButterTile, t)!,
+      accentButterCream:
+          Color.lerp(accentButterCream, other.accentButterCream, t)!,
+      accentBlush: Color.lerp(accentBlush, other.accentBlush, t)!,
+      accentBlushTile:
+          Color.lerp(accentBlushTile, other.accentBlushTile, t)!,
+      accentMint: Color.lerp(accentMint, other.accentMint, t)!,
+      accentMintTile: Color.lerp(accentMintTile, other.accentMintTile, t)!,
+      statusNormalBg: Color.lerp(statusNormalBg, other.statusNormalBg, t)!,
+      statusNormalDot: Color.lerp(statusNormalDot, other.statusNormalDot, t)!,
+      statusNormalText:
+          Color.lerp(statusNormalText, other.statusNormalText, t)!,
+      statusElevatedBg:
+          Color.lerp(statusElevatedBg, other.statusElevatedBg, t)!,
+      statusElevatedDot:
+          Color.lerp(statusElevatedDot, other.statusElevatedDot, t)!,
+      statusElevatedText:
+          Color.lerp(statusElevatedText, other.statusElevatedText, t)!,
+      statusAlertBg: Color.lerp(statusAlertBg, other.statusAlertBg, t)!,
+      statusAlertDot: Color.lerp(statusAlertDot, other.statusAlertDot, t)!,
+      statusAlertText:
+          Color.lerp(statusAlertText, other.statusAlertText, t)!,
+      statusActiveBg: Color.lerp(statusActiveBg, other.statusActiveBg, t)!,
+      statusActiveDot: Color.lerp(statusActiveDot, other.statusActiveDot, t)!,
+      statusActiveText:
+          Color.lerp(statusActiveText, other.statusActiveText, t)!,
+      statusInvitedBg: Color.lerp(statusInvitedBg, other.statusInvitedBg, t)!,
+      statusInvitedText:
+          Color.lerp(statusInvitedText, other.statusInvitedText, t)!,
     );
   }
 }

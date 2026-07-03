@@ -159,6 +159,8 @@
   "failedToSendEmail": "שליחת האימייל נכשלה",
 
   "bpm": "BPM",
+  "petCardSubtitle": "{breed} · SPR {bpm} bpm",
+  "@petCardSubtitle": { "placeholders": { "breed": { "type": "String" }, "bpm": { "type": "int" } } },
   "clinicOverview": "סקירת מרפאה",
   "patientsInYourCare": "{count} מטופלים בטיפולך",
   "@patientsInYourCare": { "placeholders": { "count": { "type": "int" } } },

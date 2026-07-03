@@ -59,7 +59,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         breedAndAge: '$breedAge${_age.isNotEmpty ? " • $_age" : ""}',
         imageUrl: AppAssets.petPlaceholder,
         statusLabel: 'Normal',
-        statusColorHex: AppPrimitives.blueLight.toARGB32(),
+        statusColorHex: AppPrimitives.pcPeriwinkle.toARGB32(),
         latestMeasurement: Measurement(bpm: 0, recordedAt: DateTime.now(), recordedAtLabel: 'No measurements yet'),
         careCircle: [ownerMember],
         diagnosis: _diagnosis.isNotEmpty ? _diagnosis : null,

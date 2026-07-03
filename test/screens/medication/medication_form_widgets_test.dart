@@ -298,7 +298,9 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(DropdownButton<String>));
+      // Tap the trigger (the currently selected value) to open the
+      // inline AppDropdown option list.
+      await tester.tap(find.text('Once daily'));
       await tester.pumpAndSettle();
 
       expect(find.text('Twice daily'), findsOneWidget);
@@ -319,12 +321,14 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(DropdownButton<String>));
+      // Open the inline option list, then choose a new option.
+      await tester.tap(find.text('Once daily'));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Twice daily').last);
       await tester.pumpAndSettle();
 
+      // onChanged reports the canonical (non-localised) value.
       expect(selected, 'Twice daily');
     });
   });

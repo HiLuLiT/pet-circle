@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/app_dropdown.dart';
+import 'package:pet_circle/widgets/note_callout.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep2 extends StatefulWidget {
@@ -64,7 +65,6 @@ class _OnboardingStep2State extends State<OnboardingStep2>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppSemanticColors.of(context);
     super.build(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
@@ -84,118 +84,27 @@ class _OnboardingStep2State extends State<OnboardingStep2>
             style: AppSemanticTextStyles.body,
           ),
           const SizedBox(height: AppSpacingTokens.md),
-          Text(
-            l10n.diagnosisOptional,
-            style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: AppSpacingTokens.sm),
-          GestureDetector(
+          AppDropdown(
+            label: l10n.diagnosisOptional,
+            value: _selectedDiagnosis,
+            placeholder: l10n.selectDiagnosis,
             onTap: _toggleDropdown,
-            child: Container(
-              height: 36,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: c.surface,
-                borderRadius: AppRadiiTokens.borderRadiusLg,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      _selectedDiagnosis ?? l10n.selectDiagnosis,
-                      style: AppSemanticTextStyles.body.copyWith(
-                        color: _selectedDiagnosis == null
-                            ? c.textTertiary
-                            : c.textPrimary,
-                      ),
-                    ),
-                  ),
-                  RotationTransition(
-                    turns: Tween(begin: 0.0, end: 0.5).animate(
-                      CurvedAnimation(
-                        parent: _chevronController,
-                        curve: Curves.easeInOut,
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.keyboard_arrow_down,
-                      color: c.textPrimary,
-                      size: 18,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            isOpen: _isOpen,
+            chevronController: _chevronController,
+            options: _diagnoses,
+            onOptionSelected: (diagnosis) {
+              setState(() {
+                _selectedDiagnosis = diagnosis;
+                _isOpen = false;
+              });
+              _chevronController.reverse();
+              widget.onDiagnosisChanged?.call(diagnosis);
+            },
           ),
-          if (_isOpen)
-            Container(
-              margin: const EdgeInsets.only(top: AppSpacingTokens.sm),
-              padding: const EdgeInsets.symmetric(vertical: AppSpacingTokens.sm),
-              decoration: BoxDecoration(
-                color: c.surface,
-                borderRadius: AppRadiiTokens.borderRadiusLg,
-              ),
-              child: Column(
-                children: _diagnoses.map((diagnosis) {
-                  final isSelected = diagnosis == _selectedDiagnosis;
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedDiagnosis = diagnosis;
-                        _isOpen = false;
-                      });
-                      _chevronController.reverse();
-                      widget.onDiagnosisChanged?.call(diagnosis);
-                    },
-                    child: Container(
-                      width: double.infinity,
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: AppSpacingTokens.sm,
-                        vertical: AppSpacingTokens.xs,
-                      ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: AppSpacingTokens.sm,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            isSelected ? c.warning.withValues(alpha: 0.2) : Colors.transparent,
-                        borderRadius: AppRadiiTokens.borderRadiusLg,
-                      ),
-                      child: Text(
-                        diagnosis,
-                        style: AppSemanticTextStyles.body.copyWith(
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.w400,
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
           const SizedBox(height: AppSpacingTokens.md),
-          Container(
-            padding: const EdgeInsets.all(AppSpacingTokens.md),
-            decoration: BoxDecoration(
-              color: c.surface,
-              borderRadius: AppRadiiTokens.borderRadiusLg,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.note,
-                  style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: AppSpacingTokens.xs),
-                Text(
-                  l10n.diagnosisNote,
-                  style: AppSemanticTextStyles.body,
-                ),
-              ],
-            ),
+          NoteCallout(
+            title: l10n.note,
+            body: l10n.diagnosisNote,
           ),
         ],
       ),
