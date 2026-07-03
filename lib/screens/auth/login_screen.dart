@@ -10,6 +10,7 @@ import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/app_input_decoration.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/social_button.dart';
 
@@ -113,34 +114,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  InputDecoration _inputDecoration(AppSemanticColors c, {required String hintText}) {
-    return InputDecoration(
-      filled: true,
-      fillColor: c.surface,
-      hintText: hintText,
-      hintStyle: AppSemanticTextStyles.body.copyWith(color: c.textTertiary),
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacingTokens.md,
-        vertical: 14,
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-        borderSide: BorderSide(color: c.divider),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-        borderSide: BorderSide(color: c.primary, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-        borderSide: BorderSide(color: c.error),
-      ),
-      focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-        borderSide: BorderSide(color: c.error, width: 2),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -204,8 +177,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           textInputAction: TextInputAction.done,
-                          decoration: _inputDecoration(
-                            c,
+                          decoration: appInputDecoration(
+                            context,
                             hintText: l10n.enterYourEmail,
                           ),
                           style: AppSemanticTextStyles.body,

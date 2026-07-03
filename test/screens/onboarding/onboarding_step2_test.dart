@@ -172,7 +172,9 @@ void main() {
       await tester.tap(find.text('Select diagnosis'));
       await tester.pumpAndSettle();
 
-      // Select "Diagnosis 01"
+      // Scroll to make the diagnosis option visible, then tap it
+      await tester.ensureVisible(find.text('Diagnosis 01'));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('Diagnosis 01'));
       await tester.pumpAndSettle();
 

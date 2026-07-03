@@ -7,6 +7,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/app_dropdown.dart';
+import 'package:pet_circle/widgets/app_input_decoration.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 enum _VetLookupState { idle, loading, foundVet, notVet, notFound }
@@ -580,22 +581,9 @@ class _VetEmailInput extends StatelessWidget {
                   controller: controller,
                   keyboardType: TextInputType.emailAddress,
                   onSubmitted: (_) => onLookUp(),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: c.surface,
+                  decoration: appInputDecoration(
+                    context,
                     hintText: 'vet@clinic.com',
-                    hintStyle: AppSemanticTextStyles.body
-                        .copyWith(color: c.textTertiary),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: AppRadiiTokens.borderRadiusSm,
-                      borderSide: BorderSide(color: c.divider),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: AppRadiiTokens.borderRadiusSm,
-                      borderSide: BorderSide(color: c.primary, width: 2),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
                   ),
                   style: AppSemanticTextStyles.body,
                 ),
@@ -697,7 +685,6 @@ class _InputRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -709,23 +696,9 @@ class _InputRow extends StatelessWidget {
           child: TextField(
             controller: controller,
             keyboardType: TextInputType.emailAddress,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: c.surface,
+            decoration: appInputDecoration(
+              context,
               hintText: hint,
-              hintStyle: AppSemanticTextStyles.body.copyWith(
-                color: c.textTertiary,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: AppRadiiTokens.borderRadiusSm,
-                borderSide: BorderSide(color: c.divider),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: AppRadiiTokens.borderRadiusSm,
-                borderSide: BorderSide(color: c.primary, width: 2),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             ),
             style: AppSemanticTextStyles.body,
           ),

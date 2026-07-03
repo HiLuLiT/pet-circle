@@ -29,11 +29,11 @@ class AppRadiiTokens {
   AppRadiiTokens._();
 
   // ── PC v3: semantic radii ────────────────────────────────────────────────
-  /// Field (inputs, selects) — 14
-  static const double pcField = 14;
+  /// Field (inputs, selects, chips) — 12, per Figma DS node 402-1191.
+  static const double pcField = 12;
 
-  /// Card — 18
-  static const double pcCard = 18;
+  /// Card — 16, per Figma DS node 402-1191.
+  static const double pcCard = 16;
 
   /// Tile (large rounded surfaces) — 30
   static const double pcTile = 30;

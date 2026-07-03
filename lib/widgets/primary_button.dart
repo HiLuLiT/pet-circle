@@ -4,12 +4,13 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/theme/tokens/typography.dart';
 
-/// Variants for the Pet Circle v3 / Claude-Design button.
+/// Variants for the Pet Circle v3 / Claude-Design button — matches the
+/// Figma DS "Button" component (node 442:8188, DS node 402-1191).
 ///
-/// - [filled] (alias: primary): ink (#161616) bg, white fg, weight 700.
-/// - [secondary]: purpleTile (#C3AEF0) bg, ink fg, weight 700.
-/// - [outlined] (alias: tertiary): white surface bg, ink fg, hairline 1px
-///   inset border, weight 600.
+/// - [filled] (alias: primary): purple (#7E5CE0) bg, white fg, Bold 16/22.
+/// - [secondary]: purpleTile (#C3AEF0) bg, ink fg, Bold 16/22.
+/// - [outlined] (alias: tertiary): transparent bg, ink fg, 1px ink border,
+///   Bold 16/22 (matches DS Tertiary — NOT a filled/hairline surface).
 /// - [link] (Figma 442:8683): no bg, no border, intrinsic size. Ink text,
 ///   SemiBold 14/20. Optional leading/trailing icons (20px, 4px gap).
 ///   Never full-width or 56h.
@@ -18,21 +19,21 @@ import 'package:pet_circle/theme/tokens/typography.dart';
 ///   (20px, 8px gap). Not full-width by default.
 enum PrimaryButtonVariant { filled, secondary, outlined, link, miniPrimary }
 
-/// Pill-shaped button matching the React/Figma "Button" component in the
-/// PC v3 (Claude-Design) palette.
+/// Pill-shaped button matching the Figma DS "Button" component (node
+/// 442:8188) in the PC v3 (Claude-Design) palette.
 ///
-/// Spec: height 56, horizontal padding 26, fully-rounded pill, fontSize 16.
-/// - filled/primary  : bg = onSurface (ink), fg = surface (white), 700
-/// - secondary       : bg = accentPurpleTile, fg = onSurface (ink), 700
-/// - outlined/tertiary: bg = surface (white), fg = onSurface (ink),
-///                      1px hairline border, 600 weight, no shadow
-/// - disabled        : bg = #E2DED5, fg = #A7A2AE
+/// Spec: ~54h (padding 32x16), fully-rounded pill, fontSize 16 Bold 16/22.
+/// - filled/primary   : bg = primary (purple), fg = onPrimary (white)
+/// - secondary        : bg = accentPurpleTile, fg = onSurface (ink)
+/// - outlined/tertiary: transparent bg, fg = onSurface (ink),
+///                      1px ink border, no shadow
+/// - disabled         : bg = #E2DED5, fg = #A7A2AE
 ///
-/// Optional [icon] (leading) and [trailingIcon] flank the [label], with an
-/// 8px gap. [child] fully overrides the inner content. The public API
-/// preserves the previous fields ([backgroundColor], [foregroundColor],
-/// [textStyle], [borderRadius], [fullWidth]) for backwards compatibility
-/// with existing call sites.
+/// Optional [icon] (leading) and [trailingIcon] flank the [label]. [child]
+/// fully overrides the inner content. The public API preserves the
+/// previous fields ([backgroundColor], [foregroundColor], [textStyle],
+/// [borderRadius], [fullWidth]) for backwards compatibility with existing
+/// call sites.
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
@@ -86,11 +87,10 @@ class PrimaryButton extends StatelessWidget {
   static const Color _disabledBg = Color(0xFFE2DED5);
   static const Color _disabledFg = Color(0xFFA7A2AE);
 
-  // Spec: 16px / 600 weight for tertiary (outlined). Defined here because
-  // there's no semantic style with exactly this combo (pcBodyBold is 700,
-  // pcBodyMedium is 500).
+  // DS Tertiary label style matches Primary/Secondary: Bold 16/22
+  // (AppSemanticTextStyles.pcButton), just with a different fg color.
   static TextStyle _outlinedLabelStyle(Color fg) =>
-      AppTypography.pcBodySemibold.copyWith(color: fg, height: 1.0);
+      AppSemanticTextStyles.pcButton.copyWith(color: fg);
 
   // SemiBold 14 / lineHeight 20 — the label style shared by the new
   // [link] and [miniPrimary] variants. Height collapsed to 1.0 to match the
@@ -118,15 +118,16 @@ class PrimaryButton extends StatelessWidget {
     final Color defaultBg;
     final Color defaultFg;
     if (isOutlined) {
-      defaultBg = c.surface;
+      // DS Tertiary: transparent bg, ink border/text (not a filled surface).
+      defaultBg = Colors.transparent;
       defaultFg = c.onSurface;
     } else if (isSecondary) {
       defaultBg = c.accentPurpleTile;
       defaultFg = c.onSurface;
     } else {
-      // filled / primary
-      defaultBg = c.onSurface;
-      defaultFg = c.surface;
+      // filled / primary — DS Primary is purple, not ink.
+      defaultBg = c.primary;
+      defaultFg = c.onPrimary;
     }
 
     final bg = backgroundColor ?? defaultBg;
@@ -135,14 +136,16 @@ class PrimaryButton extends StatelessWidget {
     final effectiveFg = isEnabled ? fg : _disabledFg;
     final isFullWidth = _resolveFullWidth();
 
-    // ── Label style ─────────────────────────────────────────────────────────
+    // ── Label style — DS Button text is Bold 16/22 for every fill variant ───
     final TextStyle baseStyle = isOutlined
         ? _outlinedLabelStyle(effectiveFg)
-        : AppSemanticTextStyles.pcBodyBold.copyWith(
-            color: effectiveFg,
-            height: 1.0,
-          );
+        : AppSemanticTextStyles.pcButton.copyWith(color: effectiveFg);
     final style = textStyle?.copyWith(color: effectiveFg) ?? baseStyle;
+
+    // Icon gap matches DS: 16px for Primary/Secondary, 12px for Tertiary.
+    final double iconGap = isOutlined
+        ? AppSpacingTokens.sm + 4 // 12px
+        : AppSpacingTokens.md; // 16px
 
     // ── Inner content ───────────────────────────────────────────────────────
     final Widget buttonChild = child ??
@@ -151,8 +154,8 @@ class PrimaryButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (icon != null) ...[
-              Icon(icon, color: effectiveFg, size: 20),
-              const SizedBox(width: AppSpacingTokens.sm), // 8px gap
+              Icon(icon, color: effectiveFg, size: 24),
+              SizedBox(width: iconGap),
             ],
             Flexible(
               child: Text(
@@ -163,18 +166,18 @@ class PrimaryButton extends StatelessWidget {
               ),
             ),
             if (trailingIcon != null) ...[
-              const SizedBox(width: AppSpacingTokens.sm), // 8px gap
+              SizedBox(width: iconGap),
               IconTheme.merge(
-                data: IconThemeData(color: effectiveFg, size: 20),
+                data: IconThemeData(color: effectiveFg, size: 24),
                 child: trailingIcon!,
               ),
             ],
           ],
         );
 
-    // ── Style: pill, 56h, 0x26 padding, optional hairline border ────────────
+    // ── Style: pill, ~54h (32x16 padding), optional 1px ink border ──────────
     final BorderSide borderSide = isOutlined
-        ? BorderSide(color: c.hairline, width: 1.0)
+        ? BorderSide(color: c.onSurface, width: 1.0)
         : BorderSide.none;
 
     final ButtonStyle bStyle = TextButton.styleFrom(
@@ -182,9 +185,9 @@ class PrimaryButton extends StatelessWidget {
       disabledBackgroundColor: _disabledBg,
       foregroundColor: effectiveFg,
       disabledForegroundColor: _disabledFg,
-      padding: const EdgeInsets.symmetric(horizontal: 26),
-      minimumSize: const Size(0, 56),
-      fixedSize: const Size.fromHeight(56),
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+      minimumSize: const Size(0, 54),
+      fixedSize: const Size.fromHeight(54),
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
       visualDensity: VisualDensity.compact,
       side: borderSide,

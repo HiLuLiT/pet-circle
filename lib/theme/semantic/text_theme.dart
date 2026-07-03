@@ -14,28 +14,51 @@ class AppSemanticTextStyles {
   AppSemanticTextStyles._();
 
   // ═══════════════════════════════════════════════════════════════════════
-  // PC v3 — Claude-Design semantic scale (use for new code)
+  // PC v3 — Claude-Design semantic scale, matches Figma DS node 402-1191
+  // (use for new code)
   // ═══════════════════════════════════════════════════════════════════════
 
-  // ── Display (34px) ──────────────────────────────────────────────────────
-  static final TextStyle pcDisplay = AppTypography.pcDisplayBold.copyWith(
+  // ── Display ─────────────────────────────────────────────────────────────
+  static final TextStyle pcDisplayXxl = AppTypography.pcDisplayXxlBold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+  static final TextStyle pcDisplayXl = AppTypography.pcDisplayXlBold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+  static final TextStyle pcDisplayL = AppTypography.pcDisplayLBold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+  static final TextStyle pcDisplay = AppTypography.pcDisplayMBold.copyWith(
     color: AppPrimitives.pcInk,
   );
 
-  // ── Title (19px) ────────────────────────────────────────────────────────
-  static final TextStyle pcTitle = AppTypography.pcTitleBold.copyWith(
+  // ── Heading ─────────────────────────────────────────────────────────────
+  static final TextStyle headingH1 = AppTypography.pcHeadingH1Bold.copyWith(
     color: AppPrimitives.pcInk,
   );
+  static final TextStyle headingH2 = AppTypography.pcHeadingH2Bold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+  static final TextStyle headingXs = AppTypography.pcHeadingXsBold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+
+  // ── Title — retired DS-less 19px scale; now maps onto Heading ───────────
+  static final TextStyle pcTitle = headingXs;
   static final TextStyle pcTitleSecondary =
-      AppTypography.pcTitleSemibold.copyWith(
+      AppTypography.pcLabelLSemibold.copyWith(
     color: AppPrimitives.pcInkSecondary,
   );
 
-  // ── Body (16px) ─────────────────────────────────────────────────────────
+  // ── Body (16px / line-height 24) ────────────────────────────────────────
   static final TextStyle pcBody = AppTypography.pcBodyRegular.copyWith(
     color: AppPrimitives.pcInk,
   );
   static final TextStyle pcBodyMedium = AppTypography.pcBodyMedium.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+  static final TextStyle pcBodySemibold =
+      AppTypography.pcBodySemibold.copyWith(
     color: AppPrimitives.pcInk,
   );
   static final TextStyle pcBodyBold = AppTypography.pcBodyBold.copyWith(
@@ -45,18 +68,55 @@ class AppSemanticTextStyles {
     color: AppPrimitives.pcInkSecondary,
   );
 
-  // ── Label (14px) ────────────────────────────────────────────────────────
+  // ── Label / L (15px) ────────────────────────────────────────────────────
+  static final TextStyle labelLBold = AppTypography.pcLabelLBold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+  static final TextStyle labelLSemibold =
+      AppTypography.pcLabelLSemibold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+  static final TextStyle labelLRegular =
+      AppTypography.pcLabelLRegular.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+
+  // ── Label / M (14px) ────────────────────────────────────────────────────
   static final TextStyle pcLabel = AppTypography.pcLabelMedium.copyWith(
     color: AppPrimitives.pcInk,
   );
   static final TextStyle pcLabelBold = AppTypography.pcLabelBold.copyWith(
     color: AppPrimitives.pcInk,
   );
+  static final TextStyle labelMSemibold =
+      AppTypography.pcLabelSemibold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
   static final TextStyle pcLabelMuted = AppTypography.pcLabelRegular.copyWith(
     color: AppPrimitives.pcInkSecondary,
   );
 
-  // ── Caption (13px) ──────────────────────────────────────────────────────
+  // ── Label / S (13px) ────────────────────────────────────────────────────
+  static final TextStyle labelSBold = AppTypography.pcLabelSBold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+  static final TextStyle labelSSemibold =
+      AppTypography.pcLabelSSemibold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+  static final TextStyle labelSRegular =
+      AppTypography.pcLabelSRegular.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+
+  // ── Caption (12px / line-height 16) ─────────────────────────────────────
+  static final TextStyle captionBold = AppTypography.pcCaptionBold.copyWith(
+    color: AppPrimitives.pcInk,
+  );
+  static final TextStyle captionMedium =
+      AppTypography.pcCaptionMedium.copyWith(
+    color: AppPrimitives.pcInkSecondary,
+  );
   static final TextStyle pcCaption =
       AppTypography.pcCaptionRegular.copyWith(
     color: AppPrimitives.pcInkSecondary,
@@ -66,36 +126,39 @@ class AppSemanticTextStyles {
     color: AppPrimitives.pcInkTertiary,
   );
 
-  // ── Button (16px medium) ────────────────────────────────────────────────
-  static final TextStyle pcButton = AppTypography.pcBodyBold.copyWith(
+  // ── Button (16px bold, matches DS Button component text) ───────────────
+  static final TextStyle pcButton = AppTypography.pcHeadingXsBold.copyWith(
     color: AppPrimitives.pcInk,
     height: 1.0,
   );
 
   // ═══════════════════════════════════════════════════════════════════════
-  // Legacy semantic styles (retinted to pcInk — sizes kept for compat)
+  // Legacy semantic styles — retargeted onto the DS-aligned pc* primitives
+  // above (nearest matching size/weight) so old call sites keep compiling
+  // while converging on one canonical scale. Names/sizes kept for compat.
   // ═══════════════════════════════════════════════════════════════════════
 
   // ── Titles ───────────────────────────────────────────────────────────────
-  static final TextStyle title1 = AppTypography.title1NormalBold.copyWith(
+  static final TextStyle title1 = AppTypography.pcDisplayXlBold.copyWith(
     color: AppPrimitives.pcInk,
   );
 
-  static final TextStyle title2 = AppTypography.title2NormalBold.copyWith(
+  static final TextStyle title2 = AppTypography.pcDisplayLBold.copyWith(
     color: AppPrimitives.pcInk,
   );
 
-  static final TextStyle title3 = AppTypography.title3NormalBold.copyWith(
+  // Exact DS match — Heading/H1 (24/32, -0.3), confirmed against the Figma
+  // "Create an account" instance.
+  static final TextStyle title3 = AppTypography.pcHeadingH1Bold.copyWith(
     color: AppPrimitives.pcInk,
   );
 
   // ── Headings ─────────────────────────────────────────────────────────────
-  static final TextStyle headingLg = AppTypography.largeNormalBold.copyWith(
+  static final TextStyle headingLg = AppTypography.pcHeadingH2Bold.copyWith(
     color: AppPrimitives.pcInk,
   );
 
-  static final TextStyle headingMd =
-      AppTypography.regularNormalBold.copyWith(
+  static final TextStyle headingMd = AppTypography.pcHeadingXsBold.copyWith(
     color: AppPrimitives.pcInk,
   );
 
@@ -105,38 +168,40 @@ class AppSemanticTextStyles {
     color: AppPrimitives.pcInk,
   );
 
-  static final TextStyle body =
-      AppTypography.regularNormalRegular.copyWith(
+  // Exact DS match — Body/Regular (16/24).
+  static final TextStyle body = AppTypography.pcBodyRegular.copyWith(
     color: AppPrimitives.pcInk,
   );
 
-  static final TextStyle bodySm =
-      AppTypography.smallNormalRegular.copyWith(
+  // Exact DS match — Label/M Regular (14/20).
+  static final TextStyle bodySm = AppTypography.pcLabelRegular.copyWith(
     color: AppPrimitives.pcInk,
   );
 
-  static final TextStyle bodyMuted =
-      AppTypography.regularNormalRegular.copyWith(
+  static final TextStyle bodyMuted = AppTypography.pcBodyRegular.copyWith(
     color: AppPrimitives.pcInkSecondary,
   );
 
   // ── Labels ───────────────────────────────────────────────────────────────
-  static final TextStyle label = AppTypography.smallNoneBold.copyWith(
+  // DS match — Label/M Bold (14/20).
+  static final TextStyle label = AppTypography.pcLabelBold.copyWith(
     color: AppPrimitives.pcInk,
   );
 
-  static final TextStyle labelSm = AppTypography.tinyNoneBold.copyWith(
+  // DS match — Caption/Bold (12/16).
+  static final TextStyle labelSm = AppTypography.pcCaptionBold.copyWith(
     color: AppPrimitives.pcInk,
   );
 
   // ── Button ───────────────────────────────────────────────────────────────
-  static final TextStyle button =
-      AppTypography.regularNoneMedium.copyWith(
+  // DS match — the Button component's text style (Heading/XS Bold, 16/22).
+  static final TextStyle button = AppTypography.pcHeadingXsBold.copyWith(
     color: AppPrimitives.pcInk,
   );
 
   // ── Caption ──────────────────────────────────────────────────────────────
-  static final TextStyle caption = AppTypography.tinyNoneRegular.copyWith(
+  // DS match — Caption/Regular (12/16).
+  static final TextStyle caption = AppTypography.pcCaptionRegular.copyWith(
     color: AppPrimitives.pcInk,
   );
 }

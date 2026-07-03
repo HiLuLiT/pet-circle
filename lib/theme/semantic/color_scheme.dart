@@ -16,6 +16,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.onPrimary,
     required this.primaryLight,
     required this.primaryLightest,
+    required this.primaryGhost,
     required this.surface,
     required this.onSurface,
     required this.background,
@@ -66,6 +67,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color onPrimary;
   final Color primaryLight;
   final Color primaryLightest;
+  /// Candy/Purple/Ghost (#E7E7FF) — pale wash for avatar tiles / icon
+  /// backdrops. Distinct from [primaryLightest] (recessed surface wash).
+  final Color primaryGhost;
   final Color surface;
   final Color onSurface;
   final Color background;
@@ -120,6 +124,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     onPrimary: AppPrimitives.pcSurface,
     primaryLight: AppPrimitives.pcPurpleTile,
     primaryLightest: AppPrimitives.pcRecessed,
+    primaryGhost: AppPrimitives.pcPurpleGhost,
     surface: AppPrimitives.pcSurface,
     onSurface: AppPrimitives.pcInk,
     background: AppPrimitives.pcBg,
@@ -171,6 +176,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     onPrimary: AppPrimitives.pcInk,
     primaryLight: AppPrimitives.pcPurpleTile,
     primaryLightest: AppPrimitives.inkDarker,
+    primaryGhost: AppPrimitives.inkDark,
     surface: AppPrimitives.inkDarker,
     onSurface: AppPrimitives.pcSurface,
     background: AppPrimitives.inkDarkest,
@@ -228,6 +234,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? onPrimary,
     Color? primaryLight,
     Color? primaryLightest,
+    Color? primaryGhost,
     Color? surface,
     Color? onSurface,
     Color? background,
@@ -277,6 +284,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       onPrimary: onPrimary ?? this.onPrimary,
       primaryLight: primaryLight ?? this.primaryLight,
       primaryLightest: primaryLightest ?? this.primaryLightest,
+      primaryGhost: primaryGhost ?? this.primaryGhost,
       surface: surface ?? this.surface,
       onSurface: onSurface ?? this.onSurface,
       background: background ?? this.background,
@@ -332,6 +340,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       primaryLight: Color.lerp(primaryLight, other.primaryLight, t)!,
       primaryLightest:
           Color.lerp(primaryLightest, other.primaryLightest, t)!,
+      primaryGhost: Color.lerp(primaryGhost, other.primaryGhost, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
       onSurface: Color.lerp(onSurface, other.onSurface, t)!,
       background: Color.lerp(background, other.background, t)!,

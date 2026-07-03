@@ -4,6 +4,7 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/app_input_decoration.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 import 'package:pet_circle/widgets/radio_card.dart';
 
@@ -116,24 +117,9 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
                         final rate = int.tryParse(value);
                         if (rate != null) widget.onTargetRateChanged?.call(rate);
                       },
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: c.background,
+                      decoration: appInputDecoration(
+                        context,
                         hintText: l10n.enterBpm,
-                        hintStyle: AppSemanticTextStyles.body
-                            .copyWith(color: c.textTertiary),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: AppRadiiTokens.borderRadiusLg,
-                          borderSide: BorderSide(color: c.divider),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: AppRadiiTokens.borderRadiusLg,
-                          borderSide: BorderSide(color: c.primary, width: 2),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacingTokens.md,
-                          vertical: 14,
-                        ),
                       ),
                       style: AppSemanticTextStyles.body.copyWith(
                         fontWeight: FontWeight.w600,

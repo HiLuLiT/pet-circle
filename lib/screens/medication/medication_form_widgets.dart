@@ -4,6 +4,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/app_dropdown.dart';
+import 'package:pet_circle/widgets/app_input_decoration.dart';
 import 'package:pet_circle/widgets/toggle_pill.dart';
 
 class ValidatedFormField extends StatelessWidget {
@@ -37,17 +38,7 @@ class ValidatedFormField extends StatelessWidget {
           validator: validator,
           keyboardType: keyboardType,
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: c.background,
-            hintText: hint,
-            hintStyle: AppSemanticTextStyles.body
-                .copyWith(color: c.textPrimary.withValues(alpha: 0.3)),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-                borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacingTokens.sm + 4, vertical: AppSpacingTokens.xs),
+          decoration: appInputDecoration(context, hintText: hint).copyWith(
             errorStyle: AppSemanticTextStyles.caption.copyWith(color: c.error),
           ),
         ),
@@ -87,19 +78,10 @@ class DatePickerField extends StatelessWidget {
           onTap: onTap,
           validator: validator,
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: c.background,
-            hintText: l10n.dateFormatHint,
-            hintStyle: AppSemanticTextStyles.body
-                .copyWith(color: c.textPrimary.withValues(alpha: 0.3)),
+          decoration: appInputDecoration(context, hintText: l10n.dateFormatHint)
+              .copyWith(
             suffixIcon: Icon(Icons.calendar_today,
                 size: 18, color: c.textPrimary.withValues(alpha: 0.5)),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-                borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacingTokens.sm + 4, vertical: AppSpacingTokens.xs),
             errorStyle: AppSemanticTextStyles.caption.copyWith(color: c.error),
           ),
         ),
@@ -199,16 +181,7 @@ class ValidatedTextArea extends StatelessWidget {
         TextFormField(
           controller: controller,
           maxLines: 3,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: c.background,
-            hintText: hint,
-            hintStyle: AppSemanticTextStyles.body
-                .copyWith(color: c.textPrimary.withValues(alpha: 0.3)),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-                borderSide: BorderSide.none),
-            contentPadding: const EdgeInsets.all(AppSpacingTokens.sm + 4),
+          decoration: appInputDecoration(context, hintText: hint).copyWith(
             errorStyle: AppSemanticTextStyles.caption.copyWith(color: c.error),
           ),
         ),

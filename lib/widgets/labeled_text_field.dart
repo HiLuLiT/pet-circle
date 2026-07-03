@@ -2,18 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/app_input_decoration.dart';
 
 /// Labeled text field — Pet Circle v3 / Claude-Design palette port of the
-/// React `TextInput` component.
+/// Figma DS "Input" component (node 465:3730, DS node 402-1191).
 ///
-/// Visuals (per Figma TextInput):
+/// Visuals (per Figma DS Input):
 ///   - Height 54
 ///   - Background = `surface` (white)
-///   - Radius = `AppRadiiTokens.pcField` (14)
-///   - Padding 0px vertical, 16px horizontal
+///   - Radius = `AppRadiiTokens.pcField` (12)
+///   - Padding 16px on all sides (see [appInputDecoration])
 ///   - Text style = `AppSemanticTextStyles.pcBody` (16px Instrument Sans, ink)
-///   - Border = 1px `hairline` on enabled/idle
-///   - Focus = 3px `accentPurple` ring (approximating the React focus shadow)
+///   - No border on idle/enabled — matches the DS's borderless white field
+///   - Focus = 2px `primary` ring (accessible affordance not in the static
+///     DS mock)
+///   - Label = `AppSemanticTextStyles.labelMSemibold` (14/20 SemiBold) —
+///     matches the DS "Full name" label sample exactly
 class LabeledTextField extends StatelessWidget {
   const LabeledTextField({
     super.key,
@@ -33,24 +37,13 @@ class LabeledTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
-    final fieldRadius = BorderRadius.circular(AppRadiiTokens.pcField);
-
-    final idleBorder = OutlineInputBorder(
-      borderRadius: fieldRadius,
-      borderSide: BorderSide(color: c.hairline, width: 1),
-    );
-
-    final focusBorder = OutlineInputBorder(
-      borderRadius: fieldRadius,
-      borderSide: BorderSide(color: c.accentPurple, width: 3),
-    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
-          style: AppSemanticTextStyles.labelSm,
+          style: AppSemanticTextStyles.labelMSemibold,
         ),
         const SizedBox(height: AppSpacingTokens.sm),
         ConstrainedBox(
@@ -62,22 +55,12 @@ class LabeledTextField extends StatelessWidget {
             style: AppSemanticTextStyles.pcBody.copyWith(
               color: c.textPrimary,
             ),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: c.surface,
+            decoration: appInputDecoration(
+              context,
               hintText: hintText,
-              hintStyle: AppSemanticTextStyles.pcBody.copyWith(
-                color: c.textTertiary,
-              ),
+            ).copyWith(
               isDense: false,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 0,
-              ),
               constraints: const BoxConstraints(minHeight: 54),
-              border: idleBorder,
-              enabledBorder: idleBorder,
-              focusedBorder: focusBorder,
             ),
           ),
         ),

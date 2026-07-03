@@ -287,17 +287,22 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                                 fillColor: c.surface,
                                 isDense: true,
                                 contentPadding: EdgeInsets.zero,
+                                // DS text inputs are borderless on idle —
+                                // this OTP box is a distinct fixed-size
+                                // component (not the shared labeled-field
+                                // pattern), so it keeps its own decoration
+                                // but drops the idle divider border.
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(
                                     AppRadiiTokens.sm,
                                   ),
-                                  borderSide: BorderSide(color: c.divider),
+                                  borderSide: BorderSide.none,
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(
                                     AppRadiiTokens.sm,
                                   ),
-                                  borderSide: BorderSide(color: c.divider),
+                                  borderSide: BorderSide.none,
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(

@@ -3,16 +3,16 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 
-/// Outlined social-auth button (Google / Apple) used on the auth screens.
+/// Social-auth button (Google / Apple) used on the auth screens — matches
+/// the Figma DS "Social Auth Button" component (node 535:1313, DS node
+/// 402-1191).
 ///
-/// Renders a full-width, surface-filled, hairline-bordered button with a
-/// leading [icon] widget and a centered [label]. Disabled when [onTap] is
-/// null. Visuals mirror the original per-screen `_SocialButton` definitions
-/// from the login / create-account screens (preserved 1:1):
-/// - height 48, full width
-/// - [AppSemanticColors.surface] background, [AppSemanticColors.divider] border
-/// - [AppRadiiTokens.md] corner radius, no elevation
-/// - icon + 12px gap + label ([AppSemanticTextStyles.body], 500 weight)
+/// Renders a full-width, borderless white button with a leading [icon]
+/// widget and a centered [label]. Disabled when [onTap] is null.
+/// - height 52, full width
+/// - [AppSemanticColors.surface] background, no border
+/// - [AppRadiiTokens.pcField] (12) corner radius, no elevation
+/// - icon + 12px gap + label (Label/L SemiBold, 15/20)
 class SocialButton extends StatelessWidget {
   const SocialButton({
     super.key,
@@ -35,20 +35,16 @@ class SocialButton extends StatelessWidget {
     final c = AppSemanticColors.of(context);
     return SizedBox(
       width: double.infinity,
-      height: 48,
+      height: 52,
       child: OutlinedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
-          side: BorderSide(color: c.divider),
+          side: BorderSide.none,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadiiTokens.md),
+            borderRadius: BorderRadius.circular(AppRadiiTokens.pcField),
           ),
           backgroundColor: c.surface,
           elevation: 0,
-        ).copyWith(
-          shadowColor: WidgetStatePropertyAll(
-            Colors.black.withValues(alpha: 0.05),
-          ),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -57,9 +53,8 @@ class SocialButton extends StatelessWidget {
             const SizedBox(width: AppSpacingTokens.sm + 4),
             Text(
               label,
-              style: AppSemanticTextStyles.body.copyWith(
+              style: AppSemanticTextStyles.labelLSemibold.copyWith(
                 color: c.textPrimary,
-                fontWeight: FontWeight.w500,
               ),
             ),
           ],

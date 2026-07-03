@@ -19,7 +19,8 @@ class AppPrimitives {
   static const Color pcInkTertiary = Color(0xFF9A9A9A);
 
   // ── PC v3: Surfaces ──────────────────────────────────────────────────────
-  static const Color pcBg = Color(0xFFF7F4EC);
+  // Neutrals/Background per Figma DS node 402-1191.
+  static const Color pcBg = Color(0xFFF5F3EF);
   static const Color pcSurface = Color(0xFFFFFFFF);
   static const Color pcRecessed = Color(0xFFEFEBE1);
   static const Color pcHairline = Color(0xFFECE7DD);
@@ -27,6 +28,8 @@ class AppPrimitives {
   // ── PC v3: Brand (Purple) ────────────────────────────────────────────────
   static const Color pcPurple = Color(0xFF7E5CE0);
   static const Color pcPurpleTile = Color(0xFFC3AEF0);
+  // Candy/Purple/Ghost — pale wash for avatar tiles / icon backdrops.
+  static const Color pcPurpleGhost = Color(0xFFE7E7FF);
 
   // ── PC v3: Accents ───────────────────────────────────────────────────────
   static const Color pcPeriwinkle = Color(0xFF6485DB);
@@ -38,12 +41,19 @@ class AppPrimitives {
   // Candy/Butter/Cream — warm cream tile (#E8E4D8). Distinct from the bright
   // yellow [pcButterTile]; used for the toggle off-track and note callouts.
   static const Color pcButterCream = Color(0xFFE8E4D8);
+  // Candy/Butter/Light and /Dark per Figma DS node 402-1191.
+  static const Color pcButterLight = Color(0xFFFFEFD7);
+  static const Color pcButterDark = Color(0xFFA05E03);
 
   static const Color pcBlush = Color(0xFFDD6593);
-  static const Color pcBlushTile = Color(0xFFF8DCE6);
+  // Candy/Blush/Tile per Figma DS node 402-1191.
+  static const Color pcBlushTile = Color(0xFFFCE4EC);
 
   static const Color pcMint = Color(0xFF46A05F);
   static const Color pcMintTile = Color(0xFFC2E8C8);
+
+  // Candy/Tomato/Accent per Figma DS node 402-1191.
+  static const Color pcTomato = Color(0xFFF0634F);
 
   // ── PC v3: Status — Normal (periwinkle) ──────────────────────────────────
   static const Color pcStatusNormalBg = Color(0xFFECEAF7);

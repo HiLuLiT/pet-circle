@@ -69,10 +69,10 @@ void main() {
       expect(find.text('Enter your email'), findsOneWidget);
     });
 
-    testWidgets('shows "Send email code" button', (tester) async {
+    testWidgets('shows "Get started" button', (tester) async {
       await _pumpWelcome(tester);
 
-      final button = find.widgetWithText(PrimaryButton, 'Send email code');
+      final button = find.widgetWithText(PrimaryButton, 'Get started');
       expect(button, findsOneWidget);
     });
 
@@ -126,8 +126,8 @@ void main() {
     testWidgets('form validation: empty name shows error', (tester) async {
       await _pumpWelcome(tester);
 
-      // Leave both fields empty and tap Send email code
-      await tester.tap(find.text('Send email code'));
+      // Leave both fields empty and tap Get started
+      await tester.tap(find.text('Get started'));
       await tester.pumpAndSettle();
 
       // The name validator returns l10n.enterYourFullName on empty input.
@@ -150,7 +150,7 @@ void main() {
         'not-an-email',
       );
 
-      await tester.tap(find.text('Send email code'));
+      await tester.tap(find.text('Get started'));
       await tester.pumpAndSettle();
 
       expect(find.text('Enter a valid email'), findsOneWidget);
@@ -178,7 +178,7 @@ void main() {
         'test@example.com',
       );
 
-      await tester.tap(find.text('Send email code'));
+      await tester.tap(find.text('Get started'));
       await tester.pumpAndSettle();
 
       // No validation errors should appear.
@@ -199,7 +199,7 @@ void main() {
         'Test User',
       );
 
-      await tester.tap(find.text('Send email code'));
+      await tester.tap(find.text('Get started'));
       await tester.pumpAndSettle();
 
       // The email validator returns "Please enter your email" on empty input.

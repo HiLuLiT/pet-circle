@@ -17,6 +17,7 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/widgets/app_dropdown.dart';
+import 'package:pet_circle/widgets/app_input_decoration.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 
 import 'package:pet_circle/screens/settings/settings_content.dart';
@@ -90,20 +91,18 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
               const SizedBox(height: 16),
               TextField(
                 controller: nameCtrl,
-                decoration: InputDecoration(
-                  labelText: l10n.displayName,
-                  filled: true, fillColor: c.surface,
-                  border: OutlineInputBorder(borderRadius: AppRadiiTokens.borderRadiusSm, borderSide: BorderSide.none),
-                ),
+                decoration: appInputDecoration(
+                  context,
+                  hintText: '',
+                ).copyWith(labelText: l10n.displayName),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: photoCtrl,
-                decoration: InputDecoration(
-                  labelText: l10n.profilePhoto,
-                  filled: true, fillColor: c.surface,
-                  border: OutlineInputBorder(borderRadius: AppRadiiTokens.borderRadiusSm, borderSide: BorderSide.none),
-                ),
+                decoration: appInputDecoration(
+                  context,
+                  hintText: '',
+                ).copyWith(labelText: l10n.profilePhoto),
               ),
               const SizedBox(height: 16),
               Row(
@@ -198,14 +197,9 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                 TextField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: InputDecoration(
+                  decoration: appInputDecoration(
+                    context,
                     hintText: l10n.enterEmailAddress,
-                    filled: true,
-                    fillColor: c.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: AppRadiiTokens.borderRadiusSm,
-                      borderSide: BorderSide.none,
-                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -378,14 +372,9 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                       child: TextField(
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
+                        decoration: appInputDecoration(
+                          context,
                           hintText: l10n.hintVetEmail,
-                          filled: true,
-                          fillColor: c.surface,
-                          border: OutlineInputBorder(
-                            borderRadius: AppRadiiTokens.borderRadiusSm,
-                            borderSide: BorderSide.none,
-                          ),
                         ),
                       ),
                     ),
@@ -649,14 +638,9 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                 TextField(
                   controller: normalController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: appInputDecoration(
+                    context,
                     hintText: l10n.hintThresholdElevated,
-                    filled: true,
-                    fillColor: c.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: AppRadiiTokens.borderRadiusSm,
-                      borderSide: BorderSide.none,
-                    ),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -665,14 +649,9 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                 TextField(
                   controller: alertController,
                   keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
+                  decoration: appInputDecoration(
+                    context,
                     hintText: l10n.hintThresholdAlert,
-                    filled: true,
-                    fillColor: c.surface,
-                    border: OutlineInputBorder(
-                      borderRadius: AppRadiiTokens.borderRadiusSm,
-                      borderSide: BorderSide.none,
-                    ),
                   ),
                 ),
                 const SizedBox(height: 24),

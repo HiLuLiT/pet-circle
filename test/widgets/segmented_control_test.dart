@@ -44,7 +44,7 @@ void main() {
         decoration.borderRadius,
         BorderRadius.circular(AppRadiiTokens.pcField),
       );
-      expect(AppRadiiTokens.pcField, 14);
+      expect(AppRadiiTokens.pcField, 12);
     });
 
     // ── Active segment styling ──────────────────────────────────────────────

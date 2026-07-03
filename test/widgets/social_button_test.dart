@@ -59,7 +59,7 @@ void main() {
       expect(button.onPressed, isNull);
     });
 
-    testWidgets('label uses 500 (medium) weight', (tester) async {
+    testWidgets('label uses 600 (SemiBold) weight', (tester) async {
       await tester.pumpWidget(testApp(
         SocialButton(
           icon: const Icon(Icons.apple),
@@ -69,10 +69,10 @@ void main() {
       ));
 
       final text = tester.widget<Text>(find.text('Continue with Apple'));
-      expect(text.style?.fontWeight, FontWeight.w500);
+      expect(text.style?.fontWeight, FontWeight.w600);
     });
 
-    testWidgets('is full width (48 high) via SizedBox', (tester) async {
+    testWidgets('is full width (52 high) via SizedBox', (tester) async {
       await tester.pumpWidget(testApp(
         SocialButton(
           icon: const Icon(Icons.apple),
@@ -83,7 +83,7 @@ void main() {
 
       final sizedBoxes = tester.widgetList<SizedBox>(find.byType(SizedBox));
       final match = sizedBoxes.where(
-        (sb) => sb.width == double.infinity && sb.height == 48,
+        (sb) => sb.width == double.infinity && sb.height == 52,
       );
       expect(match.isNotEmpty, isTrue);
     });
