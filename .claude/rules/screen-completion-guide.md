@@ -1,10 +1,6 @@
----
-description: Screen-by-screen guide for Pet Circle. Phase 1 complete, Phase 2 in progress. Tracks navigation, role system, auth flow, remaining work, and feature backlog.
-globs: "lib/screens/**/*.dart"
-alwaysApply: false
----
-
 # Pet Circle -- Screen Completion Guide
+
+> Screen-by-screen guide for Pet Circle. Phase 1 complete, Phase 2 in progress. Tracks navigation, role system, auth flow, remaining work, and feature backlog.
 
 ## Phase Status: Phase 1 COMPLETE, Phase 2 IN PROGRESS
 
@@ -135,4 +131,4 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 - [x] Searchable breed dropdown (shared widget)
 - [x] Onboarding Back/Next with persistent state
 - [x] Dark mode + i18n (EN/HE, enforced)
-- [x] Design system tokens enforced via cursor rule
+- [x] Design system tokens enforced via [design-system-enforcement.md](design-system-enforcement.md)

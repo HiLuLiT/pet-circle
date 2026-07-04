@@ -14,61 +14,83 @@ class AppTypography {
   static const String fontFamily = 'Instrument Sans';
 
   // ═══════════════════════════════════════════════════════════════════════
-  // Pet Circle v3 (Claude-Design) scale
+  // Pet Circle v3 (Claude-Design) scale — matches Figma DS node 402-1191.
   //
-  // 5 sizes: display 34, title 19, body 16, label 14, caption 13.
+  // Display (56/40/36/28) · Heading (H1 24, H2 20, XS 16) · Label (L 15,
+  // M 14, S 13) · Body (16) · Caption (12, Tag 11, XS 10).
   // Use these for new code. Legacy scale below kept for unmigrated widgets.
   // ═══════════════════════════════════════════════════════════════════════
 
-  // ── PC v3: Display (34px) ───────────────────────────────────────────────
-  static const TextStyle pcDisplayBold = TextStyle(
+  // ── PC v3: Display — Bold only ──────────────────────────────────────────
+  static const TextStyle pcDisplayXxlBold = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 34,
+    fontSize: 56,
     fontWeight: FontWeight.w700,
-    height: 40 / 34,
+    height: 64 / 56,
+  );
+  static const TextStyle pcDisplayXlBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 40,
+    fontWeight: FontWeight.w700,
+    height: 48 / 40,
+  );
+  static const TextStyle pcDisplayLBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 36,
+    fontWeight: FontWeight.w700,
+    height: 44 / 36,
+  );
+  static const TextStyle pcDisplayMBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 28,
+    fontWeight: FontWeight.w700,
+    height: 36 / 28,
+    letterSpacing: -0.5,
   );
 
-  // ── PC v3: Title (19px) ─────────────────────────────────────────────────
-  static const TextStyle pcTitleBold = TextStyle(
+  // ── PC v3: Heading — Bold only ──────────────────────────────────────────
+  static const TextStyle pcHeadingH1Bold = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 19,
+    fontSize: 24,
     fontWeight: FontWeight.w700,
-    height: 24 / 19,
+    height: 32 / 24,
+    letterSpacing: -0.3,
   );
-  static const TextStyle pcTitleSemibold = TextStyle(
+  static const TextStyle pcHeadingH2Bold = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 19,
-    fontWeight: FontWeight.w600,
-    height: 24 / 19,
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    height: 28 / 20,
+    letterSpacing: -0.2,
   );
-
-  // ── PC v3: Body (16px) ──────────────────────────────────────────────────
-  static const TextStyle pcBodyRegular = TextStyle(
+  static const TextStyle pcHeadingXsBold = TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
+    fontWeight: FontWeight.w700,
+    height: 22 / 16,
+  );
+
+  // ── PC v3: Label / L (15px) ─────────────────────────────────────────────
+  static const TextStyle pcLabelLBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: FontWeight.w700,
+    height: 20 / 15,
+  );
+  static const TextStyle pcLabelLSemibold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
+    fontWeight: FontWeight.w600,
+    height: 20 / 15,
+  );
+  static const TextStyle pcLabelLRegular = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 15,
     fontWeight: FontWeight.w400,
-    height: 22 / 16,
-  );
-  static const TextStyle pcBodyMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.w500,
-    height: 22 / 16,
-  );
-  static const TextStyle pcBodySemibold = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    height: 22 / 16,
-  );
-  static const TextStyle pcBodyBold = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.w700,
-    height: 22 / 16,
+    height: 20 / 15,
   );
 
-  // ── PC v3: Label (14px) ─────────────────────────────────────────────────
+  // ── PC v3: Label / M (14px) ─────────────────────────────────────────────
   static const TextStyle pcLabelRegular = TextStyle(
     fontFamily: fontFamily,
     fontSize: 14,
@@ -94,24 +116,88 @@ class AppTypography {
     height: 20 / 14,
   );
 
-  // ── PC v3: Caption (13px) ───────────────────────────────────────────────
-  static const TextStyle pcCaptionRegular = TextStyle(
+  // ── PC v3: Label / S (13px) ─────────────────────────────────────────────
+  static const TextStyle pcLabelSBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: FontWeight.w700,
+    height: 18 / 13,
+  );
+  static const TextStyle pcLabelSSemibold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: FontWeight.w600,
+    height: 18 / 13,
+  );
+  static const TextStyle pcLabelSRegular = TextStyle(
     fontFamily: fontFamily,
     fontSize: 13,
     fontWeight: FontWeight.w400,
     height: 18 / 13,
   );
+
+  // ── PC v3: Body (16px, line-height 24) ──────────────────────────────────
+  static const TextStyle pcBodyRegular = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w400,
+    height: 24 / 16,
+  );
+  static const TextStyle pcBodyMedium = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+    height: 24 / 16,
+  );
+  static const TextStyle pcBodySemibold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    height: 24 / 16,
+  );
+  // Not a distinct DS style (DS Body has no Bold weight) — kept for call
+  // sites that need a bold 16px run; matches Body line-height for alignment.
+  static const TextStyle pcBodyBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+    height: 24 / 16,
+  );
+
+  // ── PC v3: Caption (12px, line-height 16) ───────────────────────────────
+  static const TextStyle pcCaptionBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    fontWeight: FontWeight.w700,
+    height: 16 / 12,
+  );
   static const TextStyle pcCaptionMedium = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: FontWeight.w500,
-    height: 18 / 13,
+    height: 16 / 12,
+    letterSpacing: 0.1,
   );
-  static const TextStyle pcCaptionSemibold = TextStyle(
+  static const TextStyle pcCaptionRegular = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 13,
-    fontWeight: FontWeight.w600,
-    height: 18 / 13,
+    fontSize: 12,
+    fontWeight: FontWeight.w400,
+    height: 16 / 12,
+  );
+  // Caption/Tag — 11px, Bold, +0.5 tracking (chip tags, "NEW" badges).
+  static const TextStyle pcCaptionTagBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 11,
+    fontWeight: FontWeight.w700,
+    height: 16 / 11,
+    letterSpacing: 0.5,
+  );
+  // Caption/XS — 10px, Bold (avatar initials, tiny tags).
+  static const TextStyle pcCaptionXsBold = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    height: 14 / 10,
   );
 
   // ═══════════════════════════════════════════════════════════════════════

@@ -109,23 +109,26 @@ void main() {
       expect(label.style?.fontWeight, AppSemanticTextStyles.labelSm.fontWeight);
     });
 
-    testWidgets('trigger container uses surfaceRecessed fill', (tester) async {
+    testWidgets('trigger container uses the DS Input surface fill', (tester) async {
       await tester.pumpWidget(testApp(
         const BreedSearchField(label: 'Breed'),
       ));
 
+      // DS alignment: the trigger matches the shared "Input" component (white
+      // surface, not the recessed-grey chip look) so it's visually consistent
+      // with the other onboarding step 1 fields.
       final containers = tester.widgetList<Container>(find.byType(Container))
           .where((c) {
         final decoration = c.decoration;
         if (decoration is BoxDecoration) {
-          return decoration.color == AppSemanticColors.light.surfaceRecessed;
+          return decoration.color == AppSemanticColors.light.surface;
         }
         return false;
       });
       expect(containers.isNotEmpty, isTrue);
     });
 
-    testWidgets('selected breed highlight uses primaryLightest', (tester) async {
+    testWidgets('selected breed highlight uses accentPurpleTile', (tester) async {
       await tester.pumpWidget(testApp(
         const BreedSearchField(label: 'Breed', initialValue: 'Akita'),
       ));
@@ -134,11 +137,13 @@ void main() {
       await tester.tap(find.text('Akita'));
       await tester.pumpAndSettle();
 
+      // DS alignment (Figma node 510-1220): selected option highlight is the
+      // purple tile wash, matching the shared AppDropdown's open-list style.
       final containers = tester.widgetList<Container>(find.byType(Container))
           .where((c) {
         final decoration = c.decoration;
         if (decoration is BoxDecoration) {
-          return decoration.color == AppSemanticColors.light.primaryLightest;
+          return decoration.color == AppSemanticColors.light.accentPurpleTile;
         }
         return false;
       });

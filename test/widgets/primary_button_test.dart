@@ -136,7 +136,7 @@ void main() {
       expect(text.style?.fontWeight, FontWeight.w700);
     });
 
-    testWidgets('label uses 16px / 600 weight for outlined (tertiary) variant',
+    testWidgets('label uses 16px / 700 weight for outlined (tertiary) variant',
         (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(
@@ -148,10 +148,10 @@ void main() {
 
       final text = tester.widget<Text>(find.text('Tertiary'));
       expect(text.style?.fontSize, 16);
-      expect(text.style?.fontWeight, FontWeight.w600);
+      expect(text.style?.fontWeight, FontWeight.w700);
     });
 
-    testWidgets('filled variant uses ink bg and white fg (PC v3 spec)',
+    testWidgets('filled variant uses purple bg and white fg (DS spec)',
         (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(
@@ -163,12 +163,12 @@ void main() {
 
       final button = tester.widget<TextButton>(find.byType(TextButton));
       final bgColor = button.style?.backgroundColor?.resolve({});
-      // Light theme onSurface = pcInk (#161616).
-      expect(bgColor, AppPrimitives.pcInk);
+      // Light theme primary = pcPurple (#7E5CE0), per DS Button/Primary.
+      expect(bgColor, AppPrimitives.pcPurple);
 
       final text = tester.widget<Text>(find.text('Filled'));
-      // Light theme surface = pcSurface (white).
-      expect(text.style?.color, AppSemanticColors.light.surface);
+      // Light theme onPrimary = pcSurface (white).
+      expect(text.style?.color, AppSemanticColors.light.onPrimary);
     });
 
     testWidgets('secondary variant uses purpleTile bg and ink fg',
@@ -189,7 +189,7 @@ void main() {
       expect(text.style?.color, AppPrimitives.pcInk);
     });
 
-    testWidgets('outlined variant uses surface bg, hairline border, ink fg',
+    testWidgets('outlined variant uses transparent bg, ink border, ink fg',
         (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(
@@ -201,31 +201,32 @@ void main() {
 
       final button = tester.widget<TextButton>(find.byType(TextButton));
       final bgColor = button.style?.backgroundColor?.resolve({});
-      expect(bgColor, AppSemanticColors.light.surface);
+      expect(bgColor, Colors.transparent);
 
       final side = button.style?.side?.resolve({});
       expect(side, isNotNull);
-      expect(side!.color, AppPrimitives.pcHairline);
+      expect(side!.color, AppPrimitives.pcInk);
       expect(side.width, 1.0);
 
       final text = tester.widget<Text>(find.text('Outlined'));
       expect(text.style?.color, AppPrimitives.pcInk);
     });
 
-    // ── Layout spec: 56h, 26 horizontal padding ─────────────────────────────
-    testWidgets('uses Figma button padding (horizontal 26) and height 56',
-        (tester) async {
+    // ── Layout spec: ~54h, 32x16 padding ─────────────────────────────────────
+    testWidgets('uses DS button padding (32x16) and height 54', (tester) async {
       await tester.pumpWidget(testApp(
         PrimaryButton(label: 'Padded', onPressed: () {}),
       ));
 
       final button = tester.widget<TextButton>(find.byType(TextButton));
       final padding = button.style?.padding?.resolve({}) as EdgeInsets;
-      expect(padding.left, 26);
-      expect(padding.right, 26);
+      expect(padding.left, 32);
+      expect(padding.right, 32);
+      expect(padding.top, 16);
+      expect(padding.bottom, 16);
 
       final fixed = button.style?.fixedSize?.resolve({});
-      expect(fixed?.height, 56);
+      expect(fixed?.height, 54);
     });
 
     // ── Custom foreground color ─────────────────────────────────────────────
@@ -443,6 +444,25 @@ void main() {
         await tester.tap(find.text('Tap'));
         await tester.pump();
         expect(callCount, 1);
+      });
+
+      testWidgets('renders at the spec ~44h, not shrunk by visual density',
+          (tester) async {
+        // Regression: VisualDensity.compact silently shrank this button to
+        // 28h in practice despite the documented 24x12 padding around 20px
+        // content (24+12+12=44) — found while aligning the trends screen's
+        // Export button height to Figma node 474-2575.
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Export',
+            variant: PrimaryButtonVariant.miniPrimary,
+            trailingIcon: const Icon(Icons.file_download_outlined),
+            onPressed: () {},
+          ),
+        ));
+
+        final rect = tester.getRect(find.byType(PrimaryButton));
+        expect(rect.height, 44);
       });
     });
   });

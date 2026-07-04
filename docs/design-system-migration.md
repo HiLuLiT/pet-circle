@@ -1,5 +1,7 @@
 # Design System Migration Mapping — v1 → v2
 
+> **Superseded.** This is a historical record of the v1→v2 migration (Inter → Instrument Sans, chocolate/pink/cherry palette → Ink/Sky/Primary). The app has since moved to **PC v3 (Claude-Design)** — a different palette, radius scale, and typography scale layered on top of this one. For the current token values and component catalog, see [`.claude/rules/design-system-enforcement.md`](../.claude/rules/design-system-enforcement.md) (always-loaded project rule) and [`.claude/rules/figma-design-system.md`](../.claude/rules/figma-design-system.md). Kept here for historical reference only — do not implement against the values below.
+
 Figma design system: https://www.figma.com/design/ApTk87wJXejOTzVtEnFJMw/Pet-circle?node-id=264-1093
 Figma views: https://www.figma.com/design/ApTk87wJXejOTzVtEnFJMw/Pet-circle?node-id=167-107
 Rule: if mismatches between design system and views, **follow views**.

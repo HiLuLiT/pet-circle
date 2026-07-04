@@ -9,11 +9,13 @@ import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 
 import 'package:pet_circle/screens/settings/settings_widgets.dart';
 import 'package:pet_circle/screens/settings/settings_care_circle_widgets.dart';
 import 'package:pet_circle/screens/settings/settings_dialogs.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/round_icon_button.dart';
 
 /// Push notification categories
@@ -72,18 +74,15 @@ class _SettingsContentState extends State<SettingsContent>
                     children: [
                       Text(
                         l10n.settings,
-                        style: AppSemanticTextStyles.title3.copyWith(
+                        style: AppSemanticTextStyles.pcDisplay.copyWith(
                           color: c.textPrimary,
-                          letterSpacing: -0.96,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         l10n.managePreferences,
-                        style: AppSemanticTextStyles.body.copyWith(
-                          color: c.textPrimary,
-                          fontSize: 14,
-                          letterSpacing: -0.15,
+                        style: AppSemanticTextStyles.labelSRegular.copyWith(
+                          color: c.textTertiary,
                         ),
                       ),
                     ],
@@ -91,7 +90,7 @@ class _SettingsContentState extends State<SettingsContent>
                 ),
                 if (widget.onClose != null)
                   RoundIconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(Icons.keyboard_arrow_up),
                     variant: RoundIconButtonVariant.ghost,
                     size: 36,
                     iconSize: 24,
@@ -115,7 +114,9 @@ class _SettingsContentState extends State<SettingsContent>
                   children: [
                     SettingsToggleRow(
                       iconAsset: settingsMoonAsset,
+                      iconTileColor: c.accentPeriwinkleTile,
                       label: l10n.darkMode,
+                      description: l10n.switchToADarkerTheme,
                       isOn: appDarkMode.value,
                       onChanged: () {
                         appDarkMode.value = !appDarkMode.value;
@@ -132,9 +133,6 @@ class _SettingsContentState extends State<SettingsContent>
                 return SettingsCard(
                   title: l10n.careCircle,
                   subtitle: l10n.manageCaregivers,
-                  trailing: canManageActivePet
-                      ? InviteButton(onTap: () => showInviteDialog(context))
-                      : null,
                   child: Builder(builder: (context) {
                     if (activePet == null) {
                       return Text(l10n.noPetsYet, style: AppSemanticTextStyles.body);
@@ -144,21 +142,25 @@ class _SettingsContentState extends State<SettingsContent>
                       return Text(l10n.noCareCircleMembers, style: AppSemanticTextStyles.body);
                     }
                     return Column(
-                      children: members.map((member) {
-                        final isOwner = member.role == CareCircleRole.owner;
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: CareCircleItem(
-                            email: member.name,
-                            roleLabel: localizeRole(member.role, l10n),
-                            roleColor: isOwner ? c.textPrimary : c.primaryLight,
-                            statusLabel: l10n.active,
-                            onRemove: canManageActivePet
-                                ? () => confirmRemoveMember(context, activePet.name, member.name)
-                                : null,
-                          ),
-                        );
-                      }).toList(),
+                      children: [
+                        ...members.map((member) {
+                          final isOwner = member.role == CareCircleRole.owner;
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: CareCircleItem(
+                              email: member.name,
+                              roleLabel: localizeRole(member.role, l10n),
+                              roleColor: isOwner ? c.surface : c.accentBlushTile,
+                              statusLabel: l10n.active,
+                              onRemove: canManageActivePet
+                                  ? () => confirmRemoveMember(context, activePet.name, member.name)
+                                  : null,
+                            ),
+                          );
+                        }),
+                        if (canManageActivePet)
+                          InviteButton(onTap: () => showInviteDialog(context)),
+                      ],
                     );
                   }),
                 );
@@ -357,30 +359,11 @@ class _SettingsContentState extends State<SettingsContent>
                 ),
               ),
               const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () => showSignOutDialog(context),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: c.error.withValues(alpha: 0.08),
-                    borderRadius: AppRadiiTokens.borderRadiusLg,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.logout, size: 18, color: c.error),
-                      const SizedBox(width: 8),
-                      Text(
-                        l10n.signOut,
-                        style: AppSemanticTextStyles.body.copyWith(
-                          color: c.error,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              PrimaryButton(
+                label: l10n.signOut,
+                backgroundColor: AppPrimitives.pcTomato,
+                foregroundColor: c.surface,
+                onPressed: () => showSignOutDialog(context),
               ),
               const SizedBox(height: 24),
             ],

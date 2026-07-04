@@ -19,8 +19,9 @@ The 22 global shared widgets in `lib/widgets/`. Step 2 maps current components o
 
 | Widget | File | Purpose |
 |---|---|---|
-| `PrimaryButton` | `primary_button.dart` | Pill button — `filled` / `secondary` / `outlined` variants. |
+| `PrimaryButton` | `primary_button.dart` | Pill button — `filled`/`secondary` are purple/purple-tile filled; `outlined`/`tertiary` is transparent + 1px ink border (never a white/hairline surface), per Figma DS node 402-1191. |
 | `RoundIconButton` | `round_icon_button.dart` | Circular 54px icon button — `primary` / `ghost`. |
+| `SocialButton` | `social_button.dart` | Google/Apple auth button — borderless white, h52, radius `pcField` (12), per Figma DS node 402-1191. |
 | `AppCard` | `app_card.dart` | Flat surface/tile card, radius 18 (PC v3). |
 | `NeumorphicCard` | `neumorphic_card.dart` | Card w/ small elevation; `inner` = recessed flat. Legacy name, still used. |
 | `StatusBadge` | `status_badge.dart` | Status pill (normal/elevated/alert/active) w/ leading dot. |
@@ -31,8 +32,9 @@ The 22 global shared widgets in `lib/widgets/`. Step 2 maps current components o
 | `TogglePill` | `toggle_pill.dart` | **Segmented** two-option pill toggle (distinct from `AppToggle`). |
 | `AppSegmentedControl` | `segmented_control.dart` | Multi-segment pill control (active = surface). |
 | `AppDropdown` | `app_dropdown.dart` | Tap-to-open dropdown, field radius 14. |
-| `LabeledTextField` | `labeled_text_field.dart` | Labeled text input, radius 14, hairline border, purple focus. |
+| `LabeledTextField` | `labeled_text_field.dart` | Labeled text input, radius `pcField` (12), **borderless** on idle (2px purple focus ring). Uses shared `appInputDecoration()` helper (`app_input_decoration.dart`). |
 | `BreedSearchField` | `breed_search_field.dart` | Autocomplete breed search field. |
+| `appInputDecoration()` | `app_input_decoration.dart` | Shared `InputDecoration` builder (not a widget) — white fill, radius `pcField`, borderless idle, 2px purple focus ring. Use for any hand-rolled `TextField`/`TextFormField` instead of a bordered `InputDecoration`. |
 | `AppHeader` | `app_header.dart` | Top app header (pet name, avatar, bell). |
 | `BottomNavBar` | `bottom_nav_bar.dart` | 5-tab bottom nav, translucent + blur. |
 | `OnboardingShell` | `onboarding_shell.dart` | Onboarding step scaffold (title, progress, footer). |

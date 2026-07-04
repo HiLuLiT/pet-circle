@@ -1,10 +1,6 @@
----
-description: Current-state knowledge base for the Pet Circle design system (PC v3 / Claude-Design) — token layer + full shared-widget catalog. Enforces reuse and correct token usage for every code change. This rule ALWAYS applies.
-globs:
-alwaysApply: true
----
-
 # Pet Circle — Design System (PC v3 / Claude-Design)
+
+> Current-state knowledge base for the Pet Circle design system — token layer + full shared-widget catalog. Enforces reuse and correct token usage for every code change.
 
 Single source of truth for design tokens and shared components. The PC v3 migration (see `docs/component-inventory.md` and `docs/design-system-migration.md`) fully replaced the old neumorphic/chocolate-palette system — **do not reintroduce it**.
 
@@ -15,17 +11,18 @@ Single source of truth for design tokens and shared components. The PC v3 migrat
 - NEVER use `AppColorsTheme.of(context)` — **removed**, does not exist anymore.
 - NEVER hardcode hex (`Color(0xFF...)`, `Colors.white`, etc.) or the old v2 names (`chocolate`, `cherry`, `pink`, `offWhite`, `lightBlue`, `burgundy`).
 - Key fields on `AppSemanticColors`:
-  - Core: `primary`, `onPrimary`, `primaryLight`, `primaryLightest`, `surface`, `onSurface`, `background`, `onBackground`, `surfaceRecessed`, `hairline`, `divider`, `disabled`
+  - Core: `primary`, `onPrimary`, `primaryLight`, `primaryLightest`, `primaryGhost`, `surface`, `onSurface`, `background`, `onBackground`, `surfaceRecessed`, `hairline`, `divider`, `disabled`
   - Text: `textPrimary`, `textSecondary`, `textTertiary`, `textDisabled`
   - Feedback: `error`, `onError`, `success`, `warning`, `info`
-  - Accents (each has a base + `*Tile` wash; purple also has `*Chip`): `accentPurple`/`accentPurpleTile`, `accentPeriwinkle`/`accentPeriwinkleTile`/`accentPeriwinkleChip`, `accentButter`/`accentButterTile`/`accentButterCream`, `accentBlush`/`accentBlushTile`, `accentMint`/`accentMintTile`
+  - Accents (each has a base + `*Tile` wash; purple also has `*Chip`/`*Ghost`): `accentPurple`/`accentPurpleTile`, `accentPeriwinkle`/`accentPeriwinkleTile`/`accentPeriwinkleChip`, `accentButter`/`accentButterTile`/`accentButterCream`, `accentBlush`/`accentBlushTile`, `accentMint`/`accentMintTile`
   - Status pills (bg/dot/text triplets — see `StatusBadgeStatus`): `statusNormal*`, `statusElevated*`, `statusAlert*`, `statusActive*`, `statusInvited*` (no dot for invited/active)
 - For opacity use `.withValues(alpha: 0.5)` — NEVER the deprecated `.withOpacity()`.
 
 ### Typography
 - ALWAYS use `AppSemanticTextStyles.*`. Font family is **Instrument Sans** (not Inter/Google Fonts).
 - NEVER use `AppTextStyles.*` — **removed**, does not exist anymore.
-- Members: `title1`/`title2`/`title3`, `headingLg`/`headingMd`, `bodyLg`/`body`/`bodySm`/`bodyMuted`, `label`/`labelSm`, `caption`, `button`, plus the `pc*` scale (`pcDisplay`, `pcTitle`, `pcTitleSecondary`, `pcBody`/`pcBodyMedium`/`pcBodyBold`/`pcBodyMuted`, `pcLabel`/`pcLabelBold`/`pcLabelMuted`, `pcCaption`/`pcCaptionMuted`, `pcButton`).
+- Scale matches Figma DS node 402-1191 exactly: Display (`pcDisplayXxl/Xl/L`, `pcDisplay`=M), Heading (`headingH1` 24/32 -0.3, `headingH2` 20/28 -0.2, `headingXs` 16/22), Label L 15px (`labelLBold/Semibold/Regular`), Label M 14px (`pcLabelBold`, `labelMSemibold`, `pcLabel`=Medium, `pcLabelMuted`=Regular+secondary), Label S 13px (`labelSBold/Semibold/Regular`), Body 16/24 (`pcBodyBold`, `pcBodySemibold`, `pcBodyMedium`, `pcBody`=Regular, `pcBodyMuted`=Regular+secondary), Caption 12/16 (`captionBold`, `captionMedium`, `pcCaption`=Regular+secondary, `pcCaptionMuted`=Regular+tertiary), plus `pcButton` (16/22 Bold — the Button component's text style).
+- Legacy aliases (`title1/2/3`, `headingLg/Md`, `body`/`bodySm`/`bodyMuted`/`bodyLg`, `label`/`labelSm`, `caption`, `button`) still work — each is retargeted onto the nearest DS-aligned style above (e.g. `title3` = exact `headingH1` match, `caption` = exact `pcCaption`-equivalent match). Prefer the DS-named styles for new code.
 - Override only color/weight via `.copyWith(...)` — never build a raw `TextStyle` from scratch for body text.
 
 ### Spacing — `AppSpacingTokens`
@@ -34,9 +31,12 @@ Single source of truth for design tokens and shared components. The PC v3 migrat
 - Match whichever scale the surrounding widget/screen already uses; don't mix the two scales within one component.
 
 ### Border Radius — `AppRadiiTokens`
-- PC v3 semantic radii (prefer): `pcField` 14 (inputs/selects), `pcCard` 18 (cards), `pcTile` 30 (large rounded surfaces), `pcPill` 9999 (fully rounded).
+- PC v3 semantic radii (prefer), matching Figma DS node 402-1191: `pcField` **12** (inputs/selects/chips), `pcCard` **16** (cards), `pcTile` 30 (large rounded surfaces), `pcPill` 9999 (fully rounded).
 - Convenience getters: `borderRadiusField`, `borderRadiusCard`, `borderRadiusTile`, `borderRadiusPill` (also legacy `borderRadiusSm/Md/Lg/Xl/Full`).
 - NEVER `BorderRadius.circular(N)` with a raw number — always a token or getter.
+
+### Inputs
+- ALWAYS build `InputDecoration` via `appInputDecoration(context, hintText: ...)` (`lib/widgets/app_input_decoration.dart`) rather than hand-rolling a bordered decoration. Per the DS "Input" component, text fields are **borderless white** (`pcField` radius, no idle border) with a 2px `primary` focus ring — never re-add a hairline/divider border on idle. `hintText` is optional — omit it for call sites using a Material floating `labelText` instead (via `.copyWith(labelText: ...)`), since setting both to the same string renders it twice.
 
 ### Shadows
 - `AppShadowTokens.small/medium/large` — flat elevation levels. The old `AppShadows.neumorphicOuter/neumorphicInner` are **gone**; don't recreate neumorphic dual-shadows for new UI.
@@ -46,16 +46,16 @@ Single source of truth for design tokens and shared components. The PC v3 migrat
 ### Buttons
 | Widget | Purpose | Key API |
 |---|---|---|
-| `PrimaryButton` | Pill CTA button | `variant`: `filled`/`secondary`/`outlined`/`link`/`miniPrimary`; `label`, `icon`, `trailingIcon`, `child`, `fullWidth` |
+| `PrimaryButton` | Pill CTA button — `filled`/`secondary` are purple/purple-tile filled; `outlined`/`tertiary` is transparent + 1px ink border (never a white/hairline surface) | `variant`: `filled`/`secondary`/`outlined`/`link`/`miniPrimary`; `label`, `icon`, `trailingIcon`, `child`, `fullWidth` |
 | `RoundIconButton` | Circular icon button | `variant`: `primary`/`ghost`; `icon`, `size`=54, `iconSize`=20, `semanticLabel` |
-| `SocialButton` | Google/Apple auth button | `icon`, `label`, `onTap` |
+| `SocialButton` | Google/Apple auth button — borderless white, h52, radius `pcField` | `icon`, `label`, `onTap` |
 
 ### Inputs & Selection
 | Widget | Purpose | Key API |
 |---|---|---|
 | `AppDropdown` | Labeled dropdown, inline-open option list | `label`, `value`, `onTap`, `isOpen`, `chevronController`, `options`, `onOptionSelected`, `placeholder` |
-| `LabeledTextField` | Labeled text input | `label`, `hintText`, `keyboardType`, `controller`, `onChanged` |
-| `BreedSearchField` | Autocomplete breed search | `label`, `initialValue`, `onChanged`, `maxHeight` |
+| `LabeledTextField` | Labeled text input (borderless, DS "Input" component) | `label`, `hintText`, `keyboardType`, `controller`, `onChanged` |
+| `BreedSearchField` | Autocomplete breed search (recessed search box — distinct from the DS Input; keep as-is) | `label`, `initialValue`, `onChanged`, `maxHeight` |
 | `AppToggle` | Binary **on/off** switch | `value`, `onChanged`, `disabled` |
 | `TogglePill` | **Segmented two-option** pill (not on/off — use `AppToggle` for binary settings) | `isOn` |
 | `AppSegmentedControl` | Multi-segment pill selector | `options`, `value`, `onChanged` |
@@ -65,7 +65,7 @@ Single source of truth for design tokens and shared components. The PC v3 migrat
 ### Cards & Surfaces
 | Widget | Purpose | Key API |
 |---|---|---|
-| `AppCard` | Flat PC v3 surface/tile card (radius 18) — **prefer over `NeumorphicCard` for new UI** | `variant`: `surface`/`tile`; `tileColor`, `padding`, `child` |
+| `AppCard` | Flat PC v3 surface/tile card (radius 16) — **prefer over `NeumorphicCard` for new UI** | `variant`: `surface`/`tile`; `tileColor`, `padding`, `child` |
 | `NeumorphicCard` | Legacy card, small elevation shadow; `inner:true` = flat/recessed, no shadow | `child`, `padding`, `margin`, `color`, `radius`, `inner` |
 | `PetCard` | Purple-tile pet summary card (composes `StatusBadge` + `Mascot`/`DogPhoto`) | `name`, `subtitle`, `status`, `statusLabel`, `media`, `onTap`, `onLongPress`, `footer`, `trailing` |
 | `NotificationCard` | Notification row (unread = surface + dot; read = recessed) | `icon`, `iconTileColor`, `title`, `body`, `time`, `unread`, `onTap` |

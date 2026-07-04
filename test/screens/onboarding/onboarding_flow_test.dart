@@ -55,11 +55,13 @@ void main() {
       expect(find.byType(OnboardingStep1), findsOneWidget);
     });
 
-    testWidgets('step 1 shows "Step 1 of 3" (not "Step 1 of 4")', (tester) async {
+    testWidgets(
+        'does not show a "Step X of Y" label on step 1 (dropped per DS spec)',
+        (tester) async {
       await tester.pumpWidget(testApp(const OnboardingFlow()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Step 1 of 3'), findsOneWidget);
+      expect(find.text('Step 1 of 3'), findsNothing);
       expect(find.text('Step 1 of 4'), findsNothing);
     });
 
@@ -92,12 +94,15 @@ void main() {
       expect(find.text('Age (years)'), findsOneWidget);
     });
 
-    testWidgets('step 1 shows photo URL field', (tester) async {
+    testWidgets('step 1 shows weight field (photo URL field removed)', (tester) async {
       await tester.pumpWidget(testApp(const OnboardingFlow()));
       await tester.pumpAndSettle();
 
-      // Localized label: "Photo URL (Optional)"
-      expect(find.text('Photo URL (Optional)'), findsOneWidget);
+      // DS alignment: the Photo URL field was removed from onboarding step 1
+      // (photo upload is tracked separately as FB-001) and replaced with a
+      // Weight (kg) field alongside Age.
+      expect(find.text('Weight (kg)'), findsOneWidget);
+      expect(find.text('Photo URL (Optional)'), findsNothing);
     });
 
     testWidgets('step 1 shows setup pet profile title', (tester) async {
@@ -200,12 +205,13 @@ void main() {
       expect(find.byType(OnboardingStep2), findsOneWidget);
     });
 
-    testWidgets('shows step 2 of 3 label', (tester) async {
+    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)',
+        (tester) async {
       setStep2Size(tester);
       await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Step 2 of 3'), findsOneWidget);
+      expect(find.text('Step 2 of 3'), findsNothing);
     });
 
     testWidgets('shows medical information heading', (tester) async {
@@ -213,7 +219,8 @@ void main() {
       await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Medical Information'), findsOneWidget);
+      // l10n copy consolidation: heading casing changed to sentence case.
+      expect(find.text('Medical information'), findsOneWidget);
     });
 
     testWidgets('shows diagnosis optional label', (tester) async {
@@ -221,7 +228,11 @@ void main() {
       await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Diagnosis (Optional)'), findsOneWidget);
+      // DS alignment: "Diagnosis (Optional)" is now two separate Text
+      // widgets — l10n.diagnosisLabel ("Diagnosis") and l10n.optionalSuffix
+      // ("(optional)").
+      expect(find.text('Diagnosis'), findsOneWidget);
+      expect(find.text('(optional)'), findsOneWidget);
     });
 
     testWidgets('calls onBack when back button tapped', (tester) async {
@@ -233,7 +244,7 @@ void main() {
       )));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Back'));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pump();
 
       expect(called, isTrue);
@@ -259,12 +270,13 @@ void main() {
       expect(find.byType(OnboardingStep3), findsOneWidget);
     });
 
-    testWidgets('shows step 3 of 3 label', (tester) async {
+    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)',
+        (tester) async {
       setStep3Size(tester);
       await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Step 3 of 3'), findsOneWidget);
+      expect(find.text('Step 3 of 3'), findsNothing);
     });
 
     testWidgets('shows target respiratory rate heading', (tester) async {
@@ -289,8 +301,10 @@ void main() {
       await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
-      // Actual localized label values from app_en.arb.
-      expect(find.text('30 BPM (Standard)'), findsOneWidget);
+      // Actual localized label values from app_en.arb. DS alignment moved
+      // the "(Standard)" suffix into a separate "Most popular" badge pill.
+      expect(find.text('30 BPM'), findsOneWidget);
+      expect(find.text('Most popular'), findsOneWidget);
       expect(find.text('35 BPM'), findsOneWidget);
       expect(find.text('Custom Rate'), findsOneWidget);
     });
@@ -321,7 +335,7 @@ void main() {
       )));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Back'));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pump();
 
       expect(called, isTrue);
@@ -373,7 +387,7 @@ void main() {
       expect(find.byType(OnboardingStep2), findsOneWidget);
 
       // Navigate back to step 1
-      await tester.tap(find.text('Back'));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();
 
       expect(find.byType(OnboardingStep1), findsOneWidget);
@@ -404,17 +418,21 @@ void main() {
       expect(find.byType(OnboardingStep3), findsOneWidget);
     });
 
-    testWidgets('step 2 shows "Step 2 of 3" after navigation', (tester) async {
+    testWidgets(
+        'step 2 does not show a "Step X of Y" label after navigation (dropped per DS spec)',
+        (tester) async {
       await tester.pumpWidget(testApp(const OnboardingFlow()));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Next'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Step 2 of 3'), findsOneWidget);
+      expect(find.text('Step 2 of 3'), findsNothing);
     });
 
-    testWidgets('step 3 shows "Step 3 of 3" after navigation', (tester) async {
+    testWidgets(
+        'step 3 does not show a "Step X of Y" label after navigation (dropped per DS spec)',
+        (tester) async {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -436,7 +454,7 @@ void main() {
       await tester.tap(find.text('Next'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Step 3 of 3'), findsOneWidget);
+      expect(find.text('Step 3 of 3'), findsNothing);
     });
 
     testWidgets('step 3 shows Complete button label', (tester) async {
@@ -486,7 +504,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Navigate back
-      await tester.tap(find.text('Back'));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();
 
       // Name should still be filled
@@ -578,14 +596,12 @@ void main() {
       )));
       await tester.pumpAndSettle();
 
-      final diagField = find.widgetWithText(TextField, 'Diagnosis (Optional)');
-      if (diagField.evaluate().isNotEmpty) {
-        await tester.enterText(diagField, 'Heart murmur');
-        await tester.pump();
-        expect(captured, isNotNull);
-      } else {
-        expect(find.text('Diagnosis (Optional)'), findsOneWidget);
-      }
+      // DS alignment: diagnosis is now a plain free-text TextField (no
+      // labelText — the label is a separate Text above the field), rather
+      // than a dropdown trigger.
+      await tester.enterText(find.byType(TextField), 'Heart murmur');
+      await tester.pump();
+      expect(captured, 'Heart murmur');
     });
 
     testWidgets('pre-fills initialDiagnosis', (tester) async {

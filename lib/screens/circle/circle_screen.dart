@@ -12,6 +12,7 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
+import 'package:pet_circle/widgets/app_input_decoration.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/user_avatar.dart';
 
@@ -620,23 +621,9 @@ class _InviteSheetState extends State<_InviteSheet> {
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
               autofocus: true,
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: c.surface,
+              decoration: appInputDecoration(
+                context,
                 hintText: l10n.hintEmailExample,
-                hintStyle: AppSemanticTextStyles.body.copyWith(color: c.textTertiary),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
-                  borderSide: BorderSide(color: c.divider),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
-                  borderSide: BorderSide(color: c.primary, width: 2),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacingTokens.md,
-                  vertical: AppSpacingTokens.sm + 6,
-                ),
               ),
               style: AppSemanticTextStyles.body,
               onSubmitted: (_) => _sendInvite(),

@@ -9,6 +9,7 @@ import 'package:pet_circle/services/otp_service.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 
 class VerifyOtpScreen extends StatefulWidget {
   const VerifyOtpScreen({
@@ -179,71 +180,56 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     final c = AppSemanticColors.of(context);
 
     return Scaffold(
-      backgroundColor: c.surface,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: c.textPrimary),
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-            } else {
-              context.go('/');
-            }
-          },
-        ),
-      ),
+      backgroundColor: c.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.xl),
-          child: Center(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(32, 48, 32, 32),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 393),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(height: AppSpacingTokens.md),
-                  Align(
-                    child: Container(
-                      width: 64,
-                      height: 64,
-                      decoration: BoxDecoration(
-                        color: c.primaryLightest,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(Icons.mail_outline, size: 36, color: c.primary),
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      color: c.primaryGhost,
+                      shape: BoxShape.circle,
                     ),
+                    child: Icon(Icons.mail_outline, size: 36, color: c.primary),
                   ),
-                  const SizedBox(height: AppSpacingTokens.lg),
+                  const SizedBox(height: AppSpacingTokens.sm + 4),
                   Text(
                     l10n.enterVerificationCode,
-                    style: AppSemanticTextStyles.title3.copyWith(
+                    style: AppSemanticTextStyles.headingH1.copyWith(
                       color: c.textPrimary,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacingTokens.sm),
-                  Text.rich(
-                    TextSpan(
-                      style: AppSemanticTextStyles.body.copyWith(
-                        color: c.textPrimary,
-                      ),
-                      children: [
-                        TextSpan(text: l10n.enterTheCodeSentToLead),
-                        TextSpan(
-                          text: widget.email,
-                          style: AppSemanticTextStyles.body.copyWith(
-                            color: c.textPrimary,
-                            fontWeight: FontWeight.w500,
-                          ),
+                  SizedBox(
+                    width: 280,
+                    child: Text.rich(
+                      TextSpan(
+                        style: AppSemanticTextStyles.labelLRegular.copyWith(
+                          color: c.textSecondary,
                         ),
-                      ],
+                        children: [
+                          TextSpan(text: l10n.enterTheCodeSentToLead),
+                          TextSpan(
+                            text: widget.email,
+                            style: AppSemanticTextStyles.labelLBold.copyWith(
+                              color: c.textPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: AppSpacingTokens.xl),
+                  const SizedBox(height: AppSpacingTokens.pcXl),
                   if (_error != null) ...[
                     Text(
                       _error!,
@@ -255,69 +241,80 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                     const SizedBox(height: AppSpacingTokens.md),
                   ],
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: List.generate(6, (index) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          right: index < 5 ? AppSpacingTokens.sm + 4 : 0,
-                        ),
-                        child: SizedBox(
-                          width: 40,
-                          height: 40,
-                          child: KeyboardListener(
-                            focusNode: _rawFocusNodes[index],
-                            onKeyEvent: (event) => _onKeyPressed(index, event),
-                            child: TextFormField(
-                              controller: _controllers[index],
-                              focusNode: _focusNodes[index],
-                              keyboardType: TextInputType.number,
-                              textAlign: TextAlign.center,
-                              textAlignVertical: TextAlignVertical.center,
-                              maxLength: 1,
-                              style: AppSemanticTextStyles.body.copyWith(
-                                color: c.textPrimary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              decoration: InputDecoration(
-                                counterText: '',
-                                filled: true,
-                                fillColor: c.surface,
-                                isDense: true,
-                                contentPadding: EdgeInsets.zero,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AppRadiiTokens.sm,
-                                  ),
-                                  borderSide: BorderSide(color: c.divider),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AppRadiiTokens.sm,
-                                  ),
-                                  borderSide: BorderSide(color: c.divider),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AppRadiiTokens.sm,
-                                  ),
-                                  borderSide: BorderSide(
-                                    color: c.primary,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              onChanged: (value) =>
-                                  _onDigitChanged(index, value),
+                      return SizedBox(
+                        width: 44,
+                        height: 54,
+                        child: KeyboardListener(
+                          focusNode: _rawFocusNodes[index],
+                          onKeyEvent: (event) => _onKeyPressed(index, event),
+                          child: TextFormField(
+                            controller: _controllers[index],
+                            focusNode: _focusNodes[index],
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.center,
+                            textAlignVertical: TextAlignVertical.center,
+                            maxLength: 1,
+                            // counterText: '' alone still reserves the
+                            // subtext row's layout height, shrinking the
+                            // usable vertical space in this fixed 54px box
+                            // and making the digit look smaller/off-center
+                            // than the Figma spec. buildCounter fully drops
+                            // the reserved space.
+                            buildCounter: (
+                              context, {
+                              required currentLength,
+                              required isFocused,
+                              maxLength,
+                            }) =>
+                                null,
+                            style: AppSemanticTextStyles.headingH2.copyWith(
+                              color: c.textPrimary,
                             ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: c.surface,
+                              isDense: true,
+                              contentPadding: EdgeInsets.zero,
+                              // DS text inputs are borderless on idle —
+                              // this OTP box is a distinct fixed-size
+                              // component (not the shared labeled-field
+                              // pattern), so it keeps its own decoration
+                              // but drops the idle divider border.
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppRadiiTokens.pcField,
+                                ),
+                                borderSide: BorderSide.none,
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppRadiiTokens.pcField,
+                                ),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppRadiiTokens.pcField,
+                                ),
+                                borderSide: BorderSide(
+                                  color: c.primary,
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            onChanged: (value) =>
+                                _onDigitChanged(index, value),
                           ),
                         ),
                       );
                     }),
                   ),
-                  const SizedBox(height: AppSpacingTokens.lg),
+                  const SizedBox(height: AppSpacingTokens.pcXl),
                   if (_isVerifying)
                     Center(
                       child: Padding(
@@ -328,32 +325,11 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                       ),
                     )
                   else
-                    SizedBox(
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed:
-                            _otpCode.length == 6 ? _verifyOtp : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: c.primary,
-                          foregroundColor: c.onPrimary,
-                          disabledBackgroundColor: c.disabled,
-                          disabledForegroundColor: c.textDisabled,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppRadiiTokens.xl,
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          l10n.verifyCode,
-                          style: AppSemanticTextStyles.button.copyWith(
-                            color: c.onPrimary,
-                          ),
-                        ),
-                      ),
+                    PrimaryButton(
+                      label: l10n.verifyCode,
+                      onPressed: _otpCode.length == 6 ? _verifyOtp : null,
                     ),
-                  const SizedBox(height: AppSpacingTokens.md),
+                  const SizedBox(height: AppSpacingTokens.md + 4),
                   if (_isResending)
                     Center(
                       child: CircularProgressIndicator(color: c.primary),
@@ -364,9 +340,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                         onPressed: _resendCode,
                         child: Text(
                           l10n.resendCode,
-                          style: AppSemanticTextStyles.body.copyWith(
+                          style: AppSemanticTextStyles.labelMSemibold.copyWith(
                             color: c.primary,
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
@@ -374,12 +349,12 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                   else
                     Text(
                       l10n.resendCodeInSeconds(_resendCooldown),
-                      style: AppSemanticTextStyles.body.copyWith(
-                        color: c.textPrimary,
+                      style: AppSemanticTextStyles.pcLabelMuted.copyWith(
+                        color: c.textTertiary,
                       ),
                       textAlign: TextAlign.center,
                     ),
-                  SizedBox(height: MediaQuery.sizeOf(context).height * 0.08),
+                  const SizedBox(height: AppSpacingTokens.sm + 4),
                   Center(
                     child: TextButton(
                       style: TextButton.styleFrom(
@@ -401,9 +376,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                       },
                       child: Text(
                         l10n.useDifferentEmail,
-                        style: AppSemanticTextStyles.body.copyWith(
+                        style: AppSemanticTextStyles.labelMSemibold.copyWith(
                           color: c.primary,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),

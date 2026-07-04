@@ -1,10 +1,6 @@
----
-description: State management architecture for Pet Circle. Covers store patterns, access conventions, seeding from mock data, and how screens should read/write app state.
-globs: "lib/**/*.dart"
-alwaysApply: false
----
-
 # Pet Circle -- State Management Rules
+
+> State management architecture for Pet Circle. Covers store patterns, access conventions, seeding from mock data, and how screens should read/write app state.
 
 ## Architecture Overview
 
@@ -134,7 +130,7 @@ The global instance (e.g. `petStore`) is exported from the store file itself, NO
 ## Store Registry
 
 | Store | Global | Key Methods |
-|-------|--------|-------------|
+|-------|--------|--------------|
 | `PetStore` | `petStore` | `addPet`, `createPetWithFirestore`, `updatePet`, `updatePetWithFirestore`, `removePet`, `removePetWithFirestore`, `getPetByName`, `getPetById`, `activePet`, `activePetIndex`, `setActivePetIndex`, `currentUserRoleFor`, `removeCareCircleMember`, `removeCareCircleMemberWithFirestore`, `subscribeForUser`, `cancelSubscription` |
 | `MeasurementStore` | `measurementStore` | `addMeasurement`, `removeMeasurement`, `getMeasurements`, `latestForPet`, `countForPet`, `thisWeekCount`, `subscribeForPets`, `cancelSubscriptions` |
 | `NoteStore` | `noteStore` | `addNote`, `getNotes`, `subscribeForPets`, `cancelSubscriptions` |

@@ -61,14 +61,20 @@ void main() {
     });
 
     // ── Theme token tests (PC v3 / Claude-Design) ───────────────────────────
-    testWidgets('label uses semantic labelSm style', (tester) async {
+    testWidgets('label uses semantic labelMSemibold style', (tester) async {
       await tester.pumpWidget(testApp(
         const LabeledTextField(label: 'Label', hintText: 'hint'),
       ));
 
       final label = tester.widget<Text>(find.text('Label'));
-      expect(label.style?.fontSize, AppSemanticTextStyles.labelSm.fontSize);
-      expect(label.style?.fontWeight, AppSemanticTextStyles.labelSm.fontWeight);
+      expect(
+        label.style?.fontSize,
+        AppSemanticTextStyles.labelMSemibold.fontSize,
+      );
+      expect(
+        label.style?.fontWeight,
+        AppSemanticTextStyles.labelMSemibold.fontWeight,
+      );
     });
 
     testWidgets('input fill color is semantic surface', (tester) async {
@@ -116,25 +122,18 @@ void main() {
       );
     });
 
-    testWidgets('enabled border is 1px hairline', (tester) async {
-      late BuildContext capturedContext;
+    testWidgets('enabled border has no visible border (DS borderless field)',
+        (tester) async {
       await tester.pumpWidget(testApp(
-        Builder(builder: (ctx) {
-          capturedContext = ctx;
-          return const LabeledTextField(label: 'F', hintText: 'h');
-        }),
+        const LabeledTextField(label: 'F', hintText: 'h'),
       ));
 
       final textField = tester.widget<TextField>(find.byType(TextField));
       final border = textField.decoration?.enabledBorder as OutlineInputBorder;
-      expect(border.borderSide.width, 1);
-      expect(
-        border.borderSide.color,
-        AppSemanticColors.of(capturedContext).hairline,
-      );
+      expect(border.borderSide, BorderSide.none);
     });
 
-    testWidgets('focused border is 3px accentPurple ring', (tester) async {
+    testWidgets('focused border is 2px primary ring', (tester) async {
       late BuildContext capturedContext;
       await tester.pumpWidget(testApp(
         Builder(builder: (ctx) {
@@ -145,10 +144,10 @@ void main() {
 
       final textField = tester.widget<TextField>(find.byType(TextField));
       final border = textField.decoration?.focusedBorder as OutlineInputBorder;
-      expect(border.borderSide.width, 3);
+      expect(border.borderSide.width, 2);
       expect(
         border.borderSide.color,
-        AppSemanticColors.of(capturedContext).accentPurple,
+        AppSemanticColors.of(capturedContext).primary,
       );
     });
 

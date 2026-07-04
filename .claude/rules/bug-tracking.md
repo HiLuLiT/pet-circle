@@ -1,10 +1,6 @@
----
-description: Bug tracking and logging rules
-globs: 
-alwaysApply: true
----
-
 # Bug Tracking
+
+> Bug tracking and logging rules.
 
 Every bug discovered during development or testing MUST be logged in `docs/bug-log.md`.
 

@@ -16,6 +16,7 @@ import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/app_card.dart';
 import 'package:pet_circle/widgets/app_dropdown.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 import 'package:fl_chart/fl_chart.dart';
 
@@ -135,22 +136,22 @@ class _TrendsScreenState extends State<TrendsScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.lg)),
-        title: Text(l10n.exportLabel, style: AppSemanticTextStyles.headingLg),
+        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusCard),
+        title: Text(l10n.exportLabel, style: AppSemanticTextStyles.headingH2),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(l10n.csvPreview, style: AppSemanticTextStyles.body),
-              SizedBox(height: AppSpacingTokens.sm + 4),
+              Text(l10n.csvPreview, style: AppSemanticTextStyles.pcBody),
+              SizedBox(height: AppSpacingTokens.pcSm),
               Container(
-                padding: EdgeInsets.all(AppSpacingTokens.sm + 4),
+                padding: EdgeInsets.all(AppSpacingTokens.pcSm),
                 decoration: BoxDecoration(
                   color: c.background,
-                  borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
+                  borderRadius: AppRadiiTokens.borderRadiusField,
                 ),
-                child: Text(csvData, style: AppSemanticTextStyles.caption.copyWith(fontFamily: 'monospace', fontSize: 10)),
+                child: Text(csvData, style: AppSemanticTextStyles.pcCaption.copyWith(fontFamily: 'monospace', fontSize: 10)),
               ),
             ],
           ),
@@ -158,7 +159,7 @@ class _TrendsScreenState extends State<TrendsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.close, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
+            child: Text(l10n.close, style: AppSemanticTextStyles.pcBody.copyWith(color: c.textPrimary)),
           ),
           TextButton(
             onPressed: () async {
@@ -180,9 +181,9 @@ class _TrendsScreenState extends State<TrendsScreen>
             },
             style: TextButton.styleFrom(
               backgroundColor: c.primaryLight,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.sm)),
+              shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusField),
             ),
-            child: Text(l10n.downloadCsv, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
+            child: Text(l10n.downloadCsv, style: AppSemanticTextStyles.pcBody.copyWith(color: c.textPrimary)),
           ),
         ],
       ),
@@ -196,9 +197,9 @@ class _TrendsScreenState extends State<TrendsScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.lg)),
-        title: Text(l10n.deleteMeasurement, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
-        content: Text(l10n.deleteMeasurementConfirmation(m.bpm, dateStr), style: AppSemanticTextStyles.body),
+        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusCard),
+        title: Text(l10n.deleteMeasurement, style: AppSemanticTextStyles.headingH2.copyWith(color: c.textPrimary)),
+        content: Text(l10n.deleteMeasurementConfirmation(m.bpm, dateStr), style: AppSemanticTextStyles.pcBody),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
           TextButton(
@@ -236,29 +237,26 @@ class _TrendsScreenState extends State<TrendsScreen>
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Padding(
-              padding: const EdgeInsets.all(AppSpacingTokens.lg),
+              padding: const EdgeInsets.all(AppSpacingTokens.pcXl),
               child: Center(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-              const SizedBox(height: AppSpacingTokens.md),
-              Text(l10n.healthTrends, style: AppSemanticTextStyles.title3),
-              const SizedBox(height: AppSpacingTokens.sm),
+              Text(l10n.healthTrends, style: AppSemanticTextStyles.headingH2),
+              const SizedBox(height: AppSpacingTokens.pcXs),
               Text(
                 filtered.length < allMeasurements.length
                     ? l10n.recordingsInPeriod(petName, filtered.length, allMeasurements.length)
                     : l10n.recordingsTotal(petName, allMeasurements.length),
-                style: AppSemanticTextStyles.body,
+                style: AppSemanticTextStyles.pcLabelMuted,
               ),
-              const SizedBox(height: AppSpacingTokens.md),
-              Wrap(
-                spacing: AppSpacingTokens.sm,
-                runSpacing: AppSpacingTokens.sm + 4,
+              const SizedBox(height: AppSpacingTokens.pcMd),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: 220,
+                  Expanded(
                     child: AppDropdown(
                       label: '',
                       value: _periodLabel(_selectedPeriod, l10n),
@@ -271,59 +269,35 @@ class _TrendsScreenState extends State<TrendsScreen>
                       onOptionSelected: (label) => _selectPeriodLabel(label, l10n),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () => _showExportDialog(context),
-                    child: Container(
-                      height: 40,
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 4),
-                      decoration: BoxDecoration(
-                        color: c.primaryLight,
-                        borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.file_download, size: 16, color: c.textPrimary),
-                          const SizedBox(width: AppSpacingTokens.sm),
-                          Text(l10n.exportLabel, style: AppSemanticTextStyles.body),
-                        ],
-                      ),
-                    ),
+                  const SizedBox(width: AppSpacingTokens.pcSm),
+                  PrimaryButton(
+                    label: l10n.exportLabel,
+                    variant: PrimaryButtonVariant.miniPrimary,
+                    backgroundColor: c.textPrimary,
+                    foregroundColor: c.surface,
+                    onPressed: () => _showExportDialog(context),
+                    trailingIcon: Icon(Icons.file_download_outlined, color: c.surface),
                   ),
                 ],
               ),
-              const SizedBox(height: AppSpacingTokens.lg),
-              _StatGrid(filtered: filtered),
-              const SizedBox(height: AppSpacingTokens.lg),
-              _SectionCard(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l10n.srrOverTime, style: AppSemanticTextStyles.headingLg),
-                    const SizedBox(height: AppSpacingTokens.md),
-                    _BadgeRow(),
-                    const SizedBox(height: AppSpacingTokens.sm),
-                    _BadgeRowSecond(),
-                    const SizedBox(height: AppSpacingTokens.md),
-                    _SrrChart(measurements: filtered),
-                  ],
-                ),
-              ),
+              const SizedBox(height: AppSpacingTokens.pcMd),
+              _SrrCard(filtered: filtered),
+              const SizedBox(height: AppSpacingTokens.pcMd),
+              _MetricRow(filtered: filtered),
               if (filtered.isNotEmpty) ...[
-                const SizedBox(height: AppSpacingTokens.lg),
-                Text(l10n.measurementHistory, style: AppSemanticTextStyles.headingLg),
-                const SizedBox(height: AppSpacingTokens.sm + 4),
+                const SizedBox(height: AppSpacingTokens.pcMd),
+                Text(l10n.measurementHistory, style: AppSemanticTextStyles.headingH2),
+                const SizedBox(height: AppSpacingTokens.pcSm),
                 ...filtered.map((m) {
-                  final dateStr = '${m.recordedAt.month}/${m.recordedAt.day} ${m.recordedAt.hour}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
+                  final dateStr = '${m.recordedAt.month}/${m.recordedAt.day} · ${m.recordedAt.hour.toString().padLeft(2, '0')}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
                   final status = settingsStore.classifyStatus(m.bpm);
-                  final statusColor = status == 'Normal' ? c.primaryLight : status == 'Elevated' ? c.warning : c.error;
                   final badgeStatus = status == 'Normal'
                       ? StatusBadgeStatus.normal
                       : status == 'Elevated'
                           ? StatusBadgeStatus.elevated
                           : StatusBadgeStatus.alert;
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm),
+                    padding: const EdgeInsets.only(bottom: AppSpacingTokens.pcSm),
                     child: Dismissible(
                       key: ValueKey('${m.recordedAt.millisecondsSinceEpoch}-${m.bpm}'),
                       direction: access.canDeleteMeasurements
@@ -331,10 +305,10 @@ class _TrendsScreenState extends State<TrendsScreen>
                           : DismissDirection.none,
                       background: Container(
                         alignment: Alignment.centerRight,
-                        padding: EdgeInsets.only(right: AppSpacingTokens.md + 4),
+                        padding: EdgeInsets.only(right: AppSpacingTokens.pcMd),
                         decoration: BoxDecoration(
                           color: c.error,
-                          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
+                          borderRadius: AppRadiiTokens.borderRadiusCard,
                         ),
                         child: Icon(Icons.delete, color: c.surface),
                       ),
@@ -344,24 +318,19 @@ class _TrendsScreenState extends State<TrendsScreen>
                         return false;
                       },
                       child: Container(
-                        padding: EdgeInsets.symmetric(horizontal: AppSpacingTokens.md, vertical: AppSpacingTokens.sm + 4),
+                        padding: const EdgeInsets.all(AppSpacingTokens.pcMd),
                         decoration: BoxDecoration(
-                          color: c.background,
-                          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
+                          color: c.surface,
+                          borderRadius: AppRadiiTokens.borderRadiusCard,
                         ),
                         child: Row(
                           children: [
-                            Container(
-                              width: 8, height: 8,
-                              decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
-                            ),
-                            SizedBox(width: AppSpacingTokens.sm + 4),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('${m.bpm} BPM', style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: c.textPrimary)),
-                                  Text(dateStr, style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary)),
+                                  Text('${m.bpm} ${l10n.bpm}', style: AppSemanticTextStyles.labelLSemibold),
+                                  Text(dateStr, style: AppSemanticTextStyles.pcLabelMuted),
                                 ],
                               ),
                             ),
@@ -386,237 +355,189 @@ class _TrendsScreenState extends State<TrendsScreen>
         );
 
         if (!widget.showScaffold) {
-          return Container(color: c.surface, child: content);
+          return Container(color: c.background, child: content);
         }
-        return Scaffold(backgroundColor: c.surface, body: content);
+        return Scaffold(backgroundColor: c.background, body: content);
       },
     );
   }
 }
 
-class _StatGrid extends StatelessWidget {
-  const _StatGrid({required this.filtered});
+/// Main "Sleeping respiratory rate" card — matches Figma node 402:2096:
+/// title, big avg-BPM headline, area chart, and three legend badges
+/// (Normal / Elevated / Alert) using the candy tile accent colors.
+class _SrrCard extends StatelessWidget {
+  const _SrrCard({required this.filtered});
 
   final List<Measurement> filtered;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    if (filtered.isEmpty) {
-      return _SectionCard(
-        child: Column(children: [
-          Row(children: [
-            _StatCard(title: l10n.averageSrr, value: '--', footnote: l10n.bpm),
-            const SizedBox(width: AppSpacingTokens.sm),
-            _StatCard(title: l10n.range, value: '--', footnote: l10n.minMax),
-          ]),
-          const SizedBox(height: AppSpacingTokens.sm),
-          Row(children: [
-            _StatCard(title: l10n.trend, value: '--', footnote: l10n.bpmChange),
-            const SizedBox(width: AppSpacingTokens.sm),
-            _StatusCard(measurements: filtered),
-          ]),
-        ]),
-      );
-    }
-
+    final c = AppSemanticColors.of(context);
     final bpms = filtered.map((m) => m.bpm).toList();
-    final avg = (bpms.reduce((a, b) => a + b) / bpms.length).round();
-    final minBpm = bpms.reduce((a, b) => a < b ? a : b);
-    final maxBpm = bpms.reduce((a, b) => a > b ? a : b);
-    final weekAgo = DateTime.now().subtract(const Duration(days: 7));
-    final recent = filtered.where((m) => m.recordedAt.isAfter(weekAgo)).toList();
-    final older = filtered.where((m) => !m.recordedAt.isAfter(weekAgo)).toList();
-    final recentAvg = recent.isEmpty ? avg : (recent.map((m) => m.bpm).reduce((a, b) => a + b) / recent.length).round();
-    final olderAvg = older.isEmpty ? recentAvg : (older.map((m) => m.bpm).reduce((a, b) => a + b) / older.length).round();
-    final trend = recentAvg - olderAvg;
-    final trendStr = trend >= 0 ? '+$trend' : '$trend';
-
-    return _SectionCard(
-      child: Column(children: [
-        Row(children: [
-          _StatCard(title: l10n.averageSrr, value: '$avg', footnote: l10n.bpm),
-          const SizedBox(width: AppSpacingTokens.sm),
-          _StatCard(title: l10n.range, value: '$minBpm-$maxBpm', footnote: l10n.minMax),
-        ]),
-        const SizedBox(height: AppSpacingTokens.sm),
-        Row(children: [
-          _StatCard(title: l10n.trend, value: trendStr, footnote: l10n.bpmChange),
-          const SizedBox(width: AppSpacingTokens.sm),
-          _StatusCard(measurements: filtered),
-        ]),
-      ]),
-    );
-  }
-}
-
-class _SectionCard extends StatelessWidget {
-  const _SectionCard({required this.child});
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return AppCard(
-      variant: AppCardVariant.tile,
-      tileColor: c.background,
-      padding: const EdgeInsets.all(AppSpacingTokens.lg),
-      child: child,
-    );
-  }
-}
-
-class _BadgeRow extends StatelessWidget {
-  const _BadgeRow();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    final l10n = AppLocalizations.of(context)!;
+    final avgLabel = bpms.isEmpty
+        ? '--'
+        : (bpms.reduce((a, b) => a + b) / bpms.length).round().toString();
     final elevated = settingsStore.elevatedThreshold;
     final critical = settingsStore.criticalThreshold;
-    return Wrap(
-      spacing: AppSpacingTokens.sm,
-      runSpacing: AppSpacingTokens.sm,
-      children: [
-        _LegendBadge(color: c.primaryLight, label: l10n.legendNormal(elevated)),
-        _LegendBadge(color: c.warning, label: l10n.legendElevated(elevated, critical)),
-      ],
-    );
-  }
-}
 
-class _BadgeRowSecond extends StatelessWidget {
-  const _BadgeRowSecond();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    final l10n = AppLocalizations.of(context)!;
-    return _LegendBadge(color: c.error, label: l10n.legendAlert(settingsStore.criticalThreshold));
-  }
-}
-
-class _LegendBadge extends StatelessWidget {
-  const _LegendBadge({required this.color, required this.label});
-
-  final Color color;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm, vertical: AppSpacingTokens.xs),
-      decoration: BoxDecoration(
-        color: c.surface,
-        borderRadius: BorderRadius.circular(AppRadiiTokens.full),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+    return AppCard(
+      variant: AppCardVariant.surface,
+      padding: const EdgeInsets.all(AppSpacingTokens.pcLg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-          const SizedBox(width: AppSpacingTokens.xs),
-          Text(label, style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary)),
+          Text(l10n.srrOverTime, style: AppSemanticTextStyles.pcLabelMuted),
+          const SizedBox(height: AppSpacingTokens.pcSm),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(avgLabel, style: AppSemanticTextStyles.pcDisplayXl),
+              const SizedBox(width: AppSpacingTokens.pcXs),
+              Text(l10n.avgBpm, style: AppSemanticTextStyles.labelLRegular.copyWith(color: c.textSecondary)),
+            ],
+          ),
+          const SizedBox(height: AppSpacingTokens.pcSm),
+          _SrrChart(measurements: filtered),
+          const SizedBox(height: AppSpacingTokens.pcSm),
+          Wrap(
+            spacing: AppSpacingTokens.pcXs,
+            runSpacing: AppSpacingTokens.pcXs,
+            children: [
+              _LegendBadge(
+                bg: c.accentPeriwinkleTile,
+                dot: c.accentPeriwinkle,
+                label: l10n.legendNormal(elevated),
+              ),
+              _LegendBadge(
+                bg: c.accentButterTile,
+                dot: c.accentButter,
+                label: l10n.legendElevated(elevated, critical),
+              ),
+              _LegendBadge(
+                bg: c.accentBlushTile,
+                dot: c.accentBlush,
+                label: l10n.legendAlert(critical),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 }
 
-class _StatCard extends StatelessWidget {
-  const _StatCard({required this.title, required this.value, required this.footnote});
+/// Pill legend badge for the SRR chart — tile bg + accent dot/text, matching
+/// the Figma "Badge" component instances in node 402:2096.
+class _LegendBadge extends StatelessWidget {
+  const _LegendBadge({required this.bg, required this.dot, required this.label});
 
-  final String title;
-  final String value;
-  final String footnote;
+  final Color bg;
+  final Color dot;
+  final String label;
 
   @override
   Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    return Expanded(
-      child: Container(
-        height: 109,
-        padding: const EdgeInsets.all(AppSpacingTokens.sm + 4),
-        decoration: BoxDecoration(
-          color: c.surface,
-          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: AppSemanticTextStyles.caption),
-            const SizedBox(height: AppSpacingTokens.xs),
-            Text(value, style: AppSemanticTextStyles.title3.copyWith(fontSize: 24)),
-            const Spacer(),
-            Text(footnote, style: AppSemanticTextStyles.caption),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.only(left: AppSpacingTokens.pcSm, right: AppSpacingTokens.pcMd, top: AppSpacingTokens.pcXs, bottom: AppSpacingTokens.pcXs),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: AppRadiiTokens.borderRadiusPill,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(width: 9, height: 9, decoration: BoxDecoration(color: dot, shape: BoxShape.circle)),
+          const SizedBox(width: AppSpacingTokens.pcXs),
+          Text(label, style: AppSemanticTextStyles.labelSSemibold.copyWith(color: dot)),
+        ],
       ),
     );
   }
 }
 
-class _StatusCard extends StatelessWidget {
-  const _StatusCard({required this.measurements});
+/// Two-tile metric row below the SRR card — "Reading range" (min-max bpm)
+/// and "Readings" (color-coded normal/elevated/alert counts), matching
+/// Figma node 402:2096's "Metric Label" instances.
+class _MetricRow extends StatelessWidget {
+  const _MetricRow({required this.filtered});
 
-  final List<Measurement> measurements;
+  final List<Measurement> filtered;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppSemanticColors.of(context);
-    final normal = measurements.where((m) => m.bpm < settingsStore.elevatedThreshold).length;
-    final elevated = measurements.where((m) => m.bpm >= settingsStore.elevatedThreshold && m.bpm < settingsStore.criticalThreshold).length;
-    final critical = measurements.where((m) => m.bpm >= settingsStore.criticalThreshold).length;
-    return Expanded(
-      child: Container(
-        height: 109,
-        padding: EdgeInsets.all(AppSpacingTokens.sm + 4),
-        decoration: BoxDecoration(
-          color: c.surface,
-          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
+    final bpms = filtered.map((m) => m.bpm).toList();
+    final rangeLabel = bpms.isEmpty
+        ? '--'
+        : '${bpms.reduce((a, b) => a < b ? a : b)}-${bpms.reduce((a, b) => a > b ? a : b)}';
+    final normal = filtered.where((m) => m.bpm < settingsStore.elevatedThreshold).length;
+    final elevated = filtered
+        .where((m) => m.bpm >= settingsStore.elevatedThreshold && m.bpm < settingsStore.criticalThreshold)
+        .length;
+    final alert = filtered.where((m) => m.bpm >= settingsStore.criticalThreshold).length;
+
+    return Row(
+      children: [
+        Expanded(
+          child: _MetricTile(
+            label: l10n.readingRange,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(rangeLabel, style: AppSemanticTextStyles.headingH2),
+                const SizedBox(width: AppSpacingTokens.pcXs),
+                Text(l10n.bpm.toLowerCase(), style: AppSemanticTextStyles.labelSRegular.copyWith(color: c.textTertiary)),
+              ],
+            ),
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(l10n.status, style: AppSemanticTextStyles.caption.copyWith(fontSize: 12)),
-            const SizedBox(height: AppSpacingTokens.md),
-            Row(children: [
-              _StatusPill(value: '$normal', color: c.primaryLight),
-              const SizedBox(width: AppSpacingTokens.sm),
-              _StatusPill(value: '$elevated', color: c.warning),
-              const SizedBox(width: AppSpacingTokens.sm),
-              _StatusPill(value: '$critical', color: c.error, muted: critical == 0),
-            ]),
-          ],
+        const SizedBox(width: AppSpacingTokens.pcSm),
+        Expanded(
+          child: _MetricTile(
+            label: l10n.readingsLabel,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(text: '$normal', style: AppSemanticTextStyles.headingH2.copyWith(color: c.accentPeriwinkle)),
+                  TextSpan(text: ' ', style: AppSemanticTextStyles.headingH2),
+                  TextSpan(text: '$elevated', style: AppSemanticTextStyles.headingH2.copyWith(color: c.accentButter)),
+                  TextSpan(text: ' ', style: AppSemanticTextStyles.headingH2),
+                  TextSpan(text: '$alert', style: AppSemanticTextStyles.headingH2.copyWith(color: c.accentBlush)),
+                ],
+              ),
+            ),
+          ),
         ),
-      ),
+      ],
     );
   }
 }
 
-class _StatusPill extends StatelessWidget {
-  const _StatusPill({required this.value, required this.color, this.muted = false});
+class _MetricTile extends StatelessWidget {
+  const _MetricTile({required this.label, required this.child});
 
-  final String value;
-  final Color color;
-  final bool muted;
+  final String label;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Text(value, style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600, color: color)),
-      const SizedBox(height: AppSpacingTokens.xs),
-      Container(
-        width: 27, height: 2,
-        decoration: BoxDecoration(
-          color: muted ? color.withValues(alpha: 0.4) : color,
-          borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-        ),
+    return AppCard(
+      variant: AppCardVariant.surface,
+      padding: const EdgeInsets.all(AppSpacingTokens.pcMd),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: AppSemanticTextStyles.labelSRegular),
+          const SizedBox(height: AppSpacingTokens.pcXs),
+          child,
+        ],
       ),
-    ]);
+    );
   }
 }
 
@@ -632,23 +553,23 @@ class _SrrChart extends StatelessWidget {
 
     if (measurements.isEmpty) {
       return Container(
-        height: 392,
+        height: 220,
         width: double.infinity,
-        padding: const EdgeInsets.all(AppSpacingTokens.lg),
+        padding: const EdgeInsets.all(AppSpacingTokens.pcLg),
         decoration: BoxDecoration(
           color: c.background,
-          borderRadius: BorderRadius.circular(AppRadiiTokens.md),
+          borderRadius: AppRadiiTokens.borderRadiusField,
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.show_chart, size: 48, color: c.textSecondary.withValues(alpha: 0.4)),
-            SizedBox(height: AppSpacingTokens.sm + 4),
-            Text(l10n.noMeasurementsYet, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
-            const SizedBox(height: AppSpacingTokens.sm),
+            Icon(Icons.show_chart, size: 40, color: c.textTertiary),
+            const SizedBox(height: AppSpacingTokens.pcSm),
+            Text(l10n.noMeasurementsYet, style: AppSemanticTextStyles.labelLSemibold),
+            const SizedBox(height: AppSpacingTokens.pcXs),
             Text(
               l10n.noMeasurementsDescription,
-              style: AppSemanticTextStyles.body.copyWith(color: c.textSecondary),
+              style: AppSemanticTextStyles.pcCaption,
               textAlign: TextAlign.center,
             ),
           ],
@@ -670,22 +591,22 @@ class _SrrChart extends StatelessWidget {
     final maxBpm = spots.isEmpty ? 50.0 : spots.map((s) => s.y).reduce((a, b) => a > b ? a : b);
     final maxY = max(50.0, maxBpm + 10.0);
 
-    final labelColor = c.textSecondary;
-    final chartColor = c.info;
-    final gridColor = c.divider;
+    final labelColor = c.textTertiary;
+    final chartColor = c.accentPeriwinkle;
+    final gridColor = c.textTertiary;
 
     return Container(
-      height: 392,
+      height: 220,
       width: double.infinity,
       padding: const EdgeInsets.only(
-        top: AppSpacingTokens.md,
-        right: AppSpacingTokens.sm,
-        bottom: AppSpacingTokens.xs,
-        left: AppSpacingTokens.xs,
+        top: AppSpacingTokens.pcMd,
+        right: AppSpacingTokens.pcSm,
+        bottom: AppSpacingTokens.pcXs,
+        left: AppSpacingTokens.pcXs,
       ),
       decoration: BoxDecoration(
         color: c.background,
-        borderRadius: BorderRadius.circular(AppRadiiTokens.md),
+        borderRadius: AppRadiiTokens.borderRadiusField,
       ),
       child: LineChart(
         LineChartData(

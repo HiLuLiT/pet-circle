@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
-import 'package:pet_circle/widgets/app_dropdown.dart';
+import 'package:pet_circle/widgets/app_input_decoration.dart';
 import 'package:pet_circle/widgets/note_callout.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
@@ -21,50 +22,27 @@ class OnboardingStep2 extends StatefulWidget {
 }
 
 class _OnboardingStep2State extends State<OnboardingStep2>
-    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
-  final _diagnoses = const [
-    'Diagnosis 01',
-    'Diagnosis 02',
-    'Diagnosis 03',
-    'Diagnosis 04',
-    'Diagnosis 05',
-  ];
-  String? _selectedDiagnosis;
-  bool _isOpen = false;
-  late AnimationController _chevronController;
+  late final TextEditingController _diagnosisController;
 
   @override
   void initState() {
     super.initState();
-    _selectedDiagnosis = widget.initialDiagnosis?.isNotEmpty == true ? widget.initialDiagnosis : null;
-    _chevronController = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
+    _diagnosisController = TextEditingController(text: widget.initialDiagnosis ?? '');
   }
 
   @override
   void dispose() {
-    _chevronController.dispose();
+    _diagnosisController.dispose();
     super.dispose();
-  }
-
-  void _toggleDropdown() {
-    setState(() {
-      _isOpen = !_isOpen;
-      if (_isOpen) {
-        _chevronController.forward();
-      } else {
-        _chevronController.reverse();
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppSemanticColors.of(context);
     super.build(context);
     return OnboardingShell(
       title: l10n.setupPetProfile,
@@ -77,33 +55,42 @@ class _OnboardingStep2State extends State<OnboardingStep2>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(l10n.medicalInformation, style: AppSemanticTextStyles.headingLg),
+          Text(l10n.medicalInformation, style: AppSemanticTextStyles.headingH2),
           const SizedBox(height: AppSpacingTokens.sm),
           Text(
             l10n.medicalInfoDescription,
-            style: AppSemanticTextStyles.body,
+            style: AppSemanticTextStyles.labelLRegular.copyWith(
+              color: c.textSecondary,
+            ),
           ),
           const SizedBox(height: AppSpacingTokens.md),
-          AppDropdown(
-            label: l10n.diagnosisOptional,
-            value: _selectedDiagnosis,
-            placeholder: l10n.selectDiagnosis,
-            onTap: _toggleDropdown,
-            isOpen: _isOpen,
-            chevronController: _chevronController,
-            options: _diagnoses,
-            onOptionSelected: (diagnosis) {
-              setState(() {
-                _selectedDiagnosis = diagnosis;
-                _isOpen = false;
-              });
-              _chevronController.reverse();
-              widget.onDiagnosisChanged?.call(diagnosis);
-            },
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.diagnosisLabel,
+                style: AppSemanticTextStyles.labelMSemibold,
+              ),
+              const SizedBox(width: AppSpacingTokens.xs),
+              Text(
+                l10n.optionalSuffix,
+                style: AppSemanticTextStyles.pcLabelMuted,
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacingTokens.sm),
+          TextField(
+            controller: _diagnosisController,
+            style: AppSemanticTextStyles.pcBody,
+            decoration: appInputDecoration(
+              context,
+              hintText: l10n.diagnosisHint,
+            ),
+            onChanged: widget.onDiagnosisChanged,
           ),
           const SizedBox(height: AppSpacingTokens.md),
           NoteCallout(
-            title: l10n.note,
+            title: l10n.noteLabel,
             body: l10n.diagnosisNote,
           ),
         ],

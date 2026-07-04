@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/screens/medication/medication_form_widgets.dart';
-import 'package:pet_circle/widgets/toggle_pill.dart';
+import 'package:pet_circle/theme/semantic/color_scheme.dart';
 
 import '../../helpers/helpers.dart';
 import '../../helpers/ignore_overflow_errors.dart';
@@ -334,6 +334,94 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
+  // FrequencyChipSelector (Figma node 402-2388 — wrapped pill chips)
+  // ---------------------------------------------------------------------------
+  group('FrequencyChipSelector', () {
+    testWidgets('renders without error', (tester) async {
+      suppressOverflowErrors();
+      _setSheetSize(tester);
+
+      await tester.pumpWidget(testApp(
+        FrequencyChipSelector(
+          label: 'Frequency *',
+          value: 'Once daily',
+          onChanged: (_) {},
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FrequencyChipSelector), findsOneWidget);
+    });
+
+    testWidgets('shows all three options as chips at once', (tester) async {
+      suppressOverflowErrors();
+      _setSheetSize(tester);
+
+      await tester.pumpWidget(testApp(
+        FrequencyChipSelector(
+          label: 'Frequency *',
+          value: 'Once daily',
+          onChanged: (_) {},
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      // Unlike DropdownField, every option is visible without opening
+      // anything — no separate "open" interaction needed.
+      expect(find.text('Once daily'), findsOneWidget);
+      expect(find.text('Twice daily'), findsOneWidget);
+      expect(find.text('As needed'), findsOneWidget);
+    });
+
+    testWidgets('calls onChanged with the canonical value when tapped',
+        (tester) async {
+      suppressOverflowErrors();
+      _setSheetSize(tester);
+
+      String? selected;
+      await tester.pumpWidget(testApp(
+        FrequencyChipSelector(
+          label: 'Frequency *',
+          value: 'Once daily',
+          onChanged: (v) => selected = v,
+        ),
+      ));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Twice daily'));
+      await tester.pumpAndSettle();
+
+      expect(selected, 'Twice daily');
+    });
+
+    testWidgets('selected chip uses accentPeriwinkleTile background',
+        (tester) async {
+      suppressOverflowErrors();
+      _setSheetSize(tester);
+      late BuildContext capturedContext;
+
+      await tester.pumpWidget(testApp(
+        Builder(builder: (ctx) {
+          capturedContext = ctx;
+          return FrequencyChipSelector(
+            label: 'Frequency *',
+            value: 'Twice daily',
+            onChanged: (_) {},
+          );
+        }),
+      ));
+      await tester.pumpAndSettle();
+
+      final tileColor = AppSemanticColors.of(capturedContext).accentPeriwinkleTile;
+      final containers = tester.widgetList<Container>(find.byType(Container)).where(
+        (c) => c.decoration is BoxDecoration &&
+            (c.decoration as BoxDecoration).color == tileColor,
+      );
+      expect(containers.isNotEmpty, isTrue);
+    });
+  });
+
+  // ---------------------------------------------------------------------------
   // ValidatedTextArea
   // ---------------------------------------------------------------------------
   group('ValidatedTextArea', () {
@@ -408,113 +496,6 @@ void main() {
       await tester.pump();
 
       expect(controller.text, 'Line 1\nLine 2');
-    });
-  });
-
-  // ---------------------------------------------------------------------------
-  // ReminderCard
-  // ---------------------------------------------------------------------------
-  group('ReminderCard', () {
-    testWidgets('renders without error when disabled', (tester) async {
-      suppressOverflowErrors();
-      _setSheetSize(tester);
-
-      await tester.pumpWidget(testApp(
-        ReminderCard(enabled: false, onChanged: (_) {}),
-      ));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(ReminderCard), findsOneWidget);
-    });
-
-    testWidgets('renders without error when enabled', (tester) async {
-      suppressOverflowErrors();
-      _setSheetSize(tester);
-
-      await tester.pumpWidget(testApp(
-        ReminderCard(enabled: true, onChanged: (_) {}),
-      ));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(ReminderCard), findsOneWidget);
-    });
-
-    testWidgets('shows medication reminders text', (tester) async {
-      suppressOverflowErrors();
-      _setSheetSize(tester);
-
-      await tester.pumpWidget(testApp(
-        ReminderCard(enabled: false, onChanged: (_) {}),
-      ));
-      await tester.pumpAndSettle();
-
-      expect(find.text('Medication Reminders'), findsOneWidget);
-    });
-
-    testWidgets('shows notifications icon', (tester) async {
-      suppressOverflowErrors();
-      _setSheetSize(tester);
-
-      await tester.pumpWidget(testApp(
-        ReminderCard(enabled: false, onChanged: (_) {}),
-      ));
-      await tester.pumpAndSettle();
-
-      expect(find.byIcon(Icons.notifications_none), findsOneWidget);
-    });
-
-    testWidgets('shows TogglePill', (tester) async {
-      suppressOverflowErrors();
-      _setSheetSize(tester);
-
-      await tester.pumpWidget(testApp(
-        ReminderCard(enabled: true, onChanged: (_) {}),
-      ));
-      await tester.pumpAndSettle();
-
-      expect(find.byType(TogglePill), findsOneWidget);
-    });
-
-    testWidgets('calls onChanged when toggle is tapped', (tester) async {
-      suppressOverflowErrors();
-      _setSheetSize(tester);
-
-      bool? toggled;
-      await tester.pumpWidget(testApp(
-        ReminderCard(enabled: false, onChanged: (v) => toggled = v),
-      ));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byType(GestureDetector).last);
-      await tester.pump();
-
-      expect(toggled, isTrue);
-    });
-
-    testWidgets('TogglePill reflects enabled state (on)', (tester) async {
-      suppressOverflowErrors();
-      _setSheetSize(tester);
-
-      await tester.pumpWidget(testApp(
-        ReminderCard(enabled: true, onChanged: (_) {}),
-      ));
-      await tester.pumpAndSettle();
-
-      final pill = tester.widget<TogglePill>(find.byType(TogglePill));
-      expect(pill.isOn, isTrue);
-    });
-
-    testWidgets('TogglePill reflects enabled state (off)', (tester) async {
-      suppressOverflowErrors();
-      _setSheetSize(tester);
-
-      await tester.pumpWidget(testApp(
-        ReminderCard(enabled: false, onChanged: (_) {}),
-      ));
-      await tester.pumpAndSettle();
-
-      final pill = tester.widget<TogglePill>(find.byType(TogglePill));
-      expect(pill.isOn, isFalse);
     });
   });
 }

@@ -12,6 +12,7 @@ import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/app_input_decoration.dart';
 import 'package:pet_circle/widgets/breed_search_field.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
@@ -66,11 +67,10 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 const SizedBox(height: AppSpacingTokens.md),
                 TextField(
                   controller: nameCtrl,
-                  decoration: InputDecoration(
-                    labelText: l10n.petName,
-                    filled: true, fillColor: c.surface,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.sm), borderSide: BorderSide.none),
-                  ),
+                  decoration: appInputDecoration(
+                    context,
+                    hintText: '',
+                  ).copyWith(labelText: l10n.petName),
                 ),
                 SizedBox(height: AppSpacingTokens.sm + 4),
                 BreedSearchField(
@@ -82,11 +82,10 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 SizedBox(height: AppSpacingTokens.sm + 4),
                 TextField(
                   controller: imageCtrl,
-                  decoration: InputDecoration(
-                    labelText: l10n.photoUrl,
-                    filled: true, fillColor: c.surface,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadiiTokens.sm), borderSide: BorderSide.none),
-                  ),
+                  decoration: appInputDecoration(
+                    context,
+                    hintText: '',
+                  ).copyWith(labelText: l10n.photoUrl),
                 ),
                 const SizedBox(height: AppSpacingTokens.md),
                 Row(

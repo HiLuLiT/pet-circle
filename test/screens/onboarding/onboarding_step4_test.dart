@@ -40,13 +40,14 @@ void main() {
       expect(find.text('Setup pet profile'), findsOneWidget);
     });
 
-    testWidgets('shows "Step 4 of 4" step label', (tester) async {
+    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)',
+        (tester) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const OnboardingStep4()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Step 4 of 4'), findsOneWidget);
+      expect(find.text('Step 4 of 4'), findsNothing);
     });
 
     testWidgets('shows "Invite Your Veterinarian" section heading',
@@ -160,7 +161,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      expect(find.text('Back'), findsOneWidget);
+      expect(find.byIcon(Icons.arrow_back), findsOneWidget);
     });
 
     testWidgets('calls onBack when Back button is tapped', (tester) async {
@@ -175,7 +176,7 @@ void main() {
       ));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Back'));
+      await tester.tap(find.byIcon(Icons.arrow_back));
       await tester.pumpAndSettle();
 
       expect(backCalled, isTrue);

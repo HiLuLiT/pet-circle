@@ -122,19 +122,22 @@ docs/                  # PRD, bug log, firebase status, future features
 
 ### Figma Sources
 
-- **Design system**: https://www.figma.com/design/ApTk87wJXejOTzVtEnFJMw/Pet-circle?node-id=264-1093
+- **Design system (source of truth)**: https://www.figma.com/design/ApTk87wJXejOTzVtEnFJMw/Pet-circle?node-id=402-1191 — canonical components, tokens, type scale, colors, radii. Consult this FIRST for every design-alignment task.
+- **Design system (legacy page)**: https://www.figma.com/design/ApTk87wJXejOTzVtEnFJMw/Pet-circle?node-id=264-1093
 - **Views**: https://www.figma.com/design/ApTk87wJXejOTzVtEnFJMw/Pet-circle?node-id=167-107
 - **Conflict rule**: If design system and views disagree, **follow the views**.
 - **Migration mapping**: See `docs/design-system-migration.md` for complete token tables.
 
-### Required Figma-to-Code Flow
+### Required Figma-to-Code Flow (component-first)
 
+0. **Consult the design-system source of truth first** (`node-id=402-1191`): fetch `get_design_context`/`get_metadata` for the canonical component or token this screen uses. If the app's shared component or token diverges from the DS spec, **update the component/token to match the DS before touching the screen**.
 1. Run `get_design_context` with the Figma node for the component/screen
 2. Run `get_screenshot` for a visual reference
 3. Download any assets from the Figma MCP asset endpoint
 4. Translate Figma output (React + Tailwind) into Flutter/Dart using project conventions
-5. Use the project's semantic token classes — **never hardcode hex values**
-6. Validate against the Figma screenshot for 1:1 visual parity
+5. Build/update the screen using the (now-reconciled) shared components and tokens — never hand-roll a one-off that duplicates an existing widget
+6. Use the project's semantic token classes — **never hardcode hex values**
+7. Validate against the Figma screenshot for 1:1 visual parity
 
 ### Design Token Architecture (3 layers)
 

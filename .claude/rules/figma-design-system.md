@@ -1,23 +1,24 @@
----
-description: Rules for implementing Figma designs using the Figma MCP server. Covers component organization, styling conventions, design tokens, asset handling, and the required Figma-to-code workflow for this Flutter/Dart pet health monitoring app.
-globs: "lib/**/*.dart"
-alwaysApply: false
----
-
 # Pet Circle — Figma Design System Rules
+
+> Rules for implementing Figma designs using the Figma MCP server. Covers component organization, styling conventions, design tokens, asset handling, and the required Figma-to-code workflow for this Flutter/Dart pet health monitoring app.
 
 ## Project Overview
 
 Pet Circle is a **Flutter/Dart** cross-platform app (iOS, Android, Web, Desktop) for pet health monitoring. It uses the **PC v3 (Claude-Design) system** — a warm, flat, candy-pastel design language with centralized design tokens aligned to Figma variables. Typography is **Instrument Sans**.
 
-> For the full token layer and component catalog, see `design-system-enforcement.mdc` — that file is the single source of truth and is always applied. This file covers the Figma-specific workflow and asset handling only.
+> For the full token layer and component catalog, see [design-system-enforcement.md](design-system-enforcement.md) — that file is the single source of truth and always applies. This file covers the Figma-specific workflow and asset handling only.
 
 ## Figma MCP Integration Rules
 
 These rules define how to translate Figma inputs into code for this project and must be followed for every Figma-driven change.
 
+### Design System source of truth
+
+**https://www.figma.com/design/ApTk87wJXejOTzVtEnFJMw/Pet-circle?node-id=402-1191** — the canonical component/token catalog (buttons, inputs, cards, badges, colors, radii, type scale). This is component-first: before implementing ANY screen or component from Figma, check this node for the matching component/token. If the app's shared widget or token diverges from this spec, fix the shared widget/token FIRST, then build the screen on top of it. Never let a screen invent a one-off style that contradicts the DS node.
+
 ### Required Flow (do not skip)
 
+0. Consult the DS node above for the canonical component(s)/token(s) this task touches; reconcile app code to it first if it diverges
 1. Run `get_design_context` first to fetch the structured representation for the exact node(s)
 2. If the response is too large or truncated, run `get_metadata` to get the high-level node map, then re-fetch only the required node(s) with `get_design_context`
 3. Run `get_screenshot` for a visual reference of the node variant being implemented
@@ -76,13 +77,13 @@ lib/
 
 ### Existing Widgets (check before creating new ones)
 
-See the full component catalog (all 28 shared widgets, grouped by category, with key API params) in `design-system-enforcement.mdc`. Always search `lib/widgets/` before creating a new UI primitive.
+See the full component catalog (all shared widgets, grouped by category, with key API params) in [design-system-enforcement.md](design-system-enforcement.md). Always search `lib/widgets/` before creating a new UI primitive.
 
 ---
 
 ## Design Tokens
 
-Tokens live under `lib/theme/tokens/` (primitives) and `lib/theme/semantic/` (semantic layer). **Never hardcode colors, spacing, radii, or typography values.** Full reference (exact fields, values, and usage rules) is in `design-system-enforcement.mdc` — summary:
+Tokens live under `lib/theme/tokens/` (primitives) and `lib/theme/semantic/` (semantic layer). **Never hardcode colors, spacing, radii, or typography values.** Full reference (exact fields, values, and usage rules) is in [design-system-enforcement.md](design-system-enforcement.md) — summary:
 
 - Colors: `AppSemanticColors.of(context)` (never `AppColorsTheme`, removed)
 - Typography: `AppSemanticTextStyles.*`, font = Instrument Sans (never `AppTextStyles`, removed)
@@ -148,10 +149,10 @@ class MyWidget extends StatelessWidget {
 `PrimaryButton` supports five variants via `PrimaryButtonVariant`:
 
 ```dart
-// Filled (default): ink bg, white text — primary actions
+// Filled (default): purple bg, white text — primary actions
 PrimaryButton(label: 'Sign up', onPressed: () {})
 
-// Outlined: surface bg, ink text, hairline border — secondary actions
+// Outlined/Tertiary: transparent bg, ink text, 1px ink border — secondary actions
 PrimaryButton(label: 'Cancel', variant: PrimaryButtonVariant.outlined, onPressed: () {})
 
 // Secondary: purple-tile bg, ink text
@@ -198,7 +199,7 @@ SettingsRow(
 
 Warm, flat, candy-pastel language (per the Figma "Design System" page). Key characteristics:
 - Flat surfaces, minimal/soft elevation (`AppShadowTokens.small` — no neumorphic dual-shadows)
-- Rounded corners (`AppRadiiTokens.pcCard` = 18 default for cards)
+- Rounded corners (`AppRadiiTokens.pcCard` = 16 default for cards)
 - Warm cream background, ink text, five candy accent families (purple/periwinkle/butter/blush/mint)
 - Pill-shaped inputs and buttons (`AppRadiiTokens.pcPill`)
 - Recolorable breed mascots (`Mascot` widget) as a signature illustration element
@@ -288,12 +289,11 @@ Two icon systems are in use:
 - Global `ChangeNotifier` stores for shared state (7 stores in `lib/stores/`)
 - `ValueNotifier` for global preferences (locale, dark mode)
 - `ListenableBuilder` for reactive UI rebuilds
-- See `state-management.mdc` for full patterns and store registry
+- See [state-management.md](state-management.md) for full patterns and store registry
 
 ### Authentication
 
-- Firebase Auth is configured but **currently disabled** (`kEnableFirebase = false`)
-- Auth flows exist in `lib/screens/auth/` and `lib/providers/auth_provider.dart`
+- Firebase Auth flows exist in `lib/screens/auth/` and `lib/providers/auth_provider.dart`; toggled via `kEnableFirebase` in `main.dart`
 
 ### Routing
 

@@ -126,13 +126,13 @@ void main() {
       expect(container.isNotEmpty, isTrue);
     });
 
-    testWidgets('initials text color is onPrimary', (tester) async {
+    testWidgets('initials text color is textPrimary', (tester) async {
       await tester.pumpWidget(testApp(
         const UserAvatar(name: 'Charlie Davis'),
       ));
 
       final text = tester.widget<Text>(find.text('CD'));
-      expect(text.style?.color, AppSemanticColors.light.onPrimary);
+      expect(text.style?.color, AppSemanticColors.light.textPrimary);
     });
   });
 }

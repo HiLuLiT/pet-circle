@@ -76,7 +76,7 @@ void main() {
     });
 
     // ── Radius ──────────────────────────────────────────────────────────────
-    testWidgets('uses AppRadiiTokens.pcCard (18) for border radius',
+    testWidgets('uses AppRadiiTokens.pcCard (16) for border radius',
         (tester) async {
       await tester.pumpWidget(testApp(
         const AppCard(child: Text('Radius')),
@@ -88,7 +88,7 @@ void main() {
         decoration.borderRadius,
         BorderRadius.circular(AppRadiiTokens.pcCard),
       );
-      expect(AppRadiiTokens.pcCard, 18);
+      expect(AppRadiiTokens.pcCard, 16);
     });
 
     // ── No shadow (flat) ────────────────────────────────────────────────────

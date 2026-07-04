@@ -1,10 +1,6 @@
----
-description: Living user story map for Pet Circle. Tracks implementation status of every user story by role. Consult when working on any screen to understand what is done, what is partial, and what is missing. UPDATE this file after completing work on any story.
-globs: "lib/**/*.dart"
-alwaysApply: false
----
-
 # Pet Circle -- User Story Map
+
+> Living user story map for Pet Circle. Tracks implementation status of every user story by role. Consult when working on any screen to understand what is done, what is partial, and what is missing. UPDATE this file after completing work on any story.
 
 Last updated: 2026-03-17 (Phase 2 in progress -- Firebase Auth + Firestore pets + Firestore subcollections)
 
@@ -109,8 +105,8 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - E4: RTL layout for Hebrew
 - E5: Full dark mode support
 - E8: Searchable breed dropdown as shared widget (`lib/widgets/breed_search_field.dart`)
-- E9: All user-facing strings internationalized (enforced by cursor rule)
-- E10: Design system tokens enforced (enforced by cursor rule)
+- E9: All user-facing strings internationalized (enforced by [design-system-enforcement.md](design-system-enforcement.md))
+- E10: Design system tokens enforced (enforced by [design-system-enforcement.md](design-system-enforcement.md))
 
 ---
 
@@ -147,8 +143,8 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 
 ## Related Rules
 
-- `screen-completion-guide.mdc` -- screen-level checklist, auth screens, remaining work, feature backlog
-- `state-management.mdc` -- store patterns, access conventions, store registry, Firebase integration status, services
-- `figma-design-system.mdc` -- design tokens, colors, typography, spacing, Figma workflow
-- `design-system-enforcement.mdc` -- always-apply enforcement: tokens, components, i18n
-- `bug-tracking.mdc` -- always-apply: log all bugs to `docs/bug-log.md`
+- [screen-completion-guide.md](screen-completion-guide.md) -- screen-level checklist, auth screens, remaining work, feature backlog
+- [state-management.md](state-management.md) -- store patterns, access conventions, store registry, Firebase integration status, services
+- [figma-design-system.md](figma-design-system.md) -- design tokens, colors, typography, spacing, Figma workflow
+- [design-system-enforcement.md](design-system-enforcement.md) -- always-apply enforcement: tokens, components, i18n
+- [bug-tracking.md](bug-tracking.md) -- always-apply: log all bugs to `docs/bug-log.md`

@@ -10,10 +10,16 @@ import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/utils/notification_localizer.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/notification_card.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
+import 'package:pet_circle/widgets/round_icon_button.dart';
 import 'package:pet_circle/models/app_notification.dart' as notif;
 
 /// Opens notifications as a slide-up drawer (modal bottom sheet),
 /// matching the SettingsDrawer interaction pattern.
+///
+/// Matches Figma DS node 418:2567: a bold display-size title with a
+/// chevron-collapse button, an unread count + "Mark all read" pill, and
+/// notifications grouped into "New" (unread) and "Earlier" (read) sections.
 class NotificationsDrawer extends StatelessWidget {
   const NotificationsDrawer({super.key});
 
@@ -29,6 +35,10 @@ class NotificationsDrawer extends StatelessWidget {
           final c = AppSemanticColors.of(context);
           final l10n = AppLocalizations.of(context)!;
           final notifications = notificationStore.all;
+          final unreadNotifications =
+              notifications.where((n) => !n.isRead).toList();
+          final readNotifications =
+              notifications.where((n) => n.isRead).toList();
 
           return ClipRRect(
             borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
@@ -47,51 +57,92 @@ class NotificationsDrawer extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                l10n.notifications,
-                                style: AppSemanticTextStyles.title3.copyWith(
-                                  color: c.textPrimary,
-                                  letterSpacing: -0.96,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacingTokens.xs),
-                              Text(
-                                l10n.unreadNotifications(
-                                  notificationStore.unreadCount,
-                                ),
-                                style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
-                              ),
-                            ],
+                          child: Text(
+                            l10n.notifications,
+                            style: AppSemanticTextStyles.pcDisplay.copyWith(
+                              color: c.textPrimary,
+                            ),
                           ),
                         ),
-                        GestureDetector(
-                          behavior: HitTestBehavior.opaque,
+                        RoundIconButton(
+                          icon: const Icon(Icons.keyboard_arrow_up),
+                          variant: RoundIconButtonVariant.ghost,
+                          size: 36,
+                          iconSize: 24,
                           onTap: () => Navigator.of(context).pop(),
-                          child: Container(
-                            width: 36,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: c.background,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: c.surface, width: 2),
-                            ),
-                            child: Icon(
-                              Icons.keyboard_arrow_down,
-                              color: c.textPrimary,
-                              size: 24,
-                            ),
-                          ),
+                          semanticLabel: l10n.close,
                         ),
                       ],
                     ),
-                    const SizedBox(height: AppSpacingTokens.lg),
-                    ...notifications.map((notification) => Padding(
-                      padding: EdgeInsets.only(bottom: AppSpacingTokens.sm + 4),
-                      child: _NotificationRow(notification: notification),
-                    )),
+                    const SizedBox(height: AppSpacingTokens.sm + 4),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.unreadNotifications(
+                            notificationStore.unreadCount,
+                          ),
+                          style: AppSemanticTextStyles.pcLabelMuted,
+                        ),
+                        if (notificationStore.unreadCount > 0)
+                          PrimaryButton(
+                            label: l10n.markAllRead,
+                            variant: PrimaryButtonVariant.miniPrimary,
+                            onPressed: () => notificationStore.markAllRead(),
+                          ),
+                      ],
+                    ),
+                    if (notifications.isEmpty) ...[
+                      const SizedBox(height: AppSpacingTokens.xl),
+                      Center(
+                        child: Text(
+                          l10n.noNotifications,
+                          style: AppSemanticTextStyles.pcLabelMuted,
+                        ),
+                      ),
+                    ],
+                    if (unreadNotifications.isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: AppSpacingTokens.pcXl,
+                          bottom: AppSpacingTokens.sm,
+                        ),
+                        child: Text(
+                          l10n.notificationsSectionNew,
+                          style: AppSemanticTextStyles.captionBold.copyWith(
+                            color: c.textTertiary,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                      ...unreadNotifications.map((notification) => Padding(
+                            padding: EdgeInsets.only(
+                              bottom: AppSpacingTokens.sm + 4,
+                            ),
+                            child: _NotificationRow(notification: notification),
+                          )),
+                    ],
+                    if (readNotifications.isNotEmpty) ...[
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          top: AppSpacingTokens.pcXl,
+                          bottom: AppSpacingTokens.sm,
+                        ),
+                        child: Text(
+                          l10n.notificationsSectionEarlier,
+                          style: AppSemanticTextStyles.captionBold.copyWith(
+                            color: c.textTertiary,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                      ...readNotifications.map((notification) => Padding(
+                            padding: EdgeInsets.only(
+                              bottom: AppSpacingTokens.sm + 4,
+                            ),
+                            child: _NotificationRow(notification: notification),
+                          )),
+                    ],
                   ],
                 ),
               ),

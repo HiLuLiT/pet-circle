@@ -53,7 +53,7 @@ class UserAvatar extends StatelessWidget {
                     child: Text(
                       _initials,
                       style: AppSemanticTextStyles.labelSm.copyWith(
-                        color: c.onPrimary,
+                        color: c.textPrimary,
                         fontSize: size * 0.38,
                         height: 1,
                       ),
@@ -64,7 +64,7 @@ class UserAvatar extends StatelessWidget {
                   child: Text(
                     _initials,
                     style: AppSemanticTextStyles.labelSm.copyWith(
-                      color: c.onPrimary,
+                      color: c.textPrimary,
                       fontSize: size * 0.38,
                       height: 1,
                     ),

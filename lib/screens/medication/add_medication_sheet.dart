@@ -11,6 +11,7 @@ import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
+import 'package:pet_circle/widgets/round_icon_button.dart';
 
 import 'medication_form_widgets.dart';
 
@@ -29,15 +30,12 @@ class AddMedicationSheet extends StatefulWidget {
 
 class _AddMedicationSheetState extends State<AddMedicationSheet> {
   final _formKey = GlobalKey<FormState>();
-  bool _remindersEnabled = false;
   late String _frequency;
 
   late final TextEditingController _nameController;
   late final TextEditingController _dosageController;
   late final TextEditingController _startDateController;
   late final TextEditingController _endDateController;
-  late final TextEditingController _prescribedByController;
-  late final TextEditingController _purposeController;
   late final TextEditingController _notesController;
 
   DateTime? _startDate;
@@ -63,11 +61,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     _endDateController = TextEditingController(
         text: _endDate != null ? _formatDate(_endDate!) : '');
 
-    _prescribedByController =
-        TextEditingController(text: med?.prescribedBy ?? '');
-    _purposeController = TextEditingController(text: med?.purpose ?? '');
     _notesController = TextEditingController(text: med?.notes ?? '');
-    _remindersEnabled = med?.remindersEnabled ?? false;
   }
 
   @override
@@ -76,8 +70,6 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     _dosageController.dispose();
     _startDateController.dispose();
     _endDateController.dispose();
-    _prescribedByController.dispose();
-    _purposeController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -125,11 +117,12 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     final name = _nameController.text.trim();
     final dosage = _dosageController.text.trim();
     final startDate = _startDate ?? DateTime.now();
-    final prescribedBy = _prescribedByController.text.trim();
-    final purpose = _purposeController.text.trim();
     final notes = _notesController.text.trim();
 
     if (_isEditing) {
+      // prescribedBy/purpose/remindersEnabled aren't collected by this form
+      // (not part of the Figma spec) — omitted here so copyWith preserves
+      // whatever the record already had rather than silently wiping it.
       final updated = widget.medication!.copyWith(
         name: name,
         dosage: dosage,
@@ -137,10 +130,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         startDate: startDate,
         endDate: _endDate,
         clearEndDate: _endDate == null,
-        prescribedBy: prescribedBy.isNotEmpty ? prescribedBy : null,
-        purpose: purpose.isNotEmpty ? purpose : null,
         notes: notes.isNotEmpty ? notes : null,
-        remindersEnabled: _remindersEnabled,
       );
       medicationStore.updateMedication(petId, widget.medication!.id, updated);
 
@@ -165,10 +155,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         frequency: _frequency,
         startDate: startDate,
         endDate: _endDate,
-        prescribedBy: prescribedBy.isNotEmpty ? prescribedBy : null,
-        purpose: purpose.isNotEmpty ? purpose : null,
         notes: notes.isNotEmpty ? notes : null,
-        remindersEnabled: _remindersEnabled,
       );
       medicationStore.addMedication(petId, newMed);
 
@@ -256,14 +243,15 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Container(
         decoration: BoxDecoration(
-          color: c.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
+          color: c.background,
+          borderRadius:
+              BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.pcCard)),
         ),
         child: SafeArea(
           top: false,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(
-                AppSpacingTokens.lg, AppSpacingTokens.lg, AppSpacingTokens.lg, AppSpacingTokens.xl),
+            padding: const EdgeInsets.fromLTRB(AppSpacingTokens.pcXl,
+                AppSpacingTokens.pcLg, AppSpacingTokens.pcXl, AppSpacingTokens.pcXl),
             child: Form(
               key: _formKey,
               child: Column(
@@ -271,45 +259,42 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Expanded(
+                        child: Text(
+                          _isEditing
+                              ? l10n.editMedication
+                              : l10n.addNewMedication,
+                          style: AppSemanticTextStyles.pcDisplay,
+                        ),
+                      ),
                       if (_isEditing)
                         IconButton(
                           onPressed: _confirmDelete,
                           icon: Icon(Icons.delete_outline, color: c.error),
                           tooltip: l10n.deleteMedication,
-                        )
-                      else
-                        const SizedBox(width: 48),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close),
+                        ),
+                      RoundIconButton(
+                        icon: Icon(Icons.keyboard_arrow_up, color: c.textPrimary),
+                        variant: RoundIconButtonVariant.ghost,
+                        size: 36,
+                        iconSize: 24,
+                        semanticLabel: l10n.close,
+                        onTap: () => Navigator.of(context).pop(),
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacingTokens.sm),
-                  Center(
-                    child: Column(
-                      children: [
-                        Text(
-                          _isEditing
-                              ? l10n.editMedication
-                              : l10n.addNewMedication,
-                          style: AppSemanticTextStyles.title3,
-                        ),
-                        const SizedBox(height: AppSpacingTokens.sm),
-                        Text(
-                          _isEditing
-                              ? l10n.updateMedicationDescription(
-                                  petStore.activePet?.name ?? l10n.petName)
-                              : l10n.addMedicationDescription(
-                                  petStore.activePet?.name ?? l10n.petName),
-                          style: AppSemanticTextStyles.body,
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
+                  const SizedBox(height: AppSpacingTokens.pcSm),
+                  Text(
+                    _isEditing
+                        ? l10n.updateMedicationDescription(
+                            petStore.activePet?.name ?? l10n.petName)
+                        : l10n.addMedicationDescription(
+                            petStore.activePet?.name ?? l10n.petName),
+                    style: AppSemanticTextStyles.pcBodyMuted,
                   ),
-                  const SizedBox(height: AppSpacingTokens.lg),
+                  const SizedBox(height: AppSpacingTokens.pcXl),
                   ValidatedFormField(
                     label: l10n.medicationNameRequired,
                     hint: l10n.hintMedicationName,
@@ -318,7 +303,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                         ? l10n.fieldRequired
                         : null,
                   ),
-                  const SizedBox(height: AppSpacingTokens.md),
+                  const SizedBox(height: AppSpacingTokens.pcMd),
                   ValidatedFormField(
                     label: l10n.dosageRequired,
                     hint: l10n.hintDosage,
@@ -327,14 +312,14 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                         ? l10n.fieldRequired
                         : null,
                   ),
-                  const SizedBox(height: AppSpacingTokens.md),
-                  DropdownField(
+                  const SizedBox(height: AppSpacingTokens.pcMd),
+                  FrequencyChipSelector(
                     label: l10n.frequencyRequired,
                     value: _frequency,
                     onChanged: (value) =>
-                        setState(() => _frequency = value ?? _frequency),
+                        setState(() => _frequency = value),
                   ),
-                  const SizedBox(height: AppSpacingTokens.md),
+                  const SizedBox(height: AppSpacingTokens.pcMd),
                   Row(
                     children: [
                       Expanded(
@@ -347,7 +332,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                               : null,
                         ),
                       ),
-                      const SizedBox(width: AppSpacingTokens.md),
+                      const SizedBox(width: AppSpacingTokens.pcMd),
                       Expanded(
                         child: DatePickerField(
                           label: l10n.endDateOptional,
@@ -357,48 +342,27 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: AppSpacingTokens.md),
-                  ValidatedFormField(
-                    label: l10n.prescribedBy,
-                    hint: l10n.hintPrescribedBy,
-                    controller: _prescribedByController,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.md),
-                  ValidatedFormField(
-                    label: l10n.purposeCondition,
-                    hint: l10n.hintPurpose,
-                    controller: _purposeController,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.md),
+                  const SizedBox(height: AppSpacingTokens.pcMd),
                   ValidatedTextArea(
                     label: l10n.additionalNotes,
                     hint: l10n.hintMedicationNotes,
                     controller: _notesController,
                   ),
-                  const SizedBox(height: AppSpacingTokens.md),
-                  ReminderCard(
-                    enabled: _remindersEnabled,
-                    onChanged: (v) =>
-                        setState(() => _remindersEnabled = v),
-                  ),
-                  const SizedBox(height: AppSpacingTokens.md),
+                  const SizedBox(height: AppSpacingTokens.pcLg),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Flexible(
+                      Expanded(
                         child: PrimaryButton(
                           label: l10n.cancel,
                           variant: PrimaryButtonVariant.outlined,
-                          fullWidth: false,
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                       ),
-                      const SizedBox(width: AppSpacingTokens.sm),
-                      Flexible(
+                      const SizedBox(width: AppSpacingTokens.pcMd),
+                      Expanded(
                         child: PrimaryButton(
                           label: _isEditing ? l10n.save : l10n.addMedication,
                           variant: PrimaryButtonVariant.filled,
-                          fullWidth: false,
                           onPressed: _save,
                         ),
                       ),

@@ -4,11 +4,15 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 
 import 'package:pet_circle/screens/settings/settings_widgets.dart'
-    show settingsInviteAsset, settingsTrashAsset, settingsConfigureAsset;
+    show settingsInviteAsset, settingsTrashAsset;
 
+/// Full-width "Invite another" call-to-action — matches the Figma DS
+/// secondary (purple-tile) pill button with a trailing user-add icon
+/// (node 474:1867 in the settings-open frame).
 class InviteButton extends StatelessWidget {
   const InviteButton({super.key, required this.onTap});
 
@@ -17,31 +21,11 @@ class InviteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final c = AppSemanticColors.of(context);
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: c.primaryLight,
-          borderRadius: AppRadiiTokens.borderRadiusSm,
-        ),
-        child: Row(
-          children: [
-            SvgPicture.asset(settingsInviteAsset, width: 16, height: 16),
-            const SizedBox(width: 6),
-            Text(
-              l10n.invite,
-              style: AppSemanticTextStyles.body.copyWith(
-                color: c.textPrimary,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                letterSpacing: -0.15,
-              ),
-            ),
-          ],
-        ),
-      ),
+    return PrimaryButton(
+      label: l10n.inviteAnother,
+      variant: PrimaryButtonVariant.secondary,
+      onPressed: onTap,
+      trailingIcon: SvgPicture.asset(settingsInviteAsset, width: 24, height: 24),
     );
   }
 }
@@ -72,10 +56,10 @@ class CareCircleItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: c.background,
-        borderRadius: AppRadiiTokens.borderRadiusSm,
+        borderRadius: AppRadiiTokens.borderRadiusCard,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -86,23 +70,14 @@ class CareCircleItem extends StatelessWidget {
               children: [
                 Text(
                   email,
-                  style: AppSemanticTextStyles.body.copyWith(
+                  style: AppSemanticTextStyles.labelSSemibold.copyWith(
                     color: c.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.31,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    _Badge(
-                      label: roleLabel,
-                      backgroundColor: roleColor,
-                      textColor: roleColor == c.warning
-                          ? c.textPrimary
-                          : c.background,
-                    ),
+                    _RolePill(label: roleLabel, backgroundColor: roleColor),
                     const SizedBox(width: 4),
                     StatusBadge(
                       label: statusLabel,
@@ -113,61 +88,68 @@ class CareCircleItem extends StatelessWidget {
               ],
             ),
           ),
-          GestureDetector(
-            onTap: onRemove,
-            child: Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: c.background,
-                borderRadius: AppRadiiTokens.borderRadiusSm,
-              ),
-              child: Center(
-                child: SvgPicture.asset(
-                  settingsTrashAsset,
-                  width: 16,
-                  height: 16,
+          if (onRemove != null)
+            GestureDetector(
+              onTap: onRemove,
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: c.surface,
+                  borderRadius: AppRadiiTokens.borderRadiusField,
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    settingsTrashAsset,
+                    width: 16,
+                    height: 16,
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
   }
 }
 
-class _Badge extends StatelessWidget {
-  const _Badge({
+/// Small role pill (Admin/Member/Viewer). Matches the Figma "member-2"
+/// (Admin, white bg) and "member-1" (Member, blush bg) treatments — the
+/// text color always follows the caller-supplied [backgroundColor], mirroring
+/// the DS role-pill/text-color pairing (blush bg -> blush text, white bg ->
+/// tertiary text).
+class _RolePill extends StatelessWidget {
+  const _RolePill({
     required this.label,
     required this.backgroundColor,
-    required this.textColor,
   });
 
   final String label;
   final Color backgroundColor;
-  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
+    final c = AppSemanticColors.of(context);
+    final isNeutral = backgroundColor == c.surface;
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: AppRadiiTokens.borderRadiusSm,
+        borderRadius: AppRadiiTokens.borderRadiusPill,
       ),
       child: Text(
         label,
-        style: AppSemanticTextStyles.caption.copyWith(
-          color: textColor,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+        style: AppSemanticTextStyles.captionBold.copyWith(
+          color: isNeutral ? c.textTertiary : c.accentBlush,
         ),
       ),
     );
   }
 }
 
+/// Tappable "Alert thresholds" row inside the Measurement card — a blush
+/// icon tile + title/description, matching Figma node 474:1177. The whole
+/// row opens the threshold dialog; there is no separate "Configure" button.
 class ConfigureRow extends StatelessWidget {
   const ConfigureRow({super.key, required this.onTap});
 
@@ -177,65 +159,45 @@ class ConfigureRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppSemanticColors.of(context);
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: c.background,
-        borderRadius: AppRadiiTokens.borderRadiusSm,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.alertThresholds,
-                  style: AppSemanticTextStyles.body.copyWith(
-                    color: c.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.31,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.customizeBpmRanges,
-                  style: AppSemanticTextStyles.caption.copyWith(
-                    color: c.textPrimary,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: onTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: c.background,
+          borderRadius: AppRadiiTokens.borderRadiusCard,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 36,
+              height: 36,
               decoration: BoxDecoration(
-                color: c.primaryLight,
-                borderRadius: AppRadiiTokens.borderRadiusSm,
+                color: c.accentBlushTile,
+                shape: BoxShape.circle,
               ),
-              child: Row(
+              child: Icon(Icons.warning_amber_rounded, color: c.accentBlush, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SvgPicture.asset(settingsConfigureAsset,
-                      width: 16, height: 16),
-                  const SizedBox(width: 6),
                   Text(
-                    l10n.configure,
-                    style: AppSemanticTextStyles.body.copyWith(
+                    l10n.alertThresholds,
+                    style: AppSemanticTextStyles.labelLSemibold.copyWith(
                       color: c.textPrimary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
                     ),
+                  ),
+                  Text(
+                    l10n.customizeBpmRanges,
+                    style: AppSemanticTextStyles.pcLabelMuted,
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

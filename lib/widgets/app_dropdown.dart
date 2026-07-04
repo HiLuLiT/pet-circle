@@ -6,15 +6,16 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 /// Pet Circle v3 (Claude-Design) select trigger.
 ///
 /// Visual contract (from React `Select` component):
-///   • Closed: white surface, radius 14 (pcField), padding 15×16.
-///     Selected text: 16px bold, color = ink. Placeholder: 16px bold,
-///     color = inkTertiary. Right side: expand_more / expand_less chevron
-///     tinted inkSecondary.
+///   • Closed: white surface, no border, radius 12 (pcField), padding 16
+///     all around (per Figma node 535-1158 — 16+24+16 = 56h). Selected
+///     text: 16px bold, color = ink. Placeholder: 16px bold, color =
+///     inkTertiary. Right side: expand_more / expand_less chevron tinted
+///     inkSecondary.
 ///   • Open (when [isOpen] = true and [options] provided): a list of
 ///     options is rendered below the trigger, separated by a 1px hairline.
-///     Each option: padding 12×14, radius 11. Selected option:
-///     bg = accentPeriwinkleChip, text = bold ink. Unselected: transparent
-///     bg, medium-weight inkSecondary.
+///     Each option: padding 12×8, radius 4 (per Figma node 510-1220).
+///     Selected option: bg = accentPurpleTile, text = regular-weight ink.
+///     Unselected: transparent bg, regular-weight inkTertiary.
 ///
 /// Public API is preserved from earlier revisions: `label`, `value`,
 /// `onTap`, `isOpen`, `chevronController` are unchanged. New optional
@@ -114,11 +115,12 @@ class _Trigger extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        // 16px all around, no border — matches Figma "Input" component
+        // (node 535-1158) exactly: 16+24(text line-height)+16 = 56h.
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: colors.surface,
           borderRadius: AppRadiiTokens.borderRadiusField,
-          border: Border.all(color: colors.hairline, width: 1),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -227,12 +229,10 @@ class _Option extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bg = isSelected ? colors.accentPeriwinkleChip : Colors.transparent;
-    final style = isSelected
-        ? AppSemanticTextStyles.pcBodyBold.copyWith(color: colors.onSurface)
-        : AppSemanticTextStyles.pcBodyMedium.copyWith(
-            color: colors.textSecondary,
-          );
+    final bg = isSelected ? colors.accentPurpleTile : Colors.transparent;
+    final style = AppSemanticTextStyles.pcBody.copyWith(
+      color: isSelected ? colors.textPrimary : colors.textTertiary,
+    );
 
     return GestureDetector(
       onTap: onTap,
@@ -240,10 +240,10 @@ class _Option extends StatelessWidget {
       child: Container(
         width: double.infinity,
         margin: const EdgeInsets.symmetric(vertical: 1),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: bg,
-          borderRadius: BorderRadius.circular(11),
+          borderRadius: AppRadiiTokens.borderRadiusSm,
         ),
         child: Text(label, style: style, overflow: TextOverflow.ellipsis),
       ),

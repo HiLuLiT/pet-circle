@@ -1,4 +1,8 @@
 class AppAssets {
+  // Onboarding field icons
+  static const onboardingCalendarIcon = 'assets/figma/onboarding_calendar.svg';
+  static const onboardingPulseIcon = 'assets/figma/onboarding_pulse.svg';
+
   // Welcome
   static const welcomeGraphic = 'assets/figma/welcome.svg';
   static const welcomeCat = 'assets/figma/welcome_cat.svg';

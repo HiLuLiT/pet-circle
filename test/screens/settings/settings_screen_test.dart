@@ -68,7 +68,8 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Notifications'), findsOneWidget);
-      expect(find.text('In-app notifications'), findsOneWidget);
+      // l10n copy consolidation: pushNotifications is now singular.
+      expect(find.text('In-app notification'), findsOneWidget);
       expect(find.text('Emergency alerts'), findsOneWidget);
     });
 
@@ -83,8 +84,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
+      // DS alignment: Sign Out is now a plain PrimaryButton pill (no
+      // logout icon) with a tomato background.
       expect(find.text('Sign Out'), findsOneWidget);
-      expect(find.byIcon(Icons.logout), findsOneWidget);
     });
   });
 
@@ -130,9 +132,11 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.close), findsOneWidget);
+      // DS alignment: the close affordance is now a collapse chevron
+      // (Icons.keyboard_arrow_up), not a literal "X" close icon.
+      expect(find.byIcon(Icons.keyboard_arrow_up), findsOneWidget);
       // Tap the close button.
-      await tester.tap(find.byIcon(Icons.close));
+      await tester.tap(find.byIcon(Icons.keyboard_arrow_up));
       await tester.pumpAndSettle();
       expect(closeCalled, isTrue);
     });
@@ -147,7 +151,7 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.close), findsNothing);
+      expect(find.byIcon(Icons.keyboard_arrow_up), findsNothing);
     });
   });
 
@@ -259,7 +263,8 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      expect(find.text('In-app notifications'), findsOneWidget);
+      // l10n copy consolidation: pushNotifications is now singular.
+      expect(find.text('In-app notification'), findsOneWidget);
     });
 
     testWidgets('hides VisionRR coming soon badge (feature flag off)',

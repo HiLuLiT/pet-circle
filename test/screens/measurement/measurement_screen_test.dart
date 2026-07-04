@@ -53,7 +53,7 @@ void main() {
       expect(find.text('60s'), findsAtLeast(1));
     });
 
-    testWidgets('shows tap counter circle with initial count of 0',
+    testWidgets('shows tap-to-begin state before the timer starts',
         (tester) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
@@ -63,11 +63,14 @@ void main() {
       await tester.pumpWidget(testApp(const MeasurementScreen()));
       await tester.pumpAndSettle();
 
-      // Initial tap count is 0
-      expect(find.text('0'), findsOneWidget);
+      // DS alignment: before the timer starts, the tap circle shows a heart
+      // icon + "Tap to begin" — the numeric tap count only appears once
+      // isRunning is true.
+      expect(find.byIcon(Icons.favorite), findsOneWidget);
     });
 
-    testWidgets('shows remaining time as large countdown text', (tester) async {
+    testWidgets('shows elapsed time next to the duration progress track',
+        (tester) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -76,9 +79,11 @@ void main() {
       await tester.pumpWidget(testApp(const MeasurementScreen()));
       await tester.pumpAndSettle();
 
-      // The timer display shows remaining seconds — default 60s appears
-      // as both the chip label and the countdown, so at least 2 instances
-      expect(find.text('60s'), findsNWidgets(2));
+      // DS alignment: the timer card now shows elapsed seconds (starting at
+      // "0s") next to a progress track, rather than a large remaining-time
+      // countdown. "60s" only appears once now, as the selected duration chip.
+      expect(find.text('0s'), findsOneWidget);
+      expect(find.text('60s'), findsOneWidget);
     });
   });
 }

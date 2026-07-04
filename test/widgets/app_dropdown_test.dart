@@ -197,7 +197,9 @@ void main() {
     });
 
     testWidgets(
-      'selected option uses accentPeriwinkleChip background',
+      // DS alignment (Figma node 510-1220): selected option highlight is the
+      // purple tile wash, not the periwinkle/blue chip color.
+      'selected option uses accentPurpleTile background',
       (tester) async {
         await tester.pumpWidget(testApp(
           AppDropdown(
@@ -210,12 +212,12 @@ void main() {
           ),
         ));
 
-        final chipColor = AppSemanticColors.light.accentPeriwinkleChip;
+        final tileColor = AppSemanticColors.light.accentPurpleTile;
         final hit = tester
             .widgetList<Container>(find.byType(Container))
             .where((c) {
           final d = c.decoration;
-          return d is BoxDecoration && d.color == chipColor;
+          return d is BoxDecoration && d.color == tileColor;
         });
         expect(hit.isNotEmpty, isTrue);
       },
