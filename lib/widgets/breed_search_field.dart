@@ -250,11 +250,11 @@ class _BreedSearchFieldState extends State<BreedSearchField>
         GestureDetector(
           onTap: _toggle,
           child: Container(
-            height: 36,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 4),
+            constraints: const BoxConstraints(minHeight: 54),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: c.surfaceRecessed,
-              borderRadius: AppRadiiTokens.borderRadiusLg,
+              color: c.surface,
+              borderRadius: AppRadiiTokens.borderRadiusField,
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -262,7 +262,7 @@ class _BreedSearchFieldState extends State<BreedSearchField>
                 Expanded(
                   child: Text(
                     _selected ?? 'e.g., Golden Retriever',
-                    style: AppSemanticTextStyles.body.copyWith(
+                    style: AppSemanticTextStyles.pcBody.copyWith(
                       color: _selected == null ? c.textTertiary : c.textPrimary,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -273,7 +273,7 @@ class _BreedSearchFieldState extends State<BreedSearchField>
                   turns: Tween(begin: 0.0, end: 0.5).animate(
                     CurvedAnimation(parent: _chevronController, curve: Curves.easeInOut),
                   ),
-                  child: Icon(Icons.keyboard_arrow_down, color: c.textSecondary, size: 18),
+                  child: Icon(Icons.keyboard_arrow_down, color: c.textSecondary, size: 20),
                 ),
               ],
             ),
@@ -284,7 +284,7 @@ class _BreedSearchFieldState extends State<BreedSearchField>
             margin: const EdgeInsets.only(top: 8),
             decoration: BoxDecoration(
               color: c.surface,
-              borderRadius: AppRadiiTokens.borderRadiusLg,
+              borderRadius: AppRadiiTokens.borderRadiusField,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -347,19 +347,19 @@ class _BreedSearchFieldState extends State<BreedSearchField>
                                 widget.onChanged?.call(breed.displayName);
                               },
                               child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 decoration: BoxDecoration(
-                                  color: isSelected ? c.primaryLightest : Colors.transparent,
-                                  borderRadius: AppRadiiTokens.borderRadiusLg,
+                                  color: isSelected ? c.accentPurpleTile : Colors.transparent,
+                                  borderRadius: AppRadiiTokens.borderRadiusSm,
                                 ),
                                 child: Row(
                                   children: [
                                     Expanded(
                                       child: Text(
                                         breed.displayName,
-                                        style: AppSemanticTextStyles.body.copyWith(
-                                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                        style: AppSemanticTextStyles.pcBody.copyWith(
+                                          color: isSelected ? c.textPrimary : c.textTertiary,
                                         ),
                                       ),
                                     ),

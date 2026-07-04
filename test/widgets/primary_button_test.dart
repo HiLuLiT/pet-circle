@@ -445,6 +445,25 @@ void main() {
         await tester.pump();
         expect(callCount, 1);
       });
+
+      testWidgets('renders at the spec ~44h, not shrunk by visual density',
+          (tester) async {
+        // Regression: VisualDensity.compact silently shrank this button to
+        // 28h in practice despite the documented 24x12 padding around 20px
+        // content (24+12+12=44) — found while aligning the trends screen's
+        // Export button height to Figma node 474-2575.
+        await tester.pumpWidget(testApp(
+          PrimaryButton(
+            label: 'Export',
+            variant: PrimaryButtonVariant.miniPrimary,
+            trailingIcon: const Icon(Icons.file_download_outlined),
+            onPressed: () {},
+          ),
+        ));
+
+        final rect = tester.getRect(find.byType(PrimaryButton));
+        expect(rect.height, 44);
+      });
     });
   });
 }

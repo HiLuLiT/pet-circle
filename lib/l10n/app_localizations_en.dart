@@ -730,19 +730,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get endDateOptional => 'End Date (Optional)';
 
   @override
-  String get prescribedBy => 'Prescribed By';
-
-  @override
-  String get purposeCondition => 'Purpose / Condition';
-
-  @override
-  String get medicationReminders => 'Medication Reminders';
-
-  @override
-  String get medicationRemindersDesc =>
-      'Remind me the morning this medication ends';
-
-  @override
   String get csvPreview => 'CSV Preview:';
 
   @override
@@ -1407,12 +1394,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get hintDosage => 'e.g., 5mg';
-
-  @override
-  String get hintPrescribedBy => 'e.g., Dr. Smith, DVM';
-
-  @override
-  String get hintPurpose => 'e.g., Congestive Heart Failure';
 
   @override
   String get hintMedicationNotes =>

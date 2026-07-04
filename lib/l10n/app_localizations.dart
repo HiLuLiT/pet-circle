@@ -1460,30 +1460,6 @@ abstract class AppLocalizations {
   /// **'End Date (Optional)'**
   String get endDateOptional;
 
-  /// No description provided for @prescribedBy.
-  ///
-  /// In en, this message translates to:
-  /// **'Prescribed By'**
-  String get prescribedBy;
-
-  /// No description provided for @purposeCondition.
-  ///
-  /// In en, this message translates to:
-  /// **'Purpose / Condition'**
-  String get purposeCondition;
-
-  /// No description provided for @medicationReminders.
-  ///
-  /// In en, this message translates to:
-  /// **'Medication Reminders'**
-  String get medicationReminders;
-
-  /// No description provided for @medicationRemindersDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Remind me the morning this medication ends'**
-  String get medicationRemindersDesc;
-
   /// No description provided for @csvPreview.
   ///
   /// In en, this message translates to:
@@ -2647,18 +2623,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'e.g., 5mg'**
   String get hintDosage;
-
-  /// No description provided for @hintPrescribedBy.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g., Dr. Smith, DVM'**
-  String get hintPrescribedBy;
-
-  /// No description provided for @hintPurpose.
-  ///
-  /// In en, this message translates to:
-  /// **'e.g., Congestive Heart Failure'**
-  String get hintPurpose;
 
   /// No description provided for @hintMedicationNotes.
   ///

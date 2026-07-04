@@ -254,6 +254,7 @@ class _TrendsScreenState extends State<TrendsScreen>
               ),
               const SizedBox(height: AppSpacingTokens.pcMd),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: AppDropdown(

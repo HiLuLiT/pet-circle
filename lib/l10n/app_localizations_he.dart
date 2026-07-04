@@ -728,18 +728,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get endDateOptional => 'תאריך סיום (אופציונלי)';
 
   @override
-  String get prescribedBy => 'נרשם על ידי';
-
-  @override
-  String get purposeCondition => 'מטרה / מצב';
-
-  @override
-  String get medicationReminders => 'תזכורות תרופות';
-
-  @override
-  String get medicationRemindersDesc => 'הזכירו לי בבוקר שבו תרופה זו מסתיימת';
-
-  @override
   String get csvPreview => 'תצוגה מקדימה של CSV:';
 
   @override
@@ -1397,12 +1385,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get hintDosage => 'לדוגמה, 5 מ\"ג';
-
-  @override
-  String get hintPrescribedBy => 'לדוגמה, ד\"ר כהן, וטרינר';
-
-  @override
-  String get hintPurpose => 'לדוגמה, אי ספיקת לב';
 
   @override
   String get hintMedicationNotes =>

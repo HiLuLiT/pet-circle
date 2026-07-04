@@ -47,7 +47,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Add Medication'), findsOneWidget);
-      expect(find.byIcon(Icons.add), findsOneWidget);
+      expect(find.byIcon(Icons.add_circle_outline), findsOneWidget);
     });
 
     testWidgets('shows empty state when no medications exist', (tester) async {
@@ -201,8 +201,8 @@ void main() {
       await tester.pumpWidget(testApp(const MedicationScreen()));
       await tester.pumpAndSettle();
 
-      // Use the TextButton.icon with file_download icon to target the export button
-      final exportBtn = find.byIcon(Icons.file_download);
+      // Use the file_download_outlined icon to target the export button
+      final exportBtn = find.byIcon(Icons.file_download_outlined);
       expect(exportBtn, findsOneWidget);
       await tester.tap(exportBtn);
       await tester.pumpAndSettle();
@@ -216,7 +216,7 @@ void main() {
       await tester.pumpWidget(testApp(const MedicationScreen()));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.file_download));
+      await tester.tap(find.byIcon(Icons.file_download_outlined));
       await tester.pumpAndSettle();
 
       expect(find.text('Close'), findsOneWidget);
@@ -228,7 +228,7 @@ void main() {
       await tester.pumpWidget(testApp(const MedicationScreen()));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.file_download));
+      await tester.tap(find.byIcon(Icons.file_download_outlined));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Close'));
@@ -277,20 +277,12 @@ void main() {
       expect(find.text('Clinical Record Information'), findsOneWidget);
     });
 
-    testWidgets('shows info outline icon in clinical record section', (tester) async {
-      setViewSize(tester);
-      await tester.pumpWidget(testApp(const MedicationScreen()));
-      await tester.pumpAndSettle();
-
-      expect(find.byIcon(Icons.info_outline), findsOneWidget);
-    });
-
     testWidgets('shows file download icon for export button', (tester) async {
       setViewSize(tester);
       await tester.pumpWidget(testApp(const MedicationScreen()));
       await tester.pumpAndSettle();
 
-      expect(find.byIcon(Icons.file_download), findsOneWidget);
+      expect(find.byIcon(Icons.file_download_outlined), findsOneWidget);
     });
   });
 }

@@ -499,23 +499,11 @@ class _TimerCard extends StatelessWidget {
                   ),
                   child: Center(
                     child: isRunning
-                        ? Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                '$tapCount',
-                                style: AppSemanticTextStyles.pcDisplayXxl.copyWith(
-                                  color: c.accentBlush,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacingTokens.xs),
-                              Text(
-                                l10n.tapToStop,
-                                style: AppSemanticTextStyles.labelLSemibold.copyWith(
-                                  color: c.accentBlush,
-                                ),
-                              ),
-                            ],
+                        ? Text(
+                            '$tapCount',
+                            style: AppSemanticTextStyles.pcDisplayXxl.copyWith(
+                              color: c.accentBlush,
+                            ),
                           )
                         : Column(
                             mainAxisSize: MainAxisSize.min,

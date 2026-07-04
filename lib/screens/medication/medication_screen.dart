@@ -10,6 +10,7 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/csv_export_helper.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/widgets/app_card.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 
 import 'add_medication_sheet.dart';
@@ -158,91 +159,47 @@ class _MedicationScreenState extends State<MedicationScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: AppSpacingTokens.md),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(l10n.medicationManagement,
-                            style: AppSemanticTextStyles.title3),
-                      ),
-                      const SizedBox(width: AppSpacingTokens.sm),
-                      SizedBox(
-                        height: 32,
-                        child: TextButton.icon(
-                          onPressed: access.canManageMedication
-                              ? _openMedicationSheet
-                              : null,
-                          style: TextButton.styleFrom(
-                            backgroundColor: c.primaryLight,
-                            disabledBackgroundColor:
-                                c.primaryLight.withValues(alpha: 0.5),
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadiiTokens.full),
-                            ),
-                          ),
-                          icon: Icon(Icons.add, color: c.textPrimary, size: 16),
-                          label: Text(
-                            l10n.addMedication,
-                            style: AppSemanticTextStyles.caption
-                                .copyWith(color: c.textPrimary),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  Text(l10n.medicationManagement,
+                      style: AppSemanticTextStyles.headingH2),
                   const SizedBox(height: AppSpacingTokens.sm),
                   Text(
                     '$petName • $count ${l10n.activeTreatments.toLowerCase()}',
-                    style: AppSemanticTextStyles.body,
+                    style: AppSemanticTextStyles.pcLabelMuted,
                   ),
                   const SizedBox(height: AppSpacingTokens.lg),
                   _ActiveMedicationsList(
                     onEdit:
                         access.canManageMedication ? _openMedicationSheet : null,
                   ),
+                  if (access.canManageMedication) ...[
+                    const SizedBox(height: AppSpacingTokens.md),
+                    PrimaryButton(
+                      label: l10n.addMedication,
+                      variant: PrimaryButtonVariant.secondary,
+                      onPressed: _openMedicationSheet,
+                      trailingIcon: const Icon(Icons.add_circle_outline),
+                    ),
+                  ],
                   const SizedBox(height: AppSpacingTokens.lg),
                   _SectionCard(
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                          width: 64,
-                          height: 64,
-                          decoration: BoxDecoration(
-                              color: c.surface, shape: BoxShape.circle),
-                          child: Icon(Icons.info_outline, color: c.primary),
-                        ),
-                        const SizedBox(height: AppSpacingTokens.sm + 4),
                         Text(
                           l10n.clinicalRecordInformation,
-                          style: AppSemanticTextStyles.headingLg,
-                          textAlign: TextAlign.center,
+                          style: AppSemanticTextStyles.headingH2,
                         ),
-                        const SizedBox(height: AppSpacingTokens.xs),
+                        const SizedBox(height: AppSpacingTokens.sm),
                         Text(
                           l10n.clinicalRecordDisclaimer,
-                          style: AppSemanticTextStyles.body,
-                          textAlign: TextAlign.center,
+                          style: AppSemanticTextStyles.pcBodyMuted,
                         ),
-                        const SizedBox(height: AppSpacingTokens.lg),
-                        SizedBox(
-                          height: 40,
-                          child: TextButton.icon(
-                            onPressed: _exportMedicationLog,
-                            style: TextButton.styleFrom(
-                              backgroundColor: c.primaryLight,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(AppRadiiTokens.full),
-                              ),
-                            ),
-                            icon: Icon(Icons.file_download,
-                                color: c.textPrimary, size: 16),
-                            label: Text(
-                              l10n.exportMedicationLog,
-                              style: AppSemanticTextStyles.body
-                                  .copyWith(color: c.textPrimary),
-                            ),
-                          ),
+                        const SizedBox(height: AppSpacingTokens.md),
+                        PrimaryButton(
+                          label: l10n.exportMedicationLog,
+                          variant: PrimaryButtonVariant.filled,
+                          onPressed: _exportMedicationLog,
+                          trailingIcon: const Icon(Icons.file_download_outlined),
                         ),
                       ],
                     ),
@@ -257,9 +214,9 @@ class _MedicationScreenState extends State<MedicationScreen> {
     );
 
     if (!widget.showScaffold) {
-      return Container(color: c.surface, child: content);
+      return Container(color: c.background, child: content);
     }
-    return Scaffold(backgroundColor: c.surface, body: content);
+    return Scaffold(backgroundColor: c.background, body: content);
   }
 }
 
@@ -284,8 +241,8 @@ class _ActiveMedicationsList extends StatelessWidget {
               width: 64,
               height: 64,
               decoration:
-                  BoxDecoration(color: c.surface, shape: BoxShape.circle),
-              child: Icon(Icons.medication, color: c.textPrimary),
+                  BoxDecoration(color: c.accentBlushTile, shape: BoxShape.circle),
+              child: Icon(Icons.medication, color: c.accentBlush),
             ),
             const SizedBox(height: AppSpacingTokens.sm + 4),
             Text(l10n.noMedicationsRecorded,
@@ -311,22 +268,19 @@ class _ActiveMedicationsList extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(AppSpacingTokens.md),
               decoration: BoxDecoration(
-                color: c.background,
-                borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
+                color: c.surface,
+                borderRadius: BorderRadius.circular(AppRadiiTokens.pcCard),
               ),
               child: Row(
                 children: [
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: 36,
+                    height: 36,
                     decoration: BoxDecoration(
-                      color: med.isActive
-                          ? c.primaryLight.withValues(alpha: 0.2)
-                          : c.background,
-                      borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
+                      color: c.accentBlushTile,
+                      shape: BoxShape.circle,
                     ),
-                    child:
-                        Icon(Icons.medication, color: c.textPrimary, size: 20),
+                    child: Icon(Icons.medication, color: c.accentBlush, size: 20),
                   ),
                   const SizedBox(width: AppSpacingTokens.sm + 4),
                   Expanded(
@@ -380,7 +334,7 @@ class _SectionCard extends StatelessWidget {
       width: double.infinity,
       child: AppCard(
         variant: AppCardVariant.tile,
-        tileColor: c.background,
+        tileColor: c.surface,
         padding: const EdgeInsets.all(AppSpacingTokens.lg),
         child: child,
       ),

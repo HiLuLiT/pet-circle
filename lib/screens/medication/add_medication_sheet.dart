@@ -30,15 +30,12 @@ class AddMedicationSheet extends StatefulWidget {
 
 class _AddMedicationSheetState extends State<AddMedicationSheet> {
   final _formKey = GlobalKey<FormState>();
-  bool _remindersEnabled = false;
   late String _frequency;
 
   late final TextEditingController _nameController;
   late final TextEditingController _dosageController;
   late final TextEditingController _startDateController;
   late final TextEditingController _endDateController;
-  late final TextEditingController _prescribedByController;
-  late final TextEditingController _purposeController;
   late final TextEditingController _notesController;
 
   DateTime? _startDate;
@@ -64,11 +61,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     _endDateController = TextEditingController(
         text: _endDate != null ? _formatDate(_endDate!) : '');
 
-    _prescribedByController =
-        TextEditingController(text: med?.prescribedBy ?? '');
-    _purposeController = TextEditingController(text: med?.purpose ?? '');
     _notesController = TextEditingController(text: med?.notes ?? '');
-    _remindersEnabled = med?.remindersEnabled ?? false;
   }
 
   @override
@@ -77,8 +70,6 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     _dosageController.dispose();
     _startDateController.dispose();
     _endDateController.dispose();
-    _prescribedByController.dispose();
-    _purposeController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -126,11 +117,12 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     final name = _nameController.text.trim();
     final dosage = _dosageController.text.trim();
     final startDate = _startDate ?? DateTime.now();
-    final prescribedBy = _prescribedByController.text.trim();
-    final purpose = _purposeController.text.trim();
     final notes = _notesController.text.trim();
 
     if (_isEditing) {
+      // prescribedBy/purpose/remindersEnabled aren't collected by this form
+      // (not part of the Figma spec) — omitted here so copyWith preserves
+      // whatever the record already had rather than silently wiping it.
       final updated = widget.medication!.copyWith(
         name: name,
         dosage: dosage,
@@ -138,10 +130,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         startDate: startDate,
         endDate: _endDate,
         clearEndDate: _endDate == null,
-        prescribedBy: prescribedBy.isNotEmpty ? prescribedBy : null,
-        purpose: purpose.isNotEmpty ? purpose : null,
         notes: notes.isNotEmpty ? notes : null,
-        remindersEnabled: _remindersEnabled,
       );
       medicationStore.updateMedication(petId, widget.medication!.id, updated);
 
@@ -166,10 +155,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         frequency: _frequency,
         startDate: startDate,
         endDate: _endDate,
-        prescribedBy: prescribedBy.isNotEmpty ? prescribedBy : null,
-        purpose: purpose.isNotEmpty ? purpose : null,
         notes: notes.isNotEmpty ? notes : null,
-        remindersEnabled: _remindersEnabled,
       );
       medicationStore.addMedication(petId, newMed);
 
@@ -290,10 +276,10 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                           tooltip: l10n.deleteMedication,
                         ),
                       RoundIconButton(
-                        icon: Icon(Icons.close, color: c.textPrimary),
+                        icon: const Icon(Icons.keyboard_arrow_up),
                         variant: RoundIconButtonVariant.ghost,
                         size: 36,
-                        iconSize: 18,
+                        iconSize: 24,
                         semanticLabel: l10n.close,
                         onTap: () => Navigator.of(context).pop(),
                       ),
@@ -327,11 +313,11 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                         : null,
                   ),
                   const SizedBox(height: AppSpacingTokens.pcMd),
-                  DropdownField(
+                  FrequencyChipSelector(
                     label: l10n.frequencyRequired,
                     value: _frequency,
                     onChanged: (value) =>
-                        setState(() => _frequency = value ?? _frequency),
+                        setState(() => _frequency = value),
                   ),
                   const SizedBox(height: AppSpacingTokens.pcMd),
                   Row(
@@ -357,28 +343,10 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                     ],
                   ),
                   const SizedBox(height: AppSpacingTokens.pcMd),
-                  ValidatedFormField(
-                    label: l10n.prescribedBy,
-                    hint: l10n.hintPrescribedBy,
-                    controller: _prescribedByController,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.pcMd),
-                  ValidatedFormField(
-                    label: l10n.purposeCondition,
-                    hint: l10n.hintPurpose,
-                    controller: _purposeController,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.pcMd),
                   ValidatedTextArea(
                     label: l10n.additionalNotes,
                     hint: l10n.hintMedicationNotes,
                     controller: _notesController,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.pcMd),
-                  ReminderCard(
-                    enabled: _remindersEnabled,
-                    onChanged: (v) =>
-                        setState(() => _remindersEnabled = v),
                   ),
                   const SizedBox(height: AppSpacingTokens.pcLg),
                   Row(

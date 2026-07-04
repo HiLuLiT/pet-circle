@@ -5,7 +5,6 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/app_dropdown.dart';
 import 'package:pet_circle/widgets/app_input_decoration.dart';
-import 'package:pet_circle/widgets/toggle_pill.dart';
 
 class ValidatedFormField extends StatelessWidget {
   const ValidatedFormField({
@@ -29,9 +28,7 @@ class ValidatedFormField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style:
-                AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+        Text(label, style: AppSemanticTextStyles.labelMSemibold),
         const SizedBox(height: AppSpacingTokens.sm),
         TextFormField(
           controller: controller,
@@ -68,9 +65,7 @@ class DatePickerField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style:
-                AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+        Text(label, style: AppSemanticTextStyles.labelMSemibold),
         const SizedBox(height: AppSpacingTokens.sm),
         TextFormField(
           controller: controller,
@@ -78,10 +73,11 @@ class DatePickerField extends StatelessWidget {
           onTap: onTap,
           validator: validator,
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          decoration: appInputDecoration(context, hintText: l10n.dateFormatHint)
-              .copyWith(
-            suffixIcon: Icon(Icons.calendar_today,
-                size: 18, color: c.textPrimary.withValues(alpha: 0.5)),
+          decoration: appInputDecoration(
+            context,
+            hintText: l10n.dateFormatHint,
+            prefixIcon: Icon(Icons.calendar_today, color: c.textTertiary),
+          ).copyWith(
             errorStyle: AppSemanticTextStyles.caption.copyWith(color: c.error),
           ),
         ),
@@ -156,6 +152,101 @@ class _DropdownFieldState extends State<DropdownField> {
   }
 }
 
+/// Frequency selector matching the Figma "Add medication" drawer (node
+/// 402-2388): wrapped pill chips rather than a closed dropdown. Selected
+/// chip uses the periwinkle tile wash; unselected chips use the butter
+/// cream wash.
+///
+/// Public API mirrors [DropdownField]: callers supply/receive the
+/// *canonical* value (`'Once daily'` / `'Twice daily'` / `'As needed'`) and
+/// the widget maps to/from the localised display labels internally.
+class FrequencyChipSelector extends StatelessWidget {
+  const FrequencyChipSelector({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final String label;
+  final String value;
+  final ValueChanged<String> onChanged;
+
+  static const List<String> _canonicalValues = <String>[
+    'Once daily',
+    'Twice daily',
+    'As needed',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppSemanticColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
+
+    final displayLabels = <String>[
+      l10n.onceDaily,
+      l10n.twiceDaily,
+      l10n.asNeeded,
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppSemanticTextStyles.labelMSemibold),
+        const SizedBox(height: AppSpacingTokens.sm + 4),
+        Wrap(
+          spacing: AppSpacingTokens.sm,
+          runSpacing: AppSpacingTokens.sm,
+          children: [
+            for (var i = 0; i < _canonicalValues.length; i++)
+              _FrequencyChip(
+                label: displayLabels[i],
+                selected: value == _canonicalValues[i],
+                onTap: () => onChanged(_canonicalValues[i]),
+                colors: c,
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class _FrequencyChip extends StatelessWidget {
+  const _FrequencyChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    required this.colors,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final AppSemanticColors colors;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? colors.accentPeriwinkleTile : colors.accentButterCream,
+          borderRadius: AppRadiiTokens.borderRadiusPill,
+        ),
+        child: Text(
+          label,
+          style: AppSemanticTextStyles.labelMSemibold.copyWith(
+            color: selected ? colors.textPrimary : colors.textTertiary,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class ValidatedTextArea extends StatelessWidget {
   const ValidatedTextArea({
     super.key,
@@ -174,13 +265,11 @@ class ValidatedTextArea extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style:
-                AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+        Text(label, style: AppSemanticTextStyles.labelMSemibold),
         const SizedBox(height: AppSpacingTokens.sm),
         TextFormField(
           controller: controller,
-          maxLines: 3,
+          maxLines: 4,
           decoration: appInputDecoration(context, hintText: hint).copyWith(
             errorStyle: AppSemanticTextStyles.caption.copyWith(color: c.error),
           ),
@@ -190,49 +279,3 @@ class ValidatedTextArea extends StatelessWidget {
   }
 }
 
-class ReminderCard extends StatelessWidget {
-  const ReminderCard({
-    super.key,
-    required this.enabled,
-    required this.onChanged,
-  });
-
-  final bool enabled;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppSemanticColors.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacingTokens.md, vertical: AppSpacingTokens.sm + 4),
-      decoration: BoxDecoration(
-          color: c.primaryLight,
-          borderRadius: BorderRadius.circular(AppRadiiTokens.sm)),
-      child: Row(
-        children: [
-          Icon(Icons.notifications_none, color: c.textPrimary, size: 20),
-          const SizedBox(width: AppSpacingTokens.sm),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.medicationReminders,
-                    style: AppSemanticTextStyles.body
-                        .copyWith(fontWeight: FontWeight.w600)),
-                const SizedBox(height: 1),
-                Text(l10n.medicationRemindersDesc,
-                    style: AppSemanticTextStyles.caption),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () => onChanged(!enabled),
-            child: TogglePill(isOn: enabled),
-          ),
-        ],
-      ),
-    );
-  }
-}

@@ -256,6 +256,19 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                             textAlign: TextAlign.center,
                             textAlignVertical: TextAlignVertical.center,
                             maxLength: 1,
+                            // counterText: '' alone still reserves the
+                            // subtext row's layout height, shrinking the
+                            // usable vertical space in this fixed 54px box
+                            // and making the digit look smaller/off-center
+                            // than the Figma spec. buildCounter fully drops
+                            // the reserved space.
+                            buildCounter: (
+                              context, {
+                              required currentLength,
+                              required isFocused,
+                              maxLength,
+                            }) =>
+                                null,
                             style: AppSemanticTextStyles.headingH2.copyWith(
                               color: c.textPrimary,
                             ),
@@ -263,7 +276,6 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                               FilteringTextInputFormatter.digitsOnly,
                             ],
                             decoration: InputDecoration(
-                              counterText: '',
                               filled: true,
                               fillColor: c.surface,
                               isDense: true,
