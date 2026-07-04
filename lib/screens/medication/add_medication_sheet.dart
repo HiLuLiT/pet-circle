@@ -276,7 +276,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                           tooltip: l10n.deleteMedication,
                         ),
                       RoundIconButton(
-                        icon: const Icon(Icons.keyboard_arrow_up),
+                        icon: Icon(Icons.keyboard_arrow_up, color: c.textPrimary),
                         variant: RoundIconButtonVariant.ghost,
                         size: 36,
                         iconSize: 24,
