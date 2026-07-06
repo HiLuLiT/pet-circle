@@ -607,6 +607,25 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-032: New pet doesn't appear in the pet switcher after onboarding
+
+**Found during:** Manual testing — user added a new pet via onboarding and it did not appear in the header's pet-switcher dropdown
+**Severity:** High (core flow: a newly created pet is invisible everywhere `petStore.ownerPets` drives the UI — dashboard, pet switcher, tab content — until the next full refetch, e.g. an app restart)
+**Status:** Fixed
+
+**Symptom:** After completing onboarding to add a new pet, the pet was created successfully (visible in Firestore / on next app restart) but did not show up in the app immediately — not in the header's pet switcher, not on the home dashboard.
+
+**Root cause:** `PetStore.createPetWithFirestore()` has two branches. The mock-mode (`else`, `kEnableFirebase == false`) branch calls `addPet(pet)`, which appends to `_ownerPets` and calls `notifyListeners()`. The Firebase branch (`kEnableFirebase == true`, which is always true in production per this repo's convention) wrote the pet to Firestore and returned the created `Pet` object, but never added it to the in-memory `_ownerPets` list and never called `notifyListeners()`. The onboarding flow's `createdPet` return value was discarded (flagged by a pre-existing `unused_local_variable` analyzer lint at `onboarding_flow.dart:69` that had been dismissed as a pre-existing/unrelated warning during prior work). The UI only reflects `petStore.ownerPets`, which stayed stale until the next `PetStore.fetchForUser()` (e.g. a cold app restart).
+
+**Fix:** The Firebase branch of `createPetWithFirestore()` now appends the created pet (with its real Firestore-assigned ID) to `_ownerPets` and calls `notifyListeners()` immediately after the write succeeds, matching the pattern already used by `removePetWithFirestore()`. Deliberately does **not** reuse `addPet()` wholesale, since that helper also mirrors into `_clinicPets` — a list populated from a separate vet/clinic-membership query in Firebase mode, where blindly mirroring a newly created pet into it would misrepresent that query's result.
+
+**Files changed:**
+- `lib/stores/pet_store.dart`
+
+**Known limitation:** No automated regression test covers this success path — like the Reminders fix in BUG-029, exercising the Firebase branch in a unit test requires a Firestore mock this project doesn't have; a real call to `PetService.createPet()` throws (no Firebase app initialized) before ever reaching the new code. Verified by code inspection and by comparing against the already-correct `removePetWithFirestore()` sibling.
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]
