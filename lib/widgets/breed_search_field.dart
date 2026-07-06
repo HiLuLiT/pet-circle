@@ -253,8 +253,6 @@ class _BreedSearchFieldState extends State<BreedSearchField>
     _close();
   }
 
-  String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
-
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
@@ -355,36 +353,10 @@ class _BreedSearchFieldState extends State<BreedSearchField>
                               final isSelected =
                                   breed.displayName.toLowerCase() ==
                                       _controller.text.trim().toLowerCase();
-                              return GestureDetector(
+                              return _BreedOptionTile(
+                                breed: breed,
+                                isSelected: isSelected,
                                 onTap: () => _select(breed),
-                                child: Container(
-                                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  decoration: BoxDecoration(
-                                    color: isSelected ? c.accentPurpleTile : Colors.transparent,
-                                    borderRadius: AppRadiiTokens.borderRadiusSm,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          breed.displayName,
-                                          style: AppSemanticTextStyles.pcBody.copyWith(
-                                            color: isSelected ? c.textPrimary : c.textTertiary,
-                                          ),
-                                        ),
-                                      ),
-                                      if (breed.subBreed != null)
-                                        Text(
-                                          _capitalize(breed.breed),
-                                          style: AppSemanticTextStyles.caption.copyWith(
-                                            color: c.textSecondary,
-                                            fontSize: 10,
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                ),
                               );
                             },
                           ),
@@ -394,6 +366,74 @@ class _BreedSearchFieldState extends State<BreedSearchField>
           ),
         ),
       ],
+    );
+  }
+}
+
+String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+
+/// A single row in the breed dropdown list. Applies the same purple-tile
+/// treatment on mouse hover as on selection, so desktop/web users get
+/// visual feedback while scanning the list, not just once a breed matches
+/// the typed text.
+class _BreedOptionTile extends StatefulWidget {
+  const _BreedOptionTile({
+    required this.breed,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final BreedItem breed;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  State<_BreedOptionTile> createState() => _BreedOptionTileState();
+}
+
+class _BreedOptionTileState extends State<_BreedOptionTile> {
+  bool _hovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppSemanticColors.of(context);
+    final breed = widget.breed;
+    final highlighted = widget.isSelected || _hovered;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: highlighted ? c.accentPurpleTile : Colors.transparent,
+            borderRadius: AppRadiiTokens.borderRadiusSm,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  breed.displayName,
+                  style: AppSemanticTextStyles.pcBody.copyWith(
+                    color: highlighted ? c.textPrimary : c.textTertiary,
+                  ),
+                ),
+              ),
+              if (breed.subBreed != null)
+                Text(
+                  _capitalize(breed.breed),
+                  style: AppSemanticTextStyles.caption.copyWith(
+                    color: c.textSecondary,
+                    fontSize: 10,
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

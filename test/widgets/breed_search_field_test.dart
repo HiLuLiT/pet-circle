@@ -1,3 +1,5 @@
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
@@ -200,6 +202,35 @@ void main() {
         return false;
       });
       expect(containers.isNotEmpty, isTrue);
+    });
+
+    testWidgets('hovering an unselected option highlights it with accentPurpleTile',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        const BreedSearchField(label: 'Breed'),
+      ));
+
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+
+      final optionFinder = find.text('Airedale');
+      expect(optionFinder, findsOneWidget);
+
+      final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await gesture.addPointer(location: Offset.zero);
+      addTearDown(gesture.removePointer);
+      await tester.pump();
+      await gesture.moveTo(tester.getCenter(optionFinder));
+      await tester.pumpAndSettle();
+
+      final decoration = tester
+          .widget<Container>(find
+              .ancestor(of: optionFinder, matching: find.byType(Container))
+              .first)
+          .decoration;
+      expect(decoration is BoxDecoration, isTrue);
+      expect((decoration as BoxDecoration).color,
+          AppSemanticColors.light.accentPurpleTile);
     });
   });
 }
