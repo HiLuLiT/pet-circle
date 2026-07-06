@@ -159,12 +159,10 @@ class _MainShellState extends State<MainShell> {
               child: AppHeader(
                 userName: user?.name ?? '',
                 userImageUrl: user?.avatarUrl ?? '',
-                petName: _selectedIndex == 0 ? null : pet?.name,
-                petImageUrl: _selectedIndex == 0 ? null : pet?.imageUrl,
+                petName: pet?.name,
+                petImageUrl: pet?.imageUrl,
                 onPetSelectorTap:
-                    _selectedIndex == 0 || petStore.ownerPets.length <= 1
-                        ? null
-                        : _showPetSwitcher,
+                    petStore.ownerPets.length <= 1 ? null : _showPetSwitcher,
                 onAvatarTap: () => showModalBottomSheet<void>(
                   context: context,
                   isScrollControlled: true,

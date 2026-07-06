@@ -89,7 +89,8 @@ void main() {
     });
 
     // ── Theme token verification ──────────────────────────────────────────
-    testWidgets('notification bell bg uses divider', (tester) async {
+    testWidgets('notification bell bg uses surface with a drop shadow',
+        (tester) async {
       await tester.pumpWidget(testApp(
         const AppHeader(userName: 'Alice'),
       ));
@@ -100,12 +101,14 @@ void main() {
           .where((c) {
         final dec = c.decoration;
         if (dec is BoxDecoration && dec.shape == BoxShape.circle) {
-          return dec.color == AppSemanticColors.light.divider;
+          return dec.color == AppSemanticColors.light.surface &&
+              (dec.boxShadow?.isNotEmpty ?? false);
         }
         return false;
       });
       expect(containers.isNotEmpty, isTrue,
-          reason: 'Notification bell should use divider background');
+          reason:
+              'Notification bell should use a white surface background with a shadow');
     });
 
     testWidgets('notification icon uses textPrimary color', (tester) async {

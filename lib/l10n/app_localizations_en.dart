@@ -930,6 +930,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get petUpdated => 'Pet updated';
 
   @override
+  String get yourPets => 'Your pets';
+
+  @override
+  String get reminders => 'Reminders';
+
+  @override
+  String get noRemindersYet => 'No reminders yet';
+
+  @override
+  String get addReminder => 'Add reminder';
+
+  @override
+  String get addNewReminder => 'Add new reminder';
+
+  @override
+  String get editReminder => 'Edit reminder';
+
+  @override
+  String get reminderTitleLabel => 'Title';
+
+  @override
+  String get hintReminderTitle => 'e.g. Veterinary dentist';
+
+  @override
+  String get reminderDetailLabel => 'Details';
+
+  @override
+  String get hintReminderDetail => 'e.g. Dr. Marry Rose';
+
+  @override
+  String get reminderDateLabel => 'Date';
+
+  @override
+  String get reminderAdded => 'Reminder added';
+
+  @override
+  String get reminderUpdated => 'Reminder updated';
+
+  @override
+  String get reminderDeleted => 'Reminder deleted';
+
+  @override
+  String get deleteReminder => 'Delete reminder';
+
+  @override
+  String deleteReminderConfirmation(String title) {
+    return 'Delete \"$title\"?';
+  }
+
+  @override
   String get editProfile => 'Edit Profile';
 
   @override

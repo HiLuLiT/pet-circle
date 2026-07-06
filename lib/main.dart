@@ -16,6 +16,7 @@ import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/reminder_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/services/abstract_push_notification_service.dart';
@@ -203,6 +204,11 @@ void _seedMockStores() {
   noteStore.seed({
     princessId: MockData.princessNotes,
     maxId: MockData.maxNotes,
+  });
+
+  reminderStore.seed({
+    princessId:
+        MockData.princessReminders.map((r) => r.copyWith(petId: princessId)).toList(),
   });
 
   medicationStore.seed({

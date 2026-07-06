@@ -4,6 +4,14 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 
+/// Size variant for [PetCard].
+///
+/// * [compact] — the default 24px `title3` name style used by all existing
+///   dashboards (owner, vet, care-circle).
+/// * [hero] — the larger 28px `pcDisplay` name style used by the new home
+///   hero pet card (Figma node 402-1978).
+enum PetCardSize { hero, compact }
+
 /// Shared pet card — Figma "Pet Card" (node 442:8872).
 ///
 /// A purple-tile card used across the owner, vet and care-circle dashboards.
@@ -26,12 +34,14 @@ import 'package:pet_circle/widgets/status_badge.dart';
 /// Design-token choices (documented because the raw Figma values fall between
 /// tokens):
 ///   * Card radius — Figma node is `20`; the nearest semantic radius token is
-///     [AppRadiiTokens.pcCard] (`18`), which is far closer than
+///     [AppRadiiTokens.pcCard] (`16`), which is far closer than
 ///     [AppRadiiTokens.pcTile] (`30`). We use `pcCard`.
 ///   * Padding — Figma node is `16`; matched exactly with
 ///     [AppSpacingTokens.md] (`16`).
-///   * Name — Figma "Display/M" is `28px bold`; the nearest semantic style is
-///     [AppSemanticTextStyles.title3] (`24px bold`), used here.
+///   * Name — Figma "Display/M" is `28px bold`; the default [PetCardSize.compact]
+///     uses the nearest semantic style [AppSemanticTextStyles.title3]
+///     (`24px bold`). Pass [PetCardSize.hero] to use the exact
+///     [AppSemanticTextStyles.pcDisplay] (`28px bold`) match instead.
 ///   * Subtitle — Figma "Label/M Regular" (`14px`) maps cleanly to
 ///     [AppSemanticTextStyles.pcLabelMuted].
 class PetCard extends StatelessWidget {
@@ -46,6 +56,7 @@ class PetCard extends StatelessWidget {
     this.onLongPress,
     this.footer,
     this.trailing,
+    this.size = PetCardSize.compact,
   });
 
   /// Pet name — rendered as the card's bold heading.
@@ -78,6 +89,11 @@ class PetCard extends StatelessWidget {
   /// dashboard for the "view only" badge.
   final Widget? trailing;
 
+  /// Size variant — [PetCardSize.compact] (default) preserves the existing
+  /// 24px name style for all current callers; [PetCardSize.hero] uses the
+  /// larger 28px `pcDisplay` style for the new home hero card.
+  final PetCardSize size;
+
   /// Fixed size of the [media] slot — matches the Figma frame (`90×90`).
   static const double _mediaSize = 90;
 
@@ -109,7 +125,9 @@ class PetCard extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: AppSemanticTextStyles.title3
+                      style: (size == PetCardSize.hero
+                              ? AppSemanticTextStyles.pcDisplay
+                              : AppSemanticTextStyles.title3)
                           .copyWith(color: c.textPrimary),
                     ),
                     const SizedBox(height: AppSpacingTokens.xs),

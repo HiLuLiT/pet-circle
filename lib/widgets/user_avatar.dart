@@ -11,12 +11,22 @@ class UserAvatar extends StatelessWidget {
     this.imageUrl,
     this.size = 36,
     this.onTap,
+    this.backgroundColor,
+    this.foregroundColor,
   });
 
   final String name;
   final String? imageUrl;
   final double size;
   final VoidCallback? onTap;
+
+  /// Overrides the default fallback background color (`c.primaryLight`) when
+  /// provided.
+  final Color? backgroundColor;
+
+  /// Overrides the default initials text color (`c.textPrimary`) when
+  /// provided.
+  final Color? foregroundColor;
 
   String get _initials {
     final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
@@ -40,7 +50,7 @@ class UserAvatar extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(color: c.surface, width: 2),
-          color: _hasNetworkImage ? null : c.primaryLight,
+          color: _hasNetworkImage ? null : (backgroundColor ?? c.primaryLight),
         ),
         child: ClipOval(
           child: _hasNetworkImage
@@ -53,7 +63,7 @@ class UserAvatar extends StatelessWidget {
                     child: Text(
                       _initials,
                       style: AppSemanticTextStyles.labelSm.copyWith(
-                        color: c.textPrimary,
+                        color: foregroundColor ?? c.textPrimary,
                         fontSize: size * 0.38,
                         height: 1,
                       ),
@@ -64,7 +74,7 @@ class UserAvatar extends StatelessWidget {
                   child: Text(
                     _initials,
                     style: AppSemanticTextStyles.labelSm.copyWith(
-                      color: c.textPrimary,
+                      color: foregroundColor ?? c.textPrimary,
                       fontSize: size * 0.38,
                       height: 1,
                     ),

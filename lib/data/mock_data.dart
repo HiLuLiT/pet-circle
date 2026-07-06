@@ -2,6 +2,7 @@ import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/models/clinical_note.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/pet.dart';
+import 'package:pet_circle/models/reminder.dart';
 import 'package:pet_circle/models/user.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/theme/tokens/colors.dart';
@@ -86,6 +87,26 @@ class MockData {
       authorAvatarUrl: 'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
       content: 'Slight elevation in SRR. Recommend increasing measurement frequency to twice daily.',
       createdAt: DateTime.now().subtract(const Duration(hours: 6)),
+    ),
+  ];
+
+  // ── Reminders ──────────────────────────────────────────────────────────────
+  static final princessReminders = [
+    Reminder(
+      id: 'reminder-1',
+      petId: '',
+      date: DateTime.now().add(const Duration(days: 7)),
+      title: 'Veterinary dentist',
+      detail: 'Annual dental checkup and cleaning.',
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
+    ),
+    Reminder(
+      id: 'reminder-2',
+      petId: '',
+      date: DateTime.now().add(const Duration(days: 30)),
+      title: 'Vaccination booster',
+      detail: 'Annual booster shot due.',
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
     ),
   ];
 

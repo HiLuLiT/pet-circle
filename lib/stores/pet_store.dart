@@ -8,6 +8,7 @@ import 'package:pet_circle/repositories/user_repository.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/note_store.dart';
+import 'package:pet_circle/stores/reminder_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 
 final petStore = PetStore();
@@ -89,6 +90,7 @@ class PetStore extends ChangeNotifier {
       await Future.wait([
         measurementStore.fetchForPets(petIds),
         noteStore.fetchForPets(petIds),
+        reminderStore.fetchForPets(petIds),
         medicationStore.fetchForUser(uid),
       ]);
     } finally {
@@ -109,6 +111,7 @@ class PetStore extends ChangeNotifier {
     _clinicPets = [];
     measurementStore.clearData();
     noteStore.clearData();
+    reminderStore.clearData();
     medicationStore.clearData();
     notifyListeners();
   }

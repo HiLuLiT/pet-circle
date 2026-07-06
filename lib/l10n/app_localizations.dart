@@ -1820,6 +1820,102 @@ abstract class AppLocalizations {
   /// **'Pet updated'**
   String get petUpdated;
 
+  /// No description provided for @yourPets.
+  ///
+  /// In en, this message translates to:
+  /// **'Your pets'**
+  String get yourPets;
+
+  /// No description provided for @reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get reminders;
+
+  /// No description provided for @noRemindersYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders yet'**
+  String get noRemindersYet;
+
+  /// No description provided for @addReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add reminder'**
+  String get addReminder;
+
+  /// No description provided for @addNewReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add new reminder'**
+  String get addNewReminder;
+
+  /// No description provided for @editReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit reminder'**
+  String get editReminder;
+
+  /// No description provided for @reminderTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get reminderTitleLabel;
+
+  /// No description provided for @hintReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Veterinary dentist'**
+  String get hintReminderTitle;
+
+  /// No description provided for @reminderDetailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get reminderDetailLabel;
+
+  /// No description provided for @hintReminderDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Dr. Marry Rose'**
+  String get hintReminderDetail;
+
+  /// No description provided for @reminderDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get reminderDateLabel;
+
+  /// No description provided for @reminderAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder added'**
+  String get reminderAdded;
+
+  /// No description provided for @reminderUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder updated'**
+  String get reminderUpdated;
+
+  /// No description provided for @reminderDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder deleted'**
+  String get reminderDeleted;
+
+  /// No description provided for @deleteReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete reminder'**
+  String get deleteReminder;
+
+  /// No description provided for @deleteReminderConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{title}\"?'**
+  String deleteReminderConfirmation(String title);
+
   /// No description provided for @editProfile.
   ///
   /// In en, this message translates to:

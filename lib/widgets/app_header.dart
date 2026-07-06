@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
-import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/user_avatar.dart';
 
 /// Reusable app header with avatar (left), optional pet selector (center),
@@ -37,7 +36,9 @@ class AppHeader extends StatelessWidget {
         UserAvatar(
           name: userName,
           imageUrl: userImageUrl,
-          size: 36,
+          size: 32,
+          backgroundColor: c.accentPurpleTile,
+          foregroundColor: c.primary,
           onTap: onAvatarTap,
         ),
         // Center: Pet selector (optional)
@@ -45,51 +46,26 @@ class AppHeader extends StatelessWidget {
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onPetSelectorTap,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacingTokens.sm,
-                vertical: AppSpacingTokens.xs,
-              ),
-              decoration: BoxDecoration(
-                color: c.background,
-                borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (petImageUrl != null && petImageUrl!.isNotEmpty)
-                    ClipOval(
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: DogPhoto(
-                          endpoint: petImageUrl!,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  if (petImageUrl != null && petImageUrl!.isNotEmpty)
-                    const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      petName!,
-                      style: AppSemanticTextStyles.bodySm.copyWith(
-                        color: c.textPrimary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    petName!,
+                    style: AppSemanticTextStyles.headingH2
+                        .copyWith(color: c.textPrimary),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  if (onPetSelectorTap != null) ...[
-                    const SizedBox(width: AppSpacingTokens.xs),
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 16,
-                      color: c.textPrimary,
-                    ),
-                  ],
+                ),
+                if (onPetSelectorTap != null) ...[
+                  const SizedBox(width: AppSpacingTokens.xs),
+                  Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 24,
+                    color: c.textPrimary,
+                  ),
                 ],
-              ),
+              ],
             ),
           ),
         // Right: Notification bell
@@ -97,11 +73,18 @@ class AppHeader extends StatelessWidget {
           behavior: HitTestBehavior.opaque,
           onTap: onNotificationTap,
           child: Container(
-            width: 36,
-            height: 36,
+            width: 40,
+            height: 40,
             decoration: BoxDecoration(
-              color: c.divider,
+              color: c.surface,
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 4,
+                  offset: const Offset(0, 1),
+                ),
+              ],
             ),
             child: Icon(
               Icons.notifications_none,

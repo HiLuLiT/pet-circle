@@ -4,7 +4,15 @@
 /// previously embedded in model classes. Keeping models pure data means they
 /// remain deterministic and testable.
 
+import 'package:intl/intl.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+
+/// Formats a date as "20 September" (day + full month name), localized to
+/// [localeName] (e.g. `l10n.localeName`) so it renders correctly for every
+/// supported app language rather than hardcoding English month names.
+String formatReminderDate(DateTime date, String localeName) {
+  return DateFormat('d MMMM', localeName).format(date);
+}
 
 String formatTimeAgo(DateTime dateTime, AppLocalizations l10n) {
   final diff = DateTime.now().difference(dateTime);

@@ -7,6 +7,7 @@ import 'package:pet_circle/models/clinical_note.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/models/pet.dart';
+import 'package:pet_circle/models/reminder.dart';
 
 class PetService {
   static final _firestore = FirebaseFirestore.instance;
@@ -236,5 +237,33 @@ class PetService {
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((doc) => Medication.fromFirestore(doc)).toList());
+  }
+
+  // --- Reminders subcollection ---
+
+  static CollectionReference _remindersRef(String petId) =>
+      _petsCollection.doc(petId).collection('reminders');
+
+  static Future<void> addReminder(String petId, Reminder reminder) async {
+    await _remindersRef(petId).add(reminder.toFirestore());
+  }
+
+  static Future<void> updateReminder(
+    String petId,
+    String reminderId,
+    Map<String, dynamic> data,
+  ) async {
+    await _remindersRef(petId).doc(reminderId).update(data);
+  }
+
+  static Future<void> deleteReminder(String petId, String reminderId) async {
+    await _remindersRef(petId).doc(reminderId).delete();
+  }
+
+  /// Fetch all reminders for a pet, ordered upcoming-first (ascending date).
+  static Future<List<Reminder>> fetchReminders(String petId) async {
+    final snapshot =
+        await _remindersRef(petId).orderBy('date', descending: false).get();
+    return snapshot.docs.map((doc) => Reminder.fromFirestore(doc)).toList();
   }
 }

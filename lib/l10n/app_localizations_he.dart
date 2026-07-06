@@ -928,6 +928,56 @@ class AppLocalizationsHe extends AppLocalizations {
   String get petUpdated => 'חיית מחמד עודכנה';
 
   @override
+  String get yourPets => 'חיות המחמד שלך';
+
+  @override
+  String get reminders => 'תזכורות';
+
+  @override
+  String get noRemindersYet => 'אין עדיין תזכורות';
+
+  @override
+  String get addReminder => 'הוספת תזכורת';
+
+  @override
+  String get addNewReminder => 'הוספת תזכורת חדשה';
+
+  @override
+  String get editReminder => 'עריכת תזכורת';
+
+  @override
+  String get reminderTitleLabel => 'כותרת';
+
+  @override
+  String get hintReminderTitle => 'לדוגמה: רופא שיניים וטרינרי';
+
+  @override
+  String get reminderDetailLabel => 'פרטים';
+
+  @override
+  String get hintReminderDetail => 'לדוגמה: ד\"ר מרי רוז';
+
+  @override
+  String get reminderDateLabel => 'תאריך';
+
+  @override
+  String get reminderAdded => 'התזכורת נוספה';
+
+  @override
+  String get reminderUpdated => 'התזכורת עודכנה';
+
+  @override
+  String get reminderDeleted => 'התזכורת נמחקה';
+
+  @override
+  String get deleteReminder => 'מחיקת תזכורת';
+
+  @override
+  String deleteReminderConfirmation(String title) {
+    return 'למחוק את \"$title\"?';
+  }
+
+  @override
   String get editProfile => 'עריכת פרופיל';
 
   @override
