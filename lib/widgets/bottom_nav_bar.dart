@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableCircleTab;
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
@@ -12,6 +13,10 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 /// - Translucent surface (0.92) with a 12px backdrop blur.
 /// - Active item uses `onSurface` (pcInk); inactive uses `textTertiary`.
 /// - Padding 14/10/14/26 to match the React component.
+/// - Icons are the Figma DS outline set (node 500:1106), tinted per-state via
+///   `SvgPicture`'s `colorFilter` rather than swapping asset files, since the
+///   design uses a single outline glyph per tab (not separate active/inactive
+///   artwork like Material's outlined/filled icon pairs).
 ///
 /// Public API (`selectedIndex`, `onTap`) is unchanged.
 class BottomNavBar extends StatelessWidget {
@@ -24,12 +29,15 @@ class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final void Function(int) onTap;
 
+  // The Circle tab is hidden behind kEnableCircleTab and wasn't part of the
+  // Figma tab-bar export (which shows Diary in that slot instead) -- it
+  // keeps its Material icon fallback rather than an unsourced SVG.
   static const _allTabs = [
-    _TabDef(icon: Icons.home_outlined, activeIcon: Icons.home),
-    _TabDef(icon: Icons.show_chart_outlined, activeIcon: Icons.show_chart),
-    _TabDef(icon: Icons.people_outline, activeIcon: Icons.people),
-    _TabDef(icon: Icons.monitor_heart_outlined, activeIcon: Icons.monitor_heart),
-    _TabDef(icon: Icons.medication_outlined, activeIcon: Icons.medication),
+    _TabDef.svg('assets/figma/nav_home.svg'),
+    _TabDef.svg('assets/figma/nav_trends.svg'),
+    _TabDef.icon(Icons.people_outline, Icons.people),
+    _TabDef.svg('assets/figma/nav_measure.svg'),
+    _TabDef.svg('assets/figma/nav_medicine.svg'),
   ];
 
   /// Tabs to render, excluding the Circle tab (index 2) when
@@ -90,11 +98,19 @@ class BottomNavBar extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            isActive ? tab.activeIcon : tab.icon,
-                            size: 24,
-                            color: color,
-                          ),
+                          tab.assetPath != null
+                              ? SvgPicture.asset(
+                                  tab.assetPath!,
+                                  width: 24,
+                                  height: 24,
+                                  colorFilter:
+                                      ColorFilter.mode(color, BlendMode.srcIn),
+                                )
+                              : Icon(
+                                  isActive ? tab.activeIcon : tab.icon,
+                                  size: 24,
+                                  color: color,
+                                ),
                           const SizedBox(height: 4),
                           Text(
                             labels[i],
@@ -120,11 +136,13 @@ class BottomNavBar extends StatelessWidget {
 
 @immutable
 class _TabDef {
-  const _TabDef({
-    required this.icon,
-    required this.activeIcon,
-  });
+  const _TabDef.svg(this.assetPath)
+      : icon = null,
+        activeIcon = null;
 
-  final IconData icon;
-  final IconData activeIcon;
+  const _TabDef.icon(this.icon, this.activeIcon) : assetPath = null;
+
+  final String? assetPath;
+  final IconData? icon;
+  final IconData? activeIcon;
 }
