@@ -33,7 +33,13 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([petStore, userStore]),
+      // measurementStore is merged in so the "Last reading" metric card
+      // (_MetricsRow) refreshes the instant a new measurement is saved via
+      // _saveMeasurement() -- without it, that card stayed stuck on "--"
+      // (or whatever value it showed on first build) because saving a
+      // measurement only calls measurementStore.notifyListeners(), which
+      // nothing here was listening to (see BUG-033).
+      listenable: Listenable.merge([petStore, userStore, measurementStore]),
       builder: (context, _) {
         final c = AppSemanticColors.of(context);
         final l10n = AppLocalizations.of(context)!;
@@ -101,7 +107,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                         ),
                         const SizedBox(height: AppSpacingTokens.pcLg),
                       ],
-                      const _MetricsRow(),
+                      _MetricsRow(),
                       const SizedBox(height: AppSpacingTokens.pcLg),
                       kEnableVisionRR && _selectedTab == 1
                           ? const _VisionMode()
@@ -134,8 +140,18 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
 /// "Target" / "Last reading" metric card pair — matches the Figma
 /// "Metric Label" component pair shown above the timer card in all three
 /// measurement states (Ready / Running / Result).
+///
+/// Deliberately NOT a `const` constructor: this widget reads
+/// `petStore`/`measurementStore` globals directly in [build], so its
+/// output depends on ambient state, not just constructor args. A `const`
+/// constructor would let a caller write `const _MetricsRow()`, which Dart
+/// canonicalizes to one singleton widget instance -- Flutter's element
+/// reconciliation then takes an identity fast path that skips calling
+/// [build] again on subsequent rebuilds, so this card would silently
+/// freeze on whatever value it had at first build (see BUG-033).
 class _MetricsRow extends StatelessWidget {
-  const _MetricsRow();
+  // ignore: prefer_const_constructors_in_immutables
+  _MetricsRow();
 
   @override
   Widget build(BuildContext context) {

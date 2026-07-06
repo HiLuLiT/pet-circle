@@ -626,6 +626,30 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-033: "Last reading" on the Measure screen never updates
+
+**Found during:** Manual testing / feature request — "add last reading to measure view"
+**Severity:** High (the metric card silently freezes on its first-build value forever, for the lifetime of the screen)
+**Status:** Fixed
+
+**Symptom:** The "Last reading" card on the Measure screen showed "—" (or a stale value) and never updated, even after saving a new measurement or switching the active pet.
+
+**Root cause:** Two independent bugs, both required to fully fix the symptom:
+1. `MeasurementScreen`'s outer `ListenableBuilder` only merged `petStore` and `userStore`, not `measurementStore`. Saving a measurement (`_saveMeasurement` → `measurementStore.addMeasurement`) only calls `measurementStore.notifyListeners()`, which nothing in this screen was listening to — same pattern as BUG-030.
+2. Even after fixing (1), the card still didn't update. The actual metric-row widget (`_MetricsRow`) was instantiated at its call site as `const _MetricsRow()` with a const, zero-argument constructor, but its `build()` reads `petStore`/`measurementStore` globals directly rather than receiving data via constructor parameters. Dart canonicalizes `const _MetricsRow()` to the exact same object instance on every call. Flutter's element reconciliation (`Element.updateChild`) checks `child.widget == newWidget` (identity) as a fast path and, when true, skips calling `build()` again entirely — so this widget's `build()` only ever ran once, at first mount, regardless of how many times its ancestor `ListenableBuilder` rebuilt.
+
+**Fix:**
+- Merged `measurementStore` into `MeasurementScreen`'s `ListenableBuilder` listenable.
+- Removed `const` from both the `_MetricsRow()` call site and its constructor declaration (the constructor is intentionally *not* const now — a class whose `build()` reads ambient global state should not offer a const constructor, since that invites exactly this regression if `const` is ever re-added at a call site).
+
+**Files changed:**
+- `lib/screens/measurement/measurement_screen.dart`
+- `test/screens/measurement/measurement_screen_test.dart` (new regression test; uses `measurementStore.seed()` rather than `addMeasurement()` to avoid the unrelated Firestore-write-fails-in-tests flakiness described in BUG-029)
+
+**Broader note:** This `const` + global-read-in-`build()` pattern is a general Flutter footgun, not specific to this widget. A codebase sweep was run to check for other occurrences of the same shape (private const-constructed StatelessWidget with no constructor params, reading a global store directly in `build()`, with at least one `const` call site).
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]
