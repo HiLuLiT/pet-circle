@@ -69,7 +69,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - B24: Push / emergency notification toggles wired to Firestore-backed `settingsStore`
 - M1: "Add Pet" button on owner dashboard navigates to onboarding
 - M2: Edit pet profile -- admin-only, bottom sheet with searchable breed dropdown + Firestore persistence
-- M3: Delete pet -- admin-only, long-press on pet card with confirmation
+- M3: Delete pet -- admin-only; long-press on the home hero pet card, or the explicit trash icon button in the pet detail edit sheet, both sharing `confirmDeletePet()` (`lib/utils/pet_delete_dialog.dart`)
 - M5: Global pet switcher in header -- `petStore.activePetIndex` shared across all screens
 - M6: User profile management -- edit name/photo from settings
 - M7: Sign out from settings drawer with confirmation

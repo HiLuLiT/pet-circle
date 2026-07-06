@@ -170,6 +170,13 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Container(
+        // minHeight (not a fixed height) pins the sheet's top edge near the
+        // top of the screen regardless of how short the form content is —
+        // matches the same fix applied to add_medication_sheet.dart, which
+        // shares this exact shell pattern.
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.sizeOf(context).height * 0.9,
+        ),
         decoration: BoxDecoration(
           color: c.background,
           borderRadius:

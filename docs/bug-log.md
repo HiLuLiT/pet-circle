@@ -646,7 +646,42 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 - `lib/screens/measurement/measurement_screen.dart`
 - `test/screens/measurement/measurement_screen_test.dart` (new regression test; uses `measurementStore.seed()` rather than `addMeasurement()` to avoid the unrelated Firestore-write-fails-in-tests flakiness described in BUG-029)
 
-**Broader note:** This `const` + global-read-in-`build()` pattern is a general Flutter footgun, not specific to this widget. A codebase sweep was run to check for other occurrences of the same shape (private const-constructed StatelessWidget with no constructor params, reading a global store directly in `build()`, with at least one `const` call site).
+**Broader note:** This `const` + global-read-in-`build()` pattern is a general Flutter footgun, not specific to this widget. A codebase sweep was run to check for other occurrences of the same shape (private const-constructed StatelessWidget with no constructor params, reading a global store directly in `build()`, with at least one `const` call site). No other active instances found; one latent risk (`_ActiveMedicationsList` in `lib/screens/medication/medication_screen.dart`, const constructor + global reads, not currently called with `const`) was preventively hardened the same way.
+
+---
+
+## BUG-034: Measure screen content vertically centered instead of starting from the top
+
+**Found during:** Manual testing / UX feedback on the Measure screen
+**Severity:** Low (visual only)
+**Status:** Fixed
+
+**Symptom:** The Measure screen's content (heading, Target/Last-reading cards, timer card) appeared vertically centered in the middle of the screen, with large empty gaps above and below, instead of starting from the top like every other screen.
+
+**Root cause:** The content was wrapped in `Center(child: ConstrainedBox(...))`. `Center` centers its child in BOTH axes; since the content column is shorter than the viewport on most phones, this visibly centered the whole stack vertically. The `ConstrainedBox`'s `maxWidth` (via `responsiveMaxWidth`) was only needed to cap width on wide/tablet screens, not to center vertically.
+
+**Fix:** Changed the wrapper from `Center` to `Align(alignment: Alignment.topCenter, ...)`, which still horizontally centers the width-capped content on wide screens but no longer centers vertically.
+
+**Files changed:**
+- `lib/screens/measurement/measurement_screen.dart`
+
+---
+
+## BUG-035: "Add New Medication" / "Add reminder" bottom sheets stop partway down the screen instead of reaching the top
+
+**Found during:** Manual testing / UX feedback — screenshot showed the medication sheet stopping mid-screen with the underlying screen's header still visible above it
+**Severity:** Low (visual only)
+**Status:** Fixed
+
+**Symptom:** Opening the "Add New Medication" (or "Add reminder") bottom sheet only grew tall enough to fit its form content, leaving the sheet's top edge partway down the screen instead of reaching close to the top like a full-height drawer.
+
+**Root cause:** `showModalBottomSheet` was called with `isScrollControlled: true`, which allows the sheet to exceed the default ~50% height cap, but the sheet's own `Container` had no minimum-height constraint — so it still only sized itself to its (shorter-than-full-screen) form content.
+
+**Fix:** Added `constraints: BoxConstraints(minHeight: MediaQuery.sizeOf(context).height * 0.9)` to the sheet's outer `Container` in both `AddMedicationSheet` and `AddReminderSheet` (which share the identical shell). This pins the sheet's top edge near the screen top regardless of content length, while still allowing it to grow further (and scroll) if content ever exceeds that.
+
+**Files changed:**
+- `lib/screens/medication/add_medication_sheet.dart`
+- `lib/screens/dashboard/add_reminder_sheet.dart`
 
 ---
 

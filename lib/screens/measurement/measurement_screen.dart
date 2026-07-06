@@ -78,7 +78,12 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         final content = SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacingTokens.pcXl),
-            child: Center(
+            // Align to topCenter, not Center: this screen's content is
+            // shorter than the viewport on most phones, so a plain Center
+            // vertically centered the whole card stack instead of letting
+            // it start from the top.
+            child: Align(
+              alignment: Alignment.topCenter,
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
                 child: SingleChildScrollView(

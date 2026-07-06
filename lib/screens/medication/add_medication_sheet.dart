@@ -227,6 +227,15 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Container(
+        // minHeight (not a fixed height) pins the sheet's top edge near the
+        // top of the screen regardless of how short the form content is,
+        // while still letting it grow taller (and scroll) if content ever
+        // exceeds this. Without it the sheet only grew tall enough to fit
+        // its content, stopping partway down the screen instead of reaching
+        // the top like a full-height drawer.
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.sizeOf(context).height * 0.9,
+        ),
         decoration: BoxDecoration(
           color: c.background,
           borderRadius:

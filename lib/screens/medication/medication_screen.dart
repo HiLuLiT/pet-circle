@@ -221,7 +221,13 @@ class _MedicationScreenState extends State<MedicationScreen> {
 }
 
 class _ActiveMedicationsList extends StatelessWidget {
-  const _ActiveMedicationsList({this.onEdit});
+  // Deliberately not const: build() reads petStore/medicationStore globals
+  // directly, so a `const _ActiveMedicationsList()` call site would get
+  // canonicalized to one instance and silently stop rebuilding on store
+  // changes (see BUG-033). Not currently called with const, but the
+  // constructor shouldn't offer the option.
+  // ignore: prefer_const_constructors_in_immutables
+  _ActiveMedicationsList({this.onEdit});
 
   final void Function(Medication)? onEdit;
 

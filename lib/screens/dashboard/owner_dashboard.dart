@@ -12,6 +12,7 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/utils/mascot_mapper.dart';
+import 'package:pet_circle/utils/pet_delete_dialog.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/app_card.dart';
 import 'package:pet_circle/widgets/avatar_stack.dart';
@@ -32,42 +33,6 @@ class OwnerDashboard extends StatelessWidget {
   const OwnerDashboard({super.key, this.showScaffold = true});
 
   final bool showScaffold;
-
-  void _confirmDeletePet(BuildContext context, Pet pet) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppSemanticColors.of(context);
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-        ),
-        title: Text(l10n.deletePet,
-            style: AppSemanticTextStyles.headingLg
-                .copyWith(color: c.textPrimary)),
-        content: Text(l10n.deletePetConfirmation(pet.name),
-            style: AppSemanticTextStyles.body),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              petStore.removePetWithFirestore(pet.name);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.petDeleted)),
-              );
-            },
-            style: TextButton.styleFrom(backgroundColor: c.error),
-            child: Text(l10n.deletePet,
-                style: TextStyle(color: c.background)),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _openReminderSheet(BuildContext context, [Reminder? reminder]) {
     final access = petStore.accessForActivePet();
@@ -212,7 +177,7 @@ class OwnerDashboard extends StatelessWidget {
                         size: 90,
                       ),
                       onLongPress:
-                          access.canDeletePet ? () => _confirmDeletePet(context, pet) : null,
+                          access.canDeletePet ? () => confirmDeletePet(context, pet) : null,
                     ),
 
                     const SizedBox(height: AppSpacingTokens.md),
