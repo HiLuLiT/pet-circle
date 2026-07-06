@@ -584,17 +584,17 @@ abstract class AppLocalizations {
   /// **'Export data and manage privacy settings'**
   String get exportAndManage;
 
-  /// No description provided for @autoExportData.
+  /// No description provided for @weeklySummary.
   ///
   /// In en, this message translates to:
-  /// **'Auto-Export Data'**
-  String get autoExportData;
+  /// **'Weekly Summary'**
+  String get weeklySummary;
 
-  /// No description provided for @autoExportDesc.
+  /// No description provided for @weeklySummaryDesc.
   ///
   /// In en, this message translates to:
-  /// **'Weekly CSV export to email'**
-  String get autoExportDesc;
+  /// **'Get a weekly nudge to check your pet\'s trends'**
+  String get weeklySummaryDesc;
 
   /// No description provided for @exportAllData.
   ///
@@ -607,18 +607,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Download complete health records'**
   String get exportAllDataDesc;
-
-  /// No description provided for @shareWithVet.
-  ///
-  /// In en, this message translates to:
-  /// **'Share with Veterinarian'**
-  String get shareWithVet;
-
-  /// No description provided for @shareWithVetDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Generate shareable report link'**
-  String get shareWithVetDesc;
 
   /// No description provided for @about.
   ///
@@ -1664,6 +1652,24 @@ abstract class AppLocalizations {
   /// **'Export started'**
   String get exportStarted;
 
+  /// No description provided for @dataExported.
+  ///
+  /// In en, this message translates to:
+  /// **'Health records exported'**
+  String get dataExported;
+
+  /// No description provided for @weeklySummaryNotifTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly Summary Ready'**
+  String get weeklySummaryNotifTitle;
+
+  /// No description provided for @weeklySummaryNotifBody.
+  ///
+  /// In en, this message translates to:
+  /// **'See how {petName}\'s breathing trended this week →'**
+  String weeklySummaryNotifBody(String petName);
+
   /// No description provided for @enterVetEmail.
   ///
   /// In en, this message translates to:
@@ -1928,11 +1934,11 @@ abstract class AppLocalizations {
   /// **'As needed'**
   String get asNeeded;
 
-  /// No description provided for @searchBreeds.
+  /// No description provided for @hintBreedName.
   ///
   /// In en, this message translates to:
-  /// **'Search breeds...'**
-  String get searchBreeds;
+  /// **'e.g., Golden Retriever'**
+  String get hintBreedName;
 
   /// No description provided for @noBreedsFound.
   ///

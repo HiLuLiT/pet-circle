@@ -1,11 +1,9 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/services/reminder_service.dart';
 import 'package:pet_circle/stores/medication_store.dart';
-import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
@@ -111,7 +109,6 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     if (!access.canManageMedication) return;
     final petId = petStore.activePet?.id ?? '';
     final l10n = AppLocalizations.of(context)!;
-    final petName = petStore.activePet?.name ?? l10n.petName;
     if (petId.isEmpty) return;
 
     final name = _nameController.text.trim();
@@ -167,18 +164,6 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         );
       }
     }
-
-    notificationStore.addNotification(
-      AppNotification(
-        id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
-        title: _isEditing ? l10n.medicationUpdated : l10n.medicationAdded,
-        titleKey: _isEditing ? 'medicationUpdated' : 'medicationAdded',
-        body: name,
-        type: NotificationType.medication,
-        createdAt: DateTime.now(),
-        petName: petName,
-      ),
-    );
 
     navigator.pop();
     messenger.showSnackBar(

@@ -5,7 +5,7 @@ class UserSettings {
     this.pushNotifications = true,
     this.emergencyAlerts = true,
     this.visionRREnabled = false,
-    this.autoExport = false,
+    this.weeklySummaryEnabled = false,
     this.measurementRemindersEnabled = true,
     this.measurementReminderFrequency = 3,
     this.measurementReminderDays = const [1, 3, 5],
@@ -22,7 +22,13 @@ class UserSettings {
   final bool pushNotifications;
   final bool emergencyAlerts;
   final bool visionRREnabled;
-  final bool autoExport;
+
+  /// Weekly re-engagement nudge: a recurring local notification recapping
+  /// the pet's SRR trend, deep-linking into Trends. Replaces the former
+  /// "autoExport" (CSV-to-email) field — [fromMap] still reads the legacy
+  /// `autoExport` key as a fallback so pre-existing Firestore docs
+  /// deserialize without a migration.
+  final bool weeklySummaryEnabled;
 
   /// Whether measurement reminders are enabled.
   final bool measurementRemindersEnabled;
@@ -58,7 +64,8 @@ class UserSettings {
       pushNotifications: data['pushNotifications'] ?? true,
       emergencyAlerts: data['emergencyAlerts'] ?? true,
       visionRREnabled: data['visionRREnabled'] ?? false,
-      autoExport: data['autoExport'] ?? false,
+      weeklySummaryEnabled:
+          data['weeklySummaryEnabled'] ?? data['autoExport'] ?? false,
       measurementRemindersEnabled:
           data['measurementRemindersEnabled'] ?? true,
       measurementReminderFrequency:
@@ -84,7 +91,7 @@ class UserSettings {
       'pushNotifications': pushNotifications,
       'emergencyAlerts': emergencyAlerts,
       'visionRREnabled': visionRREnabled,
-      'autoExport': autoExport,
+      'weeklySummaryEnabled': weeklySummaryEnabled,
       'measurementRemindersEnabled': measurementRemindersEnabled,
       'measurementReminderFrequency': measurementReminderFrequency,
       'measurementReminderDays': measurementReminderDays,
@@ -103,7 +110,7 @@ class UserSettings {
     bool? pushNotifications,
     bool? emergencyAlerts,
     bool? visionRREnabled,
-    bool? autoExport,
+    bool? weeklySummaryEnabled,
     bool? measurementRemindersEnabled,
     int? measurementReminderFrequency,
     List<int>? measurementReminderDays,
@@ -120,7 +127,7 @@ class UserSettings {
       pushNotifications: pushNotifications ?? this.pushNotifications,
       emergencyAlerts: emergencyAlerts ?? this.emergencyAlerts,
       visionRREnabled: visionRREnabled ?? this.visionRREnabled,
-      autoExport: autoExport ?? this.autoExport,
+      weeklySummaryEnabled: weeklySummaryEnabled ?? this.weeklySummaryEnabled,
       measurementRemindersEnabled:
           measurementRemindersEnabled ?? this.measurementRemindersEnabled,
       measurementReminderFrequency:

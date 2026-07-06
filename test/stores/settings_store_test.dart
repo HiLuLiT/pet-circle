@@ -31,8 +31,8 @@ void main() {
       expect(store.visionRREnabled, isFalse);
     });
 
-    test('default autoExport is false', () {
-      expect(store.autoExport, isFalse);
+    test('default weeklySummaryEnabled is false', () {
+      expect(store.weeklySummaryEnabled, isFalse);
     });
   });
 
@@ -111,9 +111,33 @@ void main() {
       expect(store.visionRREnabled, isTrue);
     });
 
-    test('setAutoExport updates value', () async {
-      await store.setAutoExport(true);
-      expect(store.autoExport, isTrue);
+    test('setWeeklySummaryEnabled updates value', () async {
+      await store.setWeeklySummaryEnabled(true);
+      expect(store.weeklySummaryEnabled, isTrue);
+    });
+
+    test('setWeeklySummaryEnabled invokes onWeeklySummaryChanged with the new value',
+        () async {
+      final calls = <bool>[];
+      store.onWeeklySummaryChanged = (enabled) async {
+        calls.add(enabled);
+      };
+
+      await store.setWeeklySummaryEnabled(true);
+      await store.setWeeklySummaryEnabled(false);
+
+      expect(calls, [true, false]);
+    });
+
+    test('toggleWeeklySummaryEnabled invokes onWeeklySummaryChanged', () async {
+      final calls = <bool>[];
+      store.onWeeklySummaryChanged = (enabled) async {
+        calls.add(enabled);
+      };
+
+      await store.toggleWeeklySummaryEnabled();
+
+      expect(calls, [true]);
     });
   });
 
@@ -173,11 +197,11 @@ void main() {
       expect(callCount, greaterThanOrEqualTo(1));
     });
 
-    test('notifyListeners called on setAutoExport', () async {
+    test('notifyListeners called on setWeeklySummaryEnabled', () async {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      await store.setAutoExport(true);
+      await store.setWeeklySummaryEnabled(true);
       expect(callCount, greaterThanOrEqualTo(1));
     });
   });
@@ -213,14 +237,14 @@ void main() {
       expect(store.visionRREnabled, isFalse);
     });
 
-    test('toggleAutoExport flips value', () async {
-      expect(store.autoExport, isFalse);
+    test('toggleWeeklySummaryEnabled flips value', () async {
+      expect(store.weeklySummaryEnabled, isFalse);
 
-      await store.toggleAutoExport();
-      expect(store.autoExport, isTrue);
+      await store.toggleWeeklySummaryEnabled();
+      expect(store.weeklySummaryEnabled, isTrue);
 
-      await store.toggleAutoExport();
-      expect(store.autoExport, isFalse);
+      await store.toggleWeeklySummaryEnabled();
+      expect(store.weeklySummaryEnabled, isFalse);
     });
   });
 
@@ -236,7 +260,7 @@ void main() {
           pushNotifications: false,
           emergencyAlerts: false,
           visionRREnabled: true,
-          autoExport: true,
+          weeklySummaryEnabled: true,
         ),
       );
 
@@ -247,7 +271,7 @@ void main() {
       expect(store.pushNotifications, isFalse);
       expect(store.emergencyAlerts, isFalse);
       expect(store.visionRREnabled, isTrue);
-      expect(store.autoExport, isTrue);
+      expect(store.weeklySummaryEnabled, isTrue);
     });
 
     test('seedFromAppUser with default settings matches store defaults', () {
@@ -264,7 +288,7 @@ void main() {
       expect(store.pushNotifications, isTrue);
       expect(store.emergencyAlerts, isTrue);
       expect(store.visionRREnabled, isFalse);
-      expect(store.autoExport, isFalse);
+      expect(store.weeklySummaryEnabled, isFalse);
     });
 
     test('seedFromAppUser notifies listeners', () {
@@ -305,13 +329,13 @@ void main() {
   group('SettingsStore reset after modifications', () {
     test('reset restores all values including toggles', () async {
       await store.setEmergencyAlerts(false);
-      await store.setAutoExport(true);
+      await store.setWeeklySummaryEnabled(true);
       await store.setVisionRREnabled(true);
 
       store.reset();
 
       expect(store.emergencyAlerts, isTrue);
-      expect(store.autoExport, isFalse);
+      expect(store.weeklySummaryEnabled, isFalse);
       expect(store.visionRREnabled, isFalse);
     });
 
@@ -326,7 +350,7 @@ void main() {
           pushNotifications: false,
           emergencyAlerts: false,
           visionRREnabled: true,
-          autoExport: true,
+          weeklySummaryEnabled: true,
         ),
       );
 
@@ -338,7 +362,7 @@ void main() {
       expect(store.pushNotifications, isTrue);
       expect(store.emergencyAlerts, isTrue);
       expect(store.visionRREnabled, isFalse);
-      expect(store.autoExport, isFalse);
+      expect(store.weeklySummaryEnabled, isFalse);
     });
   });
 

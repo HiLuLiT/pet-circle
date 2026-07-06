@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/config/app_config.dart' show kEnableCircleTab;
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
@@ -22,6 +23,16 @@ import 'package:pet_circle/widgets/app_header.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 
+/// Number of tabs rendered in the shell (IndexedStack/BottomNavBar/
+/// NavigationRail all agree on this count): Home, Trends, [Circle], Measure,
+/// Medication -- Circle only counted when [kEnableCircleTab] is true.
+const _kTabCount = kEnableCircleTab ? 5 : 4;
+
+/// Clamp a tab index (e.g. from a `?tab=` query param or a stale deep link)
+/// into the valid range for the current tab count, so old links minted
+/// before [kEnableCircleTab] changed can't select a nonexistent tab.
+int _clampTabIndex(int index) => index.clamp(0, _kTabCount - 1);
+
 class MainShell extends StatefulWidget {
   const MainShell({
     super.key,
@@ -40,14 +51,14 @@ class _MainShellState extends State<MainShell> {
   @override
   void initState() {
     super.initState();
-    _selectedIndex = widget.initialIndex;
+    _selectedIndex = _clampTabIndex(widget.initialIndex);
   }
 
   @override
   void didUpdateWidget(covariant MainShell oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initialIndex != oldWidget.initialIndex) {
-      _selectedIndex = widget.initialIndex;
+      _selectedIndex = _clampTabIndex(widget.initialIndex);
     }
   }
 
@@ -175,7 +186,7 @@ class _MainShellState extends State<MainShell> {
                 children: [
                   homeScreen,
                   const TrendsScreen(showScaffold: false),
-                  const CircleScreen(showScaffold: false),
+                  if (kEnableCircleTab) const CircleScreen(showScaffold: false),
                   const MeasurementScreen(showScaffold: false),
                   const MedicationScreen(showScaffold: false),
                 ],
@@ -221,7 +232,7 @@ class _MainShellState extends State<MainShell> {
     final l10n = AppLocalizations.of(context)!;
     final showLabels = screenWidth >= kDesktopBreakpoint;
 
-    final labels = [
+    final allLabels = [
       l10n.navHome,
       l10n.navTrends,
       l10n.navCircle,
@@ -229,7 +240,7 @@ class _MainShellState extends State<MainShell> {
       l10n.navMedication,
     ];
 
-    final icons = <IconData>[
+    final allIcons = <IconData>[
       Icons.home_outlined,
       Icons.show_chart_outlined,
       Icons.people_outline,
@@ -237,13 +248,29 @@ class _MainShellState extends State<MainShell> {
       Icons.medication_outlined,
     ];
 
-    final activeIcons = <IconData>[
+    final allActiveIcons = <IconData>[
       Icons.home,
       Icons.show_chart,
       Icons.people,
       Icons.monitor_heart,
       Icons.medication,
     ];
+
+    // Circle is index 2 in the full 5-tab list; drop it from all three
+    // parallel lists when the flag is off so indices stay aligned with the
+    // IndexedStack in build() and BottomNavBar.
+    final labels = kEnableCircleTab
+        ? allLabels
+        : [for (var i = 0; i < allLabels.length; i++) if (i != 2) allLabels[i]];
+    final icons = kEnableCircleTab
+        ? allIcons
+        : [for (var i = 0; i < allIcons.length; i++) if (i != 2) allIcons[i]];
+    final activeIcons = kEnableCircleTab
+        ? allActiveIcons
+        : [
+            for (var i = 0; i < allActiveIcons.length; i++)
+              if (i != 2) allActiveIcons[i],
+          ];
 
     return Theme(
       data: Theme.of(context).copyWith(
@@ -264,7 +291,7 @@ class _MainShellState extends State<MainShell> {
       indicatorColor: c.surface,
       selectedIconTheme: IconThemeData(color: c.textPrimary),
       unselectedIconTheme: IconThemeData(color: c.textPrimary, opacity: 0.3),
-      destinations: List.generate(5, (i) {
+      destinations: List.generate(labels.length, (i) {
         return NavigationRailDestination(
           icon: Opacity(
             opacity: 0.3,

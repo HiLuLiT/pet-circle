@@ -166,8 +166,10 @@ const allBreeds = [
   BreedItem(displayName: 'Yorkshire Terrier', breed: 'terrier', subBreed: 'yorkshire'),
 ];
 
-/// Searchable breed dropdown. Displays as a tap-to-open chip; when open,
-/// shows a search field and a filtered scrollable list.
+/// Searchable breed field, styled as the shared DS dropdown trigger
+/// ([AppDropdown]) but directly typeable: the trigger itself is the search
+/// input, and typing filters the option list below it — there is no nested
+/// search box inside an opened panel.
 class BreedSearchField extends StatefulWidget {
   const BreedSearchField({
     super.key,
@@ -188,48 +190,67 @@ class BreedSearchField extends StatefulWidget {
 
 class _BreedSearchFieldState extends State<BreedSearchField>
     with SingleTickerProviderStateMixin {
-  String? _selected;
+  late final _controller = TextEditingController(
+    text: widget.initialValue?.isNotEmpty == true ? widget.initialValue : '',
+  );
+  final _focusNode = FocusNode();
   bool _isOpen = false;
-  final _searchController = TextEditingController();
-  String _query = '';
   late AnimationController _chevronController;
 
   List<BreedItem> get _filtered {
-    if (_query.isEmpty) return allBreeds;
-    final q = _query.toLowerCase();
+    final q = _controller.text.trim().toLowerCase();
+    if (q.isEmpty) return allBreeds;
     return allBreeds.where((b) => b.displayName.toLowerCase().contains(q)).toList();
   }
 
   @override
   void initState() {
     super.initState();
-    _selected = widget.initialValue?.isNotEmpty == true ? widget.initialValue : null;
     _chevronController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _searchController.addListener(() {
-      setState(() => _query = _searchController.text);
+    // Rebuilds the filtered list as the user types.
+    _controller.addListener(() => setState(() {}));
+    _focusNode.addListener(() {
+      // Rebuild on every focus change so the focus ring stays in sync, even
+      // when focus is lost via a path other than _close() (e.g. another
+      // widget stealing focus).
+      setState(() {
+        if (_focusNode.hasFocus && !_isOpen) {
+          _isOpen = true;
+          _chevronController.forward();
+        }
+      });
     });
   }
 
   @override
   void dispose() {
-    _searchController.dispose();
+    _controller.dispose();
+    _focusNode.dispose();
     _chevronController.dispose();
     super.dispose();
   }
 
-  void _toggle() {
-    setState(() {
-      _isOpen = !_isOpen;
-      if (_isOpen) {
-        _chevronController.forward();
-      } else {
-        _chevronController.reverse();
-        _searchController.clear();
-      }
-    });
+  void _close() {
+    setState(() => _isOpen = false);
+    _chevronController.reverse();
+    _focusNode.unfocus();
+  }
+
+  void _toggleChevron() {
+    if (_isOpen) {
+      _close();
+    } else {
+      _focusNode.requestFocus();
+    }
+  }
+
+  void _select(BreedItem breed) {
+    _controller.text = breed.displayName;
+    widget.onChanged?.call(breed.displayName);
+    _close();
   }
 
   String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
@@ -247,140 +268,131 @@ class _BreedSearchFieldState extends State<BreedSearchField>
           style: AppSemanticTextStyles.labelSm,
         ),
         const SizedBox(height: AppSpacingTokens.sm),
-        GestureDetector(
-          onTap: _toggle,
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 54),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: c.surface,
-              borderRadius: AppRadiiTokens.borderRadiusField,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    _selected ?? 'e.g., Golden Retriever',
-                    style: AppSemanticTextStyles.pcBody.copyWith(
-                      color: _selected == null ? c.textTertiary : c.textPrimary,
+        TapRegion(
+          onTapOutside: (_) {
+            if (_isOpen) _close();
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                constraints: const BoxConstraints(minHeight: 54),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: c.surface,
+                  borderRadius: AppRadiiTokens.borderRadiusField,
+                  // DS "Input" focus affordance (see appInputDecoration): a
+                  // 2px primary ring on focus, no border when idle. Always
+                  // reserving the 2px (transparent when idle) avoids a
+                  // layout shift when focus changes.
+                  border: Border.all(
+                    color: _focusNode.hasFocus ? c.primary : Colors.transparent,
+                    width: 2,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        focusNode: _focusNode,
+                        style: AppSemanticTextStyles.pcBody.copyWith(color: c.textPrimary),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          // The app's global InputDecorationTheme fills text
+                          // fields with a recessed tint by default; override
+                          // it so the DS white "Input" surface underneath
+                          // (this Container's c.surface) shows through.
+                          filled: false,
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                          hintText: l10n.hintBreedName,
+                          hintStyle: AppSemanticTextStyles.pcBody.copyWith(color: c.textTertiary),
+                        ),
+                      ),
                     ),
-                    overflow: TextOverflow.ellipsis,
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: _toggleChevron,
+                      child: RotationTransition(
+                        turns: Tween(begin: 0.0, end: 0.5).animate(
+                          CurvedAnimation(parent: _chevronController, curve: Curves.easeInOut),
+                        ),
+                        child: Icon(Icons.keyboard_arrow_down, color: c.textSecondary, size: 20),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (_isOpen)
+                Container(
+                  margin: const EdgeInsets.only(top: 8),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: c.surface,
+                    borderRadius: AppRadiiTokens.borderRadiusField,
+                  ),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: widget.maxHeight),
+                    child: _filtered.isEmpty
+                        ? Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Text(
+                              l10n.noBreedsFound,
+                              style: AppSemanticTextStyles.body.copyWith(
+                                color: c.textTertiary,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            shrinkWrap: true,
+                            itemCount: _filtered.length,
+                            itemBuilder: (context, index) {
+                              final breed = _filtered[index];
+                              final isSelected =
+                                  breed.displayName.toLowerCase() ==
+                                      _controller.text.trim().toLowerCase();
+                              return GestureDetector(
+                                onTap: () => _select(breed),
+                                child: Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: isSelected ? c.accentPurpleTile : Colors.transparent,
+                                    borderRadius: AppRadiiTokens.borderRadiusSm,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          breed.displayName,
+                                          style: AppSemanticTextStyles.pcBody.copyWith(
+                                            color: isSelected ? c.textPrimary : c.textTertiary,
+                                          ),
+                                        ),
+                                      ),
+                                      if (breed.subBreed != null)
+                                        Text(
+                                          _capitalize(breed.breed),
+                                          style: AppSemanticTextStyles.caption.copyWith(
+                                            color: c.textSecondary,
+                                            fontSize: 10,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                RotationTransition(
-                  turns: Tween(begin: 0.0, end: 0.5).animate(
-                    CurvedAnimation(parent: _chevronController, curve: Curves.easeInOut),
-                  ),
-                  child: Icon(Icons.keyboard_arrow_down, color: c.textSecondary, size: 20),
-                ),
-              ],
-            ),
+            ],
           ),
         ),
-        if (_isOpen)
-          Container(
-            margin: const EdgeInsets.only(top: 8),
-            decoration: BoxDecoration(
-              color: c.surface,
-              borderRadius: AppRadiiTokens.borderRadiusField,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8, 8, 8, 4),
-                  child: SizedBox(
-                    height: 36,
-                    child: TextField(
-                      controller: _searchController,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        hintText: l10n.searchBreeds,
-                        hintStyle: AppSemanticTextStyles.body.copyWith(
-                          color: c.textTertiary,
-                        ),
-                        prefixIcon: Icon(Icons.search, size: 18, color: c.textTertiary),
-                        prefixIconConstraints: const BoxConstraints(minWidth: 36),
-                        filled: true,
-                        fillColor: c.surfaceRecessed,
-                        border: OutlineInputBorder(
-                          borderRadius: AppRadiiTokens.borderRadiusLg,
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      ),
-                      style: AppSemanticTextStyles.body.copyWith(
-                        color: c.textPrimary,
-                      ),
-                    ),
-                  ),
-                ),
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxHeight: widget.maxHeight),
-                  child: _filtered.isEmpty
-                      ? Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text(
-                            l10n.noBreedsFound,
-                            style: AppSemanticTextStyles.body.copyWith(
-                              color: c.textTertiary,
-                            ),
-                          ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          shrinkWrap: true,
-                          itemCount: _filtered.length,
-                          itemBuilder: (context, index) {
-                            final breed = _filtered[index];
-                            final isSelected = breed.displayName == _selected;
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _selected = breed.displayName;
-                                  _isOpen = false;
-                                });
-                                _searchController.clear();
-                                _chevronController.reverse();
-                                widget.onChanged?.call(breed.displayName);
-                              },
-                              child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: isSelected ? c.accentPurpleTile : Colors.transparent,
-                                  borderRadius: AppRadiiTokens.borderRadiusSm,
-                                ),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: Text(
-                                        breed.displayName,
-                                        style: AppSemanticTextStyles.pcBody.copyWith(
-                                          color: isSelected ? c.textPrimary : c.textTertiary,
-                                        ),
-                                      ),
-                                    ),
-                                    if (breed.subBreed != null)
-                                      Text(
-                                        _capitalize(breed.breed),
-                                        style: AppSemanticTextStyles.caption.copyWith(
-                                          color: c.textSecondary,
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              ],
-            ),
-          ),
       ],
     );
   }

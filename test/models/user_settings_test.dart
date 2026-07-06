@@ -11,7 +11,7 @@ void main() {
       expect(settings.pushNotifications, isTrue);
       expect(settings.emergencyAlerts, isTrue);
       expect(settings.visionRREnabled, isFalse);
-      expect(settings.autoExport, isFalse);
+      expect(settings.weeklySummaryEnabled, isFalse);
     });
 
     test('creates with custom values', () {
@@ -21,7 +21,7 @@ void main() {
         pushNotifications: false,
         emergencyAlerts: false,
         visionRREnabled: true,
-        autoExport: true,
+        weeklySummaryEnabled: true,
       );
 
       expect(settings.elevatedThreshold, 25);
@@ -29,7 +29,7 @@ void main() {
       expect(settings.pushNotifications, isFalse);
       expect(settings.emergencyAlerts, isFalse);
       expect(settings.visionRREnabled, isTrue);
-      expect(settings.autoExport, isTrue);
+      expect(settings.weeklySummaryEnabled, isTrue);
     });
   });
 
@@ -50,7 +50,7 @@ void main() {
         pushNotifications: false,
         emergencyAlerts: false,
         visionRREnabled: true,
-        autoExport: true,
+        weeklySummaryEnabled: true,
       );
 
       final copy = original.copyWith();
@@ -60,7 +60,7 @@ void main() {
       expect(copy.pushNotifications, original.pushNotifications);
       expect(copy.emergencyAlerts, original.emergencyAlerts);
       expect(copy.visionRREnabled, original.visionRREnabled);
-      expect(copy.autoExport, original.autoExport);
+      expect(copy.weeklySummaryEnabled, original.weeklySummaryEnabled);
     });
 
     test('original is unchanged after copyWith', () {
@@ -70,13 +70,13 @@ void main() {
         elevatedThreshold: 10,
         criticalThreshold: 50,
         pushNotifications: false,
-        autoExport: true,
+        weeklySummaryEnabled: true,
       );
 
       expect(original.elevatedThreshold, 30);
       expect(original.criticalThreshold, 40);
       expect(original.pushNotifications, isTrue);
-      expect(original.autoExport, isFalse);
+      expect(original.weeklySummaryEnabled, isFalse);
     });
 
     test('copyWith can update each field independently', () {
@@ -103,7 +103,7 @@ void main() {
         isTrue,
       );
       expect(
-        original.copyWith(autoExport: true).autoExport,
+        original.copyWith(weeklySummaryEnabled: true).weeklySummaryEnabled,
         isTrue,
       );
     });
@@ -117,7 +117,7 @@ void main() {
         'pushNotifications': false,
         'emergencyAlerts': false,
         'visionRREnabled': true,
-        'autoExport': true,
+        'weeklySummaryEnabled': true,
       });
 
       expect(settings.elevatedThreshold, 20);
@@ -125,7 +125,7 @@ void main() {
       expect(settings.pushNotifications, isFalse);
       expect(settings.emergencyAlerts, isFalse);
       expect(settings.visionRREnabled, isTrue);
-      expect(settings.autoExport, isTrue);
+      expect(settings.weeklySummaryEnabled, isTrue);
     });
 
     test('fromMap uses defaults for missing fields', () {
@@ -136,7 +136,7 @@ void main() {
       expect(settings.pushNotifications, isTrue);
       expect(settings.emergencyAlerts, isTrue);
       expect(settings.visionRREnabled, isFalse);
-      expect(settings.autoExport, isFalse);
+      expect(settings.weeklySummaryEnabled, isFalse);
     });
 
     test('fromMap uses defaults for null values', () {
@@ -146,7 +146,7 @@ void main() {
         'pushNotifications': null,
         'emergencyAlerts': null,
         'visionRREnabled': null,
-        'autoExport': null,
+        'weeklySummaryEnabled': null,
       });
 
       expect(settings.elevatedThreshold, 30);
@@ -154,7 +154,24 @@ void main() {
       expect(settings.pushNotifications, isTrue);
       expect(settings.emergencyAlerts, isTrue);
       expect(settings.visionRREnabled, isFalse);
-      expect(settings.autoExport, isFalse);
+      expect(settings.weeklySummaryEnabled, isFalse);
+    });
+
+    test('fromMap reads the legacy autoExport key as a fallback', () {
+      // Pre-existing Firestore docs from before the weeklySummaryEnabled
+      // rename only have "autoExport" — verify they still deserialize
+      // without a migration.
+      final settings = UserSettings.fromMap({'autoExport': true});
+      expect(settings.weeklySummaryEnabled, isTrue);
+    });
+
+    test('fromMap prefers weeklySummaryEnabled over the legacy autoExport key',
+        () {
+      final settings = UserSettings.fromMap({
+        'weeklySummaryEnabled': false,
+        'autoExport': true,
+      });
+      expect(settings.weeklySummaryEnabled, isFalse);
     });
   });
 
@@ -166,7 +183,7 @@ void main() {
         pushNotifications: false,
         emergencyAlerts: true,
         visionRREnabled: true,
-        autoExport: false,
+        weeklySummaryEnabled: false,
       );
 
       final map = settings.toMap();
@@ -176,7 +193,7 @@ void main() {
       expect(map['pushNotifications'], isFalse);
       expect(map['emergencyAlerts'], isTrue);
       expect(map['visionRREnabled'], isTrue);
-      expect(map['autoExport'], isFalse);
+      expect(map['weeklySummaryEnabled'], isFalse);
     });
 
     test('toMap roundtrips with fromMap', () {
@@ -186,7 +203,7 @@ void main() {
         pushNotifications: false,
         emergencyAlerts: false,
         visionRREnabled: true,
-        autoExport: true,
+        weeklySummaryEnabled: true,
       );
 
       final roundtripped = UserSettings.fromMap(original.toMap());
@@ -196,7 +213,7 @@ void main() {
       expect(roundtripped.pushNotifications, original.pushNotifications);
       expect(roundtripped.emergencyAlerts, original.emergencyAlerts);
       expect(roundtripped.visionRREnabled, original.visionRREnabled);
-      expect(roundtripped.autoExport, original.autoExport);
+      expect(roundtripped.weeklySummaryEnabled, original.weeklySummaryEnabled);
     });
   });
 

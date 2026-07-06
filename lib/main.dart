@@ -62,6 +62,23 @@ void main() async {
     await pushService.init();
   }
 
+  // Weekly summary nudge: fixed Sunday 18:00 slot (ISO 8601 weekday 7),
+  // end-of-week reflection. Only meaningful when there's an active pet to
+  // recap, since the notification text is fixed at schedule time (a local
+  // notification can't embed live stats) and names the pet.
+  Future<void> scheduleWeeklySummaryIfPossible() async {
+    final pet = petStore.activePet;
+    if (pet == null) return;
+    final l10n = lookupAppLocalizations(appLocale.value);
+    await reminderService.scheduleWeeklySummary(
+      weekday: DateTime.sunday,
+      hour: 18,
+      minute: 0,
+      title: l10n.weeklySummaryNotifTitle,
+      body: l10n.weeklySummaryNotifBody(pet.name),
+    );
+  }
+
   // Wire the push toggle callback so disabling notifications cancels
   // all reminders and unregisters the FCM token, and re-enabling restores them.
   settingsStore.onPushToggleChanged = (enabled) async {
@@ -78,6 +95,9 @@ void main() async {
           hour: settingsStore.measurementReminderHour,
           minute: settingsStore.measurementReminderMinute,
         );
+      }
+      if (settingsStore.weeklySummaryEnabled) {
+        await scheduleWeeklySummaryIfPossible();
       }
     }
   };
@@ -96,6 +116,14 @@ void main() async {
         hour: hour,
         minute: minute,
       );
+    }
+  };
+
+  // Wire the weekly summary toggle to schedule/cancel the recurring nudge.
+  settingsStore.onWeeklySummaryChanged = (enabled) async {
+    await reminderService.cancelWeeklySummary();
+    if (enabled) {
+      await scheduleWeeklySummaryIfPossible();
     }
   };
 

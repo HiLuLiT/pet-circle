@@ -97,7 +97,7 @@ class PetMeasurementHistory extends StatelessWidget {
               TextButton.icon(
                 onPressed: () {
                   petStore.setActivePet(pet);
-                  context.go(AppRoutes.shell(tab: 1));
+                  context.go(AppRoutes.shell(tab: AppRoutes.tabTrends));
                 },
                 icon: const Icon(Icons.show_chart, size: 18),
                 label: Text(l10n.viewGraph),

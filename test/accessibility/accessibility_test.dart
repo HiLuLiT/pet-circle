@@ -76,14 +76,15 @@ void main() {
       );
     });
 
-    testWidgets('Circle nav item has semantic label "Circle"', (tester) async {
+    testWidgets('Circle nav item is hidden behind kEnableCircleTab',
+        (tester) async {
       await tester.pumpWidget(buildNav());
       await tester.pump();
 
       expect(
         find.bySemanticsLabel(RegExp('Circle')),
-        findsOneWidget,
-        reason: 'Circle tab must expose a "Circle" semantics label',
+        findsNothing,
+        reason: 'Circle tab is disabled and must not expose a semantics label',
       );
     });
 
@@ -111,12 +112,12 @@ void main() {
       );
     });
 
-    testWidgets('all five semantic labels present simultaneously',
+    testWidgets('all four semantic labels present simultaneously',
         (tester) async {
       await tester.pumpWidget(buildNav(selectedIndex: 2));
       await tester.pump();
 
-      for (final label in ['Home', 'Trends', 'Circle', 'Measure', 'Medication']) {
+      for (final label in ['Home', 'Trends', 'Measure', 'Medication']) {
         expect(
           find.bySemanticsLabel(RegExp(label)),
           findsOneWidget,

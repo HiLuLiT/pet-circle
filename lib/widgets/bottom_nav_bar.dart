@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:pet_circle/config/app_config.dart' show kEnableCircleTab;
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
@@ -23,7 +24,7 @@ class BottomNavBar extends StatelessWidget {
   final int selectedIndex;
   final void Function(int) onTap;
 
-  static const _tabs = [
+  static const _allTabs = [
     _TabDef(icon: Icons.home_outlined, activeIcon: Icons.home),
     _TabDef(icon: Icons.show_chart_outlined, activeIcon: Icons.show_chart),
     _TabDef(icon: Icons.people_outline, activeIcon: Icons.people),
@@ -31,17 +32,33 @@ class BottomNavBar extends StatelessWidget {
     _TabDef(icon: Icons.medication_outlined, activeIcon: Icons.medication),
   ];
 
+  /// Tabs to render, excluding the Circle tab (index 2) when
+  /// [kEnableCircleTab] is false. Kept in sync index-for-index with the
+  /// `labels` list built in [build].
+  static List<_TabDef> get _tabs => kEnableCircleTab
+      ? _allTabs
+      : [
+          for (var i = 0; i < _allTabs.length; i++)
+            if (i != 2) _allTabs[i],
+        ];
+
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final labels = [
+    final allLabels = [
       l10n.navHome,
       l10n.navTrends,
       l10n.navCircle,
       l10n.navMeasure,
       l10n.navMedication,
     ];
+    final labels = kEnableCircleTab
+        ? allLabels
+        : [
+            for (var i = 0; i < allLabels.length; i++)
+              if (i != 2) allLabels[i],
+          ];
 
     final activeColor = c.onSurface;
     final inactiveColor = c.textTertiary;

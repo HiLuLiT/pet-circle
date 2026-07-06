@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/breed_search_field.dart';
 
 import '../helpers/test_app.dart';
@@ -25,38 +24,74 @@ void main() {
       expect(find.text('Dog Breed'), findsOneWidget);
     });
 
-    testWidgets('shows placeholder when no selection', (tester) async {
+    testWidgets('shows placeholder hint when no selection', (tester) async {
       await tester.pumpWidget(testApp(
         const BreedSearchField(label: 'Breed'),
       ));
-      expect(find.text('e.g., Golden Retriever'), findsOneWidget);
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.decoration?.hintText, 'e.g., Golden Retriever');
+      expect(field.controller?.text, '');
     });
 
     testWidgets('shows initial value when provided', (tester) async {
       await tester.pumpWidget(testApp(
         const BreedSearchField(label: 'Breed', initialValue: 'Beagle'),
       ));
-      expect(find.text('Beagle'), findsOneWidget);
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller?.text, 'Beagle');
     });
 
-    testWidgets('opens search panel on tap', (tester) async {
+    // ── Interaction: field itself is the searchable input ──────────────────
+    testWidgets('tapping the field opens the option list', (tester) async {
       await tester.pumpWidget(testApp(
         const BreedSearchField(label: 'Breed'),
       ));
 
-      // Initially no search field
-      expect(find.byIcon(Icons.search), findsNothing);
+      // Initially closed — no options rendered.
+      expect(find.text('Akita'), findsNothing);
+      // No nested search input should ever exist — only the one trigger field.
+      expect(find.byType(TextField), findsOneWidget);
 
-      // Tap the dropdown trigger
-      await tester.tap(find.text('e.g., Golden Retriever'));
+      await tester.tap(find.byType(TextField));
       await tester.pumpAndSettle();
 
-      // Search field should appear
-      expect(find.byIcon(Icons.search), findsOneWidget);
+      // Option list appears; still exactly one TextField (the trigger itself).
+      expect(find.text('Akita'), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.byIcon(Icons.search), findsNothing);
     });
 
-    // ── Interaction test ────────────────────────────────────────────────────
-    testWidgets('selecting a breed calls onChanged and closes panel',
+    testWidgets('shows a 2px primary focus ring only while focused',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        const BreedSearchField(label: 'Breed'),
+      ));
+
+      Container triggerContainer() => tester.widget<Container>(
+            find.ancestor(
+              of: find.byType(TextField),
+              matching: find.byType(Container),
+            ).first,
+          );
+
+      // Idle: border reserved (no layout shift on focus) but transparent.
+      final idleDecoration = triggerContainer().decoration as BoxDecoration;
+      expect(idleDecoration.border, isNotNull);
+      expect(
+        (idleDecoration.border as Border).top.color,
+        Colors.transparent,
+      );
+
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+
+      final focusedDecoration = triggerContainer().decoration as BoxDecoration;
+      final borderSide = (focusedDecoration.border as Border).top;
+      expect(borderSide.color, AppSemanticColors.light.primary);
+      expect(borderSide.width, 2);
+    });
+
+    testWidgets('selecting a breed calls onChanged, fills the field, and closes the list',
         (tester) async {
       String? selected;
       await tester.pumpWidget(testApp(
@@ -66,35 +101,52 @@ void main() {
         ),
       ));
 
-      // Open the dropdown
-      await tester.tap(find.text('e.g., Golden Retriever'));
+      await tester.tap(find.byType(TextField));
       await tester.pumpAndSettle();
 
-      // Tap on a breed (Akita is early in the list, visible without scroll)
       await tester.tap(find.text('Akita'));
       await tester.pumpAndSettle();
 
       expect(selected, 'Akita');
-      // Panel should be closed — search icon gone
-      expect(find.byIcon(Icons.search), findsNothing);
+      final field = tester.widget<TextField>(find.byType(TextField));
+      expect(field.controller?.text, 'Akita');
+      // List closed — other breeds no longer rendered.
+      expect(find.text('Affenpinscher'), findsNothing);
     });
 
-    testWidgets('filters breeds when typing in search', (tester) async {
+    testWidgets('typing directly in the field filters the option list',
+        (tester) async {
       await tester.pumpWidget(testApp(
         const BreedSearchField(label: 'Breed'),
       ));
 
-      // Open
-      await tester.tap(find.text('e.g., Golden Retriever'));
-      await tester.pumpAndSettle();
-
-      // Type a search query
+      await tester.tap(find.byType(TextField));
       await tester.enterText(find.byType(TextField), 'beagle');
       await tester.pumpAndSettle();
 
-      // Beagle should be visible
+      // Beagle should be visible; a non-matching breed should not.
       expect(find.text('Beagle'), findsOneWidget);
-      // Some breed that does not match should not be visible (Akita)
+      expect(find.text('Akita'), findsNothing);
+      // Filtering happens in the trigger field itself — no nested search box.
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
+    testWidgets('tapping outside closes the option list', (tester) async {
+      await tester.pumpWidget(testApp(
+        Column(
+          children: [
+            const BreedSearchField(label: 'Breed'),
+            Container(key: const Key('outside'), height: 40, color: Colors.transparent),
+          ],
+        ),
+      ));
+
+      await tester.tap(find.byType(TextField));
+      await tester.pumpAndSettle();
+      expect(find.text('Akita'), findsOneWidget);
+
+      await tester.tap(find.byKey(const Key('outside')));
+      await tester.pumpAndSettle();
       expect(find.text('Akita'), findsNothing);
     });
 
@@ -133,8 +185,8 @@ void main() {
         const BreedSearchField(label: 'Breed', initialValue: 'Akita'),
       ));
 
-      // Open dropdown to see the list with Akita selected
-      await tester.tap(find.text('Akita'));
+      // Open the list to see Akita highlighted as the current value.
+      await tester.tap(find.byType(TextField));
       await tester.pumpAndSettle();
 
       // DS alignment (Figma node 510-1220): selected option highlight is the

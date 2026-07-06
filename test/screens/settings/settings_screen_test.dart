@@ -242,7 +242,7 @@ void main() {
       expect(find.text('Care Circle'), findsOneWidget);
     });
 
-    testWidgets('shows edit profile action row', (tester) async {
+    testWidgets('does not show edit profile action row', (tester) async {
       tester.view.physicalSize = const Size(600, 1800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -251,7 +251,9 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
-      expect(find.text('Edit Profile'), findsOneWidget);
+      // Edit Profile row was intentionally removed from Settings; the dialog
+      // itself (showEditProfileDialog) is kept in code for future reuse.
+      expect(find.text('Edit Profile'), findsNothing);
     });
 
     testWidgets('shows push notifications toggle', (tester) async {

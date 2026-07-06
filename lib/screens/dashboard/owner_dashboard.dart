@@ -143,12 +143,12 @@ class OwnerDashboard extends StatelessWidget {
           onMeasure: access.canMeasure
               ? () {
                   petStore.setActivePet(pet);
-                  context.go(AppRoutes.shell(tab: 3));
+                  context.go(AppRoutes.shell(tab: AppRoutes.tabMeasure));
                 }
               : null,
           onTrends: () {
             petStore.setActivePet(pet);
-            context.go(AppRoutes.shell(tab: 1));
+            context.go(AppRoutes.shell(tab: AppRoutes.tabTrends));
           },
         );
       });

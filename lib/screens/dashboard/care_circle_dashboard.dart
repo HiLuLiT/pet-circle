@@ -44,7 +44,13 @@ class CareCircleDashboard extends StatelessWidget {
                             (pet) => _CareCirclePetCard(
                               data: pet,
                               onTap: () => context.go(
-                                AppRoutes.shell(tab: 2),
+                                // Circle tab is retired behind kEnableCircleTab;
+                                // fall back to Home when it's unavailable.
+                                AppRoutes.shell(
+                                  tab: AppRoutes.tabCircle >= 0
+                                      ? AppRoutes.tabCircle
+                                      : AppRoutes.tabHome,
+                                ),
                               ),
                             ),
                           )

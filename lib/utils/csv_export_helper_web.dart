@@ -4,7 +4,16 @@ import 'dart:convert';
 // ignore: avoid_web_libraries_in_flutter, deprecated_member_use
 import 'dart:html' as html;
 
-Future<void> exportCsvImpl(String filename, String csvContent) async {
+/// [shareText]/[subject] are ignored on web — a browser file download has no
+/// share-sheet equivalent to attach them to. Callers that need the summary
+/// text seen by the user should surface it separately (e.g. in a dialog)
+/// before triggering the download.
+Future<void> exportCsvImpl(
+  String filename,
+  String csvContent, {
+  String? shareText,
+  String? subject,
+}) async {
   const bom = '\uFEFF';
   final bytes = utf8.encode(bom + csvContent);
   final blob = html.Blob([bytes], 'text/csv;charset=utf-8');

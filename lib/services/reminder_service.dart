@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatf
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/models/medication.dart';
 import 'package:pet_circle/services/abstract_reminder_service.dart';
 
@@ -189,7 +190,7 @@ class ReminderService implements AbstractReminderService {
 
     final payload = json.encode({
       'type': 'medication',
-      'route': '/shell?tab=4',
+      'route': AppRoutes.shell(tab: AppRoutes.tabMedication),
       'medicationId': med.id,
     });
 
@@ -256,7 +257,7 @@ class ReminderService implements AbstractReminderService {
     const body = 'It\'s time to check your pet\'s respiratory rate';
     final payload = json.encode({
       'type': 'measurement',
-      'route': '/shell?tab=3',
+      'route': AppRoutes.shell(tab: AppRoutes.tabMeasure),
     });
 
     for (final day in days) {
@@ -283,6 +284,71 @@ class ReminderService implements AbstractReminderService {
     for (var day = 1; day <= 7; day++) {
       await _plugin.cancel(_measurementBaseId + day);
     }
+  }
+
+  // ── Weekly summary nudge ─────────────────────────────────────────
+
+  /// Fixed notification ID for the weekly summary nudge (single recurring slot).
+  static const _weeklySummaryId = 800000;
+
+  @override
+  Future<void> scheduleWeeklySummary({
+    required int weekday,
+    required int hour,
+    required int minute,
+    required String title,
+    required String body,
+  }) async {
+    if (!_initialized) await init();
+
+    final permitted = await requestPermission();
+    if (!permitted) return;
+
+    await cancelWeeklySummary();
+
+    const androidDetails = AndroidNotificationDetails(
+      'weekly_summary',
+      'Weekly Summary',
+      channelDescription: "A weekly recap nudge for your pet's health trends",
+      importance: Importance.high,
+      priority: Priority.high,
+      groupKey: 'weekly_summary',
+    );
+
+    const darwinDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: darwinDetails,
+      macOS: darwinDetails,
+    );
+
+    final payload = json.encode({
+      'type': 'weeklySummary',
+      'route': AppRoutes.shell(tab: AppRoutes.tabTrends),
+    });
+
+    await _plugin.zonedSchedule(
+      _weeklySummaryId,
+      title,
+      body,
+      _nextInstanceOfDayAndTime(weekday, hour, minute),
+      details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime,
+      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
+      payload: payload,
+    );
+  }
+
+  @override
+  Future<void> cancelWeeklySummary() async {
+    await _plugin.cancel(_weeklySummaryId);
   }
 
   @override

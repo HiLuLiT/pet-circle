@@ -33,6 +33,18 @@ class WebReminderService implements AbstractReminderService {
   Future<void> cancelMeasurementReminder() async {}
 
   @override
+  Future<void> scheduleWeeklySummary({
+    required int weekday,
+    required int hour,
+    required int minute,
+    required String title,
+    required String body,
+  }) async {}
+
+  @override
+  Future<void> cancelWeeklySummary() async {}
+
+  @override
   Future<void> cancelAllReminders() async {}
 
   @override

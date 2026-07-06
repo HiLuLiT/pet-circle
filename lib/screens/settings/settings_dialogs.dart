@@ -5,17 +5,20 @@ import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/providers/auth_provider.dart';
-import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/stores/invitation_store.dart';
-import 'package:pet_circle/stores/notification_store.dart';
+import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/stores/medication_store.dart';
+import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/utils/csv_export_helper.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
+import 'package:pet_circle/utils/health_report_builder.dart';
 import 'package:pet_circle/widgets/app_dropdown.dart';
 import 'package:pet_circle/widgets/app_input_decoration.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
@@ -202,28 +205,37 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                     hintText: l10n.enterEmailAddress,
                   ),
                 ),
-                const SizedBox(height: 16),
-                AppDropdown(
-                  label: l10n.role,
-                  value: localizeRoleName(selectedRole, l10n),
-                  isOpen: isRoleOpen,
-                  options: roles.map((r) => localizeRoleName(r, l10n)).toList(),
-                  onTap: () => setSheetState(() => isRoleOpen = !isRoleOpen),
-                  onOptionSelected: (label) {
-                    // Map the localized label back to its canonical role by
-                    // position — same list, same order as `options` — mirroring
-                    // the AppDropdown adoption in medication_form_widgets.dart.
-                    final index = roles
-                        .map((r) => localizeRoleName(r, l10n))
-                        .toList()
-                        .indexOf(label);
-                    setSheetState(() {
-                      if (index >= 0) selectedRole = roles[index];
-                      isRoleOpen = false;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
+                // Role selection is intentionally hidden from the UI: invites
+                // are always created as 'member' regardless of selection (see
+                // InvitationService.createInvitation()), so exposing a role
+                // picker here was misleading. Kept behind `if (false)` — not
+                // deleted — for potential future reuse if per-role invites
+                // are implemented. `_selectedRole` still defaults to 'Member'
+                // and feeds `l10n.invitationSentTo(email, selectedRole)` below.
+                // ignore: dead_code
+                if (false) ...[
+                  AppDropdown(
+                    label: l10n.role,
+                    value: localizeRoleName(selectedRole, l10n),
+                    isOpen: isRoleOpen,
+                    options: roles.map((r) => localizeRoleName(r, l10n)).toList(),
+                    onTap: () => setSheetState(() => isRoleOpen = !isRoleOpen),
+                    onOptionSelected: (label) {
+                      // Map the localized label back to its canonical role by
+                      // position — same list, same order as `options` — mirroring
+                      // the AppDropdown adoption in medication_form_widgets.dart.
+                      final index = roles
+                          .map((r) => localizeRoleName(r, l10n))
+                          .toList()
+                          .indexOf(label);
+                      setSheetState(() {
+                        if (index >= 0) selectedRole = roles[index];
+                        isRoleOpen = false;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                ],
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -251,19 +263,6 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                             invitedEmail: email,
                             invitedByUid: userStore.currentUserUid ?? '',
                             invitedByName: userStore.currentUserDisplayName ?? '',
-                          );
-                          await notificationStore.addNotification(
-                            AppNotification(
-                              id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
-                              title: l10n.careCircleUpdated,
-                              titleKey: 'careCircleUpdated',
-                              body: l10n.invitationSentTo(email, selectedRole),
-                              bodyKey: 'invitationSentTo',
-                              args: [email, selectedRole],
-                              type: NotificationType.careCircle,
-                              createdAt: DateTime.now(),
-                              petName: activePet.name,
-                            ),
                           );
                           navigator.pop();
                           final link = 'https://petcircle.app/invite?token=$token';
@@ -298,9 +297,18 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
   void showExportDataDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppSemanticColors.of(context);
+    final pet = petStore.activePet;
+    if (pet == null || pet.id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.noPetsYet)),
+      );
+      return;
+    }
+    final petId = pet.id!;
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
         title: Text(l10n.exportAllData, style: AppSemanticTextStyles.headingLg),
         content: Text(
@@ -309,15 +317,31 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogCtx),
             child: Text(l10n.cancel),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.exportStarted), backgroundColor: c.primaryLight),
-              );
+            onPressed: () async {
+              Navigator.pop(dialogCtx);
+              try {
+                final csv = buildFullRecordCsv(
+                  pet: pet,
+                  measurements: measurementStore.getMeasurements(petId),
+                  medications: medicationStore.getMedications(petId),
+                  notes: noteStore.getNotes(petId),
+                );
+                final timestamp = DateTime.now().millisecondsSinceEpoch;
+                await exportCsv('${pet.name}_full_record_$timestamp.csv', csv);
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.dataExported), backgroundColor: c.primaryLight),
+                );
+              } catch (_) {
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(l10n.exportFailedRetry)),
+                );
+              }
             },
             style: TextButton.styleFrom(backgroundColor: c.primaryLight),
             child: Text(l10n.exportAllData, style: TextStyle(color: c.textPrimary)),
@@ -560,19 +584,6 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                               invitedEmail: email,
                               invitedByUid: userStore.currentUserUid ?? '',
                               invitedByName: userStore.currentUserDisplayName ?? '',
-                            );
-                            await notificationStore.addNotification(
-                              AppNotification(
-                                id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
-                                title: l10n.careCircleUpdated,
-                                titleKey: 'careCircleUpdated',
-                                body: l10n.vetInviteSent(email),
-                                bodyKey: 'vetInviteSent',
-                                args: [email],
-                                type: NotificationType.careCircle,
-                                createdAt: DateTime.now(),
-                                petName: activePet.name,
-                              ),
                             );
                             navigator.pop();
                             if (context.mounted) {

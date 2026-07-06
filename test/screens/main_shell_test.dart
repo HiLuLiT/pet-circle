@@ -59,7 +59,7 @@ void main() {
       expect(find.byType(BottomNavBar), findsOneWidget);
     });
 
-    testWidgets('bottom nav bar has 5 tab labels', (tester) async {
+    testWidgets('bottom nav bar has 4 tab labels', (tester) async {
       suppressOverflowErrors();
       tester.view.physicalSize = const Size(430, 932);
       tester.view.devicePixelRatio = 1.0;
@@ -73,10 +73,11 @@ void main() {
 
       // Tab labels appear in the BottomNavBar. Some labels may also
       // appear in the tab content (e.g. "Trends" heading), so use
-      // findsWidgets to allow duplicates.
+      // findsWidgets to allow duplicates. Circle is hidden behind
+      // kEnableCircleTab.
       expect(find.text('Home'), findsWidgets);
       expect(find.text('Trends'), findsWidgets);
-      expect(find.text('Circle'), findsWidgets);
+      expect(find.text('Circle'), findsNothing);
       expect(find.text('Measure'), findsWidgets);
       expect(find.text('Medication'), findsWidgets);
     });
@@ -161,7 +162,7 @@ void main() {
       expect(find.byType(BottomNavBar), findsNothing);
     });
 
-    testWidgets('NavigationRail has 5 destinations on wide layout', (tester) async {
+    testWidgets('NavigationRail has 4 destinations on wide layout', (tester) async {
       suppressOverflowErrors();
       tester.view.physicalSize = const Size(1024, 1366);
       tester.view.devicePixelRatio = 1.0;
@@ -171,8 +172,9 @@ void main() {
       await tester.pumpWidget(testApp(const MainShell()));
       await tester.pump();
 
+      // Circle destination is hidden behind kEnableCircleTab.
       final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-      expect(rail.destinations.length, 5);
+      expect(rail.destinations.length, 4);
     });
 
     testWidgets('uses narrow layout on phone screen (<768px)', (tester) async {
@@ -199,8 +201,9 @@ void main() {
       await tester.pumpWidget(testApp(const MainShell()));
       await tester.pump();
 
+      // CircleScreen is excluded behind kEnableCircleTab.
       final stack = tester.widget<IndexedStack>(find.byType(IndexedStack));
-      expect(stack.children.length, 5);
+      expect(stack.children.length, 4);
     });
   });
 }

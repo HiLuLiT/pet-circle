@@ -259,22 +259,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get exportAndManage => 'ייצוא נתונים וניהול הגדרות פרטיות';
 
   @override
-  String get autoExportData => 'ייצוא נתונים אוטומטי';
+  String get weeklySummary => 'סיכום שבועי';
 
   @override
-  String get autoExportDesc => 'ייצוא CSV שבועי למייל';
+  String get weeklySummaryDesc =>
+      'קבלו תזכורת שבועית לבדוק את המגמות של חיית המחמד שלכם';
 
   @override
   String get exportAllData => 'ייצוא כל הנתונים';
 
   @override
   String get exportAllDataDesc => 'הורדת רשומות בריאות מלאות';
-
-  @override
-  String get shareWithVet => 'שיתוף עם וטרינר';
-
-  @override
-  String get shareWithVetDesc => 'יצירת קישור לדוח לשיתוף';
 
   @override
   String get about => 'אודות';
@@ -836,6 +831,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get exportStarted => 'הייצוא החל';
 
   @override
+  String get dataExported => 'רשומות הבריאות יוצאו';
+
+  @override
+  String get weeklySummaryNotifTitle => 'הסיכום השבועי מוכן';
+
+  @override
+  String weeklySummaryNotifBody(String petName) {
+    return 'גלו כיצד הנשימה של $petName השתנתה השבוע ←';
+  }
+
+  @override
   String get enterVetEmail =>
       'הכנס את כתובת האימייל של הוטרינר שלך לשיתוף נתונים.';
 
@@ -987,7 +993,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get asNeeded => 'לפי הצורך';
 
   @override
-  String get searchBreeds => 'חיפוש גזעים...';
+  String get hintBreedName => 'לדוגמה, גולדן רטריבר';
 
   @override
   String get noBreedsFound => 'לא נמצאו גזעים';

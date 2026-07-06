@@ -56,7 +56,7 @@ class CareCircleItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: c.background,
         borderRadius: AppRadiiTokens.borderRadiusCard,

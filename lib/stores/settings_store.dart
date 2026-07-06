@@ -18,6 +18,9 @@ typedef MeasurementReminderCallback = Future<void> Function({
   required bool enabled,
 });
 
+/// Callback type for when the weekly summary nudge toggle changes.
+typedef WeeklySummaryCallback = Future<void> Function(bool enabled);
+
 class SettingsStore extends ChangeNotifier {
   /// Optional callback invoked when push notifications are toggled.
   /// Set by main.dart to wire FCM token + reminder lifecycle.
@@ -27,12 +30,16 @@ class SettingsStore extends ChangeNotifier {
   /// Set by main.dart to reschedule local notifications.
   MeasurementReminderCallback? onMeasurementReminderChanged;
 
+  /// Optional callback invoked when the weekly summary nudge is toggled.
+  /// Set by main.dart to schedule/cancel the recurring local notification.
+  WeeklySummaryCallback? onWeeklySummaryChanged;
+
   int _elevatedThreshold = 30;
   int _criticalThreshold = 40;
   bool _pushNotifications = true;
   bool _emergencyAlerts = true;
   bool _visionRREnabled = false;
-  bool _autoExport = false;
+  bool _weeklySummaryEnabled = false;
   bool _measurementRemindersEnabled = true;
   int _measurementReminderFrequency = 3;
   List<int> _measurementReminderDays = const [1, 3, 5];
@@ -48,7 +55,7 @@ class SettingsStore extends ChangeNotifier {
   bool get pushNotifications => _pushNotifications;
   bool get emergencyAlerts => _emergencyAlerts;
   bool get visionRREnabled => _visionRREnabled;
-  bool get autoExport => _autoExport;
+  bool get weeklySummaryEnabled => _weeklySummaryEnabled;
   bool get measurementRemindersEnabled => _measurementRemindersEnabled;
   int get measurementReminderFrequency => _measurementReminderFrequency;
   List<int> get measurementReminderDays =>
@@ -66,7 +73,7 @@ class SettingsStore extends ChangeNotifier {
     _pushNotifications = true;
     _emergencyAlerts = true;
     _visionRREnabled = false;
-    _autoExport = false;
+    _weeklySummaryEnabled = false;
     _measurementRemindersEnabled = true;
     _measurementReminderFrequency = 3;
     _measurementReminderDays = const [1, 3, 5];
@@ -86,7 +93,7 @@ class SettingsStore extends ChangeNotifier {
     _pushNotifications = settings.pushNotifications;
     _emergencyAlerts = settings.emergencyAlerts;
     _visionRREnabled = settings.visionRREnabled;
-    _autoExport = settings.autoExport;
+    _weeklySummaryEnabled = settings.weeklySummaryEnabled;
     _measurementRemindersEnabled = settings.measurementRemindersEnabled;
     _measurementReminderFrequency = settings.measurementReminderFrequency;
     _measurementReminderDays = List.of(settings.measurementReminderDays);
@@ -137,14 +144,15 @@ class SettingsStore extends ChangeNotifier {
     await setVisionRREnabled(!_visionRREnabled);
   }
 
-  Future<void> setAutoExport(bool value) async {
-    _autoExport = value;
+  Future<void> setWeeklySummaryEnabled(bool value) async {
+    _weeklySummaryEnabled = value;
     notifyListeners();
     await _persist();
+    await onWeeklySummaryChanged?.call(value);
   }
 
-  Future<void> toggleAutoExport() async {
-    await setAutoExport(!_autoExport);
+  Future<void> toggleWeeklySummaryEnabled() async {
+    await setWeeklySummaryEnabled(!_weeklySummaryEnabled);
   }
 
   // ── Measurement reminder settings ─────────────────────────────────
@@ -237,7 +245,7 @@ class SettingsStore extends ChangeNotifier {
       pushNotifications: _pushNotifications,
       emergencyAlerts: _emergencyAlerts,
       visionRREnabled: _visionRREnabled,
-      autoExport: _autoExport,
+      weeklySummaryEnabled: _weeklySummaryEnabled,
       measurementRemindersEnabled: _measurementRemindersEnabled,
       measurementReminderFrequency: _measurementReminderFrequency,
       measurementReminderDays: _measurementReminderDays,

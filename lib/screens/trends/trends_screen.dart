@@ -38,7 +38,7 @@ class TrendsScreen extends StatefulWidget {
 
 class _TrendsScreenState extends State<TrendsScreen>
     with SingleTickerProviderStateMixin {
-  TrendsPeriod _selectedPeriod = TrendsPeriod.last7Days;
+  TrendsPeriod _selectedPeriod = TrendsPeriod.last30Days;
   bool _isPeriodOpen = false;
   late final AnimationController _chevronController = AnimationController(
     vsync: this,
@@ -254,9 +254,10 @@ class _TrendsScreenState extends State<TrendsScreen>
               ),
               const SizedBox(height: AppSpacingTokens.pcMd),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(
+                  SizedBox(
+                    width: 165,
                     child: AppDropdown(
                       label: '',
                       value: _periodLabel(_selectedPeriod, l10n),
@@ -269,14 +270,22 @@ class _TrendsScreenState extends State<TrendsScreen>
                       onOptionSelected: (label) => _selectPeriodLabel(label, l10n),
                     ),
                   ),
-                  const SizedBox(width: AppSpacingTokens.pcSm),
-                  PrimaryButton(
-                    label: l10n.exportLabel,
-                    variant: PrimaryButtonVariant.miniPrimary,
-                    backgroundColor: c.textPrimary,
-                    foregroundColor: c.surface,
-                    onPressed: () => _showExportDialog(context),
-                    trailingIcon: Icon(Icons.file_download_outlined, color: c.surface),
+                  const SizedBox(width: AppSpacingTokens.sm),
+                  // Matches the dropdown trigger's height exactly (16 padding
+                  // + 24 line-height + 16 padding = 56, see AppDropdown's
+                  // _Trigger). miniPrimary is normally a compact ~44h button
+                  // (minimumSize: Size.zero), so without this it renders
+                  // visibly shorter than the dropdown beside it.
+                  SizedBox(
+                    height: 56,
+                    child: PrimaryButton(
+                      label: l10n.exportLabel,
+                      variant: PrimaryButtonVariant.miniPrimary,
+                      backgroundColor: c.textPrimary,
+                      foregroundColor: c.surface,
+                      onPressed: () => _showExportDialog(context),
+                      trailingIcon: Icon(Icons.file_download_outlined, color: c.surface),
+                    ),
                   ),
                 ],
               ),

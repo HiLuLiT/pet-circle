@@ -2,7 +2,8 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
+import 'package:pet_circle/config/app_config.dart'
+    show kEnableCircleTab, kEnableFirebase;
 import 'package:pet_circle/providers/auth_provider.dart';
 import 'package:pet_circle/screens/auth/auth_gate.dart';
 import 'package:pet_circle/screens/auth/login_screen.dart';
@@ -36,6 +37,20 @@ class AppRoutes {
 
   /// Build pet detail path.
   static String petDetail(String petId) => '/shell/pet/$petId';
+
+  // -- Bottom-nav tab indices --
+  //
+  // The main shell's tab order collapses from 5 tabs to 4 when
+  // [kEnableCircleTab] is false (Circle removed): Home, Trends, Measure,
+  // Medication. These named constants track the Circle flag so every call
+  // site that navigates to a specific tab (e.g. "go to Measure tab") stays
+  // correct regardless of whether Circle is present. Always prefer these
+  // over a raw tab-index literal.
+  static const tabHome = 0;
+  static const tabTrends = 1;
+  static const tabCircle = kEnableCircleTab ? 2 : -1;
+  static const tabMeasure = kEnableCircleTab ? 3 : 2;
+  static const tabMedication = kEnableCircleTab ? 4 : 3;
 }
 
 /// Routes that are exempt from the auth-gate redirect (they handle their own

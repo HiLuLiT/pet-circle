@@ -132,7 +132,11 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
-  // showEditProfileDialog — triggered via Edit Profile action row
+  // showEditProfileDialog — the Edit Profile action row that triggered this
+  // dialog has been intentionally removed from Settings; showEditProfileDialog
+  // itself is kept in code for future reuse. These tests are skipped (not
+  // deleted) since there is currently no UI entry point to tap into the
+  // dialog — re-enable once a trigger is reinstated.
   // ---------------------------------------------------------------------------
   group('showEditProfileDialog', () {
     testWidgets('opens edit profile bottom sheet', (tester) async {
@@ -146,7 +150,7 @@ void main() {
 
       expect(find.text('Display Name'), findsOneWidget);
       expect(find.text('Profile Photo URL'), findsOneWidget);
-    });
+    }, skip: true);
 
     testWidgets('cancel button closes edit profile sheet', (tester) async {
       suppressOverflowErrors();
@@ -162,7 +166,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Display Name'), findsNothing);
-    });
+    }, skip: true);
 
     testWidgets('save button shows profile updated snackbar', (tester) async {
       suppressOverflowErrors();
@@ -177,7 +181,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Profile updated'), findsOneWidget);
-    });
+    }, skip: true);
 
     testWidgets('pre-fills name and photo URL from current user', (tester) async {
       suppressOverflowErrors();
@@ -197,7 +201,7 @@ void main() {
         final editable = tester.widget<EditableText>(nameField);
         expect(editable.controller.text, equals('Hila'));
       }
-    });
+    }, skip: true);
 
     testWidgets('entering a new name and saving updates user store',
         (tester) async {
@@ -220,7 +224,7 @@ void main() {
 
       // Snackbar appears
       expect(find.text('Profile updated'), findsOneWidget);
-    });
+    }, skip: true);
   });
 
   // ---------------------------------------------------------------------------
@@ -259,7 +263,7 @@ void main() {
       expect(find.byType(AlertDialog), findsNothing);
     });
 
-    testWidgets('confirm button shows export started snackbar', (tester) async {
+    testWidgets('confirm button closes the dialog', (tester) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -268,11 +272,17 @@ void main() {
       await tester.tap(find.text('Export All Data'));
       await tester.pumpAndSettle();
 
-      // Tap the Export All Data button inside the dialog (second occurrence)
+      // Tap the Export All Data button inside the dialog (second occurrence).
+      // The dialog closes synchronously (Navigator.pop happens before the
+      // async CSV-build + share-sheet call). The share_plus platform channel
+      // isn't mocked in widget tests, so the actual export outcome isn't
+      // asserted here — same limitation as the medication/trends export
+      // dialogs (see MedicationScreen/TrendsScreen export dialog tests,
+      // which likewise never tap through to the real share call).
       await tester.tap(find.text('Export All Data').last);
       await tester.pumpAndSettle();
 
-      expect(find.text('Export started'), findsOneWidget);
+      expect(find.byType(AlertDialog), findsNothing);
     });
 
     testWidgets('export dialog shows title and two action buttons', (tester) async {
@@ -609,7 +619,11 @@ void main() {
   });
 
   // ---------------------------------------------------------------------------
-  // showShareWithVetDialog — triggered via Share with Veterinarian row
+  // showShareWithVetDialog — the "Share with Veterinarian" settings row was
+  // removed (it duplicated Export All Data). showShareWithVetDialog itself is
+  // kept in code for reuse (the care-circle vet invite is still reachable via
+  // the Care Circle card's invite dialog), but there is no UI entry point left
+  // to reach it directly, so these tests are skipped rather than deleted.
   // ---------------------------------------------------------------------------
   group('showShareWithVetDialog', () {
     /// Opens the share-with-vet sheet.  Returns false if the row was not found
@@ -636,7 +650,7 @@ void main() {
       expect(find.text('Invite Your Veterinarian'), findsOneWidget);
       // Hint text in the email field
       expect(find.text('vet@clinic.com'), findsOneWidget);
-    });
+    }, skip: true);
 
     testWidgets('cancel closes share with vet sheet', (tester) async {
       suppressOverflowErrors();
@@ -651,7 +665,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Invite Your Veterinarian'), findsNothing);
-    });
+    }, skip: true);
 
     testWidgets('share with vet sheet shows Look Up button', (tester) async {
       suppressOverflowErrors();
@@ -664,7 +678,7 @@ void main() {
 
       // l10n.lookUpVet = "Look Up"
       expect(find.text('Look Up'), findsOneWidget);
-    });
+    }, skip: true);
 
     testWidgets(
         'looking up vet with non-Firebase mode shows not-found state and action button',
@@ -691,7 +705,7 @@ void main() {
       final hasAction = sendInviteBtn.evaluate().isNotEmpty ||
           addAsVetBtn.evaluate().isNotEmpty;
       expect(hasAction, isTrue);
-    });
+    }, skip: true);
 
     testWidgets(
         'send vet invite button is visible after not-found lookup',
@@ -719,7 +733,7 @@ void main() {
       expect(sendBtn, findsOneWidget);
       // NOTE: Tapping Send Vet Invite would trigger InvitationService (Firebase)
       // when kEnableFirebase=true; we skip the tap to avoid async exceptions.
-    });
+    }, skip: true);
 
     testWidgets('share with vet sheet shows hospital icon and description',
         (tester) async {
@@ -732,7 +746,7 @@ void main() {
       if (!opened) return;
 
       expect(find.byIcon(Icons.local_hospital), findsOneWidget);
-    });
+    }, skip: true);
 
     testWidgets('looking up with empty email does nothing', (tester) async {
       suppressOverflowErrors();
@@ -751,7 +765,7 @@ void main() {
       expect(find.text('Invite Your Veterinarian'), findsOneWidget);
       // No Send Vet Invite or Add as Vet button appears
       expect(find.text('Send Vet Invite'), findsNothing);
-    });
+    }, skip: true);
   });
 
   // ---------------------------------------------------------------------------

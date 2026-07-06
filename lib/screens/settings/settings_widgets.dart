@@ -177,7 +177,7 @@ class LanguageRow extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: c.background,
-          borderRadius: AppRadiiTokens.borderRadiusField,
+          borderRadius: AppRadiiTokens.borderRadiusCard,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -268,6 +268,7 @@ class ActionRow extends StatelessWidget {
     required this.title,
     required this.description,
     required this.onTap,
+    this.iconTileColor,
   });
 
   final String iconAsset;
@@ -275,51 +276,58 @@ class ActionRow extends StatelessWidget {
   final String description;
   final VoidCallback? onTap;
 
+  /// Background color for the circular icon tile. Defaults to
+  /// `c.accentPeriwinkleTile`, matching [SettingsToggleRow]'s default.
+  final Color? iconTileColor;
+
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
+    final isDisabled = onTap == null;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: onTap == null ? c.background.withValues(alpha: 0.7) : c.background,
-          borderRadius: AppRadiiTokens.borderRadiusSm,
+          color: isDisabled ? c.background.withValues(alpha: 0.7) : c.background,
+          borderRadius: AppRadiiTokens.borderRadiusCard,
         ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                SvgPicture.asset(iconAsset, width: 16, height: 16),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: AppSemanticTextStyles.body.copyWith(
-                        color: onTap == null
-                            ? c.textPrimary.withValues(alpha: 0.5)
-                            : c.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.31,
-                      ),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: iconTileColor ?? c.accentPeriwinkleTile,
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: SvgPicture.asset(iconAsset, width: 24, height: 24),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppSemanticTextStyles.labelLSemibold.copyWith(
+                      color: isDisabled
+                          ? c.textPrimary.withValues(alpha: 0.5)
+                          : c.textPrimary,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: AppSemanticTextStyles.caption.copyWith(
-                        color: onTap == null
-                            ? c.textPrimary.withValues(alpha: 0.5)
-                            : c.textPrimary,
-                        fontSize: 12,
-                      ),
+                  ),
+                  Text(
+                    description,
+                    style: AppSemanticTextStyles.pcLabelMuted.copyWith(
+                      color: isDisabled
+                          ? c.textTertiary.withValues(alpha: 0.5)
+                          : null,
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -343,17 +351,14 @@ class SimpleRow extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: c.background,
-          borderRadius: AppRadiiTokens.borderRadiusSm,
+          borderRadius: AppRadiiTokens.borderRadiusCard,
         ),
         child: Row(
           children: [
             Text(
               label,
-              style: AppSemanticTextStyles.body.copyWith(
+              style: AppSemanticTextStyles.labelLSemibold.copyWith(
                 color: c.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.31,
               ),
             ),
           ],

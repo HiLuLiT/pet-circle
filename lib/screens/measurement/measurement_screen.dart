@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableVisionRR;
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
-import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
@@ -337,7 +335,6 @@ class _ManualModeState extends State<_ManualMode>
     _isSaving = true;
     final l10n = AppLocalizations.of(context)!;
     final petId = petStore.activePet?.id ?? '';
-    final petName = petStore.activePet?.name ?? l10n.petName;
     if (petId.isEmpty) {
       setState(() => _isSaving = false);
       return;
@@ -348,19 +345,6 @@ class _ManualModeState extends State<_ManualMode>
       Measurement(
         bpm: bpm,
         recordedAt: DateTime.now(),
-      ),
-    );
-    notificationStore.addNotification(
-      AppNotification(
-        id: 'notif-${DateTime.now().millisecondsSinceEpoch}',
-        title: l10n.measurementComplete,
-        titleKey: 'measurementComplete',
-        body: l10n.measurementSavedBpm(bpm),
-        bodyKey: 'measurementSavedBpm',
-        args: [bpm.toString()],
-        type: NotificationType.measurement,
-        createdAt: DateTime.now(),
-        petName: petName,
       ),
     );
 

@@ -15,15 +15,15 @@ void main() {
       expect(find.byType(BottomNavBar), findsOneWidget);
     });
 
-    // ── All 5 tabs render ─────────────────────────────────────────────────
-    testWidgets('renders all 5 tab labels', (tester) async {
+    // ── All 4 tabs render (Circle hidden behind kEnableCircleTab) ──────────
+    testWidgets('renders all 4 tab labels', (tester) async {
       await tester.pumpWidget(testApp(
         BottomNavBar(selectedIndex: 0, onTap: (_) {}),
       ));
 
       expect(find.text('Home'), findsOneWidget);
       expect(find.text('Trends'), findsOneWidget);
-      expect(find.text('Circle'), findsOneWidget);
+      expect(find.text('Circle'), findsNothing);
       expect(find.text('Measure'), findsOneWidget);
       expect(find.text('Medication'), findsOneWidget);
     });
@@ -48,13 +48,14 @@ void main() {
       expect(trendsLabel.style?.color, AppSemanticColors.light.textTertiary);
     });
 
-    testWidgets('selecting index 2 highlights Circle tab', (tester) async {
+    testWidgets('selecting index 2 highlights Measure tab', (tester) async {
       await tester.pumpWidget(testApp(
         BottomNavBar(selectedIndex: 2, onTap: (_) {}),
       ));
 
-      final diaryLabel = tester.widget<Text>(find.text('Circle'));
-      expect(diaryLabel.style?.color, AppSemanticColors.light.onSurface);
+      // With Circle hidden, index 2 is Measure (Home, Trends, Measure, Medication).
+      final measureLabel = tester.widget<Text>(find.text('Measure'));
+      expect(measureLabel.style?.color, AppSemanticColors.light.onSurface);
 
       final homeLabel = tester.widget<Text>(find.text('Home'));
       expect(homeLabel.style?.color, AppSemanticColors.light.textTertiary);
@@ -68,19 +69,20 @@ void main() {
         BottomNavBar(selectedIndex: 0, onTap: (i) => tappedIndex = i),
       ));
 
+      // Medication is index 3 in the 4-tab layout (Circle hidden).
       await tester.tap(find.text('Medication'));
       await tester.pump();
-      expect(tappedIndex, 4);
+      expect(tappedIndex, 3);
     });
 
-    testWidgets('tapping Circle tab calls onTap with index 2',
+    testWidgets('tapping Measure tab calls onTap with index 2',
         (tester) async {
       int? tappedIndex;
       await tester.pumpWidget(testApp(
         BottomNavBar(selectedIndex: 0, onTap: (i) => tappedIndex = i),
       ));
 
-      await tester.tap(find.text('Circle'));
+      await tester.tap(find.text('Measure'));
       await tester.pump();
       expect(tappedIndex, 2);
     });
@@ -91,12 +93,12 @@ void main() {
         BottomNavBar(selectedIndex: 0, onTap: (_) {}),
       ));
 
-      // There should be 5 Semantics widgets with button: true
+      // There should be 4 Semantics widgets with button: true (Circle hidden).
       final semanticsWidgets = tester
           .widgetList<Semantics>(find.byType(Semantics))
           .where((s) => s.properties.button == true)
           .toList();
-      expect(semanticsWidgets.length, 5);
+      expect(semanticsWidgets.length, 4);
     });
 
     // ── Theme token verification ──────────────────────────────────────────

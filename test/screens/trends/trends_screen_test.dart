@@ -45,8 +45,8 @@ void main() {
       await tester.pumpWidget(testApp(const TrendsScreen()));
       await tester.pumpAndSettle();
 
-      // Default period is "Last 7 days"
-      expect(find.text('Last 7 days'), findsOneWidget);
+      // Default period is "Last 30 days"
+      expect(find.text('Last 30 days'), findsOneWidget);
     });
 
     testWidgets('opening the period dropdown and selecting updates the value',
@@ -61,11 +61,11 @@ void main() {
 
       // Closed: only the trigger shows the current value, the other options
       // are not rendered yet.
-      expect(find.text('Last 7 days'), findsOneWidget);
+      expect(find.text('Last 30 days'), findsOneWidget);
       expect(find.text('Last 24 hours'), findsNothing);
 
       // Tap the trigger to open the inline option list.
-      await tester.tap(find.text('Last 7 days'));
+      await tester.tap(find.text('Last 30 days'));
       await tester.pumpAndSettle();
 
       // The selected option now appears in both the trigger and the open
@@ -78,7 +78,7 @@ void main() {
 
       expect(find.text('Last 24 hours'), findsOneWidget);
       // The previously-selected label is no longer shown anywhere.
-      expect(find.text('Last 7 days'), findsNothing);
+      expect(find.text('Last 30 days'), findsNothing);
     });
 
     testWidgets('shows export button', (tester) async {
@@ -113,7 +113,7 @@ void main() {
 
     // Regression: the period selector used to store its value as a localized
     // display string. When the app locale changed while the screen stayed
-    // mounted, the DropdownButton's value (e.g. "Last 7 days") no longer
+    // mounted, the DropdownButton's value (e.g. "Last 30 days") no longer
     // matched any of its now-Hebrew items, throwing the framework assertion
     // "There should be exactly one item with [DropdownButton]'s value".
     // The value is now a locale-independent [TrendsPeriod] enum, so switching
@@ -144,7 +144,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Default English label is shown for the selected period.
-      expect(find.text('Last 7 days'), findsOneWidget);
+      expect(find.text('Last 30 days'), findsOneWidget);
 
       // Switch to Hebrew while the same TrendsScreen State stays mounted.
       localeNotifier.value = const Locale('he');
@@ -153,7 +153,7 @@ void main() {
       // No DropdownButton assertion, and the English label is gone (the
       // dropdown re-rendered its label in Hebrew while keeping the same value).
       expect(tester.takeException(), isNull);
-      expect(find.text('Last 7 days'), findsNothing);
+      expect(find.text('Last 30 days'), findsNothing);
     });
   });
 }

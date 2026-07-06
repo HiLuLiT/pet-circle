@@ -261,22 +261,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportAndManage => 'Export data and manage privacy settings';
 
   @override
-  String get autoExportData => 'Auto-Export Data';
+  String get weeklySummary => 'Weekly Summary';
 
   @override
-  String get autoExportDesc => 'Weekly CSV export to email';
+  String get weeklySummaryDesc =>
+      'Get a weekly nudge to check your pet\'s trends';
 
   @override
   String get exportAllData => 'Export All Data';
 
   @override
   String get exportAllDataDesc => 'Download complete health records';
-
-  @override
-  String get shareWithVet => 'Share with Veterinarian';
-
-  @override
-  String get shareWithVetDesc => 'Generate shareable report link';
 
   @override
   String get about => 'About';
@@ -838,6 +833,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get exportStarted => 'Export started';
 
   @override
+  String get dataExported => 'Health records exported';
+
+  @override
+  String get weeklySummaryNotifTitle => 'Weekly Summary Ready';
+
+  @override
+  String weeklySummaryNotifBody(String petName) {
+    return 'See how $petName\'s breathing trended this week →';
+  }
+
+  @override
   String get enterVetEmail =>
       'Enter your veterinarian\'s email to share pet data.';
 
@@ -989,7 +995,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get asNeeded => 'As needed';
 
   @override
-  String get searchBreeds => 'Search breeds...';
+  String get hintBreedName => 'e.g., Golden Retriever';
 
   @override
   String get noBreedsFound => 'No breeds found';

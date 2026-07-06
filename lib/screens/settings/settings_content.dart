@@ -5,7 +5,6 @@ import 'package:pet_circle/config/app_config.dart'
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
-import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
@@ -100,13 +99,6 @@ class _SettingsContentState extends State<SettingsContent>
               ],
             ),
             const SizedBox(height: 24),
-              ActionRow(
-                iconAsset: settingsConfigureAsset,
-                title: l10n.editProfile,
-                description: userStore.currentUser?.name ?? '',
-                onTap: () => showEditProfileDialog(context),
-              ),
-              const SizedBox(height: 16),
               SettingsCard(
                 title: l10n.appearance,
                 subtitle: l10n.customizeLookAndFeel,
@@ -304,11 +296,11 @@ class _SettingsContentState extends State<SettingsContent>
                 child: Column(
                   children: [
                     SettingsToggleRow(
-                      label: l10n.autoExportData,
-                      description: l10n.autoExportDesc,
-                      isOn: settingsStore.autoExport,
+                      label: l10n.weeklySummary,
+                      description: l10n.weeklySummaryDesc,
+                      isOn: settingsStore.weeklySummaryEnabled,
                       onChanged: () async {
-                        await settingsStore.toggleAutoExport();
+                        await settingsStore.toggleWeeklySummaryEnabled();
                         if (!mounted) return;
                         setState(() {});
                       },
@@ -319,15 +311,6 @@ class _SettingsContentState extends State<SettingsContent>
                       title: l10n.exportAllData,
                       description: l10n.exportAllDataDesc,
                       onTap: () => showExportDataDialog(context),
-                    ),
-                    const SizedBox(height: 12),
-                    ActionRow(
-                      iconAsset: settingsShareAsset,
-                      title: l10n.shareWithVet,
-                      description: l10n.shareWithVetDesc,
-                      onTap: canManageActivePet
-                          ? () => showShareWithVetDialog(context)
-                          : null,
                     ),
                   ],
                 ),

@@ -254,25 +254,25 @@ _NotificationTypeStyle _styleForType(
       return _NotificationTypeStyle(
         icon: Icons.medication,
         iconColor: c.primary,
-        tab: 3,
+        tab: AppRoutes.tabMedication,
       );
     case notif.NotificationType.measurement:
       return _NotificationTypeStyle(
         icon: Icons.monitor_heart,
         iconColor: c.error,
-        tab: 1,
+        tab: AppRoutes.tabTrends,
       );
     case notif.NotificationType.careCircle:
       return _NotificationTypeStyle(
         icon: Icons.group_add,
         iconColor: c.primaryLight,
-        tab: 0,
+        tab: AppRoutes.tabHome,
       );
     case notif.NotificationType.report:
       return _NotificationTypeStyle(
         icon: Icons.mail_outline,
         iconColor: c.error,
-        tab: 1,
+        tab: AppRoutes.tabTrends,
       );
   }
 }

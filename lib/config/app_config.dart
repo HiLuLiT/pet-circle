@@ -9,6 +9,11 @@ const bool kEnableFirebase = true;
 /// store, and l10n plumbing stay in place for a future release.
 const bool kEnableVisionRR = false;
 
+/// Set to true to surface the Circle tab in the bottom navigation. Kept
+/// behind a flag so the underlying screen and route plumbing stay in place
+/// for a future release.
+const bool kEnableCircleTab = false;
+
 /// Global locale notifier -- updated from Settings language switcher.
 final ValueNotifier<Locale> appLocale = ValueNotifier(const Locale('en'));
 
