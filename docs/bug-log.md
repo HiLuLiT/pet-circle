@@ -550,6 +550,28 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-029: New reminder sometimes deleted/reverted instead of the intended one
+
+**Found during:** Manual testing of the new Reminders feature (home screen redesign) — user reported "when I add a reminder and then click on it it sometimes gets removed/deleted"
+**Severity:** High (data integrity — a delete can silently no-op on the real record while removing the wrong local entry; an edit can silently fail and revert)
+**Status:** Fixed
+
+**Symptom:** After adding a reminder and immediately tapping it to edit or delete, the action sometimes appeared to succeed locally but didn't actually affect the intended Firestore document — deletes could leave the real document intact (reappearing on next refresh) while removing the item from the local list, and edits could silently revert.
+
+**Root cause:** `AddReminderSheet._save()` builds a new `Reminder` with a client-generated placeholder ID (`'rem-<timestamp>'`) and passes it to `ReminderStore.addReminder()`. That method calls `PetService.addReminder()`, which writes to Firestore via `.add()` — Firestore ignores the client-supplied ID and assigns its own document ID. The store's local list entry was never updated with the real ID, so it permanently kept the placeholder ID. Any subsequent update/delete on that entry addressed Firestore by the wrong (placeholder) ID:
+- `.update()` on a nonexistent doc ID throws `NOT_FOUND`, which was silently swallowed by the store's rollback (and never surfaced to the user, since the sheet's save call is fire-and-forget) — the edit appeared to succeed then reverted.
+- `.delete()` on a nonexistent doc ID is a Firestore no-op that succeeds without error — the item vanished from the local list, but the real document was never deleted and would reappear on the next fetch.
+
+**Fix:** `PetService.addReminder()` now returns the server-assigned document ID instead of `void`. `ReminderStore.addReminder()` patches the local list entry with the real ID (via `copyWith(id: realId)`) once the Firestore write resolves, so a subsequent update/delete addresses the document that actually exists.
+
+**Files changed:**
+- `lib/services/pet_service.dart`
+- `lib/stores/reminder_store.dart`
+
+**Known limitation:** There remains a narrow race window if a user opens the edit/delete sheet for a just-added reminder *before* the Firestore write resolves — the sheet still holds the stale placeholder-ID object at that instant. This window is now milliseconds (one Firestore round-trip) rather than indefinite, and self-corrects on the next rebuild once the ID patch lands. No automated regression test covers the success path, since the project has no Firestore mocking library to simulate a resolved write in unit tests.
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

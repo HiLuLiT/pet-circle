@@ -29,7 +29,19 @@ class ReminderStore extends ChangeNotifier {
 
     if (kEnableFirebase) {
       try {
-        await PetService.addReminder(petId, reminder);
+        // Firestore assigns its own document ID on add() and ignores the
+        // client-generated placeholder id on [reminder]. Patch the local
+        // entry with the real ID once the write completes, so a subsequent
+        // update/delete (which addresses the doc by ID) targets the
+        // document that actually exists in Firestore instead of silently
+        // no-op'ing (delete) or throwing not-found (update).
+        final realId = await PetService.addReminder(petId, reminder);
+        final list = _reminders[petId];
+        final idx = list?.indexOf(reminder) ?? -1;
+        if (idx != -1) {
+          list![idx] = reminder.copyWith(id: realId);
+          notifyListeners();
+        }
       } catch (e) {
         _reminders[petId]?.remove(reminder);
         notifyListeners();

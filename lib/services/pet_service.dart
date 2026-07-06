@@ -244,8 +244,13 @@ class PetService {
   static CollectionReference _remindersRef(String petId) =>
       _petsCollection.doc(petId).collection('reminders');
 
-  static Future<void> addReminder(String petId, Reminder reminder) async {
-    await _remindersRef(petId).add(reminder.toFirestore());
+  /// Adds [reminder] to Firestore and returns the server-assigned document
+  /// ID. Firestore's `.add()` ignores any `id` already set on [reminder], so
+  /// callers must use the returned ID (not [reminder].id) to address this
+  /// document in subsequent updates/deletes.
+  static Future<String> addReminder(String petId, Reminder reminder) async {
+    final docRef = await _remindersRef(petId).add(reminder.toFirestore());
+    return docRef.id;
   }
 
   static Future<void> updateReminder(
