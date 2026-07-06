@@ -1,7 +1,12 @@
+import 'dart:async' show runZonedGuarded;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/screens/settings/settings_content.dart';
 import 'package:pet_circle/screens/settings/settings_screen.dart';
+import 'package:pet_circle/screens/settings/settings_widgets.dart';
+import 'package:pet_circle/stores/settings_store.dart';
+import 'package:pet_circle/widgets/app_toggle.dart';
 
 import '../../helpers/test_app.dart';
 import '../../helpers/mock_stores.dart';
@@ -267,6 +272,57 @@ void main() {
 
       // l10n copy consolidation: pushNotifications is now singular.
       expect(find.text('In-app notification'), findsOneWidget);
+    });
+
+    testWidgets(
+        'push notification toggle flips visually on the very next frame '
+        '(BUG-030 — was gated behind the awaited persist call)',
+        (tester) async {
+      tester.view.physicalSize = const Size(600, 1800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const SettingsContent()));
+      await tester.pumpAndSettle();
+
+      final before = settingsStore.pushNotifications;
+      final toggleFinder = find
+          .ancestor(
+            of: find.text('In-app notification'),
+            matching: find.byType(SettingsToggleRow),
+          )
+          .first;
+      expect(
+        tester.widget<SettingsToggleRow>(toggleFinder).isOn,
+        before,
+      );
+      // Scope to the AppToggle inside THIS row -- the dark-mode row (which
+      // appears earlier in the tree) also renders an AppToggle, so an
+      // unscoped find.byType(AppToggle).first would tap the wrong switch.
+      final switchFinder =
+          find.descendant(of: toggleFinder, matching: find.byType(AppToggle));
+
+      // Tap, then pump exactly one frame (not pumpAndSettle) so any
+      // awaited work inside togglePushNotifications() -- persisting to
+      // Firestore, notification-permission side effects -- has not had a
+      // chance to resolve yet. Before the fix, the toggle only rebuilt via
+      // a manual setState() placed *after* that awaited chain, so it would
+      // still show the old value here. runZonedGuarded intercepts the
+      // FirebaseException the eventual persist call throws in this
+      // Firebase-less test environment; the in-memory store mutation and
+      // notifyListeners() it fires happen synchronously before that await,
+      // which is exactly the part this regression test is verifying.
+      await runZonedGuarded(() async {
+        await tester.tap(switchFinder);
+        await tester.pump();
+      }, (error, stack) {});
+
+      expect(settingsStore.pushNotifications, !before);
+      expect(
+        tester.widget<SettingsToggleRow>(toggleFinder).isOn,
+        !before,
+      );
     });
 
     testWidgets('hides VisionRR coming soon badge (feature flag off)',

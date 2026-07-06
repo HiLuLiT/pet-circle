@@ -572,6 +572,41 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-030: Settings toggles have a ~1 second delay before visually flipping
+
+**Found during:** Manual testing of the Settings screen (In-app notification, Emergency alerts, Measurement Reminders toggles)
+**Severity:** Medium (feels broken/unresponsive, no data loss)
+**Status:** Fixed
+
+**Symptom:** Tapping a toggle switch in Settings (push notifications, emergency alerts, measurement reminders, VisionRR, weekly summary) visually lagged by roughly a second before flipping.
+
+**Root cause:** `SettingsContent`'s `ListenableBuilder` only listened to `petStore`, not `settingsStore`. Each toggle's `onChanged` handler called `await settingsStore.toggleX()` (which mutates state and calls `notifyListeners()` synchronously, then awaits a Firestore persist + any side-effect callback) and only rebuilt the row via a manual `setState(() {})` placed *after* that full await chain. So the switch's visual state didn't change until the entire persist round-trip completed, even though the underlying store had already flipped and notified instantly.
+
+**Fix:** Merged `settingsStore` into the screen's `ListenableBuilder` listenable, so the row rebuilds the instant `notifyListeners()` fires. Simplified the five affected `onChanged` handlers to call the store's toggle method directly, removing the now-redundant manual `setState`/`mounted` dance.
+
+**Files changed:**
+- `lib/screens/settings/settings_content.dart`
+- `test/screens/settings/settings_screen_test.dart` (new regression test)
+
+---
+
+## BUG-031: Export button shifts down when the Trends period dropdown opens
+
+**Found during:** Manual testing of the Trends screen's period filter
+**Severity:** Low (visual only)
+**Status:** Fixed
+
+**Symptom:** Opening the "Custom range" (period) dropdown on the Trends screen visually pushed the adjacent Export button downward instead of leaving it in place.
+
+**Root cause:** `AppDropdown` renders its open option list inline (growing its own height), not as an overlay. The `Row` containing the dropdown and the Export button used `crossAxisAlignment: CrossAxisAlignment.center`, so when the dropdown's column grew taller, the fixed-height Export button re-centered within the now-taller row and appeared to move down.
+
+**Fix:** Changed the Row's `crossAxisAlignment` to `CrossAxisAlignment.start` so both children stay top-aligned regardless of how tall the dropdown's open list grows.
+
+**Files changed:**
+- `lib/screens/trends/trends_screen.dart`
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]
