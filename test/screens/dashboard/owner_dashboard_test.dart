@@ -121,13 +121,17 @@ void main() {
       expect(find.byType(AddReminderSheet), findsOneWidget);
     });
 
-    testWidgets('tapping a reminder tile opens it for editing', (tester) async {
+    testWidgets('reminder tile shows a close button instead of opening a sheet',
+        (tester) async {
       await pumpDashboard(tester);
 
+      // Tiles are no longer tappable — tapping the text does not open any sheet.
       await tester.tap(find.text('Veterinary dentist'));
       await tester.pumpAndSettle();
+      expect(find.byType(AddReminderSheet), findsNothing);
 
-      expect(find.byType(AddReminderSheet), findsOneWidget);
+      // Each tile shows a × dismiss button.
+      expect(find.byIcon(Icons.close), findsWidgets);
     });
 
     testWidgets('shows Measure and Trends action buttons', (tester) async {
