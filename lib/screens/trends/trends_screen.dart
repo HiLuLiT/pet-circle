@@ -273,6 +273,7 @@ class _TrendsScreenState extends State<TrendsScreen>
                           .map((period) => _periodLabel(period, l10n))
                           .toList(),
                       onOptionSelected: (label) => _selectPeriodLabel(label, l10n),
+                      overlayMode: true,
                     ),
                   ),
                   const SizedBox(width: AppSpacingTokens.sm),
