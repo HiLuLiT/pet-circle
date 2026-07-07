@@ -302,6 +302,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tapToStop => 'הקש לעצירה';
 
   @override
+  String get stopMeasurement => 'עצור';
+
+  @override
+  String get restartMeasurement => 'התחל מחדש';
+
+  @override
   String get measurementComplete => 'המדידה הושלמה';
 
   @override

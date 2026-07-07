@@ -14,6 +14,7 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
+import 'package:pet_circle/widgets/round_icon_button.dart';
 import 'package:pet_circle/widgets/segmented_control.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 
@@ -252,6 +253,7 @@ class _ManualMode extends StatefulWidget {
 class _ManualModeState extends State<_ManualMode>
     with SingleTickerProviderStateMixin {
   bool _isRunning = false;
+  bool _isPaused = false;
   bool _isSaving = false;
   bool _showResult = false;
   int _remainingSeconds = 0;
@@ -324,10 +326,31 @@ class _ManualModeState extends State<_ManualMode>
     });
   }
 
+  void _pauseTimer() {
+    _timer?.cancel();
+    if (!mounted) return;
+    setState(() {
+      _isRunning = false;
+      _isPaused = true;
+    });
+  }
+
+  void _restartTimer() {
+    _timer?.cancel();
+    if (!mounted) return;
+    setState(() {
+      _isRunning = false;
+      _isPaused = false;
+      _tapCount = 0;
+      _remainingSeconds = widget.selectedDuration;
+    });
+  }
+
   void _resetTimer() {
     _timer?.cancel();
     setState(() {
       _isRunning = false;
+      _isPaused = false;
       _showResult = false;
       _resultBpm = null;
       _tapCount = 0;
@@ -397,10 +420,13 @@ class _ManualModeState extends State<_ManualMode>
       selectedDuration: widget.selectedDuration,
       onDurationChanged: widget.onDurationChanged,
       isRunning: _isRunning,
+      isPaused: _isPaused,
       remainingSeconds: _remainingSeconds,
       tapCount: _tapCount,
       scaleAnimation: _scaleAnimation,
       onTap: _onTap,
+      onStop: _pauseTimer,
+      onRestart: _restartTimer,
       hintText: l10n.measurementHint,
     );
   }
@@ -414,20 +440,26 @@ class _TimerCard extends StatelessWidget {
     required this.selectedDuration,
     required this.onDurationChanged,
     required this.isRunning,
+    required this.isPaused,
     required this.remainingSeconds,
     required this.tapCount,
     required this.scaleAnimation,
     required this.onTap,
+    required this.onStop,
+    required this.onRestart,
     required this.hintText,
   });
 
   final int selectedDuration;
   final ValueChanged<int> onDurationChanged;
   final bool isRunning;
+  final bool isPaused;
   final int remainingSeconds;
   final int tapCount;
   final Animation<double> scaleAnimation;
   final VoidCallback onTap;
+  final VoidCallback onStop;
+  final VoidCallback onRestart;
   final String hintText;
 
   @override
@@ -483,6 +515,21 @@ class _TimerCard extends StatelessWidget {
                   color: c.textTertiary,
                 ),
               ),
+              if (isRunning || isPaused) ...[
+                const SizedBox(width: AppSpacingTokens.pcSm),
+                RoundIconButton(
+                  variant: RoundIconButtonVariant.ghost,
+                  size: 32,
+                  iconSize: 16,
+                  semanticLabel: isRunning
+                      ? l10n.stopMeasurement
+                      : l10n.restartMeasurement,
+                  icon: Icon(
+                    isRunning ? Icons.stop_rounded : Icons.replay_rounded,
+                  ),
+                  onTap: isRunning ? onStop : onRestart,
+                ),
+              ],
             ],
           ),
           const SizedBox(height: AppSpacingTokens.pcMd),

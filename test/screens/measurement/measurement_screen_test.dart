@@ -126,5 +126,103 @@ void main() {
       expect(find.text('99'), findsOneWidget);
       expect(find.text('22'), findsNothing);
     });
+
+    testWidgets('stop button is absent before timing starts', (tester) async {
+      tester.view.physicalSize = const Size(480, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MeasurementScreen()));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.stop_rounded), findsNothing);
+      expect(find.byIcon(Icons.replay_rounded), findsNothing);
+    });
+
+    testWidgets('stop button appears once timing starts', (tester) async {
+      tester.view.physicalSize = const Size(480, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MeasurementScreen()));
+      await tester.pumpAndSettle();
+
+      // Tap the circle (the GestureDetector wrapping the heart icon).
+      final circleGesture = find.ancestor(
+        of: find.byIcon(Icons.favorite),
+        matching: find.byType(GestureDetector),
+      ).first;
+      await tester.tap(circleGesture);
+      await tester.pump();
+
+      expect(find.byIcon(Icons.stop_rounded), findsOneWidget);
+      expect(find.byIcon(Icons.replay_rounded), findsNothing);
+    });
+
+    testWidgets('stop button shows restart icon after being tapped',
+        (tester) async {
+      tester.view.physicalSize = const Size(480, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MeasurementScreen()));
+      await tester.pumpAndSettle();
+
+      // Tap the circle (ancestor of the heart icon) to start timing.
+      final circleGesture = find.ancestor(
+        of: find.byIcon(Icons.favorite),
+        matching: find.byType(GestureDetector),
+      ).first;
+      await tester.tap(circleGesture);
+      await tester.pump();
+
+      // Stop button should now be present; tap it.
+      expect(find.byIcon(Icons.stop_rounded), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.stop_rounded));
+      await tester.pump();
+
+      // Timer is cancelled: stop icon gone, restart icon appears.
+      expect(find.byIcon(Icons.stop_rounded), findsNothing);
+      expect(find.byIcon(Icons.replay_rounded), findsOneWidget);
+    });
+
+    testWidgets('restart button resets to ready state without auto-starting',
+        (tester) async {
+      tester.view.physicalSize = const Size(480, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MeasurementScreen()));
+      await tester.pumpAndSettle();
+
+      // Tap the circle to start.
+      final circleGesture = find.ancestor(
+        of: find.byIcon(Icons.favorite),
+        matching: find.byType(GestureDetector),
+      ).first;
+      await tester.tap(circleGesture);
+      await tester.pump();
+
+      // Tap stop.
+      await tester.tap(find.byIcon(Icons.stop_rounded));
+      await tester.pump();
+
+      // Tap restart.
+      await tester.tap(find.byIcon(Icons.replay_rounded));
+      await tester.pump();
+
+      // Back to ready state: heart icon visible, no stop/restart buttons.
+      expect(find.byIcon(Icons.favorite), findsOneWidget);
+      expect(find.byIcon(Icons.stop_rounded), findsNothing);
+      expect(find.byIcon(Icons.replay_rounded), findsNothing);
+
+      // Pump some time — elapsed should stay at 0s (not auto-started).
+      await tester.pump(const Duration(seconds: 3));
+      expect(find.text('0s'), findsOneWidget);
+    });
   });
 }

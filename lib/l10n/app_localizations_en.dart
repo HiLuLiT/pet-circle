@@ -304,6 +304,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tapToStop => 'Tap to stop';
 
   @override
+  String get stopMeasurement => 'Stop';
+
+  @override
+  String get restartMeasurement => 'Restart';
+
+  @override
   String get measurementComplete => 'Measurement Complete';
 
   @override

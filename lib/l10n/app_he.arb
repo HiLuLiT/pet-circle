@@ -97,6 +97,8 @@
   "timerDuration": "משך טיימר",
   "tapToBegin": "הקש להתחלה",
   "tapToStop": "הקש לעצירה",
+  "stopMeasurement": "עצור",
+  "restartMeasurement": "התחל מחדש",
   "measurementComplete": "המדידה הושלמה",
   "breathsPerMinute": "נשימות לדקה",
   "breathCountMessage": "ספרת {taps} נשימות ב-{seconds} שניות.",

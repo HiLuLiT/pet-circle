@@ -97,6 +97,8 @@
   "timerDuration": "Timer Duration",
   "tapToBegin": "Tap to begin",
   "tapToStop": "Tap to stop",
+  "stopMeasurement": "Stop",
+  "restartMeasurement": "Restart",
   "measurementComplete": "Measurement Complete",
   "breathsPerMinute": "breaths per minute",
   "breathCountMessage": "You counted {taps} breaths in {seconds} seconds.",

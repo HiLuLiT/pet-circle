@@ -668,6 +668,18 @@ abstract class AppLocalizations {
   /// **'Tap to stop'**
   String get tapToStop;
 
+  /// No description provided for @stopMeasurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get stopMeasurement;
+
+  /// No description provided for @restartMeasurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get restartMeasurement;
+
   /// No description provided for @measurementComplete.
   ///
   /// In en, this message translates to:
