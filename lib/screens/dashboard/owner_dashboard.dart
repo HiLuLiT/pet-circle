@@ -247,12 +247,13 @@ class OwnerDashboard extends StatelessWidget {
                     // Care circle card — Figma node 442:8959.
                     AppCard(
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            l10n.careCircle,
-                            style: AppSemanticTextStyles.pcBodySemibold
-                                .copyWith(color: c.textPrimary),
+                          Expanded(
+                            child: Text(
+                              l10n.careCircle,
+                              style: AppSemanticTextStyles.pcBodySemibold
+                                  .copyWith(color: c.textPrimary),
+                            ),
                           ),
                           AvatarStack(
                             avatars: pet.careCircle,
@@ -270,12 +271,13 @@ class OwnerDashboard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                l10n.reminders,
-                                style: AppSemanticTextStyles.pcBodySemibold
-                                    .copyWith(color: c.textPrimary),
+                              Expanded(
+                                child: Text(
+                                  l10n.reminders,
+                                  style: AppSemanticTextStyles.pcBodySemibold
+                                      .copyWith(color: c.textPrimary),
+                                ),
                               ),
                               GestureDetector(
                                 behavior: HitTestBehavior.opaque,
