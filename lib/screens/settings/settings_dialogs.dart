@@ -237,52 +237,54 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   const SizedBox(height: 16),
                 ],
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: Text(l10n.cancel),
+                    Expanded(
+                      child: PrimaryButton(
+                        label: l10n.cancel,
+                        variant: PrimaryButtonVariant.outlined,
+                        onPressed: () => Navigator.pop(ctx),
+                      ),
                     ),
-                    const SizedBox(width: 8),
-                    TextButton(
-                      onPressed: isSending ? null : () async {
-                        final email = emailController.text.trim();
-                        if (email.isEmpty) return;
+                    const SizedBox(width: AppSpacingTokens.sm),
+                    Expanded(
+                      child: PrimaryButton(
+                        label: l10n.sendInvite,
+                        variant: PrimaryButtonVariant.filled,
+                        onPressed: isSending ? null : () async {
+                          final email = emailController.text.trim();
+                          if (email.isEmpty) return;
 
-                        if (kEnableFirebase) {
-                          setSheetState(() => isSending = true);
-                          final activePet = petStore.activePet;
-                          if (activePet?.id == null) {
+                          if (kEnableFirebase) {
+                            setSheetState(() => isSending = true);
+                            final activePet = petStore.activePet;
+                            if (activePet?.id == null) {
+                              Navigator.pop(ctx);
+                              return;
+                            }
+                            final navigator = Navigator.of(ctx);
+                            final token = await invitationStore.createInvitation(
+                              petId: activePet!.id!,
+                              petName: activePet.name,
+                              invitedEmail: email,
+                              invitedByUid: userStore.currentUserUid ?? '',
+                              invitedByName: userStore.currentUserDisplayName ?? '',
+                            );
+                            navigator.pop();
+                            final link = 'https://petcircle.app/invite?token=$token';
+                            await Clipboard.setData(ClipboardData(text: link));
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(l10n.invitationSentTo(email, selectedRole))),
+                              );
+                            }
+                          } else {
                             Navigator.pop(ctx);
-                            return;
-                          }
-                          final navigator = Navigator.of(ctx);
-                          final token = await invitationStore.createInvitation(
-                            petId: activePet!.id!,
-                            petName: activePet.name,
-                            invitedEmail: email,
-                            invitedByUid: userStore.currentUserUid ?? '',
-                            invitedByName: userStore.currentUserDisplayName ?? '',
-                          );
-                          navigator.pop();
-                          final link = 'https://petcircle.app/invite?token=$token';
-                          await Clipboard.setData(ClipboardData(text: link));
-                          if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text(l10n.invitationSentTo(email, selectedRole))),
                             );
                           }
-                        } else {
-                          Navigator.pop(ctx);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text(l10n.invitationSentTo(email, selectedRole))),
-                          );
-                        }
-                      },
-                      style: TextButton.styleFrom(backgroundColor: c.primaryLight),
-                      child: isSending
-                          ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: c.textPrimary))
-                          : Text(l10n.sendInvite, style: TextStyle(color: c.textPrimary)),
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -667,34 +669,34 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                 ),
                 const SizedBox(height: 24),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(l10n.cancel, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
-                    ),
-                    const SizedBox(width: 12),
-                    TextButton(
-                      onPressed: () {
-                        final navigator = Navigator.of(context);
-                        final messenger = ScaffoldMessenger.of(this.context);
-                        final elevated = int.tryParse(normalController.text) ?? 30;
-                        final critical = int.tryParse(alertController.text) ?? 40;
-                        settingsStore.updateThresholds(
-                          elevated: elevated,
-                          critical: critical,
-                        );
-                        navigator.pop();
-                        messenger.showSnackBar(
-                          SnackBar(content: Text(l10n.thresholdsUpdated)),
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: c.primaryLight,
-                        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusSm),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    Expanded(
+                      child: PrimaryButton(
+                        label: l10n.cancel,
+                        variant: PrimaryButtonVariant.outlined,
+                        onPressed: () => Navigator.pop(context),
                       ),
-                      child: Text(l10n.save, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
+                    ),
+                    const SizedBox(width: AppSpacingTokens.sm),
+                    Expanded(
+                      child: PrimaryButton(
+                        label: l10n.save,
+                        variant: PrimaryButtonVariant.filled,
+                        onPressed: () {
+                          final navigator = Navigator.of(context);
+                          final messenger = ScaffoldMessenger.of(this.context);
+                          final elevated = int.tryParse(normalController.text) ?? 30;
+                          final critical = int.tryParse(alertController.text) ?? 40;
+                          settingsStore.updateThresholds(
+                            elevated: elevated,
+                            critical: critical,
+                          );
+                          navigator.pop();
+                          messenger.showSnackBar(
+                            SnackBar(content: Text(l10n.thresholdsUpdated)),
+                          );
+                        },
+                      ),
                     ),
                   ],
                 ),

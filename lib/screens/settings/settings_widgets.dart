@@ -264,14 +264,23 @@ class LanguageRow extends StatelessWidget {
 class ActionRow extends StatelessWidget {
   const ActionRow({
     super.key,
-    required this.iconAsset,
+    this.iconAsset,
+    this.iconWidget,
     required this.title,
     required this.description,
     required this.onTap,
     this.iconTileColor,
-  });
+  }) : assert(iconAsset != null || iconWidget != null,
+            'Provide either iconAsset or iconWidget');
 
-  final String iconAsset;
+  /// SVG asset path. Mutually exclusive with [iconWidget] — if [iconWidget]
+  /// is provided, [iconAsset] is ignored.
+  final String? iconAsset;
+
+  /// Optional widget to render inside the icon tile instead of an SVG.
+  /// Use for Material icons (e.g. `Icon(Icons.download_outlined)`).
+  final Widget? iconWidget;
+
   final String title;
   final String description;
   final VoidCallback? onTap;
@@ -302,7 +311,8 @@ class ActionRow extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: SvgPicture.asset(iconAsset, width: 24, height: 24),
+                child: iconWidget ??
+                    SvgPicture.asset(iconAsset!, width: 24, height: 24),
               ),
             ),
             const SizedBox(width: 12),

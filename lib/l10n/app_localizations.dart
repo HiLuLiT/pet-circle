@@ -704,6 +704,12 @@ abstract class AppLocalizations {
   /// **'Done'**
   String get done;
 
+  /// No description provided for @expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get expired;
+
   /// No description provided for @addToGraph.
   ///
   /// In en, this message translates to:

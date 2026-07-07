@@ -104,6 +104,7 @@
   "breathCountMessage": "ספרת {taps} נשימות ב-{seconds} שניות.",
   "@breathCountMessage": { "placeholders": { "taps": { "type": "int" }, "seconds": { "type": "int" } } },
   "done": "סיום",
+  "expired": "פג תוקף",
   "addToGraph": "הוסף לגרף",
   "measureAgain": "מדוד שוב",
   "healthTrends": "מגמות בריאות",

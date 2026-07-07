@@ -324,6 +324,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get done => 'Done';
 
   @override
+  String get expired => 'Expired';
+
+  @override
   String get addToGraph => 'Add to Graph';
 
   @override

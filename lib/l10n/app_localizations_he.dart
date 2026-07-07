@@ -322,6 +322,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get done => 'סיום';
 
   @override
+  String get expired => 'פג תוקף';
+
+  @override
   String get addToGraph => 'הוסף לגרף';
 
   @override

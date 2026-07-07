@@ -16,6 +16,7 @@ import 'package:pet_circle/screens/settings/settings_care_circle_widgets.dart';
 import 'package:pet_circle/screens/settings/settings_dialogs.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/round_icon_button.dart';
+import 'package:pet_circle/widgets/segmented_control.dart';
 
 /// Push notification categories
 /// - Medicine reminders: upcoming doses, missed doses
@@ -292,7 +293,11 @@ class _SettingsContentState extends State<SettingsContent>
                     ),
                     const SizedBox(height: 12),
                     ActionRow(
-                      iconAsset: settingsDownAsset,
+                      iconWidget: Icon(
+                        Icons.download_outlined,
+                        size: 22,
+                        color: c.accentPeriwinkle,
+                      ),
                       title: l10n.exportAllData,
                       description: l10n.exportAllDataDesc,
                       onTap: () => showExportDataDialog(context),
@@ -374,25 +379,16 @@ class _MeasurementReminderFrequencyRow extends StatelessWidget {
           style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: SegmentedButton<int>(
-            segments: _options
-                .map((v) => ButtonSegment(value: v, label: Text(labels[v]!)))
-                .toList(),
-            selected: {current},
-            onSelectionChanged: (selected) async {
+        AppSegmentedControl(
+          options: _options.map((v) => labels[v]!).toList(),
+          value: labels[current]!,
+          onChanged: (label) async {
+            final idx = _options.indexWhere((v) => labels[v] == label);
+            if (idx >= 0) {
               await settingsStore
-                  .setMeasurementReminderFrequency(selected.first);
-            },
-            showSelectedIcon: false,
-            style: ButtonStyle(
-              visualDensity: VisualDensity.compact,
-              textStyle: WidgetStatePropertyAll(
-                AppSemanticTextStyles.caption,
-              ),
-            ),
-          ),
+                  .setMeasurementReminderFrequency(_options[idx]);
+            }
+          },
         ),
       ],
     );
@@ -429,6 +425,7 @@ class _MedicationTimeRow extends StatelessWidget {
             final picked = await showTimePicker(
               context: context,
               initialTime: time,
+              initialEntryMode: TimePickerEntryMode.input,
             );
             if (picked != null) {
               onChanged(picked.hour, picked.minute);
@@ -468,6 +465,7 @@ class _MeasurementReminderTimeRow extends StatelessWidget {
             final picked = await showTimePicker(
               context: context,
               initialTime: time,
+              initialEntryMode: TimePickerEntryMode.input,
             );
             if (picked != null) {
               await settingsStore.setMeasurementReminderTime(
