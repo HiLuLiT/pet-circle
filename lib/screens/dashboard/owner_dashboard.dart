@@ -46,6 +46,20 @@ class OwnerDashboard extends StatelessWidget {
     );
   }
 
+  Future<void> _deleteReminder(BuildContext context, Reminder reminder) async {
+    final access = petStore.accessForActivePet();
+    if (!access.canManageMedication) return;
+    final petId = petStore.activePet?.id ?? '';
+    if (petId.isEmpty) return;
+    await reminderStore.removeReminder(petId, reminder.id);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.reminderDeleted),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -290,8 +304,8 @@ class OwnerDashboard extends StatelessWidget {
                                   child: _ReminderTile(
                                     reminder: reminder,
                                     petName: pet.name,
-                                    onTap: () =>
-                                        _openReminderSheet(context, reminder),
+                                    onDelete: () =>
+                                        _deleteReminder(context, reminder),
                                   ),
                                 )),
                         ],
@@ -334,74 +348,82 @@ class OwnerDashboard extends StatelessWidget {
 
 /// A single recessed reminder row inside the Reminders card — Figma node
 /// 469:1023. Shows the reminder date + a purple pet-name chip, then the
-/// title/detail with a trailing chevron.
+/// title/detail with a trailing remove button.
 class _ReminderTile extends StatelessWidget {
   const _ReminderTile({
     required this.reminder,
     required this.petName,
-    this.onTap,
+    this.onDelete,
   });
 
   final Reminder reminder;
   final String petName;
-  final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(AppSpacingTokens.md),
-        decoration: BoxDecoration(
-          color: c.background,
-          borderRadius: BorderRadius.circular(AppRadiiTokens.pcCard),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Text(
-                  formatReminderDate(reminder.date, l10n.localeName),
-                  style: AppSemanticTextStyles.bodySm
-                      .copyWith(color: c.textSecondary),
-                ),
-                const SizedBox(width: AppSpacingTokens.sm),
-                _PetChip(petName: petName),
-              ],
-            ),
-            const SizedBox(height: AppSpacingTokens.sm),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacingTokens.md),
+      decoration: BoxDecoration(
+        color: c.background,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.pcCard),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                formatReminderDate(reminder.date, l10n.localeName),
+                style: AppSemanticTextStyles.bodySm
+                    .copyWith(color: c.textSecondary),
+              ),
+              const SizedBox(width: AppSpacingTokens.sm),
+              _PetChip(petName: petName),
+            ],
+          ),
+          const SizedBox(height: AppSpacingTokens.sm),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      reminder.title,
+                      style: AppSemanticTextStyles.pcBodySemibold
+                          .copyWith(color: c.textPrimary),
+                    ),
+                    if (reminder.detail != null &&
+                        reminder.detail!.isNotEmpty)
                       Text(
-                        reminder.title,
-                        style: AppSemanticTextStyles.pcBodySemibold
-                            .copyWith(color: c.textPrimary),
+                        reminder.detail!,
+                        style: AppSemanticTextStyles.bodySm
+                            .copyWith(color: c.textSecondary),
                       ),
-                      if (reminder.detail != null &&
-                          reminder.detail!.isNotEmpty)
-                        Text(
-                          reminder.detail!,
-                          style: AppSemanticTextStyles.bodySm
-                              .copyWith(color: c.textSecondary),
-                        ),
-                    ],
+                  ],
+                ),
+              ),
+              if (onDelete != null)
+                GestureDetector(
+                  onTap: onDelete,
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: AppSpacingTokens.sm),
+                    child: Icon(
+                      Icons.close,
+                      size: 18,
+                      color: c.textTertiary,
+                    ),
                   ),
                 ),
-                Icon(Icons.chevron_right, color: c.textPrimary),
-              ],
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
