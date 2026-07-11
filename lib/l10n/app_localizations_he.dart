@@ -1384,8 +1384,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get medicationEndingTitle => 'התרופה מסתיימת היום';
 
   @override
-  String medicationEndingBody(String name) {
-    return 'מהלך הטיפול התרופתי של $name מסתיים היום';
+  String medicationEndingBody(String petName, String medName) {
+    return 'מהלך הטיפול \"$medName\" של $petName מסתיים היום';
   }
 
   @override
@@ -1490,6 +1490,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get failedToSendInvite => 'שליחת ההזמנה נכשלה. אנא נסה שוב.';
+
+  @override
+  String get failedToSaveReminder => 'לא ניתן לשמור את התזכורת. אנא נסה שוב.';
+
+  @override
+  String get failedToDeleteReminder => 'לא ניתן למחוק את התזכורת. אנא נסה שוב.';
 
   @override
   String get noActivePet => 'אין חיית מחמד פעילה';

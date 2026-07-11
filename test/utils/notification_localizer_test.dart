@@ -65,9 +65,11 @@ void main() {
   });
 
   group('localizeNotification — body resolution', () {
-    test('resolves templated body with string arg (medicationEndingBody)', () {
-      final n = _notif(bodyKey: 'medicationEndingBody', args: const ['Rex']);
-      expect(localizeNotification(n, en).body, en.medicationEndingBody('Rex'));
+    test('resolves templated body with string args (medicationEndingBody)', () {
+      final n = _notif(
+          bodyKey: 'medicationEndingBody', args: const ['Rex', 'test med']);
+      expect(localizeNotification(n, en).body,
+          en.medicationEndingBody('Rex', 'test med'));
     });
 
     test('resolves measurementSavedBpm with int arg', () {
@@ -95,8 +97,10 @@ void main() {
     });
 
     test('localizes body in Hebrew', () {
-      final n = _notif(bodyKey: 'medicationEndingBody', args: const ['Rex']);
-      expect(localizeNotification(n, he).body, he.medicationEndingBody('Rex'));
+      final n = _notif(
+          bodyKey: 'medicationEndingBody', args: const ['Rex', 'test med']);
+      expect(localizeNotification(n, he).body,
+          he.medicationEndingBody('Rex', 'test med'));
     });
 
     test('falls back to stored body when bodyKey is null', () {

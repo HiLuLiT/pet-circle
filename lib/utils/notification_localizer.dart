@@ -47,7 +47,7 @@ String? _resolveTitle(String? key, AppLocalizations l10n) {
 String? _resolveBody(String? key, List<String> args, AppLocalizations l10n) {
   switch (key) {
     case 'medicationEndingBody':
-      return args.isNotEmpty ? l10n.medicationEndingBody(args[0]) : null;
+      return args.length >= 2 ? l10n.medicationEndingBody(args[0], args[1]) : null;
     case 'measurementSavedBpm':
       final bpm = args.isNotEmpty ? int.tryParse(args[0]) : null;
       return bpm != null ? l10n.measurementSavedBpm(bpm) : null;

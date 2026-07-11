@@ -1393,8 +1393,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get medicationEndingTitle => 'Medication ending today';
 
   @override
-  String medicationEndingBody(String name) {
-    return '$name\'s medication course ends today';
+  String medicationEndingBody(String petName, String medName) {
+    return '$petName\'s \"$medName\" course ends today';
   }
 
   @override
@@ -1500,6 +1500,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToSendInvite => 'Failed to send invite. Please try again.';
+
+  @override
+  String get failedToSaveReminder =>
+      'Couldn\'t save the reminder. Please try again.';
+
+  @override
+  String get failedToDeleteReminder =>
+      'Couldn\'t delete the reminder. Please try again.';
 
   @override
   String get noActivePet => 'No active pet';

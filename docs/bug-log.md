@@ -685,6 +685,66 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-036: Reminders fail to save — undeployed Firestore rule + silent error
+
+**Found during:** Manual testing of Add Reminder on the Home screen
+**Severity:** Critical
+**Status:** Fixed
+
+**Symptom:** User fills in a reminder, taps "Add reminder", sees "Reminder added" snackbar and the sheet closes — but the reminder never persists. On reload it is gone.
+
+**Root cause:** Two independent issues:
+1. The Firestore security rule for `/pets/{petId}/reminders` was added in commit `1d55cc0` on `feat/home-redesign-figma-402-1978` but never deployed to production (not on `main`). Live rules fall through to the catch-all `allow read, write: if false`, causing PERMISSION_DENIED on every reminder write.
+2. `AddReminderSheet._save()` called `reminderStore.addReminder()` without `await`, popped the sheet, and showed a success snackbar synchronously. The store's optimistic insert was silently rolled back on Firestore failure, and the rethrown error became an uncaught zone error. `_confirmDelete()` awaited but had no try/catch — errors crashed unhandled.
+
+**Fix:**
+- Client: converted `_save()` to async, added `_isSaving` guard, wrapped store calls in try/catch. On failure: sheet stays open, error snackbar shown, user can retry. Added `isLoading` prop to `PrimaryButton` for a spinner during save. Same try/catch pattern applied to `_confirmDelete()`. Two new l10n keys (`failedToSaveReminder`, `failedToDeleteReminder`).
+- Server: deploy `firestore.rules` from this branch (which already contains the correct reminders block) via `firebase deploy --only firestore:rules`.
+
+**Files changed:**
+- `lib/widgets/primary_button.dart`
+- `lib/screens/dashboard/add_reminder_sheet.dart`
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_he.arb`
+- `test/screens/dashboard/add_reminder_sheet_test.dart`
+- `docs/bug-log.md`
+
+---
+
+## BUG-037: "Medication ending today" notification shows medication name as pet name + mark-as-read reverts
+
+**Found during:** Manual testing of in-app notifications drawer
+**Severity:** High
+**Status:** Fixed
+
+**Symptom:**
+1. Notification body reads "[med name]'s medication course ends today" (e.g. "test med's medication course ends today") instead of the pet's name.
+2. Tapping a notification to mark it as read briefly shows it as read, then ~1 second later it snaps back to unread.
+
+**Root cause:**
+1. `notification_store.dart:reconcileMedicationEndNotifications` set `petName: med.name` and `args: [med.name]` — both used the medication name in the pet-name slot. The caller in `main.dart` also passed `l10n.medicationEndingBody(med.name)` with one placeholder, matching the single-arg `{name}` template.
+2. `NotificationService.addNotification` persisted with Firestore `.add()`, which assigns an auto-generated doc id and ignores the client's `notification.id`. `markRead` then called `_notificationsRef(uid).doc(notificationId).update(...)` using the **client id** — pointing at a nonexistent document. Firestore threw `not-found`, the store's catch block rolled back the optimistic read → unread flip, and `rethrew`. The ~1 s delay was the network round-trip for the failed update. Worse, `reconcileMedicationEndNotifications` only inserted notifications locally (never persisted to Firestore), so `markRead` could never find a matching document.
+
+**Fix:**
+- `lib/l10n/app_en.arb` + `app_he.arb`: changed `medicationEndingBody` from one placeholder (`{name}`) to two (`{petName}` and `{medName}`). EN: `"{petName}'s "{medName}" course ends today"`, HE: `"מהלך הטיפול "{medName}" של {petName} מסתיים היום"`.
+- `lib/utils/notification_localizer.dart`: updated `medicationEndingBody` case to pass two args `(args[0], args[1])` guarded by `args.length >= 2`.
+- `lib/stores/notification_store.dart`: added `String? petName` param to `reconcileMedicationEndNotifications`; made it `async`; corrected `petName`/`petId`/`args` fields; persists each new notification to Firestore immediately after local insert (wrapped in try/catch).
+- `lib/services/notification_service.dart`: switched `addNotification` from `.add(...)` to `.doc(notification.id).set(...)` so the Firestore doc id matches the client id — `markRead`'s `.update()` now finds the correct document.
+- `lib/main.dart`: resolves `petStore.getPetById(med.petId)?.name` and passes it as `petName` and the first arg of `medicationEndingBody`.
+- `lib/screens/medication/add_medication_sheet.dart`: updated two `scheduleMedicationReminder` calls to use the two-arg `medicationEndingBody` with the active pet's name.
+
+**Files changed:**
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_he.arb`
+- `lib/utils/notification_localizer.dart`
+- `lib/stores/notification_store.dart`
+- `lib/services/notification_service.dart`
+- `lib/main.dart`
+- `lib/screens/medication/add_medication_sheet.dart`
+- `test/utils/notification_localizer_test.dart`
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

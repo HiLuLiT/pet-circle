@@ -138,17 +138,22 @@ void main() async {
     final l10n = lookupAppLocalizations(appLocale.value);
     final now = DateTime.now();
     for (final med in medicationStore.getMedicationsWithEndReminder()) {
+      final resolvedPetName =
+          petStore.getPetById(med.petId)?.name ?? med.name;
       if (!med.endDate!.isAfter(now)) {
         notificationStore.reconcileMedicationEndNotifications(
           [med],
           title: l10n.medicationEndingTitle,
-          body: l10n.medicationEndingBody(med.name),
+          body: l10n.medicationEndingBody(resolvedPetName, med.name),
+          petName: resolvedPetName,
         );
       }
     }
     if (!kIsWeb) {
       final liveIds = <String>{};
       for (final med in medicationStore.getMedicationsWithEndReminder()) {
+        final resolvedPetName =
+            petStore.getPetById(med.petId)?.name ?? med.name;
         liveIds.add(med.id);
         final endDate = med.endDate!;
         if (scheduledEndDates[med.id] == endDate) continue;
@@ -156,7 +161,7 @@ void main() async {
         reminderService.scheduleMedicationReminder(
           med,
           title: l10n.medicationEndingTitle,
-          body: l10n.medicationEndingBody(med.name),
+          body: l10n.medicationEndingBody(resolvedPetName, med.name),
         );
       }
       // Drop cache entries for meds that no longer have an end reminder.

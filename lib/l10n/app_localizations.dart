@@ -2639,8 +2639,8 @@ abstract class AppLocalizations {
   /// No description provided for @medicationEndingBody.
   ///
   /// In en, this message translates to:
-  /// **'{name}\'s medication course ends today'**
-  String medicationEndingBody(String name);
+  /// **'{petName}\'s \"{medName}\" course ends today'**
+  String medicationEndingBody(String petName, String medName);
 
   /// No description provided for @delete.
   ///
@@ -2821,6 +2821,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to send invite. Please try again.'**
   String get failedToSendInvite;
+
+  /// No description provided for @failedToSaveReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the reminder. Please try again.'**
+  String get failedToSaveReminder;
+
+  /// No description provided for @failedToDeleteReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t delete the reminder. Please try again.'**
+  String get failedToDeleteReminder;
 
   /// No description provided for @noActivePet.
   ///
