@@ -32,6 +32,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
   late final TextEditingController _dateController;
 
   DateTime? _date;
+  bool _isSaving = false;
 
   bool get _isEditing => widget.reminder != null;
 
@@ -72,7 +73,8 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
     });
   }
 
-  void _save() {
+  Future<void> _save() async {
+    if (_isSaving) return;
     if (!_formKey.currentState!.validate()) return;
 
     final navigator = Navigator.of(context);
@@ -84,36 +86,49 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
     final petId = petStore.activePet?.id ?? '';
     if (petId.isEmpty) return;
 
+    setState(() => _isSaving = true);
+
     final title = _titleController.text.trim();
     final date = _date ?? DateTime.now();
     final detail = _detailController.text.trim();
 
-    if (_isEditing) {
-      final updated = widget.reminder!.copyWith(
-        title: title,
-        date: date,
-        detail: detail.isNotEmpty ? detail : null,
-        clearDetail: detail.isEmpty,
-      );
-      reminderStore.updateReminder(petId, widget.reminder!.id, updated);
-    } else {
-      final newReminder = Reminder(
-        id: 'rem-${DateTime.now().millisecondsSinceEpoch}',
-        petId: petId,
-        date: date,
-        title: title,
-        detail: detail.isNotEmpty ? detail : null,
-      );
-      reminderStore.addReminder(petId, newReminder);
-    }
+    try {
+      if (_isEditing) {
+        final updated = widget.reminder!.copyWith(
+          title: title,
+          date: date,
+          detail: detail.isNotEmpty ? detail : null,
+          clearDetail: detail.isEmpty,
+        );
+        await reminderStore.updateReminder(
+            petId, widget.reminder!.id, updated);
+      } else {
+        final newReminder = Reminder(
+          id: 'rem-${DateTime.now().millisecondsSinceEpoch}',
+          petId: petId,
+          date: date,
+          title: title,
+          detail: detail.isNotEmpty ? detail : null,
+        );
+        await reminderStore.addReminder(petId, newReminder);
+      }
 
-    navigator.pop();
-    messenger.showSnackBar(
-      SnackBar(
-        content:
-            Text(_isEditing ? l10n.reminderUpdated : l10n.reminderAdded),
-      ),
-    );
+      if (!mounted) return;
+      navigator.pop();
+      messenger.showSnackBar(
+        SnackBar(
+          content:
+              Text(_isEditing ? l10n.reminderUpdated : l10n.reminderAdded),
+        ),
+      );
+    } catch (e) {
+      debugPrint('[AddReminderSheet] Failed to save reminder: $e');
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.failedToSaveReminder)),
+      );
+    }
   }
 
   Future<void> _confirmDelete() async {
@@ -153,13 +168,20 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
 
     if (confirmed != true || !mounted) return;
 
-    await reminderStore.removeReminder(petId, reminder.id);
-    if (!mounted) return;
-
-    navigator.pop();
-    messenger.showSnackBar(
-      SnackBar(content: Text(l10n.reminderDeleted)),
-    );
+    try {
+      await reminderStore.removeReminder(petId, reminder.id);
+      if (!mounted) return;
+      navigator.pop();
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.reminderDeleted)),
+      );
+    } catch (e) {
+      debugPrint('[AddReminderSheet] Failed to delete reminder: $e');
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text(l10n.failedToDeleteReminder)),
+      );
+    }
   }
 
   @override
@@ -248,7 +270,8 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                         child: PrimaryButton(
                           label: l10n.cancel,
                           variant: PrimaryButtonVariant.outlined,
-                          onPressed: () => Navigator.of(context).pop(),
+                          onPressed:
+                              _isSaving ? null : () => Navigator.of(context).pop(),
                         ),
                       ),
                       const SizedBox(width: AppSpacingTokens.pcMd),
@@ -256,7 +279,8 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                         child: PrimaryButton(
                           label: _isEditing ? l10n.save : l10n.addReminder,
                           variant: PrimaryButtonVariant.filled,
-                          onPressed: _save,
+                          isLoading: _isSaving,
+                          onPressed: _isSaving ? null : _save,
                         ),
                       ),
                     ],

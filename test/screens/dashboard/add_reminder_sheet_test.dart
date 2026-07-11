@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -12,22 +11,6 @@ import '../../helpers/test_app.dart';
 import '../../helpers/mock_stores.dart';
 import '../../helpers/ignore_overflow_errors.dart';
 import '../../helpers/test_http_overrides.dart';
-
-// NOTE on this whole file: AddReminderSheet's save/delete flows call into
-// reminderStore.addReminder / updateReminder / removeReminder, all of which
-// (per reminder_store.dart) attempt a real Firestore write whenever
-// kEnableFirebase is true — and this project always has kEnableFirebase=true
-// (lib/config/app_config.dart), with no signed-in-uid guard for reminders
-// (unlike medication_store.dart's uid-gated calls). In this unit-test
-// environment there is no Firebase.initializeApp(), so every such call
-// throws a FirebaseException. addReminder/updateReminder/removeReminder
-// catch it, roll back their optimistic mutation, and rethrow — but
-// AddReminderSheet's callers (_save / _confirmDelete) do not catch that
-// rethrow (see the implementation-concerns notes below). Some of these
-// failures surface as *uncaught zone errors* that bypass
-// tester.takeException() entirely, so the affected tests below wrap the
-// triggering gesture in runZonedGuarded to keep the expected, already-
-// documented failure from being reported as a test framework error.
 void main() {
   setUpAll(() => HttpOverrides.global = MockHttpOverrides());
 
@@ -108,7 +91,7 @@ void main() {
     });
 
     testWidgets(
-        'filling a valid title adds a reminder via the store and pops',
+        'when Firestore write fails, sheet stays open and error snackbar shown',
         (tester) async {
       suppressOverflowErrors();
       await setSize(tester);
@@ -137,12 +120,6 @@ void main() {
 
       expect(find.byType(AddReminderSheet), findsOneWidget);
 
-      // Title (index 0) and Date (index 1) are both required by the form's
-      // validators. The DatePickerField is `readOnly: true` with `onTap`
-      // opening a real `showDatePicker` dialog — WidgetTester.enterText is
-      // a no-op on a readOnly field (it never updates the controller), so
-      // the date must be filled by actually driving the picker: tap the
-      // field to open it, then tap OK to confirm today's date.
       await tester.enterText(find.byType(TextFormField).at(0), 'Grooming');
       await tester.pumpAndSettle();
 
@@ -152,34 +129,24 @@ void main() {
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
 
-      // AddReminderSheet._save() calls reminderStore.addReminder without
-      // awaiting it (fire-and-forget) and pops the sheet immediately.
-      // addReminder's own internal `await PetService.addReminder(...)`
-      // throws a FirebaseException in this Firebase-less test environment;
-      // because _save() never awaits that Future, the rejection becomes an
-      // uncaught zone error rather than something `tester.takeException()`
-      // can observe. runZonedGuarded intercepts it here so the test can
-      // assert on the (documented) real-world outcome instead of failing.
-      await runZonedGuarded(() async {
-        await tester.tap(find.text('Add reminder'));
-        await tester.pumpAndSettle();
-      }, (error, stack) {
-        // Expected: PetService.addReminder fails without Firebase
-        // initialized; reminderStore.addReminder rolls back and rethrows.
-      });
+      // _save() now awaits the store call and catches errors. In this
+      // test environment (no Firebase.initializeApp()), the Firestore
+      // write throws, _save catches it, and shows an error snackbar.
+      await tester.tap(find.text('Add reminder'));
+      await tester.pumpAndSettle();
 
-      // Sheet has been popped regardless of the write's eventual outcome —
-      // _save() pops synchronously and does not wait for the result.
-      expect(find.byType(AddReminderSheet), findsNothing);
-      // Net state after the failed write's rollback: reminder count is
-      // unchanged from before the tap. This is the real gap flagged in the
-      // report: the user sees the sheet close as if the save succeeded,
-      // but the underlying write failed silently with no error surfaced
-      // and no retry offered.
+      // Sheet stays open — the save failed, so the user can retry.
+      expect(find.byType(AddReminderSheet), findsOneWidget);
+      // Reminder count unchanged (store rolled back the optimistic insert).
       expect(reminderStore.getReminders(petId).length, before);
       expect(
         reminderStore.getReminders(petId).any((r) => r.title == 'Grooming'),
         isFalse,
+      );
+      // Error snackbar is shown.
+      expect(
+        find.text("Couldn't save the reminder. Please try again."),
+        findsOneWidget,
       );
     });
   });
@@ -227,26 +194,8 @@ void main() {
     });
 
     testWidgets(
-        'tapping delete then confirming calls reminderStore.removeReminder',
+        'when Firestore delete fails, sheet stays open and error snackbar shown',
         (tester) async {
-      // NOTE: AddReminderSheet._confirmDelete() does
-      // `await reminderStore.removeReminder(petId, reminder.id);` with no
-      // try/catch around it. In this unit-test environment (no
-      // Firebase.initializeApp()) that call always throws a
-      // FirebaseException, which propagates out of _confirmDelete
-      // unhandled — becoming an uncaught zone error rather than something
-      // observable through `tester.takeException()`. The whole
-      // pump-tap-confirm sequence below is wrapped in a single
-      // runZonedGuarded so that error is intercepted regardless of which
-      // internal async gap (dialog route machinery, gesture dispatch, etc.)
-      // it ultimately surfaces through. Because of this gap, the sheet
-      // never reaches `navigator.pop()` / the success snackbar in this
-      // environment — the optimistic removal from the store is visible
-      // immediately, then rolled back once the Firestore call fails. This
-      // is flagged as a real implementation gap in the report (missing
-      // error handling around the delete confirmation flow); the test
-      // asserts the actual observed behavior rather than the originally
-      // assumed happy path.
       suppressOverflowErrors();
       await setSize(tester);
 
@@ -254,32 +203,27 @@ void main() {
       final reminder = existingReminder();
       final before = reminderStore.getReminders(petId).length;
 
-      await runZonedGuarded(() async {
-        await tester
-            .pumpWidget(testApp(AddReminderSheet(reminder: reminder)));
-        await tester.pumpAndSettle();
+      await tester
+          .pumpWidget(testApp(AddReminderSheet(reminder: reminder)));
+      await tester.pumpAndSettle();
 
-        await tester.tap(find.byIcon(Icons.delete_outline));
-        await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.delete_outline));
+      await tester.pumpAndSettle();
 
-        // AlertDialog confirmation is shown.
-        expect(find.byType(AlertDialog), findsOneWidget);
-        expect(find.text('Delete reminder'), findsOneWidget);
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.text('Delete reminder'), findsOneWidget);
 
-        // Confirm deletion via the "Delete" action.
-        await tester.tap(find.text('Delete'));
-        await tester.pumpAndSettle();
-      }, (error, stack) {
-        // Expected: PetService.deleteReminder fails without Firebase
-        // initialized; reminderStore.removeReminder rolls back and
-        // rethrows, and _confirmDelete does not catch it.
-      });
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
 
-      // Net effect: removeReminder's rollback restores the reminder, and
-      // because _confirmDelete's await threw before reaching
-      // `navigator.pop()`, the sheet is still showing.
+      // _confirmDelete now catches the Firestore error, shows an error
+      // snackbar, and keeps the sheet open.
       expect(reminderStore.getReminders(petId).length, before);
       expect(find.byType(AddReminderSheet), findsOneWidget);
+      expect(
+        find.text("Couldn't delete the reminder. Please try again."),
+        findsOneWidget,
+      );
     });
 
     testWidgets('tapping delete then cancelling keeps the reminder',
