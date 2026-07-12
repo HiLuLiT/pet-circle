@@ -236,6 +236,7 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   ),
                   const SizedBox(height: 16),
                 ],
+                const SizedBox(height: 16),
                 Row(
                   children: [
                     Expanded(

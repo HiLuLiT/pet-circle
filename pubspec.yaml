@@ -40,8 +40,7 @@ dependencies:
   flutter_svg: ^2.0.10
   http: ^1.2.2
   image_picker: ^1.0.7
-  google_fonts: ^6.2.1
-  
+
   # Firebase
   firebase_core: ^3.8.1
   firebase_auth: ^5.3.4
@@ -88,13 +87,13 @@ flutter:
     - assets/figma/
     - assets/fonts/
 
-  # Instrument Sans is bundled locally so text renders correctly offline —
-  # AppTypography's TextStyles reference fontFamily: 'Instrument Sans'
-  # directly, which only resolves via this registration. Without it, that
-  # name only exists if google_fonts' runtime network fetch (app_theme.dart)
-  # happens to succeed; if it's slow, blocked, or fails, every explicit
-  # 'Instrument Sans' TextStyle silently falls back to the platform default
-  # font, which renders visibly smaller/thinner at the same declared size.
+  # Instrument Sans is bundled locally (all 4 weights + italics) so text
+  # renders correctly and consistently offline. AppTypography's TextStyles
+  # reference fontFamily: 'Instrument Sans' directly, resolved entirely from
+  # this registration — do not add a google_fonts runtime fetch for the same
+  # family name; a prior version of this app did, and having two font
+  # sources registered under one family name caused Flutter Web's font
+  # matching to intermittently resolve bold text to a lighter weight.
   fonts:
     - family: Instrument Sans
       fonts:

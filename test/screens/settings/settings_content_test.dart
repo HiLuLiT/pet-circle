@@ -45,7 +45,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Settings'), findsOneWidget);
-      expect(find.text('Manage your PetBreath preferences'), findsOneWidget);
+      expect(find.text('Manage your preferences'), findsOneWidget);
     });
 
     testWidgets('shows close button when onClose callback provided', (tester) async {

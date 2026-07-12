@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
@@ -41,10 +40,6 @@ void main() async {
 
   // Wire up global Flutter / platform error handlers before anything else.
   AppErrorHandler.instance.init();
-
-  // Allow runtime fetching so google_fonts can download Instrument Sans.
-  // TODO: bundle static Instrument Sans font files to avoid network dependency.
-  GoogleFonts.config.allowRuntimeFetching = true;
 
   if (kEnableFirebase) {
     await Firebase.initializeApp(

@@ -179,7 +179,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
-  String get managePreferences => 'Manage your PetBreath preferences';
+  String get managePreferences => 'Manage your preferences';
 
   @override
   String get appearance => 'Appearance';

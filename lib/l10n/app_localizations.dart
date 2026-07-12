@@ -425,7 +425,7 @@ abstract class AppLocalizations {
   /// No description provided for @managePreferences.
   ///
   /// In en, this message translates to:
-  /// **'Manage your PetBreath preferences'**
+  /// **'Manage your preferences'**
   String get managePreferences;
 
   /// No description provided for @appearance.

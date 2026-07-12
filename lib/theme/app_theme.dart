@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/typography.dart';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // Theme builders — wire design tokens into Flutter ThemeData.
 // As of Pet Circle v3 (Claude-Design palette), the light theme uses pcBg/pcPurple.
 // ═══════════════════════════════════════════════════════════════════════════════
-
-/// Returns the Instrument Sans text theme, falling back to the default text
-/// theme when the font is unavailable offline.
-TextTheme _instrumentSansTextTheme([TextTheme? base]) {
-  try {
-    return base != null
-        ? GoogleFonts.instrumentSansTextTheme(base)
-        : GoogleFonts.instrumentSansTextTheme();
-  } catch (_) {
-    return base ?? const TextTheme();
-  }
-}
+//
+// fontFamily is set directly to the locally-bundled "Instrument Sans" (see
+// pubspec.yaml, which registers all 4 static weights). Do NOT reintroduce
+// google_fonts here — GoogleFonts.instrumentSansTextTheme() fetches the same
+// family name from Google's CDN and registers it under the identical
+// "Instrument Sans" string as the local assets, which causes Skia's font
+// manager (esp. on Flutter Web) to resolve some weight requests to the wrong
+// font source, making bold text intermittently render lighter than 700.
 
 ThemeData buildAppTheme() {
-  final baseTextTheme = _instrumentSansTextTheme();
   return ThemeData(
+    fontFamily: AppTypography.fontFamily,
     brightness: Brightness.light,
     scaffoldBackgroundColor: AppPrimitives.pcBg,
     colorScheme: ColorScheme.fromSeed(
@@ -30,7 +26,7 @@ ThemeData buildAppTheme() {
       primary: AppPrimitives.pcPurple,
       surface: AppPrimitives.pcSurface,
     ),
-    textTheme: baseTextTheme.copyWith(
+    textTheme: ThemeData.light().textTheme.copyWith(
       headlineSmall: const TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w700,
@@ -79,8 +75,8 @@ ThemeData buildAppTheme() {
 }
 
 ThemeData buildDarkTheme() {
-  final baseTextTheme = _instrumentSansTextTheme(ThemeData.dark().textTheme);
   return ThemeData(
+    fontFamily: AppTypography.fontFamily,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: AppPrimitives.pcDarkBg,
     colorScheme: ColorScheme.fromSeed(
@@ -89,7 +85,7 @@ ThemeData buildDarkTheme() {
       primary: AppPrimitives.pcPurpleTile,
       surface: AppPrimitives.pcDarkSurface,
     ),
-    textTheme: baseTextTheme.copyWith(
+    textTheme: ThemeData.dark().textTheme.copyWith(
       headlineSmall: const TextStyle(
         fontSize: 24,
         fontWeight: FontWeight.w700,
