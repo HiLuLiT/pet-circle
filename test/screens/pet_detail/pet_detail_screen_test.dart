@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/models/pet.dart';
@@ -363,6 +364,66 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.edit), findsOneWidget);
+    });
+
+    testWidgets('edit sheet shows a delete icon button for owner', (tester) async {
+      setViewSize(tester);
+      suppressErrors(tester);
+
+      await tester.pumpWidget(testApp(PetDetailScreen(pet: testPet())));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.edit));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SvgPicture), findsWidgets);
+    });
+
+    testWidgets(
+        'tapping delete in the edit sheet closes it and opens the delete '
+        'confirmation dialog', (tester) async {
+      setViewSize(tester);
+      suppressErrors(tester);
+
+      final pet = testPet();
+      await tester.pumpWidget(testApp(PetDetailScreen(pet: pet)));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.edit));
+      await tester.pumpAndSettle();
+      expect(find.text('Edit Pet'), findsOneWidget);
+
+      // The delete button is the tappable Container wrapping the trash SVG,
+      // adjacent to the "Edit Pet" title.
+      await tester.tap(find.byType(SvgPicture).first);
+      await tester.pumpAndSettle();
+
+      // Edit sheet is gone; the confirmation dialog is showing instead.
+      expect(find.text('Edit Pet'), findsNothing);
+      expect(find.text('Delete Pet'), findsWidgets);
+      expect(find.textContaining(pet.name), findsWidgets);
+    });
+
+    testWidgets('cancelling the delete confirmation keeps the pet',
+        (tester) async {
+      setViewSize(tester);
+      suppressErrors(tester);
+
+      final pet = testPet();
+      final before = petStore.ownerPets.length;
+      await tester.pumpWidget(testApp(PetDetailScreen(pet: pet)));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byIcon(Icons.edit));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(SvgPicture).first);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Delete Pet'), findsNothing);
+      expect(petStore.ownerPets.length, before);
     });
   });
 }

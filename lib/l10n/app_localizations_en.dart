@@ -179,7 +179,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
-  String get managePreferences => 'Manage your PetBreath preferences';
+  String get managePreferences => 'Manage your preferences';
 
   @override
   String get appearance => 'Appearance';
@@ -304,6 +304,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tapToStop => 'Tap to stop';
 
   @override
+  String get stopMeasurement => 'Stop';
+
+  @override
+  String get restartMeasurement => 'Restart';
+
+  @override
   String get measurementComplete => 'Measurement Complete';
 
   @override
@@ -316,6 +322,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get done => 'Done';
+
+  @override
+  String get expired => 'Expired';
 
   @override
   String get addToGraph => 'Add to Graph';
@@ -930,6 +939,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get petUpdated => 'Pet updated';
 
   @override
+  String get yourPets => 'Your pets';
+
+  @override
+  String get reminders => 'Reminders';
+
+  @override
+  String get noRemindersYet => 'No reminders yet';
+
+  @override
+  String get addReminder => 'Add reminder';
+
+  @override
+  String get addNewReminder => 'Add new reminder';
+
+  @override
+  String get editReminder => 'Edit reminder';
+
+  @override
+  String get reminderTitleLabel => 'Title';
+
+  @override
+  String get hintReminderTitle => 'e.g. Veterinary dentist';
+
+  @override
+  String get reminderDetailLabel => 'Details';
+
+  @override
+  String get hintReminderDetail => 'e.g. Dr. Marry Rose';
+
+  @override
+  String get reminderDateLabel => 'Date';
+
+  @override
+  String get reminderAdded => 'Reminder added';
+
+  @override
+  String get reminderUpdated => 'Reminder updated';
+
+  @override
+  String get reminderDeleted => 'Reminder deleted';
+
+  @override
+  String get deleteReminder => 'Delete reminder';
+
+  @override
+  String deleteReminderConfirmation(String title) {
+    return 'Delete \"$title\"?';
+  }
+
+  @override
   String get editProfile => 'Edit Profile';
 
   @override
@@ -1334,8 +1393,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get medicationEndingTitle => 'Medication ending today';
 
   @override
-  String medicationEndingBody(String name) {
-    return '$name\'s medication course ends today';
+  String medicationEndingBody(String petName, String medName) {
+    return '$petName\'s \"$medName\" course ends today';
   }
 
   @override
@@ -1441,6 +1500,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToSendInvite => 'Failed to send invite. Please try again.';
+
+  @override
+  String get failedToSaveReminder =>
+      'Couldn\'t save the reminder. Please try again.';
+
+  @override
+  String get failedToDeleteReminder =>
+      'Couldn\'t delete the reminder. Please try again.';
 
   @override
   String get noActivePet => 'No active pet';

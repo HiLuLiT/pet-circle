@@ -16,6 +16,7 @@ import 'package:pet_circle/screens/settings/settings_care_circle_widgets.dart';
 import 'package:pet_circle/screens/settings/settings_dialogs.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/round_icon_button.dart';
+import 'package:pet_circle/widgets/segmented_control.dart';
 
 /// Push notification categories
 /// - Medicine reminders: upcoming doses, missed doses
@@ -50,7 +51,12 @@ class _SettingsContentState extends State<SettingsContent>
     return Container(
       color: c.background,
       child: ListenableBuilder(
-        listenable: petStore,
+        // settingsStore is merged in so toggle rows rebuild the instant
+        // notifyListeners() fires (right after the in-memory flip), rather
+        // than waiting on the manual setState() below the awaited
+        // persist/side-effect calls -- which was making every switch feel
+        // like it lagged by however long that write took (BUG-030).
+        listenable: Listenable.merge([petStore, settingsStore]),
         builder: (context, _) {
           final activePet = petStore.activePet;
           final access = petStore.accessForPet(activePet);
@@ -167,33 +173,21 @@ class _SettingsContentState extends State<SettingsContent>
                       label: l10n.pushNotifications,
                       description: l10n.pushNotificationsDesc,
                       isOn: settingsStore.pushNotifications,
-                      onChanged: () async {
-                        await settingsStore.togglePushNotifications();
-                        if (!mounted) return;
-                        setState(() {});
-                      },
+                      onChanged: settingsStore.togglePushNotifications,
                     ),
                     const SizedBox(height: 12),
                     SettingsToggleRow(
                       label: l10n.emergencyAlerts,
                       description: l10n.emergencyAlertsDesc,
                       isOn: settingsStore.emergencyAlerts,
-                      onChanged: () async {
-                        await settingsStore.toggleEmergencyAlerts();
-                        if (!mounted) return;
-                        setState(() {});
-                      },
+                      onChanged: settingsStore.toggleEmergencyAlerts,
                     ),
                     const SizedBox(height: 12),
                     SettingsToggleRow(
                       label: l10n.measurementReminders,
                       description: l10n.measurementRemindersDesc,
                       isOn: settingsStore.measurementRemindersEnabled,
-                      onChanged: () async {
-                        await settingsStore.toggleMeasurementReminders();
-                        if (!mounted) return;
-                        setState(() {});
-                      },
+                      onChanged: settingsStore.toggleMeasurementReminders,
                     ),
                     if (settingsStore.measurementRemindersEnabled) ...[
                       const SizedBox(height: 12),
@@ -256,11 +250,7 @@ class _SettingsContentState extends State<SettingsContent>
                             label: l10n.visionRRCameraMode,
                             description: l10n.visionRRDesc,
                             isOn: settingsStore.visionRREnabled,
-                            onChanged: () async {
-                              await settingsStore.toggleVisionRR();
-                              if (!mounted) return;
-                              setState(() {});
-                            },
+                            onChanged: settingsStore.toggleVisionRR,
                           ),
                           Positioned(
                             top: 8,
@@ -299,15 +289,15 @@ class _SettingsContentState extends State<SettingsContent>
                       label: l10n.weeklySummary,
                       description: l10n.weeklySummaryDesc,
                       isOn: settingsStore.weeklySummaryEnabled,
-                      onChanged: () async {
-                        await settingsStore.toggleWeeklySummaryEnabled();
-                        if (!mounted) return;
-                        setState(() {});
-                      },
+                      onChanged: settingsStore.toggleWeeklySummaryEnabled,
                     ),
                     const SizedBox(height: 12),
                     ActionRow(
-                      iconAsset: settingsDownAsset,
+                      iconWidget: Icon(
+                        Icons.download_outlined,
+                        size: 22,
+                        color: c.accentPeriwinkle,
+                      ),
                       title: l10n.exportAllData,
                       description: l10n.exportAllDataDesc,
                       onTap: () => showExportDataDialog(context),
@@ -389,25 +379,16 @@ class _MeasurementReminderFrequencyRow extends StatelessWidget {
           style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
         ),
         const SizedBox(height: 8),
-        SizedBox(
-          width: double.infinity,
-          child: SegmentedButton<int>(
-            segments: _options
-                .map((v) => ButtonSegment(value: v, label: Text(labels[v]!)))
-                .toList(),
-            selected: {current},
-            onSelectionChanged: (selected) async {
+        AppSegmentedControl(
+          options: _options.map((v) => labels[v]!).toList(),
+          value: labels[current]!,
+          onChanged: (label) async {
+            final idx = _options.indexWhere((v) => labels[v] == label);
+            if (idx >= 0) {
               await settingsStore
-                  .setMeasurementReminderFrequency(selected.first);
-            },
-            showSelectedIcon: false,
-            style: ButtonStyle(
-              visualDensity: VisualDensity.compact,
-              textStyle: WidgetStatePropertyAll(
-                AppSemanticTextStyles.caption,
-              ),
-            ),
-          ),
+                  .setMeasurementReminderFrequency(_options[idx]);
+            }
+          },
         ),
       ],
     );
@@ -444,6 +425,7 @@ class _MedicationTimeRow extends StatelessWidget {
             final picked = await showTimePicker(
               context: context,
               initialTime: time,
+              initialEntryMode: TimePickerEntryMode.input,
             );
             if (picked != null) {
               onChanged(picked.hour, picked.minute);
@@ -483,6 +465,7 @@ class _MeasurementReminderTimeRow extends StatelessWidget {
             final picked = await showTimePicker(
               context: context,
               initialTime: time,
+              initialEntryMode: TimePickerEntryMode.input,
             );
             if (picked != null) {
               await settingsStore.setMeasurementReminderTime(

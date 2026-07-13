@@ -254,7 +254,12 @@ class _TrendsScreenState extends State<TrendsScreen>
               ),
               const SizedBox(height: AppSpacingTokens.pcMd),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                // Top-aligned, not centered: AppDropdown renders its open
+                // option list inline below the trigger, growing this Row's
+                // height when opened. Centering would re-center the fixed-
+                // height Export button within that taller row, making it
+                // visibly shift down each time the list opens (BUG-031).
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
                     width: 165,
@@ -268,6 +273,7 @@ class _TrendsScreenState extends State<TrendsScreen>
                           .map((period) => _periodLabel(period, l10n))
                           .toList(),
                       onOptionSelected: (label) => _selectPeriodLabel(label, l10n),
+                      overlayMode: true,
                     ),
                   ),
                   const SizedBox(width: AppSpacingTokens.sm),

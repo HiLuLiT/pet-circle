@@ -425,7 +425,7 @@ abstract class AppLocalizations {
   /// No description provided for @managePreferences.
   ///
   /// In en, this message translates to:
-  /// **'Manage your PetBreath preferences'**
+  /// **'Manage your preferences'**
   String get managePreferences;
 
   /// No description provided for @appearance.
@@ -668,6 +668,18 @@ abstract class AppLocalizations {
   /// **'Tap to stop'**
   String get tapToStop;
 
+  /// No description provided for @stopMeasurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop'**
+  String get stopMeasurement;
+
+  /// No description provided for @restartMeasurement.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart'**
+  String get restartMeasurement;
+
   /// No description provided for @measurementComplete.
   ///
   /// In en, this message translates to:
@@ -691,6 +703,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Done'**
   String get done;
+
+  /// No description provided for @expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get expired;
 
   /// No description provided for @addToGraph.
   ///
@@ -1820,6 +1838,102 @@ abstract class AppLocalizations {
   /// **'Pet updated'**
   String get petUpdated;
 
+  /// No description provided for @yourPets.
+  ///
+  /// In en, this message translates to:
+  /// **'Your pets'**
+  String get yourPets;
+
+  /// No description provided for @reminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get reminders;
+
+  /// No description provided for @noRemindersYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders yet'**
+  String get noRemindersYet;
+
+  /// No description provided for @addReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add reminder'**
+  String get addReminder;
+
+  /// No description provided for @addNewReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add new reminder'**
+  String get addNewReminder;
+
+  /// No description provided for @editReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit reminder'**
+  String get editReminder;
+
+  /// No description provided for @reminderTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get reminderTitleLabel;
+
+  /// No description provided for @hintReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Veterinary dentist'**
+  String get hintReminderTitle;
+
+  /// No description provided for @reminderDetailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get reminderDetailLabel;
+
+  /// No description provided for @hintReminderDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Dr. Marry Rose'**
+  String get hintReminderDetail;
+
+  /// No description provided for @reminderDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get reminderDateLabel;
+
+  /// No description provided for @reminderAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder added'**
+  String get reminderAdded;
+
+  /// No description provided for @reminderUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder updated'**
+  String get reminderUpdated;
+
+  /// No description provided for @reminderDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder deleted'**
+  String get reminderDeleted;
+
+  /// No description provided for @deleteReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete reminder'**
+  String get deleteReminder;
+
+  /// No description provided for @deleteReminderConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{title}\"?'**
+  String deleteReminderConfirmation(String title);
+
   /// No description provided for @editProfile.
   ///
   /// In en, this message translates to:
@@ -2525,8 +2639,8 @@ abstract class AppLocalizations {
   /// No description provided for @medicationEndingBody.
   ///
   /// In en, this message translates to:
-  /// **'{name}\'s medication course ends today'**
-  String medicationEndingBody(String name);
+  /// **'{petName}\'s \"{medName}\" course ends today'**
+  String medicationEndingBody(String petName, String medName);
 
   /// No description provided for @delete.
   ///
@@ -2707,6 +2821,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to send invite. Please try again.'**
   String get failedToSendInvite;
+
+  /// No description provided for @failedToSaveReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save the reminder. Please try again.'**
+  String get failedToSaveReminder;
+
+  /// No description provided for @failedToDeleteReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t delete the reminder. Please try again.'**
+  String get failedToDeleteReminder;
 
   /// No description provided for @noActivePet.
   ///

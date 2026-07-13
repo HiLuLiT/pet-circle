@@ -550,6 +550,201 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 ---
 
+## BUG-029: New reminder sometimes deleted/reverted instead of the intended one
+
+**Found during:** Manual testing of the new Reminders feature (home screen redesign) — user reported "when I add a reminder and then click on it it sometimes gets removed/deleted"
+**Severity:** High (data integrity — a delete can silently no-op on the real record while removing the wrong local entry; an edit can silently fail and revert)
+**Status:** Fixed
+
+**Symptom:** After adding a reminder and immediately tapping it to edit or delete, the action sometimes appeared to succeed locally but didn't actually affect the intended Firestore document — deletes could leave the real document intact (reappearing on next refresh) while removing the item from the local list, and edits could silently revert.
+
+**Root cause:** `AddReminderSheet._save()` builds a new `Reminder` with a client-generated placeholder ID (`'rem-<timestamp>'`) and passes it to `ReminderStore.addReminder()`. That method calls `PetService.addReminder()`, which writes to Firestore via `.add()` — Firestore ignores the client-supplied ID and assigns its own document ID. The store's local list entry was never updated with the real ID, so it permanently kept the placeholder ID. Any subsequent update/delete on that entry addressed Firestore by the wrong (placeholder) ID:
+- `.update()` on a nonexistent doc ID throws `NOT_FOUND`, which was silently swallowed by the store's rollback (and never surfaced to the user, since the sheet's save call is fire-and-forget) — the edit appeared to succeed then reverted.
+- `.delete()` on a nonexistent doc ID is a Firestore no-op that succeeds without error — the item vanished from the local list, but the real document was never deleted and would reappear on the next fetch.
+
+**Fix:** `PetService.addReminder()` now returns the server-assigned document ID instead of `void`. `ReminderStore.addReminder()` patches the local list entry with the real ID (via `copyWith(id: realId)`) once the Firestore write resolves, so a subsequent update/delete addresses the document that actually exists.
+
+**Files changed:**
+- `lib/services/pet_service.dart`
+- `lib/stores/reminder_store.dart`
+
+**Known limitation:** There remains a narrow race window if a user opens the edit/delete sheet for a just-added reminder *before* the Firestore write resolves — the sheet still holds the stale placeholder-ID object at that instant. This window is now milliseconds (one Firestore round-trip) rather than indefinite, and self-corrects on the next rebuild once the ID patch lands. No automated regression test covers the success path, since the project has no Firestore mocking library to simulate a resolved write in unit tests.
+
+---
+
+## BUG-030: Settings toggles have a ~1 second delay before visually flipping
+
+**Found during:** Manual testing of the Settings screen (In-app notification, Emergency alerts, Measurement Reminders toggles)
+**Severity:** Medium (feels broken/unresponsive, no data loss)
+**Status:** Fixed
+
+**Symptom:** Tapping a toggle switch in Settings (push notifications, emergency alerts, measurement reminders, VisionRR, weekly summary) visually lagged by roughly a second before flipping.
+
+**Root cause:** `SettingsContent`'s `ListenableBuilder` only listened to `petStore`, not `settingsStore`. Each toggle's `onChanged` handler called `await settingsStore.toggleX()` (which mutates state and calls `notifyListeners()` synchronously, then awaits a Firestore persist + any side-effect callback) and only rebuilt the row via a manual `setState(() {})` placed *after* that full await chain. So the switch's visual state didn't change until the entire persist round-trip completed, even though the underlying store had already flipped and notified instantly.
+
+**Fix:** Merged `settingsStore` into the screen's `ListenableBuilder` listenable, so the row rebuilds the instant `notifyListeners()` fires. Simplified the five affected `onChanged` handlers to call the store's toggle method directly, removing the now-redundant manual `setState`/`mounted` dance.
+
+**Files changed:**
+- `lib/screens/settings/settings_content.dart`
+- `test/screens/settings/settings_screen_test.dart` (new regression test)
+
+---
+
+## BUG-031: Export button shifts down when the Trends period dropdown opens
+
+**Found during:** Manual testing of the Trends screen's period filter
+**Severity:** Low (visual only)
+**Status:** Fixed
+
+**Symptom:** Opening the "Custom range" (period) dropdown on the Trends screen visually pushed the adjacent Export button downward instead of leaving it in place.
+
+**Root cause:** `AppDropdown` renders its open option list inline (growing its own height), not as an overlay. The `Row` containing the dropdown and the Export button used `crossAxisAlignment: CrossAxisAlignment.center`, so when the dropdown's column grew taller, the fixed-height Export button re-centered within the now-taller row and appeared to move down.
+
+**Fix:** Changed the Row's `crossAxisAlignment` to `CrossAxisAlignment.start` so both children stay top-aligned regardless of how tall the dropdown's open list grows.
+
+**Files changed:**
+- `lib/screens/trends/trends_screen.dart`
+
+---
+
+## BUG-032: New pet doesn't appear in the pet switcher after onboarding
+
+**Found during:** Manual testing — user added a new pet via onboarding and it did not appear in the header's pet-switcher dropdown
+**Severity:** High (core flow: a newly created pet is invisible everywhere `petStore.ownerPets` drives the UI — dashboard, pet switcher, tab content — until the next full refetch, e.g. an app restart)
+**Status:** Fixed
+
+**Symptom:** After completing onboarding to add a new pet, the pet was created successfully (visible in Firestore / on next app restart) but did not show up in the app immediately — not in the header's pet switcher, not on the home dashboard.
+
+**Root cause:** `PetStore.createPetWithFirestore()` has two branches. The mock-mode (`else`, `kEnableFirebase == false`) branch calls `addPet(pet)`, which appends to `_ownerPets` and calls `notifyListeners()`. The Firebase branch (`kEnableFirebase == true`, which is always true in production per this repo's convention) wrote the pet to Firestore and returned the created `Pet` object, but never added it to the in-memory `_ownerPets` list and never called `notifyListeners()`. The onboarding flow's `createdPet` return value was discarded (flagged by a pre-existing `unused_local_variable` analyzer lint at `onboarding_flow.dart:69` that had been dismissed as a pre-existing/unrelated warning during prior work). The UI only reflects `petStore.ownerPets`, which stayed stale until the next `PetStore.fetchForUser()` (e.g. a cold app restart).
+
+**Fix:** The Firebase branch of `createPetWithFirestore()` now appends the created pet (with its real Firestore-assigned ID) to `_ownerPets` and calls `notifyListeners()` immediately after the write succeeds, matching the pattern already used by `removePetWithFirestore()`. Deliberately does **not** reuse `addPet()` wholesale, since that helper also mirrors into `_clinicPets` — a list populated from a separate vet/clinic-membership query in Firebase mode, where blindly mirroring a newly created pet into it would misrepresent that query's result.
+
+**Files changed:**
+- `lib/stores/pet_store.dart`
+
+**Known limitation:** No automated regression test covers this success path — like the Reminders fix in BUG-029, exercising the Firebase branch in a unit test requires a Firestore mock this project doesn't have; a real call to `PetService.createPet()` throws (no Firebase app initialized) before ever reaching the new code. Verified by code inspection and by comparing against the already-correct `removePetWithFirestore()` sibling.
+
+---
+
+## BUG-033: "Last reading" on the Measure screen never updates
+
+**Found during:** Manual testing / feature request — "add last reading to measure view"
+**Severity:** High (the metric card silently freezes on its first-build value forever, for the lifetime of the screen)
+**Status:** Fixed
+
+**Symptom:** The "Last reading" card on the Measure screen showed "—" (or a stale value) and never updated, even after saving a new measurement or switching the active pet.
+
+**Root cause:** Two independent bugs, both required to fully fix the symptom:
+1. `MeasurementScreen`'s outer `ListenableBuilder` only merged `petStore` and `userStore`, not `measurementStore`. Saving a measurement (`_saveMeasurement` → `measurementStore.addMeasurement`) only calls `measurementStore.notifyListeners()`, which nothing in this screen was listening to — same pattern as BUG-030.
+2. Even after fixing (1), the card still didn't update. The actual metric-row widget (`_MetricsRow`) was instantiated at its call site as `const _MetricsRow()` with a const, zero-argument constructor, but its `build()` reads `petStore`/`measurementStore` globals directly rather than receiving data via constructor parameters. Dart canonicalizes `const _MetricsRow()` to the exact same object instance on every call. Flutter's element reconciliation (`Element.updateChild`) checks `child.widget == newWidget` (identity) as a fast path and, when true, skips calling `build()` again entirely — so this widget's `build()` only ever ran once, at first mount, regardless of how many times its ancestor `ListenableBuilder` rebuilt.
+
+**Fix:**
+- Merged `measurementStore` into `MeasurementScreen`'s `ListenableBuilder` listenable.
+- Removed `const` from both the `_MetricsRow()` call site and its constructor declaration (the constructor is intentionally *not* const now — a class whose `build()` reads ambient global state should not offer a const constructor, since that invites exactly this regression if `const` is ever re-added at a call site).
+
+**Files changed:**
+- `lib/screens/measurement/measurement_screen.dart`
+- `test/screens/measurement/measurement_screen_test.dart` (new regression test; uses `measurementStore.seed()` rather than `addMeasurement()` to avoid the unrelated Firestore-write-fails-in-tests flakiness described in BUG-029)
+
+**Broader note:** This `const` + global-read-in-`build()` pattern is a general Flutter footgun, not specific to this widget. A codebase sweep was run to check for other occurrences of the same shape (private const-constructed StatelessWidget with no constructor params, reading a global store directly in `build()`, with at least one `const` call site). No other active instances found; one latent risk (`_ActiveMedicationsList` in `lib/screens/medication/medication_screen.dart`, const constructor + global reads, not currently called with `const`) was preventively hardened the same way.
+
+---
+
+## BUG-034: Measure screen content vertically centered instead of starting from the top
+
+**Found during:** Manual testing / UX feedback on the Measure screen
+**Severity:** Low (visual only)
+**Status:** Fixed
+
+**Symptom:** The Measure screen's content (heading, Target/Last-reading cards, timer card) appeared vertically centered in the middle of the screen, with large empty gaps above and below, instead of starting from the top like every other screen.
+
+**Root cause:** The content was wrapped in `Center(child: ConstrainedBox(...))`. `Center` centers its child in BOTH axes; since the content column is shorter than the viewport on most phones, this visibly centered the whole stack vertically. The `ConstrainedBox`'s `maxWidth` (via `responsiveMaxWidth`) was only needed to cap width on wide/tablet screens, not to center vertically.
+
+**Fix:** Changed the wrapper from `Center` to `Align(alignment: Alignment.topCenter, ...)`, which still horizontally centers the width-capped content on wide screens but no longer centers vertically.
+
+**Files changed:**
+- `lib/screens/measurement/measurement_screen.dart`
+
+---
+
+## BUG-035: "Add New Medication" / "Add reminder" bottom sheets stop partway down the screen instead of reaching the top
+
+**Found during:** Manual testing / UX feedback — screenshot showed the medication sheet stopping mid-screen with the underlying screen's header still visible above it
+**Severity:** Low (visual only)
+**Status:** Fixed
+
+**Symptom:** Opening the "Add New Medication" (or "Add reminder") bottom sheet only grew tall enough to fit its form content, leaving the sheet's top edge partway down the screen instead of reaching close to the top like a full-height drawer.
+
+**Root cause:** `showModalBottomSheet` was called with `isScrollControlled: true`, which allows the sheet to exceed the default ~50% height cap, but the sheet's own `Container` had no minimum-height constraint — so it still only sized itself to its (shorter-than-full-screen) form content.
+
+**Fix:** Added `constraints: BoxConstraints(minHeight: MediaQuery.sizeOf(context).height * 0.9)` to the sheet's outer `Container` in both `AddMedicationSheet` and `AddReminderSheet` (which share the identical shell). This pins the sheet's top edge near the screen top regardless of content length, while still allowing it to grow further (and scroll) if content ever exceeds that.
+
+**Files changed:**
+- `lib/screens/medication/add_medication_sheet.dart`
+- `lib/screens/dashboard/add_reminder_sheet.dart`
+
+---
+
+## BUG-036: Reminders fail to save — undeployed Firestore rule + silent error
+
+**Found during:** Manual testing of Add Reminder on the Home screen
+**Severity:** Critical
+**Status:** Fixed
+
+**Symptom:** User fills in a reminder, taps "Add reminder", sees "Reminder added" snackbar and the sheet closes — but the reminder never persists. On reload it is gone.
+
+**Root cause:** Two independent issues:
+1. The Firestore security rule for `/pets/{petId}/reminders` was added in commit `1d55cc0` on `feat/home-redesign-figma-402-1978` but never deployed to production (not on `main`). Live rules fall through to the catch-all `allow read, write: if false`, causing PERMISSION_DENIED on every reminder write.
+2. `AddReminderSheet._save()` called `reminderStore.addReminder()` without `await`, popped the sheet, and showed a success snackbar synchronously. The store's optimistic insert was silently rolled back on Firestore failure, and the rethrown error became an uncaught zone error. `_confirmDelete()` awaited but had no try/catch — errors crashed unhandled.
+
+**Fix:**
+- Client: converted `_save()` to async, added `_isSaving` guard, wrapped store calls in try/catch. On failure: sheet stays open, error snackbar shown, user can retry. Added `isLoading` prop to `PrimaryButton` for a spinner during save. Same try/catch pattern applied to `_confirmDelete()`. Two new l10n keys (`failedToSaveReminder`, `failedToDeleteReminder`).
+- Server: deploy `firestore.rules` from this branch (which already contains the correct reminders block) via `firebase deploy --only firestore:rules`.
+
+**Files changed:**
+- `lib/widgets/primary_button.dart`
+- `lib/screens/dashboard/add_reminder_sheet.dart`
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_he.arb`
+- `test/screens/dashboard/add_reminder_sheet_test.dart`
+- `docs/bug-log.md`
+
+---
+
+## BUG-037: "Medication ending today" notification shows medication name as pet name + mark-as-read reverts
+
+**Found during:** Manual testing of in-app notifications drawer
+**Severity:** High
+**Status:** Fixed
+
+**Symptom:**
+1. Notification body reads "[med name]'s medication course ends today" (e.g. "test med's medication course ends today") instead of the pet's name.
+2. Tapping a notification to mark it as read briefly shows it as read, then ~1 second later it snaps back to unread.
+
+**Root cause:**
+1. `notification_store.dart:reconcileMedicationEndNotifications` set `petName: med.name` and `args: [med.name]` — both used the medication name in the pet-name slot. The caller in `main.dart` also passed `l10n.medicationEndingBody(med.name)` with one placeholder, matching the single-arg `{name}` template.
+2. `NotificationService.addNotification` persisted with Firestore `.add()`, which assigns an auto-generated doc id and ignores the client's `notification.id`. `markRead` then called `_notificationsRef(uid).doc(notificationId).update(...)` using the **client id** — pointing at a nonexistent document. Firestore threw `not-found`, the store's catch block rolled back the optimistic read → unread flip, and `rethrew`. The ~1 s delay was the network round-trip for the failed update. Worse, `reconcileMedicationEndNotifications` only inserted notifications locally (never persisted to Firestore), so `markRead` could never find a matching document.
+
+**Fix:**
+- `lib/l10n/app_en.arb` + `app_he.arb`: changed `medicationEndingBody` from one placeholder (`{name}`) to two (`{petName}` and `{medName}`). EN: `"{petName}'s "{medName}" course ends today"`, HE: `"מהלך הטיפול "{medName}" של {petName} מסתיים היום"`.
+- `lib/utils/notification_localizer.dart`: updated `medicationEndingBody` case to pass two args `(args[0], args[1])` guarded by `args.length >= 2`.
+- `lib/stores/notification_store.dart`: added `String? petName` param to `reconcileMedicationEndNotifications`; made it `async`; corrected `petName`/`petId`/`args` fields; persists each new notification to Firestore immediately after local insert (wrapped in try/catch).
+- `lib/services/notification_service.dart`: switched `addNotification` from `.add(...)` to `.doc(notification.id).set(...)` so the Firestore doc id matches the client id — `markRead`'s `.update()` now finds the correct document.
+- `lib/main.dart`: resolves `petStore.getPetById(med.petId)?.name` and passes it as `petName` and the first arg of `medicationEndingBody`.
+- `lib/screens/medication/add_medication_sheet.dart`: updated two `scheduleMedicationReminder` calls to use the two-arg `medicationEndingBody` with the active pet's name.
+
+**Files changed:**
+- `lib/l10n/app_en.arb`
+- `lib/l10n/app_he.arb`
+- `lib/utils/notification_localizer.dart`
+- `lib/stores/notification_store.dart`
+- `lib/services/notification_service.dart`
+- `lib/main.dart`
+- `lib/screens/medication/add_medication_sheet.dart`
+- `test/utils/notification_localizer_test.dart`
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

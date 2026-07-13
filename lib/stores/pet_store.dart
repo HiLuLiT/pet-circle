@@ -8,6 +8,7 @@ import 'package:pet_circle/repositories/user_repository.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/note_store.dart';
+import 'package:pet_circle/stores/reminder_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 
 final petStore = PetStore();
@@ -89,6 +90,7 @@ class PetStore extends ChangeNotifier {
       await Future.wait([
         measurementStore.fetchForPets(petIds),
         noteStore.fetchForPets(petIds),
+        reminderStore.fetchForPets(petIds),
         medicationStore.fetchForUser(uid),
       ]);
     } finally {
@@ -109,6 +111,7 @@ class PetStore extends ChangeNotifier {
     _clinicPets = [];
     measurementStore.clearData();
     noteStore.clearData();
+    reminderStore.clearData();
     medicationStore.clearData();
     notifyListeners();
   }
@@ -151,6 +154,14 @@ class PetStore extends ChangeNotifier {
       if (uid != null && created.id != null) {
         await userRepository.addPetToUser(uid, created.id!);
       }
+      // Append to the in-memory list immediately so the pet switcher and
+      // dashboard show the new pet right away, instead of only appearing
+      // after the next fetchForUser() (e.g. app restart). Owner-pets only
+      // -- _clinicPets is populated from a separate vet/clinic-membership
+      // query and mirroring into it here would misrepresent that query's
+      // result (see BUG-032).
+      _ownerPets.add(created);
+      notifyListeners();
       return created;
     } else {
       addPet(pet);

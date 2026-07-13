@@ -14,6 +14,7 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/utils/formatters.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
+import 'package:pet_circle/widgets/round_icon_button.dart';
 import 'package:pet_circle/widgets/segmented_control.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 
@@ -33,7 +34,13 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([petStore, userStore]),
+      // measurementStore is merged in so the "Last reading" metric card
+      // (_MetricsRow) refreshes the instant a new measurement is saved via
+      // _saveMeasurement() -- without it, that card stayed stuck on "--"
+      // (or whatever value it showed on first build) because saving a
+      // measurement only calls measurementStore.notifyListeners(), which
+      // nothing here was listening to (see BUG-033).
+      listenable: Listenable.merge([petStore, userStore, measurementStore]),
       builder: (context, _) {
         final c = AppSemanticColors.of(context);
         final l10n = AppLocalizations.of(context)!;
@@ -72,7 +79,12 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         final content = SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacingTokens.pcXl),
-            child: Center(
+            // Align to topCenter, not Center: this screen's content is
+            // shorter than the viewport on most phones, so a plain Center
+            // vertically centered the whole card stack instead of letting
+            // it start from the top.
+            child: Align(
+              alignment: Alignment.topCenter,
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
                 child: SingleChildScrollView(
@@ -101,7 +113,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                         ),
                         const SizedBox(height: AppSpacingTokens.pcLg),
                       ],
-                      const _MetricsRow(),
+                      _MetricsRow(),
                       const SizedBox(height: AppSpacingTokens.pcLg),
                       kEnableVisionRR && _selectedTab == 1
                           ? const _VisionMode()
@@ -134,8 +146,18 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
 /// "Target" / "Last reading" metric card pair — matches the Figma
 /// "Metric Label" component pair shown above the timer card in all three
 /// measurement states (Ready / Running / Result).
+///
+/// Deliberately NOT a `const` constructor: this widget reads
+/// `petStore`/`measurementStore` globals directly in [build], so its
+/// output depends on ambient state, not just constructor args. A `const`
+/// constructor would let a caller write `const _MetricsRow()`, which Dart
+/// canonicalizes to one singleton widget instance -- Flutter's element
+/// reconciliation then takes an identity fast path that skips calling
+/// [build] again on subsequent rebuilds, so this card would silently
+/// freeze on whatever value it had at first build (see BUG-033).
 class _MetricsRow extends StatelessWidget {
-  const _MetricsRow();
+  // ignore: prefer_const_constructors_in_immutables
+  _MetricsRow();
 
   @override
   Widget build(BuildContext context) {
@@ -231,6 +253,7 @@ class _ManualMode extends StatefulWidget {
 class _ManualModeState extends State<_ManualMode>
     with SingleTickerProviderStateMixin {
   bool _isRunning = false;
+  bool _isPaused = false;
   bool _isSaving = false;
   bool _showResult = false;
   int _remainingSeconds = 0;
@@ -303,10 +326,31 @@ class _ManualModeState extends State<_ManualMode>
     });
   }
 
+  void _pauseTimer() {
+    _timer?.cancel();
+    if (!mounted) return;
+    setState(() {
+      _isRunning = false;
+      _isPaused = true;
+    });
+  }
+
+  void _restartTimer() {
+    _timer?.cancel();
+    if (!mounted) return;
+    setState(() {
+      _isRunning = false;
+      _isPaused = false;
+      _tapCount = 0;
+      _remainingSeconds = widget.selectedDuration;
+    });
+  }
+
   void _resetTimer() {
     _timer?.cancel();
     setState(() {
       _isRunning = false;
+      _isPaused = false;
       _showResult = false;
       _resultBpm = null;
       _tapCount = 0;
@@ -376,10 +420,13 @@ class _ManualModeState extends State<_ManualMode>
       selectedDuration: widget.selectedDuration,
       onDurationChanged: widget.onDurationChanged,
       isRunning: _isRunning,
+      isPaused: _isPaused,
       remainingSeconds: _remainingSeconds,
       tapCount: _tapCount,
       scaleAnimation: _scaleAnimation,
       onTap: _onTap,
+      onStop: _pauseTimer,
+      onRestart: _restartTimer,
       hintText: l10n.measurementHint,
     );
   }
@@ -393,20 +440,26 @@ class _TimerCard extends StatelessWidget {
     required this.selectedDuration,
     required this.onDurationChanged,
     required this.isRunning,
+    required this.isPaused,
     required this.remainingSeconds,
     required this.tapCount,
     required this.scaleAnimation,
     required this.onTap,
+    required this.onStop,
+    required this.onRestart,
     required this.hintText,
   });
 
   final int selectedDuration;
   final ValueChanged<int> onDurationChanged;
   final bool isRunning;
+  final bool isPaused;
   final int remainingSeconds;
   final int tapCount;
   final Animation<double> scaleAnimation;
   final VoidCallback onTap;
+  final VoidCallback onStop;
+  final VoidCallback onRestart;
   final String hintText;
 
   @override
@@ -462,6 +515,21 @@ class _TimerCard extends StatelessWidget {
                   color: c.textTertiary,
                 ),
               ),
+              if (isRunning || isPaused) ...[
+                const SizedBox(width: AppSpacingTokens.pcSm),
+                RoundIconButton(
+                  variant: RoundIconButtonVariant.ghost,
+                  size: 32,
+                  iconSize: 16,
+                  semanticLabel: isRunning
+                      ? l10n.stopMeasurement
+                      : l10n.restartMeasurement,
+                  icon: Icon(
+                    isRunning ? Icons.stop_rounded : Icons.replay_rounded,
+                  ),
+                  onTap: isRunning ? onStop : onRestart,
+                ),
+              ],
             ],
           ),
           const SizedBox(height: AppSpacingTokens.pcMd),

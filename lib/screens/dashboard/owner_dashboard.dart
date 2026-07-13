@@ -1,62 +1,61 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
+import 'package:pet_circle/models/pet.dart';
+import 'package:pet_circle/models/reminder.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
-import 'package:pet_circle/models/pet_access.dart';
-import 'package:pet_circle/models/pet.dart';
+import 'package:pet_circle/stores/reminder_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/utils/display_localizer.dart';
+import 'package:pet_circle/utils/formatters.dart';
+import 'package:pet_circle/utils/mascot_mapper.dart';
+import 'package:pet_circle/utils/pet_delete_dialog.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
+import 'package:pet_circle/widgets/app_card.dart';
 import 'package:pet_circle/widgets/avatar_stack.dart';
-import 'package:pet_circle/widgets/dog_photo.dart';
+import 'package:pet_circle/widgets/mascot.dart';
 import 'package:pet_circle/widgets/pet_card.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
-import 'package:pet_circle/widgets/round_icon_button.dart';
+import 'package:pet_circle/widgets/status_badge.dart';
 
-const _careCircleIconAsset = 'assets/figma/care_circle_icon.svg';
+import 'add_reminder_sheet.dart';
 
+/// Owner home screen — Figma node 402:1978.
+///
+/// An active-pet-focused dashboard: a hero [PetCard] for
+/// `petStore.activePet`, a latest-reading summary, the care circle, upcoming
+/// reminders, and Measure/Trends shortcuts. Switching pets via the header
+/// selector (see [main_shell.dart]) changes what this screen shows.
 class OwnerDashboard extends StatelessWidget {
   const OwnerDashboard({super.key, this.showScaffold = true});
 
   final bool showScaffold;
 
-  void _confirmDeletePet(BuildContext context, Pet pet) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppSemanticColors.of(context);
-    showDialog(
+  void _openReminderSheet(BuildContext context, [Reminder? reminder]) {
+    final access = petStore.accessForActivePet();
+    if (!access.canManageMedication) return;
+    showModalBottomSheet<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadiiTokens.md),
-        ),
-        title: Text(l10n.deletePet,
-            style: AppSemanticTextStyles.headingLg
-                .copyWith(color: c.textPrimary)),
-        content: Text(l10n.deletePetConfirmation(pet.name),
-            style: AppSemanticTextStyles.body),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              petStore.removePetWithFirestore(pet.name);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.petDeleted)),
-              );
-            },
-            style: TextButton.styleFrom(backgroundColor: c.error),
-            child: Text(l10n.deletePet,
-                style: TextStyle(color: c.background)),
-          ),
-        ],
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => AddReminderSheet(reminder: reminder),
+    );
+  }
+
+  Future<void> _deleteReminder(BuildContext context, Reminder reminder) async {
+    final access = petStore.accessForActivePet();
+    if (!access.canManageMedication) return;
+    final petId = petStore.activePet?.id ?? '';
+    if (petId.isEmpty) return;
+    await reminderStore.removeReminder(petId, reminder.id);
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context)!.reminderDeleted),
       ),
     );
   }
@@ -64,7 +63,7 @@ class OwnerDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([petStore, measurementStore]),
+      listenable: Listenable.merge([petStore, measurementStore, reminderStore]),
       builder: (context, _) => _buildContent(context),
     );
   }
@@ -78,15 +77,16 @@ class OwnerDashboard extends StatelessWidget {
       final loader = Center(
         child: CircularProgressIndicator(color: c.primary),
       );
-      if (!showScaffold) return Container(color: c.surface, child: loader);
-      return Scaffold(backgroundColor: c.surface, body: loader);
+      if (!showScaffold) return Container(color: c.background, child: loader);
+      return Scaffold(backgroundColor: c.background, body: loader);
     }
 
     if (pets.isEmpty) {
       return _buildEmptyState(context, c, l10n);
     }
 
-    return _buildPetList(context, c, l10n, pets);
+    final pet = petStore.activePet ?? pets.first;
+    return _buildActivePetHome(context, c, l10n, pet);
   }
 
   Widget _buildEmptyState(
@@ -124,35 +124,19 @@ class OwnerDashboard extends StatelessWidget {
     );
 
     if (!showScaffold) {
-      return Container(color: c.surface, child: emptyContent);
+      return Container(color: c.background, child: emptyContent);
     }
-    return Scaffold(backgroundColor: c.surface, body: emptyContent);
+    return Scaffold(backgroundColor: c.background, body: emptyContent);
   }
 
-  Widget _buildPetList(BuildContext context, AppSemanticColors c,
-      AppLocalizations l10n, List<Pet> pets) {
-    final petCards = pets.map((pet) {
-      return Builder(builder: (context) {
-        final access = petStore.accessForPet(pet);
-        return _OwnerPetCard(
-          data: pet,
-          access: access,
-          onLongPress: access.canDeletePet
-              ? () => _confirmDeletePet(context, pet)
-              : null,
-          onMeasure: access.canMeasure
-              ? () {
-                  petStore.setActivePet(pet);
-                  context.go(AppRoutes.shell(tab: AppRoutes.tabMeasure));
-                }
-              : null,
-          onTrends: () {
-            petStore.setActivePet(pet);
-            context.go(AppRoutes.shell(tab: AppRoutes.tabTrends));
-          },
-        );
-      });
-    }).toList();
+  Widget _buildActivePetHome(BuildContext context, AppSemanticColors c,
+      AppLocalizations l10n, Pet pet) {
+    final access = petStore.accessForPet(pet);
+    final latest = measurementStore.latestForPet(pet.id ?? '');
+    final subtitle = latest != null
+        ? l10n.petCardSubtitle(pet.breedAndAge, latest.bpm)
+        : pet.breedAndAge;
+    final reminders = reminderStore.getReminders(pet.id ?? '');
 
     final content = SafeArea(
       child: RefreshIndicator(
@@ -160,184 +144,314 @@ class OwnerDashboard extends StatelessWidget {
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           child: Center(
-          child: ConstrainedBox(
-            constraints:
-                BoxConstraints(maxWidth: responsiveMaxWidth(context)),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacingTokens.xl),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: AppSpacingTokens.lg),
+            child: ConstrainedBox(
+              constraints:
+                  BoxConstraints(maxWidth: responsiveMaxWidth(context)),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacingTokens.xl),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: AppSpacingTokens.lg),
 
-                  // Title row — Figma node 407:3528: Heading/H2 (20px bold)
-                  // + inline "Add pet" link button (circle-plus icon).
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        l10n.myPets,
-                        style: AppSemanticTextStyles.headingH2
-                            .copyWith(color: c.textPrimary),
+                    // Section header — Figma node 407:3528.
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.yourPets,
+                          style: AppSemanticTextStyles.headingH2
+                              .copyWith(color: c.textPrimary),
+                        ),
+                        PrimaryButton(
+                          label: l10n.addPet,
+                          variant: PrimaryButtonVariant.link,
+                          onPressed: () => context.push(AppRoutes.onboarding),
+                          trailingIcon: Icon(
+                            Icons.add_circle_outline,
+                            color: c.textPrimary,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: AppSpacingTokens.lg),
+
+                    // Hero pet card — Figma node 442:8893.
+                    PetCard(
+                      name: pet.name,
+                      subtitle: subtitle,
+                      status: StatusBadgeStatus.active,
+                      statusLabel: l10n.active,
+                      size: PetCardSize.hero,
+                      media: Mascot(
+                        breed: mascotBreedFor(pet.breedAndAge),
+                        color: c.accentPurple,
+                        size: 90,
                       ),
-                      PrimaryButton(
-                        label: l10n.addPet,
-                        variant: PrimaryButtonVariant.link,
-                        onPressed: () => context.push(AppRoutes.onboarding),
-                        trailingIcon: Icon(
-                          Icons.add_circle_outline,
-                          color: c.textPrimary,
+                      onLongPress:
+                          access.canDeletePet ? () => confirmDeletePet(context, pet) : null,
+                    ),
+
+                    const SizedBox(height: AppSpacingTokens.md),
+
+                    // Latest reading card — Figma node 469:939.
+                    if (latest != null)
+                      AppCard(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                color: c.accentBlushTile,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.favorite,
+                                color: c.accentBlush,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacingTokens.sm),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '${latest.bpm} ${l10n.bpm}',
+                                    style: AppSemanticTextStyles.headingH2
+                                        .copyWith(color: c.textPrimary),
+                                  ),
+                                  Text(
+                                    l10n.latestReading,
+                                    style: AppSemanticTextStyles.labelSRegular
+                                        .copyWith(color: c.textTertiary),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Text(
+                              formatTimeAgo(latest.recordedAt, l10n),
+                              style: AppSemanticTextStyles.labelSRegular
+                                  .copyWith(color: c.textTertiary),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
 
-                  const SizedBox(height: AppSpacingTokens.lg),
+                    if (latest != null)
+                      const SizedBox(height: AppSpacingTokens.md),
 
-                  // Pet cards
-                  LayoutBuilder(builder: (context, constraints) {
-                    final isWide =
-                        constraints.maxWidth >= kTabletBreakpoint;
-                    if (isWide) {
-                      return GridView.count(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        crossAxisCount: 2,
-                        crossAxisSpacing: AppSpacingTokens.lg,
-                        mainAxisSpacing: AppSpacingTokens.lg,
-                        childAspectRatio: 0.85,
-                        children: petCards,
-                      );
-                    }
-                    return Column(
-                      children: petCards
-                          .map((card) => Padding(
-                                padding: const EdgeInsets.only(
-                                    bottom: AppSpacingTokens.lg),
-                                child: card,
-                              ))
-                          .toList(),
-                    );
-                  }),
-
-                  // "Add another pet" button — outlined pill with trailing plus icon
-                  Center(
-                    child: PrimaryButton(
-                      label: l10n.addAnotherPet,
-                      variant: PrimaryButtonVariant.outlined,
-                      fullWidth: false,
-                      onPressed: () => context.push(AppRoutes.onboarding),
-                      trailingIcon: const RoundIconButton(
-                        icon: Icon(Icons.add),
-                        variant: RoundIconButtonVariant.ghost,
-                        size: 24,
-                        iconSize: 16,
+                    // Care circle card — Figma node 442:8959.
+                    AppCard(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              l10n.careCircle,
+                              style: AppSemanticTextStyles.pcBodySemibold
+                                  .copyWith(color: c.textPrimary),
+                            ),
+                          ),
+                          AvatarStack(
+                            avatars: pet.careCircle,
+                            borderColor: c.surface,
+                          ),
+                        ],
                       ),
                     ),
-                  ),
 
-                  const SizedBox(height: AppSpacingTokens.xl),
-                ],
+                    const SizedBox(height: AppSpacingTokens.md),
+
+                    // Reminders card — Figma node 442:9012.
+                    AppCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  l10n.reminders,
+                                  style: AppSemanticTextStyles.pcBodySemibold
+                                      .copyWith(color: c.textPrimary),
+                                ),
+                              ),
+                              GestureDetector(
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () => _openReminderSheet(context),
+                                child: Icon(
+                                  Icons.add_circle_outline,
+                                  color: c.textPrimary,
+                                  size: 24,
+                                ),
+                              ),
+                            ],
+                          ),
+                          if (reminders.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  top: AppSpacingTokens.md),
+                              child: Text(
+                                l10n.noRemindersYet,
+                                style: AppSemanticTextStyles.pcBodyMuted,
+                              ),
+                            )
+                          else
+                            ...reminders.map((reminder) => Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: AppSpacingTokens.md),
+                                  child: _ReminderTile(
+                                    reminder: reminder,
+                                    petName: pet.name,
+                                    onDelete: () =>
+                                        _deleteReminder(context, reminder),
+                                  ),
+                                )),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: AppSpacingTokens.lg),
+
+                    // Action buttons — Figma node 426:1182.
+                    PrimaryButton(
+                      label: l10n.measure,
+                      variant: PrimaryButtonVariant.filled,
+                      onPressed: () =>
+                          context.go(AppRoutes.shell(tab: AppRoutes.tabMeasure)),
+                    ),
+                    const SizedBox(height: AppSpacingTokens.md),
+                    PrimaryButton(
+                      label: l10n.trends,
+                      variant: PrimaryButtonVariant.outlined,
+                      onPressed: () =>
+                          context.go(AppRoutes.shell(tab: AppRoutes.tabTrends)),
+                    ),
+
+                    const SizedBox(height: AppSpacingTokens.xl),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
-      ),
     );
 
     if (!showScaffold) {
-      return Container(color: c.surface, child: content);
+      return Container(color: c.background, child: content);
     }
-    return Scaffold(backgroundColor: c.surface, body: content);
+    return Scaffold(backgroundColor: c.background, body: content);
   }
 }
 
-/// Owner-context adapter around the shared [PetCard].
-///
-/// Composes the base [PetCard] (Figma node 442:8872) with the owner-specific
-/// footer: the care-circle avatar stack and the Trends / Measure action
-/// buttons. Long-press (delete) and tap callbacks are forwarded to [PetCard].
-class _OwnerPetCard extends StatelessWidget {
-  const _OwnerPetCard({
-    required this.data,
-    required this.onMeasure,
-    required this.onTrends,
-    required this.access,
-    this.onLongPress,
+/// A single recessed reminder row inside the Reminders card — Figma node
+/// 469:1023. Shows the reminder date + a purple pet-name chip, then the
+/// title/detail with a trailing remove button.
+class _ReminderTile extends StatelessWidget {
+  const _ReminderTile({
+    required this.reminder,
+    required this.petName,
+    this.onDelete,
   });
 
-  final Pet data;
-  final VoidCallback? onMeasure;
-  final VoidCallback onTrends;
-  final PetAccess access;
-  final VoidCallback? onLongPress;
+  final Reminder reminder;
+  final String petName;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final latestFromStore = measurementStore.latestForPet(data.id ?? '');
-    final latest = latestFromStore ?? data.latestMeasurement;
-    final hasMeasurement = latest.bpm > 0;
-    final subtitle = hasMeasurement
-        ? l10n.petCardSubtitle(data.breedAndAge, latest.bpm)
-        : data.breedAndAge;
-
-    return PetCard(
-      name: data.name,
-      subtitle: subtitle,
-      status: statusBadgeStatusFor(data.statusLabel),
-      statusLabel: localizeStatus(data.statusLabel, l10n),
-      media: ClipOval(child: DogPhoto(endpoint: data.imageUrl)),
-      onLongPress: onLongPress,
-      footer: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacingTokens.md),
+      decoration: BoxDecoration(
+        color: c.background,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.pcCard),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Care-circle row — icon + label + overlapping avatar stack.
+          Row(
+            children: [
+              Text(
+                formatReminderDate(reminder.date, l10n.localeName),
+                style: AppSemanticTextStyles.bodySm
+                    .copyWith(color: c.textSecondary),
+              ),
+              const SizedBox(width: AppSpacingTokens.sm),
+              _PetChip(petName: petName),
+            ],
+          ),
+          const SizedBox(height: AppSpacingTokens.sm),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  SvgPicture.asset(_careCircleIconAsset, width: 24, height: 24),
-                  const SizedBox(width: AppSpacingTokens.xs),
-                  Text(
-                    l10n.careCircle,
-                    style: AppSemanticTextStyles.body
-                        .copyWith(color: c.textPrimary),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      reminder.title,
+                      style: AppSemanticTextStyles.pcBodySemibold
+                          .copyWith(color: c.textPrimary),
+                    ),
+                    if (reminder.detail != null &&
+                        reminder.detail!.isNotEmpty)
+                      Text(
+                        reminder.detail!,
+                        style: AppSemanticTextStyles.bodySm
+                            .copyWith(color: c.textSecondary),
+                      ),
+                  ],
+                ),
+              ),
+              if (onDelete != null)
+                GestureDetector(
+                  onTap: onDelete,
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: AppSpacingTokens.sm),
+                    child: Icon(
+                      Icons.close,
+                      size: 18,
+                      color: c.textTertiary,
+                    ),
                   ),
-                ],
-              ),
-              AvatarStack(
-                avatars: data.careCircle,
-                borderColor: c.primaryLightest,
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacingTokens.lg),
-          // Action buttons — Trends + Measure.
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              PrimaryButton(
-                label: l10n.trends,
-                variant: PrimaryButtonVariant.outlined,
-                fullWidth: false,
-                onPressed: onTrends,
-              ),
-              const SizedBox(width: AppSpacingTokens.md),
-              if (onMeasure != null)
-                PrimaryButton(
-                  label: l10n.measure,
-                  variant: PrimaryButtonVariant.filled,
-                  fullWidth: false,
-                  onPressed: onMeasure!,
                 ),
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Small pill chip showing the pet's name inside a reminder tile — Figma
+/// node 469:1007 ("Badge"). Single call site; not promoted to a shared
+/// widget.
+class _PetChip extends StatelessWidget {
+  const _PetChip({required this.petName});
+
+  final String petName;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppSemanticColors.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: c.accentPurpleTile,
+        borderRadius: BorderRadius.circular(AppRadiiTokens.pcPill),
+      ),
+      child: Text(
+        petName,
+        style: AppSemanticTextStyles.labelSSemibold
+            .copyWith(color: c.textPrimary),
       ),
     );
   }

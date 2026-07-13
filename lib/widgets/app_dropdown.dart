@@ -12,16 +12,17 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 ///     inkTertiary. Right side: expand_more / expand_less chevron tinted
 ///     inkSecondary.
 ///   • Open (when [isOpen] = true and [options] provided): a list of
-///     options is rendered below the trigger, separated by a 1px hairline.
+///     options is rendered inline below the trigger (default) or as a
+///     floating overlay on top of subsequent content ([overlayMode] = true).
 ///     Each option: padding 12×8, radius 4 (per Figma node 510-1220).
 ///     Selected option: bg = accentPurpleTile, text = regular-weight ink.
 ///     Unselected: transparent bg, regular-weight inkTertiary.
 ///
 /// Public API is preserved from earlier revisions: `label`, `value`,
 /// `onTap`, `isOpen`, `chevronController` are unchanged. New optional
-/// `options` + `onOptionSelected` enable the inline open-list rendering
+/// `options` + `onOptionSelected` enable the open-list rendering
 /// without breaking existing callers.
-class AppDropdown extends StatelessWidget {
+class AppDropdown extends StatefulWidget {
   const AppDropdown({
     super.key,
     required this.label,
@@ -32,6 +33,7 @@ class AppDropdown extends StatelessWidget {
     this.options,
     this.onOptionSelected,
     this.placeholder,
+    this.overlayMode = false,
   });
 
   final String label;
@@ -41,7 +43,7 @@ class AppDropdown extends StatelessWidget {
   final AnimationController? chevronController;
 
   /// Optional list of options. When provided together with [isOpen] = true,
-  /// the widget renders an inline option list below the trigger.
+  /// the widget renders an option list.
   final List<String>? options;
 
   /// Called when an option from [options] is selected. Required if
@@ -52,32 +54,131 @@ class AppDropdown extends StatelessWidget {
   /// an empty string for backward compatibility.
   final String? placeholder;
 
+  /// When true, the open option list is rendered in the root [Overlay] so it
+  /// floats over content below the trigger rather than pushing it down.
+  /// Use this when the dropdown sits above content that must not shift on open
+  /// (e.g. a chart).
+  final bool overlayMode;
+
+  @override
+  State<AppDropdown> createState() => _AppDropdownState();
+}
+
+class _AppDropdownState extends State<AppDropdown> {
+  // Key used to measure the trigger's position and width when inserting the
+  // overlay entry.
+  final _triggerKey = GlobalKey();
+  OverlayEntry? _overlayEntry;
+
+  @override
+  void didUpdateWidget(covariant AppDropdown old) {
+    super.didUpdateWidget(old);
+    if (!widget.overlayMode) return;
+
+    if (widget.isOpen && !old.isOpen) {
+      // Schedule after frame so the trigger is fully laid out before we
+      // measure its position.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _insertOverlay();
+      });
+    } else if (!widget.isOpen && old.isOpen) {
+      _removeOverlay();
+    } else if (widget.isOpen && _overlayEntry != null) {
+      // Value changed while open — refresh the selected highlight.
+      _overlayEntry!.markNeedsBuild();
+    }
+  }
+
+  @override
+  void dispose() {
+    _removeOverlay();
+    super.dispose();
+  }
+
+  void _insertOverlay() {
+    _removeOverlay();
+
+    final box = _triggerKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null) return;
+    final origin = box.localToGlobal(Offset.zero);
+    final triggerSize = box.size;
+
+    _overlayEntry = OverlayEntry(
+      builder: (ctx) {
+        // Resolve colors from the overlay context — the Overlay inherits the
+        // MaterialApp theme so AppSemanticColors is always available.
+        final c = AppSemanticColors.of(ctx);
+        return Positioned(
+          left: origin.dx,
+          top: origin.dy + triggerSize.height + AppSpacingTokens.pcXs,
+          width: triggerSize.width,
+          child: Material(
+            color: Colors.transparent,
+            child: _OpenList(
+              options: widget.options ?? [],
+              selectedValue: widget.value,
+              onSelected: widget.onOptionSelected,
+              colors: c,
+            ),
+          ),
+        );
+      },
+    );
+
+    Overlay.of(_triggerKey.currentContext!).insert(_overlayEntry!);
+  }
+
+  void _removeOverlay() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
+
+    final labelWidgets = widget.label.isNotEmpty
+        ? <Widget>[
+            Text(widget.label, style: AppSemanticTextStyles.labelSm),
+            const SizedBox(height: AppSpacingTokens.sm),
+          ]
+        : const <Widget>[];
+
+    final trigger = _Trigger(
+      value: widget.value,
+      placeholder: widget.placeholder,
+      isOpen: widget.isOpen,
+      chevronController: widget.chevronController,
+      onTap: widget.onTap,
+      colors: c,
+    );
+
+    if (widget.overlayMode) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ...labelWidgets,
+          // Container gives _triggerKey a stable RenderBox to measure.
+          Container(key: _triggerKey, child: trigger),
+        ],
+      );
+    }
+
+    // Default: inline list pushes content below the dropdown down.
+    final hasOpenList =
+        widget.isOpen && widget.options != null && widget.options!.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Omit the label row entirely when no label is given, so callers that
-        // pass an empty string (e.g. an inline picker) don't get a dead 8px gap.
-        if (label.isNotEmpty) ...[
-          Text(label, style: AppSemanticTextStyles.labelSm),
-          const SizedBox(height: AppSpacingTokens.sm),
-        ],
-        _Trigger(
-          value: value,
-          placeholder: placeholder,
-          isOpen: isOpen,
-          chevronController: chevronController,
-          onTap: onTap,
-          colors: c,
-        ),
-        if (isOpen && options != null && options!.isNotEmpty) ...[
+        ...labelWidgets,
+        trigger,
+        if (hasOpenList) ...[
           const SizedBox(height: AppSpacingTokens.pcXs),
           _OpenList(
-            options: options!,
-            selectedValue: value,
-            onSelected: onOptionSelected,
+            options: widget.options!,
+            selectedValue: widget.value,
+            onSelected: widget.onOptionSelected,
             colors: c,
           ),
         ],

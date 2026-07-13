@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/clinical_note.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_sections.dart';
+import 'package:pet_circle/screens/settings/settings_widgets.dart' show settingsTrashAsset;
 import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/utils/display_localizer.dart';
+import 'package:pet_circle/utils/pet_delete_dialog.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
@@ -41,6 +44,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   void _showEditSheet() {
     final l10n = AppLocalizations.of(context)!;
     final c = AppSemanticColors.of(context);
+    final access = petStore.accessForPet(_pet);
     final nameCtrl = TextEditingController(text: _pet.name);
     final imageCtrl = TextEditingController(text: _pet.imageUrl);
     String selectedBreed = _pet.breedAndAge;
@@ -63,7 +67,36 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.editPet, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(l10n.editPet,
+                        style: AppSemanticTextStyles.headingLg
+                            .copyWith(color: c.textPrimary)),
+                    if (access.canDeletePet)
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(ctx);
+                          confirmDeletePet(context, _pet);
+                        },
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: c.surface,
+                            borderRadius: AppRadiiTokens.borderRadiusField,
+                          ),
+                          child: Center(
+                            child: SvgPicture.asset(
+                              settingsTrashAsset,
+                              width: 16,
+                              height: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
                 const SizedBox(height: AppSpacingTokens.md),
                 TextField(
                   controller: nameCtrl,

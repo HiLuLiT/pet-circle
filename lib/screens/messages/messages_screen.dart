@@ -34,7 +34,12 @@ class NotificationsDrawer extends StatelessWidget {
         builder: (context, scrollController) {
           final c = AppSemanticColors.of(context);
           final l10n = AppLocalizations.of(context)!;
-          final notifications = notificationStore.all;
+          final now = DateTime.now();
+          final notifications = notificationStore.all.where((n) {
+            return n.createdAt.year == now.year &&
+                n.createdAt.month == now.month &&
+                n.createdAt.day == now.day;
+          }).toList();
           final unreadNotifications =
               notifications.where((n) => !n.isRead).toList();
           final readNotifications =
@@ -80,11 +85,11 @@ class NotificationsDrawer extends StatelessWidget {
                       children: [
                         Text(
                           l10n.unreadNotifications(
-                            notificationStore.unreadCount,
+                            unreadNotifications.length,
                           ),
                           style: AppSemanticTextStyles.pcLabelMuted,
                         ),
-                        if (notificationStore.unreadCount > 0)
+                        if (unreadNotifications.isNotEmpty)
                           PrimaryButton(
                             label: l10n.markAllRead,
                             variant: PrimaryButtonVariant.miniPrimary,
@@ -224,27 +229,30 @@ class MessagesScreen extends StatelessWidget {
 // ─── Notification Card ───────────────────────────────────────────
 
 /// Per-type visual + routing descriptor for a notification, derived from
-/// [notif.NotificationType]. Keeps the icon, tile color, and destination tab
-/// in one place so [_NotificationRow] can feed the shared [NotificationCard].
+/// [notif.NotificationType]. Keeps the icon, icon color, tile background
+/// color, and destination tab in one place so [_NotificationRow] can feed
+/// the shared [NotificationCard].
 class _NotificationTypeStyle {
   const _NotificationTypeStyle({
     required this.icon,
     required this.iconColor,
+    required this.iconTileColor,
     required this.tab,
   });
 
   final IconData icon;
   final Color iconColor;
+
+  /// Accessible tile background from the DS semantic palette — uses the
+  /// `*Tile` wash tokens so icon-on-tile contrast meets WCAG AA.
+  final Color iconTileColor;
   final int tab;
 }
 
-/// Resolves the per-type icon, color, and destination tab for [type].
+/// Resolves the per-type icon, colors, and destination tab for [type].
 ///
-/// Preserves the original `_AppNotificationCard` mapping 1:1:
-/// - medication  → `Icons.medication`,  primary,      tab 3
-/// - measurement → `Icons.monitor_heart`, error,      tab 1
-/// - careCircle  → `Icons.group_add`,   primaryLight, tab 0
-/// - report      → `Icons.mail_outline`, error,       tab 1
+/// Icon colors use the base accent; tile backgrounds use the matching
+/// `*Tile` wash from [AppSemanticColors] for accessible contrast.
 _NotificationTypeStyle _styleForType(
   notif.NotificationType type,
   AppSemanticColors c,
@@ -254,24 +262,28 @@ _NotificationTypeStyle _styleForType(
       return _NotificationTypeStyle(
         icon: Icons.medication,
         iconColor: c.primary,
+        iconTileColor: c.accentPurpleTile,
         tab: AppRoutes.tabMedication,
       );
     case notif.NotificationType.measurement:
       return _NotificationTypeStyle(
         icon: Icons.monitor_heart,
         iconColor: c.error,
+        iconTileColor: c.accentBlushTile,
         tab: AppRoutes.tabTrends,
       );
     case notif.NotificationType.careCircle:
       return _NotificationTypeStyle(
         icon: Icons.group_add,
-        iconColor: c.primaryLight,
+        iconColor: c.accentPeriwinkle,
+        iconTileColor: c.accentPeriwinkleTile,
         tab: AppRoutes.tabHome,
       );
     case notif.NotificationType.report:
       return _NotificationTypeStyle(
         icon: Icons.mail_outline,
         iconColor: c.error,
+        iconTileColor: c.accentBlushTile,
         tab: AppRoutes.tabTrends,
       );
   }
@@ -295,7 +307,7 @@ class _NotificationRow extends StatelessWidget {
 
     return NotificationCard(
       icon: Icon(style.icon, size: 20, color: style.iconColor),
-      iconTileColor: style.iconColor.withAlpha(26),
+      iconTileColor: style.iconTileColor,
       title: localized.title,
       body: localized.body,
       time: formatTimeAgoShort(notification.createdAt, l10n),

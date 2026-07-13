@@ -4,6 +4,7 @@ import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/reminder_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 
@@ -32,6 +33,12 @@ void seedAllStores() {
     princessId: MockData.princessNotes,
   });
 
+  // Reminder store — keyed by pet mock-id
+  reminderStore.seed({
+    princessId:
+        MockData.princessReminders.map((r) => r.copyWith(petId: princessId)).toList(),
+  });
+
   // Medication store — empty by default (no mock medications defined)
   medicationStore.seed({});
 
@@ -50,6 +57,7 @@ void resetAllStores() {
   measurementStore.seed({});
   medicationStore.seed({});
   noteStore.seed({});
+  reminderStore.seed({});
   notificationStore.reset();
   settingsStore.reset();
 }

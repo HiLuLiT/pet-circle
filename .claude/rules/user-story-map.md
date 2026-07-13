@@ -2,7 +2,7 @@
 
 > Living user story map for Pet Circle. Tracks implementation status of every user story by role. Consult when working on any screen to understand what is done, what is partial, and what is missing. UPDATE this file after completing work on any story.
 
-Last updated: 2026-03-17 (Phase 2 in progress -- Firebase Auth + Firestore pets + Firestore subcollections)
+Last updated: 2026-07-06 (Home screen rebuilt to Figma 402:1978 active-pet dashboard + new Reminders feature)
 
 ## Update Protocol
 
@@ -45,8 +45,10 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - B26: Pet creation writes to Firestore via `PetStore.createPetWithFirestore()`, auto-adds owner as Admin
 
 ### Owner Experience
-- B5: Owner dashboard with pet cards from `petStore` + empty state CTA
+- B5: Owner home -- active-pet-focused dashboard (Figma 402:1978): hero `PetCard` (mascot, SPR subtitle), latest-reading card, Care Circle card, Reminders card, Measure/Trends actions, empty-state CTA
 - B6: Pet card tap navigates to pet detail
+- B27: Reminders -- per-pet Firestore subcollection (`Reminder` model, `ReminderStore`, `PetService` CRUD), add/edit/delete bottom sheet from the home Reminders card
+- B28: Header pet-name + pet switcher now visible/enabled on every tab (previously hidden on Home)
 - B7: Quick-action Measure / Trends buttons per pet
 - B8: Manual tap-to-count with haptics and BPM calculation
 - B9: Configurable timer durations (15s / 30s / 60s)
@@ -67,7 +69,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - B24: Push / emergency notification toggles wired to Firestore-backed `settingsStore`
 - M1: "Add Pet" button on owner dashboard navigates to onboarding
 - M2: Edit pet profile -- admin-only, bottom sheet with searchable breed dropdown + Firestore persistence
-- M3: Delete pet -- admin-only, long-press on pet card with confirmation
+- M3: Delete pet -- admin-only; long-press on the home hero pet card, or the explicit trash icon button in the pet detail edit sheet, both sharing `confirmDeletePet()` (`lib/utils/pet_delete_dialog.dart`)
 - M5: Global pet switcher in header -- `petStore.activePetIndex` shared across all screens
 - M6: User profile management -- edit name/photo from settings
 - M7: Sign out from settings drawer with confirmation

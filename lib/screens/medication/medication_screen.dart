@@ -221,7 +221,13 @@ class _MedicationScreenState extends State<MedicationScreen> {
 }
 
 class _ActiveMedicationsList extends StatelessWidget {
-  const _ActiveMedicationsList({this.onEdit});
+  // Deliberately not const: build() reads petStore/medicationStore globals
+  // directly, so a `const _ActiveMedicationsList()` call site would get
+  // canonicalized to one instance and silently stop rebuilding on store
+  // changes (see BUG-033). Not currently called with const, but the
+  // constructor shouldn't offer the option.
+  // ignore: prefer_const_constructors_in_immutables
+  _ActiveMedicationsList({this.onEdit});
 
   final void Function(Medication)? onEdit;
 
@@ -300,12 +306,7 @@ class _ActiveMedicationsList extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      StatusBadge(
-                        label: med.isActive ? l10n.active : l10n.done,
-                        status: med.isActive
-                            ? StatusBadgeStatus.active
-                            : StatusBadgeStatus.normal,
-                      ),
+                      _medicationBadge(med, l10n),
                       const SizedBox(height: AppSpacingTokens.xs),
                       Text(dateStr,
                           style: AppSemanticTextStyles.caption
@@ -320,6 +321,23 @@ class _ActiveMedicationsList extends StatelessWidget {
       }).toList(),
     );
   }
+}
+
+/// Returns the correct [StatusBadge] for a medication:
+/// - Expired → alert (end date in the past)
+/// - Active  → active (isActive = true)
+/// - Done    → normal (completed on time)
+StatusBadge _medicationBadge(Medication med, AppLocalizations l10n) {
+  final now = DateTime.now();
+  final isPastDue =
+      med.endDate != null && med.endDate!.isBefore(DateTime(now.year, now.month, now.day));
+  if (isPastDue && !med.isActive) {
+    return StatusBadge(label: l10n.expired, status: StatusBadgeStatus.alert);
+  }
+  if (med.isActive) {
+    return StatusBadge(label: l10n.active, status: StatusBadgeStatus.active);
+  }
+  return StatusBadge(label: l10n.done, status: StatusBadgeStatus.normal);
 }
 
 class _SectionCard extends StatelessWidget {

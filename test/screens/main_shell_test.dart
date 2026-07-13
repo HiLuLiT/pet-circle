@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/models/user.dart';
 import 'package:pet_circle/screens/main_shell.dart';
+import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
 import '../helpers/ignore_overflow_errors.dart';
@@ -114,6 +115,25 @@ void main() {
       await tester.pump();
 
       expect(find.byType(BottomNavBar), findsOneWidget);
+    });
+
+    testWidgets('shows the active pet name in the header on the Home tab',
+        (tester) async {
+      suppressOverflowErrors();
+      tester.view.physicalSize = const Size(430, 932);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const MainShell()));
+      await tester.pump();
+
+      final activePet = petStore.activePet;
+      expect(activePet, isNotNull);
+      // The header shows the pet name unconditionally now (previously
+      // hidden on the Home tab), and the home screen's hero card also
+      // shows it — so it appears at least once.
+      expect(find.text(activePet!.name), findsWidgets);
     });
   });
 

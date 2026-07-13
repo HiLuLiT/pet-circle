@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/widgets/bottom_nav_bar.dart';
@@ -85,6 +86,52 @@ void main() {
       await tester.tap(find.text('Measure'));
       await tester.pump();
       expect(tappedIndex, 2);
+    });
+
+    // ── Figma DS icons (node 500:1106) ──────────────────────────────────────
+    testWidgets('uses the Figma nav SVGs for Home, Trends, Measure, Medicine',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        BottomNavBar(selectedIndex: 0, onTap: (_) {}),
+      ));
+
+      final svgs = tester
+          .widgetList<SvgPicture>(find.byType(SvgPicture))
+          .map((s) => (s.bytesLoader as SvgAssetLoader).assetName)
+          .toList();
+      expect(svgs, containsAll([
+        'assets/figma/nav_home.svg',
+        'assets/figma/nav_trends.svg',
+        'assets/figma/nav_measure.svg',
+        'assets/figma/nav_medicine.svg',
+      ]));
+      // No Material Icon fallback for these 4 tabs anymore.
+      expect(find.byType(Icon), findsNothing);
+    });
+
+    testWidgets('tints the active tab icon with onSurface, inactive with textTertiary',
+        (tester) async {
+      await tester.pumpWidget(testApp(
+        BottomNavBar(selectedIndex: 0, onTap: (_) {}),
+      ));
+
+      final homeIcon = tester.widget<SvgPicture>(find.descendant(
+        of: find.ancestor(
+            of: find.text('Home'), matching: find.byType(GestureDetector)),
+        matching: find.byType(SvgPicture),
+      ));
+      expect(homeIcon.colorFilter,
+          ColorFilter.mode(AppSemanticColors.light.onSurface, BlendMode.srcIn));
+
+      final trendsIcon = tester.widget<SvgPicture>(find.descendant(
+        of: find.ancestor(
+            of: find.text('Trends'), matching: find.byType(GestureDetector)),
+        matching: find.byType(SvgPicture),
+      ));
+      expect(
+          trendsIcon.colorFilter,
+          ColorFilter.mode(
+              AppSemanticColors.light.textTertiary, BlendMode.srcIn));
     });
 
     // ── Semantics ─────────────────────────────────────────────────────────

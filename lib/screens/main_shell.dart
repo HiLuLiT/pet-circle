@@ -82,58 +82,71 @@ class _MainShellState extends State<MainShell> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
       ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(height: AppSpacingTokens.sm + 4),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: c.surface,
-                borderRadius: BorderRadius.circular(2),
-              ),
+      builder: (context) {
+        final screenHeight = MediaQuery.sizeOf(context).height;
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: screenHeight * 0.6),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: AppSpacingTokens.sm + 4),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: c.surface,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: AppSpacingTokens.md),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: pets.length,
+                    itemBuilder: (context, i) {
+                      final pet = pets[i];
+                      final isSelected = i == petStore.activePetIndex;
+                      return ListTile(
+                        leading: ClipOval(
+                          child: SizedBox(
+                            width: 36,
+                            height: 36,
+                            child: DogPhoto(
+                                endpoint: pet.imageUrl, fit: BoxFit.cover),
+                          ),
+                        ),
+                        title: Text(
+                          pet.name,
+                          style: AppSemanticTextStyles.body.copyWith(
+                            color: c.textPrimary,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w400,
+                          ),
+                        ),
+                        subtitle: Text(
+                          pet.breedAndAge,
+                          style: AppSemanticTextStyles.caption
+                              .copyWith(color: c.textPrimary),
+                        ),
+                        trailing: isSelected
+                            ? Icon(Icons.check_circle, color: c.primaryLight)
+                            : null,
+                        onTap: () {
+                          petStore.setActivePetIndex(i);
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: AppSpacingTokens.sm),
+              ],
             ),
-            const SizedBox(height: AppSpacingTokens.md),
-            ...List.generate(pets.length, (i) {
-              final pet = pets[i];
-              final isSelected = i == petStore.activePetIndex;
-              return ListTile(
-                leading: ClipOval(
-                  child: SizedBox(
-                    width: 36,
-                    height: 36,
-                    child:
-                        DogPhoto(endpoint: pet.imageUrl, fit: BoxFit.cover),
-                  ),
-                ),
-                title: Text(
-                  pet.name,
-                  style: AppSemanticTextStyles.body.copyWith(
-                    color: c.textPrimary,
-                    fontWeight:
-                        isSelected ? FontWeight.w700 : FontWeight.w400,
-                  ),
-                ),
-                subtitle: Text(
-                  pet.breedAndAge,
-                  style:
-                      AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
-                ),
-                trailing: isSelected
-                    ? Icon(Icons.check_circle, color: c.primaryLight)
-                    : null,
-                onTap: () {
-                  petStore.setActivePetIndex(i);
-                  Navigator.pop(context);
-                },
-              );
-            }),
-            const SizedBox(height: AppSpacingTokens.sm),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -159,12 +172,10 @@ class _MainShellState extends State<MainShell> {
               child: AppHeader(
                 userName: user?.name ?? '',
                 userImageUrl: user?.avatarUrl ?? '',
-                petName: _selectedIndex == 0 ? null : pet?.name,
-                petImageUrl: _selectedIndex == 0 ? null : pet?.imageUrl,
+                petName: pet?.name,
+                petImageUrl: pet?.imageUrl,
                 onPetSelectorTap:
-                    _selectedIndex == 0 || petStore.ownerPets.length <= 1
-                        ? null
-                        : _showPetSwitcher,
+                    petStore.ownerPets.length <= 1 ? null : _showPetSwitcher,
                 onAvatarTap: () => showModalBottomSheet<void>(
                   context: context,
                   isScrollControlled: true,

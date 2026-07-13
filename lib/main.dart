@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
@@ -16,6 +15,7 @@ import 'package:pet_circle/stores/medication_store.dart';
 import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/stores/reminder_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/services/abstract_push_notification_service.dart';
@@ -40,10 +40,6 @@ void main() async {
 
   // Wire up global Flutter / platform error handlers before anything else.
   AppErrorHandler.instance.init();
-
-  // Allow runtime fetching so google_fonts can download Instrument Sans.
-  // TODO: bundle static Instrument Sans font files to avoid network dependency.
-  GoogleFonts.config.allowRuntimeFetching = true;
 
   if (kEnableFirebase) {
     await Firebase.initializeApp(
@@ -137,17 +133,22 @@ void main() async {
     final l10n = lookupAppLocalizations(appLocale.value);
     final now = DateTime.now();
     for (final med in medicationStore.getMedicationsWithEndReminder()) {
+      final resolvedPetName =
+          petStore.getPetById(med.petId)?.name ?? med.name;
       if (!med.endDate!.isAfter(now)) {
         notificationStore.reconcileMedicationEndNotifications(
           [med],
           title: l10n.medicationEndingTitle,
-          body: l10n.medicationEndingBody(med.name),
+          body: l10n.medicationEndingBody(resolvedPetName, med.name),
+          petName: resolvedPetName,
         );
       }
     }
     if (!kIsWeb) {
       final liveIds = <String>{};
       for (final med in medicationStore.getMedicationsWithEndReminder()) {
+        final resolvedPetName =
+            petStore.getPetById(med.petId)?.name ?? med.name;
         liveIds.add(med.id);
         final endDate = med.endDate!;
         if (scheduledEndDates[med.id] == endDate) continue;
@@ -155,7 +156,7 @@ void main() async {
         reminderService.scheduleMedicationReminder(
           med,
           title: l10n.medicationEndingTitle,
-          body: l10n.medicationEndingBody(med.name),
+          body: l10n.medicationEndingBody(resolvedPetName, med.name),
         );
       }
       // Drop cache entries for meds that no longer have an end reminder.
@@ -203,6 +204,11 @@ void _seedMockStores() {
   noteStore.seed({
     princessId: MockData.princessNotes,
     maxId: MockData.maxNotes,
+  });
+
+  reminderStore.seed({
+    princessId:
+        MockData.princessReminders.map((r) => r.copyWith(petId: princessId)).toList(),
   });
 
   medicationStore.seed({

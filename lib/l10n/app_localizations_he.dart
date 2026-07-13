@@ -178,7 +178,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get settings => 'הגדרות';
 
   @override
-  String get managePreferences => 'ניהול העדפות PetBreath';
+  String get managePreferences => 'נהל את ההעדפות שלך';
 
   @override
   String get appearance => 'מראה';
@@ -302,6 +302,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get tapToStop => 'הקש לעצירה';
 
   @override
+  String get stopMeasurement => 'עצור';
+
+  @override
+  String get restartMeasurement => 'התחל מחדש';
+
+  @override
   String get measurementComplete => 'המדידה הושלמה';
 
   @override
@@ -314,6 +320,9 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get done => 'סיום';
+
+  @override
+  String get expired => 'פג תוקף';
 
   @override
   String get addToGraph => 'הוסף לגרף';
@@ -928,6 +937,56 @@ class AppLocalizationsHe extends AppLocalizations {
   String get petUpdated => 'חיית מחמד עודכנה';
 
   @override
+  String get yourPets => 'חיות המחמד שלך';
+
+  @override
+  String get reminders => 'תזכורות';
+
+  @override
+  String get noRemindersYet => 'אין עדיין תזכורות';
+
+  @override
+  String get addReminder => 'הוספת תזכורת';
+
+  @override
+  String get addNewReminder => 'הוספת תזכורת חדשה';
+
+  @override
+  String get editReminder => 'עריכת תזכורת';
+
+  @override
+  String get reminderTitleLabel => 'כותרת';
+
+  @override
+  String get hintReminderTitle => 'לדוגמה: רופא שיניים וטרינרי';
+
+  @override
+  String get reminderDetailLabel => 'פרטים';
+
+  @override
+  String get hintReminderDetail => 'לדוגמה: ד\"ר מרי רוז';
+
+  @override
+  String get reminderDateLabel => 'תאריך';
+
+  @override
+  String get reminderAdded => 'התזכורת נוספה';
+
+  @override
+  String get reminderUpdated => 'התזכורת עודכנה';
+
+  @override
+  String get reminderDeleted => 'התזכורת נמחקה';
+
+  @override
+  String get deleteReminder => 'מחיקת תזכורת';
+
+  @override
+  String deleteReminderConfirmation(String title) {
+    return 'למחוק את \"$title\"?';
+  }
+
+  @override
   String get editProfile => 'עריכת פרופיל';
 
   @override
@@ -1325,8 +1384,8 @@ class AppLocalizationsHe extends AppLocalizations {
   String get medicationEndingTitle => 'התרופה מסתיימת היום';
 
   @override
-  String medicationEndingBody(String name) {
-    return 'מהלך הטיפול התרופתי של $name מסתיים היום';
+  String medicationEndingBody(String petName, String medName) {
+    return 'מהלך הטיפול \"$medName\" של $petName מסתיים היום';
   }
 
   @override
@@ -1431,6 +1490,12 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get failedToSendInvite => 'שליחת ההזמנה נכשלה. אנא נסה שוב.';
+
+  @override
+  String get failedToSaveReminder => 'לא ניתן לשמור את התזכורת. אנא נסה שוב.';
+
+  @override
+  String get failedToDeleteReminder => 'לא ניתן למחוק את התזכורת. אנא נסה שוב.';
 
   @override
   String get noActivePet => 'אין חיית מחמד פעילה';

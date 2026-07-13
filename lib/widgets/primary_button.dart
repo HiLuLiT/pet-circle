@@ -48,8 +48,9 @@ class PrimaryButton extends StatelessWidget {
     this.child,
     this.variant = PrimaryButtonVariant.filled,
     this.fullWidth,
-  }) : assert(label != null || child != null,
-            'Either label or child must be provided');
+    this.isLoading = false,
+  }) : assert(label != null || child != null || isLoading,
+            'Either label, child, or isLoading must be provided');
 
   final String? label;
   final VoidCallback? onPressed;
@@ -61,6 +62,7 @@ class PrimaryButton extends StatelessWidget {
   final Widget? trailingIcon;
   final Widget? child;
   final PrimaryButtonVariant variant;
+  final bool isLoading;
 
   /// When null, the per-variant default applies: `true` for
   /// filled/secondary/outlined (unchanged legacy behavior), `false` for the
@@ -110,7 +112,7 @@ class PrimaryButton extends StatelessWidget {
       return _buildMiniPrimary(context, c);
     }
 
-    final isEnabled = onPressed != null;
+    final isEnabled = onPressed != null && !isLoading;
     final isOutlined = variant == PrimaryButtonVariant.outlined;
     final isSecondary = variant == PrimaryButtonVariant.secondary;
 
@@ -148,7 +150,16 @@ class PrimaryButton extends StatelessWidget {
         : AppSpacingTokens.md; // 16px
 
     // ── Inner content ───────────────────────────────────────────────────────
-    final Widget buttonChild = child ??
+    final Widget buttonChild = isLoading
+        ? SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: effectiveFg,
+            ),
+          )
+        : child ??
         Row(
           mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -199,7 +210,7 @@ class PrimaryButton extends StatelessWidget {
 
     final button = TextButton(
       style: bStyle,
-      onPressed: onPressed,
+      onPressed: isEnabled ? onPressed : null,
       child: buttonChild,
     );
 

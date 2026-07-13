@@ -65,39 +65,46 @@ class NotificationStore extends ChangeNotifier {
   }
 
   /// Add an in-app notification for each medication whose end date has arrived,
-  /// once per medication end date.
+  /// once per medication end date. Persists to Firestore so markRead sticks.
   ///
   /// Dedup key is `med-end-<medId>-<endDayEpoch>`, so a given medication's end
   /// date only ever produces a single in-app entry.
-  void reconcileMedicationEndNotifications(
+  Future<void> reconcileMedicationEndNotifications(
     List<Medication> endedMeds, {
     required String title,
     required String body,
-  }) {
-    var changed = false;
+    String? petName,
+  }) async {
+    final uid = kEnableFirebase ? userStore.currentUserUid : null;
     for (final med in endedMeds) {
       final endDate = med.endDate;
       if (endDate == null) continue;
       final dayEpoch = endDate.millisecondsSinceEpoch ~/ 86400000;
       final id = 'med-end-${med.id}-$dayEpoch';
       if (_notifications.any((n) => n.id == id)) continue;
-      _notifications.insert(
-        0,
-        AppNotification(
-          id: id,
-          title: title,
-          body: body,
-          titleKey: 'medicationEndingTitle',
-          bodyKey: 'medicationEndingBody',
-          args: [med.name],
-          type: NotificationType.medication,
-          createdAt: DateTime.now(),
-          petName: med.name,
-        ),
+      final effectivePetName = petName ?? med.name;
+      final notif = AppNotification(
+        id: id,
+        title: title,
+        body: body,
+        titleKey: 'medicationEndingTitle',
+        bodyKey: 'medicationEndingBody',
+        args: [effectivePetName, med.name],
+        type: NotificationType.medication,
+        createdAt: DateTime.now(),
+        petName: effectivePetName,
+        petId: med.petId,
       );
-      changed = true;
+      _notifications.insert(0, notif);
+      notifyListeners();
+      if (uid != null && uid.isNotEmpty) {
+        try {
+          await NotificationService.addNotification(uid, notif);
+        } catch (e) {
+          debugPrint('[NotificationStore] Failed to persist med-end notification: $e');
+        }
+      }
     }
-    if (changed) notifyListeners();
   }
 
   Future<void> markRead(String id) async {
