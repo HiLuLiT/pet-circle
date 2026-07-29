@@ -17,17 +17,22 @@ class LocalizedNotification {
 /// is present and recognised, the matching localized string is produced at
 /// render time so it follows the current language. Otherwise the frozen
 /// [AppNotification.title] / [AppNotification.body] stored at creation time is
-/// used as a fallback (server-pushed and legacy notifications have no keys).
+/// used as a fallback (legacy notifications have no keys).
+///
+/// Server-generated notifications do carry keys: the Cloud Functions triggers
+/// in `functions/src/` write `titleKey`/`bodyKey`/`args` alongside frozen
+/// English text, so a pushed notification renders in the reader's own language
+/// while the OS push banner falls back to the frozen strings.
 LocalizedNotification localizeNotification(
   AppNotification n,
   AppLocalizations l10n,
 ) {
-  final title = _resolveTitle(n.titleKey, l10n) ?? n.title;
+  final title = _resolveTitle(n.titleKey, n.args, l10n) ?? n.title;
   final body = _resolveBody(n.bodyKey, n.args, l10n) ?? n.body;
   return LocalizedNotification(title, body);
 }
 
-String? _resolveTitle(String? key, AppLocalizations l10n) {
+String? _resolveTitle(String? key, List<String> args, AppLocalizations l10n) {
   switch (key) {
     case 'medicationAdded':
       return l10n.medicationAdded;
@@ -39,6 +44,10 @@ String? _resolveTitle(String? key, AppLocalizations l10n) {
       return l10n.measurementComplete;
     case 'careCircleUpdated':
       return l10n.careCircleUpdated;
+    case 'inviteAcceptedTitle':
+      return args.length >= 2
+          ? l10n.inviteAcceptedTitle(args[0], args[1])
+          : null;
     default:
       return null;
   }
@@ -57,6 +66,8 @@ String? _resolveBody(String? key, List<String> args, AppLocalizations l10n) {
           : null;
     case 'vetInviteSent':
       return args.isNotEmpty ? l10n.vetInviteSent(args[0]) : null;
+    case 'inviteAcceptedBody':
+      return l10n.inviteAcceptedBody;
     default:
       return null;
   }

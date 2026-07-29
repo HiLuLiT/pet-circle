@@ -1,6 +1,10 @@
 import { Resend } from "resend";
 import { OTP_TTL_MINUTES } from "./config";
-import { invitationEmailHtml, invitationEmailText } from "./email-templates";
+import {
+  invitationEmailHtml,
+  invitationEmailText,
+  sanitiseInline,
+} from "./email-templates";
 
 let resendClient: Resend | null = null;
 
@@ -13,6 +17,26 @@ function getResendClient(): Resend {
     resendClient = new Resend(apiKey);
   }
   return resendClient;
+}
+
+/**
+ * Resend's shared sandbox sender. Mail sent from this address is only
+ * delivered to the Resend account owner, so real invitations silently never
+ * arrive. Set `FROM_EMAIL` (see .env.example) to a verified domain sender in
+ * any environment that needs to reach actual users.
+ */
+const SANDBOX_FROM_ADDRESS = "Pet Circle <onboarding@resend.dev>";
+
+function getFromAddress(): string {
+  const configured = process.env.FROM_EMAIL;
+  if (configured && configured.trim().length > 0) {
+    return configured.trim();
+  }
+  console.warn(
+    "FROM_EMAIL is not set — falling back to Resend's sandbox sender, " +
+      "which only delivers to the Resend account owner."
+  );
+  return SANDBOX_FROM_ADDRESS;
 }
 
 export function buildOtpEmailHtml(code: string): string {
@@ -43,7 +67,7 @@ export async function sendOtpEmail(
   try {
     const client = getResendClient();
     await client.emails.send({
-      from: "Pet Circle <onboarding@resend.dev>",
+      from: getFromAddress(),
       to: [to],
       subject: `${code} is your Pet Circle verification code`,
       html: buildOtpEmailHtml(code),
@@ -66,9 +90,12 @@ export async function sendInvitationViaResend(
   try {
     const client = getResendClient();
     await client.emails.send({
-      from: "Pet Circle <onboarding@resend.dev>",
+      from: getFromAddress(),
       to: [to],
-      subject: `${inviterName} invited you to ${petName}'s care circle`,
+      // Sanitise the interpolated names, not the assembled subject: this also
+      // caps their length, and prevents header injection via CR/LF.
+      subject: `${sanitiseInline(inviterName)} invited you to ` +
+        `${sanitiseInline(petName)}'s care circle`,
       html: invitationEmailHtml({ inviterName, petName, inviteLink }),
       text: invitationEmailText({ inviterName, petName, inviteLink }),
     });

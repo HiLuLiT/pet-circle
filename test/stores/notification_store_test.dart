@@ -179,6 +179,63 @@ void main() {
     });
   });
 
+  group('NotificationStore addLocal', () {
+    test('addLocal inserts at beginning of list', () {
+      store.seed([_makeNotification(id: 'n-existing')]);
+
+      store.addLocal(_makeNotification(id: 'n-push', title: 'Pushed'));
+
+      expect(store.all.length, 2);
+      expect(store.all.first.id, 'n-push');
+    });
+
+    test('addLocal ignores a duplicate id', () {
+      store.seed([]);
+
+      store.addLocal(_makeNotification(id: 'n-push'));
+      store.addLocal(_makeNotification(id: 'n-push'));
+
+      expect(store.all.length, 1);
+    });
+
+    test('addLocal duplicate does not inflate unread count', () {
+      store.seed([]);
+
+      store.addLocal(_makeNotification(id: 'n-push', isRead: false));
+      store.addLocal(_makeNotification(id: 'n-push', isRead: false));
+
+      expect(store.unreadCount, 1);
+    });
+
+    test('markRead clears unread count for an addLocal notification', () async {
+      store.seed([]);
+      store.addLocal(_makeNotification(id: 'n-push', isRead: false));
+
+      await store.markRead('n-push');
+
+      expect(store.unreadCount, 0);
+    });
+
+    test('addLocal notifies listeners', () {
+      int callCount = 0;
+      store.addListener(() => callCount++);
+
+      store.addLocal(_makeNotification(id: 'n-push'));
+
+      expect(callCount, greaterThanOrEqualTo(1));
+    });
+
+    test('addLocal duplicate does not notify listeners', () {
+      store.addLocal(_makeNotification(id: 'n-push'));
+
+      int callCount = 0;
+      store.addListener(() => callCount++);
+      store.addLocal(_makeNotification(id: 'n-push'));
+
+      expect(callCount, 0);
+    });
+  });
+
   group('NotificationStore markRead edge cases', () {
     test('markRead on non-existent id does not throw', () async {
       store.seed([_makeNotification(id: 'n-1')]);

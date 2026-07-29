@@ -340,6 +340,8 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 
 **Fix:** Invitation creation now writes a trusted `pendingInvites.{token}` entry onto the pet document, and invitation acceptance removes that entry in the same transaction that adds the authenticated member to `careCircle` / `memberUids`. Firestore rules now verify the accepted token against the pet's trusted pending-invite state instead of relying on a broad self-join exception. The updated rules were deployed to Firebase after the repo changes landed.
 
+**Update (Phase 2 audit):** the privilege-escalation aspect of this exception is now closed — see BUG-040. `canAcceptPendingInvite` previously let the invitee assign themselves `role: 'admin'`, which mapped to `CareCircleRole.owner`; self-join may now only grant `member`. The remaining limitation is narrower than originally written: the invitee still writes their own care-circle entry, so the `canAcceptPendingInvite` clause cannot be deleted outright. Moving acceptance into a callable Cloud Function that uses the Admin SDK would remove the clause entirely, and would also be the natural place to maintain the invitee's `petIds` — which nothing does today. Status stays **Known limitation** pending that change.
+
 **Files changed:**
 - `lib/screens/onboarding/onboarding_flow.dart`
 - `lib/screens/auth/auth_gate.dart`
@@ -742,6 +744,122 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 - `lib/main.dart`
 - `lib/screens/medication/add_medication_sheet.dart`
 - `test/utils/notification_localizer_test.dart`
+
+---
+
+## BUG-038: Push notifications flash "read" then revert — server/client notification ID mismatch
+
+**Found during:** Phase 2 audit of the shipped FCM push path (code review, not manual testing — the app cannot be built in the audit environment).
+**Severity:** High
+**Status:** Fixed
+
+**Symptom:** A notification delivered by push cannot be marked read. Tapping it in the notifications drawer flips it to read, then it reverts to unread a moment later, with no error shown. The unread badge count comes back too.
+
+**Root cause:** Exactly the same root-cause class as BUG-037, reintroduced on the server side. `writeInAppNotification` in `functions/src/fcm-utils.ts` persisted the notification with `.add()`, letting Firestore assign an auto-ID, while the client's foreground handler stored the same notification in `notificationStore` under `message.messageId`. `NotificationStore.markRead` optimistically flips `isRead`, then calls `NotificationService.markRead`, which does `.doc(notificationId).update(...)` — against an ID that never existed. The write threw `not-found`, the `catch` rolled the optimistic flip back, and because the call site in `messages_screen.dart` is unawaited and uncaught, the `rethrow` became an unhandled zone error rather than a visible message.
+
+**Fix:** Three coordinated changes plus one class-level hardening.
+- `functions/src/fcm-utils.ts`: `writeInAppNotification` now generates the document reference locally with `.doc()`, writes with `.set()`, and returns the document ID (`Promise<string | null>`). The catch returns `null` explicitly, which `noImplicitReturns` requires under the new return type.
+- `functions/src/invitation-notification.ts`: the in-app write and the push are no longer run under `Promise.all`. The write happens first so its document ID can travel in the FCM `data` payload as `notificationId`. This ordering is a correctness requirement, not a style choice: `.doc()` generates the ID without a round trip, so parallel execution would still yield a stable ID, but a push tapped before the Firestore write landed would reproduce the same `not-found` rollback intermittently. A comment records this so it is not "optimized" back.
+- `lib/services/push_notification_service.dart`: `_handleForegroundMessage` prefers `data['notificationId']` for `AppNotification.id`, validating its shape via `_validNotificationId` before it is used to build a Firestore document path, and keeping `message.messageId` as a fallback for payloads from an older function version.
+- `lib/stores/notification_store.dart`: `markRead` now treats `FirebaseException` with code `not-found` as terminal success — it logs and **keeps** the optimistic flip instead of reverting and rethrowing. This is the durable fix for the whole "flashes read then reverts" family, and it is the correct behaviour for rows that only ever existed in memory. Read state for such rows simply does not survive a restart, which is strictly better than reverting a second later.
+
+**Files changed:**
+- `functions/src/fcm-utils.ts`
+- `functions/src/invitation-notification.ts`
+- `lib/services/push_notification_service.dart`
+- `lib/stores/notification_store.dart`
+- `test/stores/notification_store_test.dart`
+
+---
+
+## BUG-039: Server-generated notifications always render in English
+
+**Found during:** Phase 2 audit of the shipped FCM push path.
+**Severity:** Medium
+**Status:** Fixed
+
+**Symptom:** A Hebrew-locale user who receives a care-circle notification sees English text in the in-app notifications drawer, while every locally-generated notification is correctly translated.
+
+**Root cause:** `AppNotification` supports render-time localization through `titleKey` / `bodyKey` / `args`, resolved by `lib/utils/notification_localizer.dart`. `writeInAppNotification` never wrote those three fields, so server-created notifications only carried the frozen English `title` / `body` and the localizer had nothing to resolve. The ARB keys `inviteAcceptedTitle` and `inviteAcceptedBody` already existed in both `app_en.arb` and `app_he.arb` — added in anticipation of this work, and documented in the `onInvitationStatusChanged` docstring — but had zero call sites.
+
+**Fix:**
+- `functions/src/fcm-utils.ts`: `InAppNotification` gained `titleKey` / `bodyKey` / `args`, persisted alongside the frozen text. Empty `args` are omitted, matching `AppNotification.toFirestore`'s own `if (args.isNotEmpty)` shape.
+- `functions/src/invitation-notification.ts`: sends `titleKey: 'inviteAcceptedTitle'`, `bodyKey: 'inviteAcceptedBody'`, and `args: [displayEmail, petName]` in the Firestore document, and the same values JSON-stringified in the FCM `data` map (FCM data values must be strings). The truncated `displayEmail` is passed rather than the raw address so the localized row and the OS banner agree for long addresses. A comment pins the frozen English fallback strings to the EN ARB values and their placeholder order, since nothing automated ties them together.
+- `lib/utils/notification_localizer.dart`: `_resolveTitle` now takes `args`, because for this pair the **title** is the templated string (`inviteAcceptedTitle(email, petName)`) and the body is static. Guarded with `args.length >= 2`, matching the existing `medicationEndingBody` case, so a malformed payload falls back to the frozen title rather than throwing.
+- `lib/services/push_notification_service.dart`: reads `titleKey` / `bodyKey` from `message.data` and decodes `args` from JSON through a guarded helper.
+
+No ARB or generated-localization changes were needed.
+
+**Known limitation (accepted):** when the app is in the background, the OS builds the push banner directly from the FCM payload with no Dart involved, so that banner stays English regardless of the reader's locale. Fixing it requires the Cloud Function to look up the recipient's locale from their user document and localize server-side. The **foreground** banner is localized (see below), so the inconsistency is limited to background delivery.
+
+**Files changed:**
+- `functions/src/fcm-utils.ts`
+- `functions/src/invitation-notification.ts`
+- `lib/utils/notification_localizer.dart`
+- `lib/services/push_notification_service.dart`
+- `test/utils/notification_localizer_test.dart`
+
+---
+
+## BUG-040: Invitee can grant themselves the owner role when accepting an invitation
+
+**Found during:** Phase 2 security audit of `firestore.rules`.
+**Severity:** High
+**Status:** Fixed
+
+**Symptom:** No symptom in normal use — this is a privilege-escalation hole reachable only by a modified client.
+
+**Root cause:** `canAcceptPendingInvite()` in `firestore.rules` accepted `'member'`, `'viewer'`, or `'admin'` as the role an accepting invitee writes for themselves, for legacy compatibility. `CareCirclePermissions.fromString` maps `'admin'` to `CareCircleRole.owner`, which grants `canEditPet`, `canManageCircle`, and `canDeletePet`. A client that wrote `role: 'admin'` while accepting a legitimate invitation would therefore be treated as a pet owner. Actual Firestore writes to the pet document remain gated on `ownerId`, so the blast radius was the client-side permission affordances rather than direct data loss.
+
+**Fix:** `firestore.rules` now requires the self-assigned role to be exactly `'member'` on the accept path. This is behaviour-preserving for the real client: `InvitationService._pendingInviteData` hardcodes `role: 'member'`, and the accept transaction writes `CareCircleMember(role: CareCircleRole.member)`.
+
+**Files changed:**
+- `firestore.rules`
+
+---
+
+## BUG-041: HTML injection into outbound invitation emails
+
+**Found during:** Phase 2 security audit of the Cloud Functions email path.
+**Severity:** High
+**Status:** Fixed
+
+**Symptom:** No symptom in normal use. A user who sets their display name to markup causes that markup to be rendered inside the invitation email delivered to a third party.
+
+**Root cause:** `functions/src/email-templates.ts` interpolated `inviterName` and `petName` straight into the email HTML. Both originate from client-controlled Firestore fields — `invitedByName` is the sender's own display name, taken from `userStore.currentUserDisplayName`. Because the recipient's address is also attacker-chosen, this was a content/link injection vector in mail that legitimately originates from the project's sending domain: a phishing primitive rather than a browser XSS. The invitation link was interpolated unescaped into an `href` as well, and the invitation token forming part of that link is a client-chosen Firestore document ID. Separately, the email subject interpolated the same unescaped values, so a display name containing CR/LF could inject additional mail headers.
+
+Escaping alone turned out to be insufficient. The first pass at this fix escaped the HTML part only, on the reasoning that a plain-text body has nothing to escape. A security review caught that this misses **line-structure forging**: the `text/plain` alternative interpolated the same raw values, and mail clients auto-linkify bare URLs in plain text. A display name containing newlines could therefore forge an extra `Join the circle: https://evil.example/...` line above the real one — reintroducing exactly the attacker-planted link that HTML escaping removes, in a message signed by the project's sending domain, rendered by every text-only client and every preview pane preferring `text/plain`.
+
+**Fix:**
+- `functions/src/email-templates.ts`: added `sanitiseInline`, which collapses CR/LF/tabs and whitespace runs to single spaces and caps length at 100 characters. It is applied to `inviterName` and `petName` in **both** the HTML and the plain-text template — escaping is layered on top of it for the HTML part, never instead of it. Also added `escapeHtml`, applied to `inviterName`, `petName`, and `inviteLink` at every HTML interpolation site.
+- `functions/src/email.ts`: the subject line now interpolates `sanitiseInline`-processed names rather than stripping CR/LF from the assembled string, which additionally caps their length.
+- `functions/src/invitation-email.ts`: the token is now `encodeURIComponent`-encoded when building the invite link.
+- `firestore.rules`: `canCreateInvitation()` now requires `invitedByName` and `petName` to be strings of at most 200 characters, bounding the payload the email trigger can be handed at the server. The templates truncate independently; this is the outer ceiling.
+
+**Related, not fixed here:** invitation creation has no server-side rate limit — `InvitationService.maxInvitesPerDay` is enforced only on the client, so direct Firestore writes bypass it and every create fires an outbound email to an arbitrary address. That is what makes this injection surface weaponisable at scale. Tracked as FB-004, raised to High.
+
+**Files changed:**
+- `functions/src/email-templates.ts`
+- `functions/src/email.ts`
+- `functions/src/invitation-email.ts`
+- `firestore.rules`
+
+---
+
+## BUG-042: Firestore composite indexes were never deployed
+
+**Found during:** Phase 2 audit of Firebase configuration.
+**Severity:** Low
+**Status:** Fixed
+
+**Symptom:** Latent. Any query needing one of the declared composite indexes would fail at runtime with a `failed-precondition` "requires an index" error, despite the index being defined in the repo.
+
+**Root cause:** `firestore.indexes.json` declares two composite indexes on the `invitations` collection, but the `firestore` block in `firebase.json` referenced only `rules`. The Firebase CLI therefore never shipped the index definitions. The current `InvitationService` queries happen to be served by automatic single-field indexes, which is why this had not surfaced.
+
+**Fix:** Added `"indexes": "firestore.indexes.json"` to the `firestore` block in `firebase.json`.
+
+**Files changed:**
+- `firebase.json`
 
 ---
 

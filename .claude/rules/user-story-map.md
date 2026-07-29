@@ -2,7 +2,7 @@
 
 > Living user story map for Pet Circle. Tracks implementation status of every user story by role. Consult when working on any screen to understand what is done, what is partial, and what is missing. UPDATE this file after completing work on any story.
 
-Last updated: 2026-07-06 (Home screen rebuilt to Figma 402:1978 active-pet dashboard + new Reminders feature)
+Last updated: 2026-07-29 (Phase 2 audit: FCM push + invitation email confirmed shipped; BUG-038..042 fixed)
 
 ## Update Protocol
 
@@ -128,10 +128,21 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - Invitation flow with deep link acceptance
 - Permission enforcement across all screens
 
+### Also done in Phase 2
+- Push notifications via FCM -- device-token registration/rotation (`users/{uid}/fcmTokens`), foreground + background handlers, tap routing behind a route allowlist, and server-side fanout from Cloud Functions (`functions/src/fcm-utils.ts`)
+- Invitation email delivery -- `onInvitationCreated` sends via Resend (`functions/src/invitation-email.ts`), closing FB-002
+- Repo-managed Firestore security rules deployed; `firebase.json` now deploys `firestore.indexes.json` too
+- Invitation acceptance hardened -- the broad self-join rule was replaced by a `pendingInvites` entry the rules can verify, and self-join may now only ever grant the `member` role (BUG-040)
+- Server-generated notifications are localized via `titleKey`/`bodyKey`/`args`, and pushed notifications can be marked read (BUG-038, BUG-039)
+
 ### Remaining in Phase 2
-- Push notifications via FCM
-- Deploy repo-managed Firestore security rules
-- Harden invitation acceptance so strict rules do not need a self-join exception
+- Server-side locale resolution for push payloads -- an OS-rendered background banner is still English regardless of the reader's locale
+- More push triggers -- only invite-accepted sends one today
+- Invitee-side decline of an invitation is denied by the rules on both writes
+- Invitation acceptance still relies on the `canAcceptPendingInvite` pet-document exception (BUG-019); moving accept into a callable function would remove it
+- No `tsc` step for `functions/` in CI, so TypeScript breakage there ships unnoticed
+
+See `docs/firebase-status.md` -> "Known Gaps" for the full audited list.
 
 ## Status: FUTURE (Phase 3-5)
 

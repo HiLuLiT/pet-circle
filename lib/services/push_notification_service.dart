@@ -7,10 +7,14 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter/widgets.dart' show WidgetsBinding;
+import 'package:pet_circle/config/app_config.dart' show appLocale;
+import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/services/abstract_push_notification_service.dart';
 import 'package:pet_circle/services/reminder_service.dart';
 import 'package:pet_circle/stores/notification_store.dart';
+import 'package:pet_circle/utils/notification_localizer.dart';
+import 'package:pet_circle/utils/push_payload.dart';
 
 /// Top-level background handler — must be a top-level function for FCM.
 @pragma('vm:entry-point')
@@ -189,23 +193,18 @@ class PushNotificationService implements AbstractPushNotificationService {
     final body = notification.body ?? '';
     final data = message.data;
 
-    // Display as a local heads-up notification.
-    final notifId =
-        (message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString())
-                .hashCode &
-            0x7FFFFFFF;
-    await ReminderService.instance.showImmediateNotification(
-      notifId,
-      title,
-      body,
-      json.encode(data),
-    );
+    // Use the Firestore document ID the server put in the payload, so the
+    // in-app row is keyed by the same ID as the persisted document and
+    // markRead can find it. Falls back to messageId for payloads sent by an
+    // older function version. See docs/bug-log.md BUG-038.
+    final serverId = parseNotificationId(data['notificationId']);
+    final fallbackId =
+        message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
+    final notificationId = serverId ?? fallbackId;
 
-    // Also add to the in-app notification list.
     final type = _notificationTypeFromData(data);
     final appNotification = AppNotification(
-      id: message.messageId ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
+      id: notificationId,
       title: title,
       body: body,
       type: type,
@@ -213,7 +212,25 @@ class PushNotificationService implements AbstractPushNotificationService {
       petName: data['petName'],
       route: data['route'],
       petId: data['petId'],
+      titleKey: data['titleKey'] as String?,
+      bodyKey: data['bodyKey'] as String?,
+      args: decodeNotificationArgs(data['args']),
     );
+
+    // Localize the heads-up banner too. Without this, a push arriving while
+    // the app is foregrounded would show the server's frozen English banner
+    // right next to a localized in-app row.
+    final l10n = lookupAppLocalizations(appLocale.value);
+    final localized = localizeNotification(appNotification, l10n);
+
+    final notifId = notificationId.hashCode & 0x7FFFFFFF;
+    await ReminderService.instance.showImmediateNotification(
+      notifId,
+      localized.title,
+      localized.body,
+      json.encode(data),
+    );
+
     notificationStore.addLocal(appNotification);
   }
 

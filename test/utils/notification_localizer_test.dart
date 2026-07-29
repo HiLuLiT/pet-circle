@@ -53,6 +53,29 @@ void main() {
       }
     });
 
+    test('resolves templated inviteAcceptedTitle with two args (en)', () {
+      final n = _notif(
+          titleKey: 'inviteAcceptedTitle', args: const ['a@b.com', 'Rex']);
+      expect(localizeNotification(n, en).title,
+          en.inviteAcceptedTitle('a@b.com', 'Rex'));
+    });
+
+    test('resolves templated inviteAcceptedTitle in Hebrew (he)', () {
+      final n = _notif(
+          titleKey: 'inviteAcceptedTitle', args: const ['a@b.com', 'Rex']);
+      expect(localizeNotification(n, he).title,
+          he.inviteAcceptedTitle('a@b.com', 'Rex'));
+    });
+
+    test('falls back to stored title when inviteAcceptedTitle args are insufficient',
+        () {
+      final n = _notif(
+          title: 'frozen title',
+          titleKey: 'inviteAcceptedTitle',
+          args: const ['a@b.com']);
+      expect(localizeNotification(n, en).title, 'frozen title');
+    });
+
     test('falls back to stored title when titleKey is null', () {
       final n = _notif(title: 'frozen title');
       expect(localizeNotification(n, en).title, 'frozen title');
@@ -94,6 +117,16 @@ void main() {
     test('resolves vetInviteSent with one arg', () {
       final n = _notif(bodyKey: 'vetInviteSent', args: const ['a@b.com']);
       expect(localizeNotification(n, en).body, en.vetInviteSent('a@b.com'));
+    });
+
+    test('resolves static inviteAcceptedBody (en)', () {
+      final n = _notif(bodyKey: 'inviteAcceptedBody');
+      expect(localizeNotification(n, en).body, en.inviteAcceptedBody);
+    });
+
+    test('resolves static inviteAcceptedBody in Hebrew (he)', () {
+      final n = _notif(bodyKey: 'inviteAcceptedBody');
+      expect(localizeNotification(n, he).body, he.inviteAcceptedBody);
     });
 
     test('localizes body in Hebrew', () {

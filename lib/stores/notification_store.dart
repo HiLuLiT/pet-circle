@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart' show FirebaseException;
 import 'package:flutter/foundation.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/models/app_notification.dart';
@@ -59,7 +60,14 @@ class NotificationStore extends ChangeNotifier {
 
   /// Add a notification to the in-memory list only (no Firestore write).
   /// Used for FCM foreground messages where the server already persisted it.
+  ///
+  /// Ignores a notification whose ID is already present. Server-pushed
+  /// notifications carry the Firestore document ID, so a redelivered FCM
+  /// message would otherwise insert a second row sharing that ID — and
+  /// [markRead] only flips the first match, leaving the duplicate permanently
+  /// unread and [unreadCount] stuck above zero.
   void addLocal(AppNotification notification) {
+    if (_notifications.any((n) => n.id == notification.id)) return;
     _notifications.insert(0, notification);
     notifyListeners();
   }
@@ -119,6 +127,19 @@ class NotificationStore extends ChangeNotifier {
       try {
         await NotificationService.markRead(uid, id);
       } catch (e) {
+        // A missing document means there is nothing to persist — the row only
+        // ever existed in memory. Keep the optimistic flip rather than
+        // reverting it: rolling back made the notification visibly "flash read
+        // then revert" with no error surfaced, because the call site in
+        // messages_screen.dart is unawaited (docs/bug-log.md BUG-038/BUG-037).
+        // The read state simply won't survive a restart.
+        if (e is FirebaseException && e.code == 'not-found') {
+          debugPrint(
+            '[NotificationStore] markRead: no Firestore doc for $id — '
+            'keeping local read state',
+          );
+          return;
+        }
         if (idx != -1) {
           _notifications[idx] = _notifications[idx].copyWith(isRead: false);
           notifyListeners();

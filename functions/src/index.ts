@@ -7,6 +7,7 @@ import { generateOtpCode, isOtpExpired } from "./otp";
 import { sendOtpEmail } from "./email";
 import { checkIpRateLimit, extractClientIp } from "./rate_limit";
 import {
+  FUNCTION_REGION,
   OTP_COLLECTION,
   OTP_TTL_MINUTES,
   OTP_MAX_ATTEMPTS,
@@ -51,7 +52,12 @@ interface VerifyOtpData {
 }
 
 export const sendOTP = onCall<SendOtpData>(
-  { cors: ALLOWED_ORIGINS, invoker: "public", secrets: [resendApiKey] },
+  {
+    cors: ALLOWED_ORIGINS,
+    invoker: "public",
+    secrets: [resendApiKey],
+    region: FUNCTION_REGION,
+  },
   async (request) => {
     const { email, name, isSignup } = request.data;
 
@@ -102,7 +108,7 @@ export const sendOTP = onCall<SendOtpData>(
 );
 
 export const verifyOTP = onCall<VerifyOtpData>(
-  { cors: ALLOWED_ORIGINS, invoker: "public" },
+  { cors: ALLOWED_ORIGINS, invoker: "public", region: FUNCTION_REGION },
   async (request) => {
     const { email, code } = request.data;
 
