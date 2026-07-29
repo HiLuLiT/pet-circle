@@ -1,9 +1,30 @@
+/**
+ * Escape a string for safe interpolation into HTML text/attribute content.
+ *
+ * Both `inviterName` and `petName` reach this template from client-controlled
+ * Firestore fields (`invitedByName` is the user's own display name), so
+ * interpolating them raw let a chosen display name inject markup into mail
+ * sent to a third party — see docs/bug-log.md BUG-041.
+ */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export function invitationEmailHtml(params: {
   inviterName: string;
   petName: string;
   inviteLink: string;
 }): string {
-  const { inviterName, petName, inviteLink } = params;
+  const inviterName = escapeHtml(params.inviterName);
+  const petName = escapeHtml(params.petName);
+  // The link ends up in an href attribute, and the invitation token is a
+  // client-chosen Firestore document ID, so escape it too.
+  const inviteLink = escapeHtml(params.inviteLink);
   return `<!DOCTYPE html>
 <html>
 <head>

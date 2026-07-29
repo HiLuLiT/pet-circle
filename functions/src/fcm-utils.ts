@@ -16,6 +16,16 @@ export interface InAppNotification {
   petName?: string;
   route?: string;
   petId?: string;
+  /**
+   * Localization keys mirroring `AppNotification.titleKey` / `bodyKey` on the
+   * client. When set, the in-app row is re-localized at render time by
+   * `lib/utils/notification_localizer.dart`; `title`/`body` remain the frozen
+   * fallback that the OS renders for the push banner itself.
+   */
+  titleKey?: string;
+  bodyKey?: string;
+  /** Positional arguments for a templated `titleKey`/`bodyKey`. */
+  args?: string[];
 }
 
 /**
@@ -101,29 +111,52 @@ export async function sendPushToUser(
 /**
  * Write an in-app notification to the user's Firestore notifications
  * subcollection, matching the AppNotification model on the client.
+ *
+ * Returns the document ID, or `null` if the write failed.
+ *
+ * The ID is generated locally by `.doc()` and written with `.set()` rather
+ * than letting `.add()` assign one, so callers can put it in the FCM `data`
+ * payload. The client stores the in-app row under that same ID, which is what
+ * lets `markRead` find the document — see `NotificationService.markRead`.
+ * Using `.add()` here left the client keying rows by `message.messageId`,
+ * so marking a pushed notification read failed with `not-found` and the
+ * optimistic flip rolled back (docs/bug-log.md BUG-038, same root-cause class
+ * as BUG-037 on the client side).
  */
 export async function writeInAppNotification(
   uid: string,
   notification: InAppNotification
-): Promise<void> {
+): Promise<string | null> {
   try {
-    await db
+    const ref = db
       .collection("users")
       .doc(uid)
       .collection("notifications")
-      .add({
-        title: notification.title,
-        body: notification.body,
-        type: notification.type,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        isRead: false,
-        ...(notification.petName && { petName: notification.petName }),
-        ...(notification.route && { route: notification.route }),
-        ...(notification.petId && { petId: notification.petId }),
-      });
+      .doc();
+
+    await ref.set({
+      title: notification.title,
+      body: notification.body,
+      type: notification.type,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      isRead: false,
+      ...(notification.petName && { petName: notification.petName }),
+      ...(notification.route && { route: notification.route }),
+      ...(notification.petId && { petId: notification.petId }),
+      ...(notification.titleKey && { titleKey: notification.titleKey }),
+      ...(notification.bodyKey && { bodyKey: notification.bodyKey }),
+      // Omit empty args to match the client's own write shape
+      // (AppNotification.toFirestore uses `if (args.isNotEmpty)`).
+      ...(notification.args && notification.args.length > 0
+        ? { args: notification.args }
+        : {}),
+    });
+
+    return ref.id;
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     logger.error("Failed to write in-app notification", { uid, error: msg });
+    return null;
   }
 }
 

@@ -112,10 +112,14 @@ service cloud.firestore {
           request.resource.data.pendingInvites[acceptedInvitationToken()] ==
               null &&
           request.resource.data.careCircle[request.auth.uid] != null &&
-          // Accept both legacy and new role values
-          (request.resource.data.careCircle[request.auth.uid].role == 'member' ||
-              request.resource.data.careCircle[request.auth.uid].role == 'viewer' ||
-              request.resource.data.careCircle[request.auth.uid].role == 'admin') &&
+          // Self-join may only ever grant 'member'. Previously 'viewer' and
+          // 'admin' were also accepted for legacy compatibility, which let an
+          // invitee hand themselves 'admin' — CareCirclePermissions.fromString
+          // maps that to CareCircleRole.owner, unlocking the edit / delete /
+          // manage-circle affordances. Invitations are always created with
+          // role 'member' (InvitationService._pendingInviteData), so this is
+          // behaviour-preserving for the real client.
+          request.resource.data.careCircle[request.auth.uid].role == 'member' &&
           (
               request.resource.data.careCircle[request.auth.uid].name ==
                   request.auth.token.email ||

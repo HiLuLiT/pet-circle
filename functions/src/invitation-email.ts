@@ -2,6 +2,7 @@ import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import { sendInvitationViaResend } from "./email";
+import { FUNCTION_REGION } from "./config";
 
 const resendApiKey = defineSecret("RESEND_API_KEY");
 
@@ -9,6 +10,7 @@ export const onInvitationCreated = onDocumentCreated(
   {
     document: "invitations/{token}",
     secrets: [resendApiKey],
+    region: FUNCTION_REGION,
   },
   async (event) => {
     const snap = event.data;
@@ -25,8 +27,16 @@ export const onInvitationCreated = onDocumentCreated(
       return;
     }
 
+    // A silent fallback here produces invite links pointing at the wrong host,
+    // which is invisible until a recipient reports a dead link.
+    if (!process.env.APP_URL) {
+      logger.warn(
+        "APP_URL is not set — invite links will use the default host",
+        { defaultHost: "https://petcircle.app" }
+      );
+    }
     const appUrl = process.env.APP_URL || "https://petcircle.app";
-    const inviteLink = `${appUrl}/invite?token=${token}`;
+    const inviteLink = `${appUrl}/invite?token=${encodeURIComponent(token)}`;
 
     // Reuse the same email sending pattern as OTP (singleton Resend client)
     const result = await sendInvitationViaResend(

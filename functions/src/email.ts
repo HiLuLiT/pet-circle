@@ -15,6 +15,34 @@ function getResendClient(): Resend {
   return resendClient;
 }
 
+/**
+ * Resend's shared sandbox sender. Mail sent from this address is only
+ * delivered to the Resend account owner, so real invitations silently never
+ * arrive. Set `FROM_EMAIL` (see .env.example) to a verified domain sender in
+ * any environment that needs to reach actual users.
+ */
+const SANDBOX_FROM_ADDRESS = "Pet Circle <onboarding@resend.dev>";
+
+function getFromAddress(): string {
+  const configured = process.env.FROM_EMAIL;
+  if (configured && configured.trim().length > 0) {
+    return configured.trim();
+  }
+  console.warn(
+    "FROM_EMAIL is not set — falling back to Resend's sandbox sender, " +
+      "which only delivers to the Resend account owner."
+  );
+  return SANDBOX_FROM_ADDRESS;
+}
+
+/**
+ * Strip CR/LF so interpolated user-controlled text cannot inject additional
+ * email headers via the subject line.
+ */
+function sanitiseSubject(subject: string): string {
+  return subject.replace(/[\r\n]+/g, " ").trim();
+}
+
 export function buildOtpEmailHtml(code: string): string {
   return `
     <div style="font-family: 'Helvetica Neue', Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px;">
@@ -43,7 +71,7 @@ export async function sendOtpEmail(
   try {
     const client = getResendClient();
     await client.emails.send({
-      from: "Pet Circle <onboarding@resend.dev>",
+      from: getFromAddress(),
       to: [to],
       subject: `${code} is your Pet Circle verification code`,
       html: buildOtpEmailHtml(code),
@@ -66,9 +94,11 @@ export async function sendInvitationViaResend(
   try {
     const client = getResendClient();
     await client.emails.send({
-      from: "Pet Circle <onboarding@resend.dev>",
+      from: getFromAddress(),
       to: [to],
-      subject: `${inviterName} invited you to ${petName}'s care circle`,
+      subject: sanitiseSubject(
+        `${inviterName} invited you to ${petName}'s care circle`
+      ),
       html: invitationEmailHtml({ inviterName, petName, inviteLink }),
       text: invitationEmailText({ inviterName, petName, inviteLink }),
     });

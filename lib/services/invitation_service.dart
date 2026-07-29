@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
@@ -151,9 +152,23 @@ class InvitationService {
 
         return AcceptResult(success: true, petId: invitation.petId);
       });
-    } on FirebaseException {
+    } on FirebaseException catch (e) {
+      // Log the real cause. The user-facing errorCode stays generic, but
+      // without this the most likely failure is invisible: the security rules
+      // require careCircle[uid].name to equal the auth token's email or name
+      // (firestore.rules canAcceptPendingInvite), while callers pass
+      // AppUser.displayName — so a user who renamed themselves gets an opaque
+      // permission-denied.
+      developer.log(
+        'acceptInvitation failed: ${e.code} ${e.message ?? ''}',
+        name: 'InvitationService',
+      );
       return AcceptResult(success: false, errorCode: 'invitationAcceptFailed');
-    } catch (_) {
+    } catch (e) {
+      developer.log(
+        'acceptInvitation failed with a non-Firebase error: $e',
+        name: 'InvitationService',
+      );
       return AcceptResult(success: false, errorCode: 'invitationAcceptFailed');
     }
   }
