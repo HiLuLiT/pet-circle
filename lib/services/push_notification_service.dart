@@ -14,6 +14,7 @@ import 'package:pet_circle/services/abstract_push_notification_service.dart';
 import 'package:pet_circle/services/reminder_service.dart';
 import 'package:pet_circle/stores/notification_store.dart';
 import 'package:pet_circle/utils/notification_localizer.dart';
+import 'package:pet_circle/utils/push_payload.dart';
 
 /// Top-level background handler — must be a top-level function for FCM.
 @pragma('vm:entry-point')
@@ -196,7 +197,7 @@ class PushNotificationService implements AbstractPushNotificationService {
     // in-app row is keyed by the same ID as the persisted document and
     // markRead can find it. Falls back to messageId for payloads sent by an
     // older function version. See docs/bug-log.md BUG-038.
-    final serverId = _validNotificationId(data['notificationId']);
+    final serverId = parseNotificationId(data['notificationId']);
     final fallbackId =
         message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
     final notificationId = serverId ?? fallbackId;
@@ -213,7 +214,7 @@ class PushNotificationService implements AbstractPushNotificationService {
       petId: data['petId'],
       titleKey: data['titleKey'] as String?,
       bodyKey: data['bodyKey'] as String?,
-      args: _decodeArgs(data['args']),
+      args: decodeNotificationArgs(data['args']),
     );
 
     // Localize the heads-up banner too. Without this, a push arriving while
@@ -231,36 +232,6 @@ class PushNotificationService implements AbstractPushNotificationService {
     );
 
     notificationStore.addLocal(appNotification);
-  }
-
-  /// Validate a payload-supplied Firestore document ID before it is used to
-  /// build a document path. The value comes from the push payload, and the
-  /// client writes to `.doc(id)` when marking the notification read.
-  String? _validNotificationId(Object? value) {
-    if (value is! String) return null;
-    final id = value.trim();
-    if (id.isEmpty || id.length > 128) return null;
-    // Firestore document IDs cannot contain '/', and '.'/'..' are reserved.
-    if (id.contains('/') || id == '.' || id == '..') return null;
-    return id;
-  }
-
-  /// Decode the JSON-encoded `args` list from an FCM data payload. FCM data
-  /// values are always strings, so the server sends `JSON.stringify(args)`.
-  List<String> _decodeArgs(Object? value) {
-    if (value is! String || value.isEmpty) return const [];
-    try {
-      final decoded = json.decode(value);
-      if (decoded is List) {
-        return decoded.map((e) => e.toString()).toList();
-      }
-    } catch (e) {
-      developer.log(
-        'Failed to decode notification args: $e',
-        name: 'PushNotificationService',
-      );
-    }
-    return const [];
   }
 
   NotificationType _notificationTypeFromData(Map<String, dynamic> data) {

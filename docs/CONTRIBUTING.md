@@ -65,6 +65,15 @@ Set `kEnableFirebase = false` in `lib/main.dart` to run entirely on mock data (n
 - Target: **80% coverage minimum**
 - Use `kEnableFirebase = false` for widget tests — all stores work from mock data
 
+### Cloud Functions
+
+- Tests live in `functions/test/` as CommonJS `*.test.js`, run by the built-in `node:test`
+  runner against the compiled output in `functions/lib/`, so they exercise what actually
+  deploys. No extra test dependency is needed.
+- Typecheck: `npm --prefix functions run typecheck` (`tsc --noEmit`)
+- Test: `npm --prefix functions test` (builds first). Requires Node 20+.
+- Neither runs in CI yet; the workflow is Flutter-only.
+
 ### Test structure
 ```
 test/

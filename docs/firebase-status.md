@@ -77,8 +77,10 @@ look up the recipient's locale from their user document and localize server-side
    language (see the limitation above).
 2. Additional push triggers — today only invite-accepted sends one. Candidates: SRR threshold
    alerts, measurements recorded by another circle member, medication ending.
-3. A `tsc --noEmit` (and ideally lint) step for `functions/` in CI. The workflow currently runs
-   Flutter jobs only, so TypeScript breakage in the functions codebase ships unnoticed.
+3. Wire `functions/` into CI. The workflow currently runs Flutter jobs only, so TypeScript
+   breakage in the functions codebase ships unnoticed. The scripts now exist — add a Node 20
+   job running `npm --prefix functions ci`, then `npm --prefix functions run typecheck`
+   (`tsc --noEmit`) and `npm --prefix functions test`.
 4. `firebase_storage` for pet photo upload when image management becomes a product requirement.
 5. Crashlytics after the next release candidate so production failures are visible before
    broader rollout.

@@ -116,6 +116,15 @@ docs/                  # PRD, bug log, firebase status, future features
 - Shared test helpers in `test/helpers/` (`test_app.dart`, `mock_stores.dart`).
 - Coverage target: **80%+** line coverage.
 
+### Cloud Functions tests
+
+- Tests live in `functions/test/` as CommonJS `*.test.js`, using the built-in `node:test`
+  runner against the compiled output in `functions/lib/` — so they exercise exactly what
+  deploys, with no extra test dependency.
+- Run with `npm --prefix functions test` (builds first). Typecheck with
+  `npm --prefix functions run typecheck`. Requires Node 20+.
+- CI does **not** run either yet — see `docs/firebase-status.md` → "Next Firebase Priorities".
+
 ---
 
 ## Figma Design System Rules
