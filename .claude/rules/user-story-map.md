@@ -2,7 +2,7 @@
 
 > Living user story map for Pet Circle. Tracks implementation status of every user story by role. Consult when working on any screen to understand what is done, what is partial, and what is missing. UPDATE this file after completing work on any story.
 
-Last updated: 2026-08-29 (M3 pet deletion made discoverable and correct -- BUG-050 / BUG-051)
+Last updated: 2026-08-30 (/pc-phase HIGH findings closed -- BUG-057..059 fixed, BUG-060 open)
 
 ## Update Protocol
 
@@ -141,7 +141,9 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - More push triggers -- only invite-accepted sends one today
 - Invitee-side decline of an invitation is denied by the rules on both writes
 - Invitation acceptance still relies on the `canAcceptPendingInvite` pet-document exception (BUG-019); moving accept into a callable function would remove it
-- No `tsc` step for `functions/` in CI, so TypeScript breakage there ships unnoticed
+- No `tsc`/test step for `functions/` in CI, so TypeScript breakage there ships unnoticed (the `typecheck` and `test` scripts now exist; CI just needs a Node 20 job calling them)
+- App language is not persisted -- `appLocale` resets to English on every cold start (BUG-060), which also makes in-app notifications render in English after relaunch
+- `NotificationStore` talks to the concrete static `NotificationService` rather than a repository, so its Firestore failure branches are unreachable from unit tests
 
 See `docs/firebase-status.md` -> "Known Gaps" for the full audited list.
 

@@ -112,6 +112,20 @@ Found during the Phase 2 audit, deliberately not fixed in that pass:
   enforced only on the client, so direct Firestore writes bypass it and each one triggers an
   outbound email to an arbitrary address. Raised to High as FB-004 — see
   `.claude/rules/screen-completion-guide.md`.
+- **`NotificationStore.markRead` rethrows into an unawaited call site.** `messages_screen.dart`
+  calls it without `await` and without a `catch`, so any failure other than `not-found` — most
+  realistically `unavailable` while offline — rolls the optimistic flip back and escapes as an
+  unhandled zone error. The user sees the row flash read and revert with no explanation.
+  Resolving it needs a product decision (surface a snackbar, or accept the write silently and
+  reconcile later) plus an l10n key, so it was not changed during the defect pass.
+- **The `not-found` branch in `markRead` has no test coverage and cannot get any as written.**
+  `NotificationStore` calls the concrete static `NotificationService` directly instead of going
+  through `lib/repositories/`, and the branch only executes when `userStore.currentUserUid` is
+  non-null. Closing this needs a `NotificationRepository` mirroring
+  `lib/repositories/invitation_repository.dart`, injected into the store.
+- **App language is not persisted** — see BUG-060. `appLocale` resets to English on every cold
+  start, which also means a Hebrew reader's in-app notifications render in English after
+  relaunch despite the BUG-039 fix.
 - **Function logs carry unredacted PII.** `functions/src/invitation-email.ts` logs the full
   `invitedEmail` together with the invite `token`, and `functions/src/email.ts` logs raw
   recipient addresses. `functions/src/index.ts` already has a `redactEmail` helper that these

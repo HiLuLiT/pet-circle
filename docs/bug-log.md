@@ -760,15 +760,25 @@ Tracks all bugs discovered during development and testing. Each entry includes c
 **Fix:** Three coordinated changes plus one class-level hardening.
 - `functions/src/fcm-utils.ts`: `writeInAppNotification` now generates the document reference locally with `.doc()`, writes with `.set()`, and returns the document ID (`Promise<string | null>`). The catch returns `null` explicitly, which `noImplicitReturns` requires under the new return type.
 - `functions/src/invitation-notification.ts`: the in-app write and the push are no longer run under `Promise.all`. The write happens first so its document ID can travel in the FCM `data` payload as `notificationId`. This ordering is a correctness requirement, not a style choice: `.doc()` generates the ID without a round trip, so parallel execution would still yield a stable ID, but a push tapped before the Firestore write landed would reproduce the same `not-found` rollback intermittently. A comment records this so it is not "optimized" back.
-- `lib/services/push_notification_service.dart`: `_handleForegroundMessage` prefers `data['notificationId']` for `AppNotification.id`, validating its shape via `_validNotificationId` before it is used to build a Firestore document path, and keeping `message.messageId` as a fallback for payloads from an older function version.
+- `lib/services/push_notification_service.dart`: `_handleForegroundMessage` prefers `data['notificationId']` for `AppNotification.id`, keeping `message.messageId` as a fallback for payloads from an older function version. The mapping and the ID validation live in `lib/utils/push_payload.dart` (`appNotificationFromPushData` / `parseNotificationId`) rather than in the service, so they are unit-testable without a Firebase binding; the ID is validated before it is used to build a Firestore document path.
 - `lib/stores/notification_store.dart`: `markRead` now treats `FirebaseException` with code `not-found` as terminal success — it logs and **keeps** the optimistic flip instead of reverting and rethrowing. This is the durable fix for the whole "flashes read then reverts" family, and it is the correct behaviour for rows that only ever existed in memory. Read state for such rows simply does not survive a restart, which is strictly better than reverting a second later.
 
 **Files changed:**
 - `functions/src/fcm-utils.ts`
 - `functions/src/invitation-notification.ts`
 - `lib/services/push_notification_service.dart`
+- `lib/utils/push_payload.dart`
 - `lib/stores/notification_store.dart`
 - `test/stores/notification_store_test.dart`
+- `test/utils/push_payload_test.dart`
+
+**Coverage note:** the `not-found` branch in `NotificationStore.markRead` is **not**
+covered by a test. `markRead` only reaches `NotificationService.markRead` when
+`userStore.currentUserUid` is non-null, and `NotificationStore` calls the concrete
+static `NotificationService` directly rather than going through `lib/repositories/`,
+so the branch is unreachable from a unit test. Closing that needs a
+`NotificationRepository` mirroring `invitation_repository.dart` — logged as a
+follow-up rather than done here.
 
 ---
 
@@ -1336,6 +1346,87 @@ inside the deleted screen and had no other host.
 `flutter_test`); `test/screens/dashboard/owner_dashboard_test.dart` -> 'hero pet card does not
 navigate anywhere', which also pins that long-press delete survived. The three pet-detail test files
 were deleted with the screen.
+---
+
+## BUG-057: Accepting an invitation lets the invitee evict every other care-circle member
+
+**Found during:** `/pc-phase` security review of the merged Phase 2 changeset (PR #17).
+**Severity:** High
+**Status:** Fixed
+
+**Symptom:** No symptom in normal use — an access-control integrity hole reachable by a modified client. Exploited, every non-owner member of a pet silently loses access to that pet and all of its measurements, notes, reminders and medications, while the care-circle UI continues to list them as members.
+
+**Root cause:** `canAcceptPendingInvite()` constrained `memberUids` with only three clauses: the caller must not already be in the old list, must be in the new list, and the new list's size must be exactly old + 1. Nothing required the pre-existing entries to be carried over, and `memberUids` is a list that tolerates duplicates. An invitee holding a valid pending invite could therefore submit `memberUids: [myUid, myUid, …]` sized `old + 1`, satisfying every clause while dropping everyone else. Since `isPetMemberData()` gates reads on `request.auth.uid in data.memberUids`, the evicted users immediately fail authorization. The pet owner survives via the separate `data.ownerId == request.auth.uid` branch. The removal is silent because the write is restricted to the accepter's own `careCircle` key, so the evicted members' `careCircle` entries — which is what the UI renders — remain intact.
+
+This predates the Phase 2 work; BUG-040 hardened the *role* an invitee may assign themselves in this same function but left the membership-list integrity unconstrained.
+
+**Fix:** Two clauses added to `canAcceptPendingInvite()` in `firestore.rules`:
+- `resource.data.memberUids.hasOnly(request.resource.data.memberUids)` — every old member must be present in the new list (old ⊆ new).
+- `request.resource.data.memberUids.toSet().size() == request.resource.data.memberUids.size()` — rejects duplicate padding, which would otherwise let the size check pass without adding a distinct member.
+
+With `old ⊆ new`, `size(new) == size(old) + 1`, `uid ∈ new` and `uid ∉ old`, the new list is forced to be exactly the old list plus the caller.
+
+The durable fix remains moving acceptance into a callable Cloud Function using the Admin SDK (BUG-019), which would stop the client authoring `memberUids` at all.
+
+**Files changed:**
+- `firestore.rules`
+
+---
+
+## BUG-058: `NotificationStore` rollback used a stale list index across an `await`
+
+**Found during:** `/pc-phase` Flutter review of the merged Phase 2 changeset (PR #17).
+**Severity:** High
+**Status:** Fixed
+
+**Symptom:** When persisting a read-state change fails, the wrong notification can be marked unread — or the app throws a `RangeError` from an unawaited future.
+
+**Root cause:** `markRead` resolved the target's index *before* awaiting the Firestore write, then reused that index in the failure path. `_notifications` is mutated concurrently: `addLocal` inserts at position 0 from the FCM foreground handler, and `fetchForUser` replaces the list wholesale from pull-to-refresh (`messages_screen.dart`). A shift therefore made the rollback write `isRead: false` into whichever row now occupied that index, and a shorter replacement list made the subscript throw. `markAllRead` had the same class of defect from the other direction: it restored a wholesale `previous` snapshot, discarding any notification that arrived while the write was in flight.
+
+**Fix:** Added a private `_setReadState(id, isRead:)` helper that always re-resolves the index by ID, and routed both the optimistic flip and the rollback through it. `markAllRead` now records the IDs it actually flipped and reverts only those, instead of restoring a snapshot. It also returns early when nothing is unread, which makes its existing "all already read is a no-op" test literally true.
+
+**Files changed:**
+- `lib/stores/notification_store.dart`
+
+---
+
+## BUG-059: `npm test` for Cloud Functions failed on the pinned Node runtime
+
+**Found during:** `/pc-phase` code review of the merged Phase 2 changeset (PR #17).
+**Severity:** High
+**Status:** Fixed
+
+**Symptom:** `npm --prefix functions test` exits non-zero without running any test, on Node 20 — the version pinned in `functions/package.json` `engines.node` and used by the Firebase Functions runtime. The recommended CI job documented in the same changeset would therefore have failed on its first run.
+
+**Root cause:** The script was `node --test "test/**/*.test.js"`. Passing a *quoted* glob relies on the test runner expanding glob patterns itself, which is not supported on Node 20 — the pattern is taken as a literal path and no file matches. It passed during development only because the authoring environment had Node 22.
+
+**Fix:** No change is carried by this entry — `main` had already landed an equivalent fix (`node --test test/`) before this branch was rebased, so the branch's own `functions/package.json` edit was dropped as redundant.
+
+The original fix proposed here was `node --test test/*.test.js`, unquoted, letting the **shell** expand the pattern into concrete file paths. This entry originally recorded that the bare-directory form `node --test test/` "does not work … even on Node 22". That claim did **not** reproduce on re-verification: on Node 20.10.0, in a clean `npm ci` tree, **both** forms run the suite and pass 22/22. The directory form additionally recurses into subdirectories, which the glob does not, so `main`'s version is the better of the two and was kept.
+
+The underlying defect — the original quoted `node --test "test/**/*.test.js"`, which relies on runner-side glob expansion unavailable on Node 20 — was real; only the comparison between the two candidate fixes was wrong.
+
+**Files changed:**
+- (none — superseded by the equivalent fix already on `main`)
+
+---
+
+## BUG-060: App language selection is lost on every cold start
+
+**Found during:** `/pc-phase` Flutter review of the merged Phase 2 changeset (PR #17).
+**Severity:** High
+**Status:** Open
+
+**Symptom:** A user who switches the app to Hebrew sees the entire UI revert to English the next time the app is launched. The language switcher must be touched again on every launch.
+
+**Root cause:** `appLocale` (`lib/config/app_config.dart`) is an in-memory `ValueNotifier` initialised to `const Locale('en')` and consumed by `main.dart`'s `ValueListenableBuilder` as the app's locale. It is written in exactly two places — the English and Hebrew buttons in `settings_widgets.dart` — and nothing ever restores it. There is no locale or language field in `UserSettings` at all, so the choice is never persisted to Firestore and never seeded at startup.
+
+This is pre-existing and app-wide, not specific to notifications. It is recorded here because it partially blunts BUG-039: a Hebrew reader's in-app notification will render in English after a cold start, for the same reason the rest of their UI does.
+
+**Fix:** Not yet applied. Needs a `locale` (or `languageCode`) field on `UserSettings` with `fromMap`/`toMap`/`copyWith` support, persistence through `SettingsStore`, and seeding of `appLocale.value` during `seedFromAppUser` — before `PushNotificationService.setupForegroundHandler()` can fire. Deliberately out of scope for the Phase 2 defect pass, which was limited to the push-notification and invitation paths.
+
+**Files changed:**
+- (none yet)
 
 ---
 
