@@ -106,3 +106,11 @@ Found during the Phase 2 audit, deliberately not fixed in that pass:
   silently degrades to "not found".
 - **`emergencyAlerts` and the medication morning/evening times** persist to Firestore but drive
   no behaviour.
+- **Invitation creation has no server-side rate limit.** `InvitationService.maxInvitesPerDay` is
+  enforced only on the client, so direct Firestore writes bypass it and each one triggers an
+  outbound email to an arbitrary address. Raised to High as FB-004 — see
+  `.claude/rules/screen-completion-guide.md`.
+- **Function logs carry unredacted PII.** `functions/src/invitation-email.ts` logs the full
+  `invitedEmail` together with the invite `token`, and `functions/src/email.ts` logs raw
+  recipient addresses. `functions/src/index.ts` already has a `redactEmail` helper that these
+  call sites should use; a token in logs is itself a credential for accepting an invitation.

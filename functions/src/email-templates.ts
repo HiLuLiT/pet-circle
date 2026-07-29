@@ -1,10 +1,32 @@
+/** Maximum rendered length for a user-controlled name in an email. */
+const MAX_INLINE_LENGTH = 100;
+
+/**
+ * Flatten a user-controlled value to a single capped line.
+ *
+ * Escaping alone is not enough for these fields. `inviterName` is the sender's
+ * own display name and `petName` is free text, both client-controlled, and the
+ * recipient address is attacker-chosen too — so a name containing newlines can
+ * forge extra lines in the plain-text part of the mail. Mail clients
+ * auto-linkify bare URLs in `text/plain`, which reintroduces the very
+ * attacker-planted link that HTML escaping removes, inside a message signed by
+ * the project's sending domain. Collapsing line breaks and capping length
+ * closes that, and applies to every MIME part and the subject alike.
+ * See docs/bug-log.md BUG-041.
+ */
+export function sanitiseInline(value: string): string {
+  return value
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/\s{2,}/g, " ")
+    .trim()
+    .slice(0, MAX_INLINE_LENGTH);
+}
+
 /**
  * Escape a string for safe interpolation into HTML text/attribute content.
  *
- * Both `inviterName` and `petName` reach this template from client-controlled
- * Firestore fields (`invitedByName` is the user's own display name), so
- * interpolating them raw let a chosen display name inject markup into mail
- * sent to a third party — see docs/bug-log.md BUG-041.
+ * Always applied on top of [sanitiseInline] for user-controlled values, never
+ * instead of it.
  */
 function escapeHtml(value: string): string {
   return value
@@ -20,8 +42,8 @@ export function invitationEmailHtml(params: {
   petName: string;
   inviteLink: string;
 }): string {
-  const inviterName = escapeHtml(params.inviterName);
-  const petName = escapeHtml(params.petName);
+  const inviterName = escapeHtml(sanitiseInline(params.inviterName));
+  const petName = escapeHtml(sanitiseInline(params.petName));
   // The link ends up in an href attribute, and the invitation token is a
   // client-chosen Firestore document ID, so escape it too.
   const inviteLink = escapeHtml(params.inviteLink);
@@ -66,7 +88,12 @@ export function invitationEmailText(params: {
   petName: string;
   inviteLink: string;
 }): string {
-  const { inviterName, petName, inviteLink } = params;
+  // Line breaks here would let a crafted display name forge a second
+  // "Join the circle:" line pointing at an attacker URL, which mail clients
+  // render as a live link. See [sanitiseInline].
+  const inviterName = sanitiseInline(params.inviterName);
+  const petName = sanitiseInline(params.petName);
+  const { inviteLink } = params;
   return [
     "You're invited to Pet Circle!",
     "",

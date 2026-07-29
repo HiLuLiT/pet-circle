@@ -1,6 +1,10 @@
 import { Resend } from "resend";
 import { OTP_TTL_MINUTES } from "./config";
-import { invitationEmailHtml, invitationEmailText } from "./email-templates";
+import {
+  invitationEmailHtml,
+  invitationEmailText,
+  sanitiseInline,
+} from "./email-templates";
 
 let resendClient: Resend | null = null;
 
@@ -33,14 +37,6 @@ function getFromAddress(): string {
       "which only delivers to the Resend account owner."
   );
   return SANDBOX_FROM_ADDRESS;
-}
-
-/**
- * Strip CR/LF so interpolated user-controlled text cannot inject additional
- * email headers via the subject line.
- */
-function sanitiseSubject(subject: string): string {
-  return subject.replace(/[\r\n]+/g, " ").trim();
 }
 
 export function buildOtpEmailHtml(code: string): string {
@@ -96,9 +92,10 @@ export async function sendInvitationViaResend(
     await client.emails.send({
       from: getFromAddress(),
       to: [to],
-      subject: sanitiseSubject(
-        `${inviterName} invited you to ${petName}'s care circle`
-      ),
+      // Sanitise the interpolated names, not the assembled subject: this also
+      // caps their length, and prevents header injection via CR/LF.
+      subject: `${sanitiseInline(inviterName)} invited you to ` +
+        `${sanitiseInline(petName)}'s care circle`,
       html: invitationEmailHtml({ inviterName, petName, inviteLink }),
       text: invitationEmailText({ inviterName, petName, inviteLink }),
     });

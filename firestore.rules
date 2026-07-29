@@ -137,7 +137,17 @@ service cloud.firestore {
     function canCreateInvitation() {
       return signedIn() &&
           request.resource.data.invitedByUid == request.auth.uid &&
-          isPetOwner(request.resource.data.petId);
+          isPetOwner(request.resource.data.petId) &&
+          // Creating an invitation triggers an outbound email that interpolates
+          // these two client-controlled fields, so bound what the trigger can
+          // be handed. The email templates also flatten and truncate them
+          // (functions/src/email-templates.ts sanitiseInline); this is the
+          // server-side ceiling. The limit is far above any real display or
+          // pet name.
+          request.resource.data.invitedByName is string &&
+          request.resource.data.invitedByName.size() <= 200 &&
+          request.resource.data.petName is string &&
+          request.resource.data.petName.size() <= 200;
     }
 
     function canCancelInvitation() {

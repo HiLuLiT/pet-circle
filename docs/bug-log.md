@@ -828,15 +828,21 @@ No ARB or generated-localization changes were needed.
 
 **Root cause:** `functions/src/email-templates.ts` interpolated `inviterName` and `petName` straight into the email HTML. Both originate from client-controlled Firestore fields — `invitedByName` is the sender's own display name, taken from `userStore.currentUserDisplayName`. Because the recipient's address is also attacker-chosen, this was a content/link injection vector in mail that legitimately originates from the project's sending domain: a phishing primitive rather than a browser XSS. The invitation link was interpolated unescaped into an `href` as well, and the invitation token forming part of that link is a client-chosen Firestore document ID. Separately, the email subject interpolated the same unescaped values, so a display name containing CR/LF could inject additional mail headers.
 
+Escaping alone turned out to be insufficient. The first pass at this fix escaped the HTML part only, on the reasoning that a plain-text body has nothing to escape. A security review caught that this misses **line-structure forging**: the `text/plain` alternative interpolated the same raw values, and mail clients auto-linkify bare URLs in plain text. A display name containing newlines could therefore forge an extra `Join the circle: https://evil.example/...` line above the real one — reintroducing exactly the attacker-planted link that HTML escaping removes, in a message signed by the project's sending domain, rendered by every text-only client and every preview pane preferring `text/plain`.
+
 **Fix:**
-- `functions/src/email-templates.ts`: added an `escapeHtml` helper and applied it to `inviterName`, `petName`, and `inviteLink` at every HTML interpolation site. The plain-text template needs no escaping.
-- `functions/src/email.ts`: added `sanitiseSubject`, which strips CR/LF from the subject line.
+- `functions/src/email-templates.ts`: added `sanitiseInline`, which collapses CR/LF/tabs and whitespace runs to single spaces and caps length at 100 characters. It is applied to `inviterName` and `petName` in **both** the HTML and the plain-text template — escaping is layered on top of it for the HTML part, never instead of it. Also added `escapeHtml`, applied to `inviterName`, `petName`, and `inviteLink` at every HTML interpolation site.
+- `functions/src/email.ts`: the subject line now interpolates `sanitiseInline`-processed names rather than stripping CR/LF from the assembled string, which additionally caps their length.
 - `functions/src/invitation-email.ts`: the token is now `encodeURIComponent`-encoded when building the invite link.
+- `firestore.rules`: `canCreateInvitation()` now requires `invitedByName` and `petName` to be strings of at most 200 characters, bounding the payload the email trigger can be handed at the server. The templates truncate independently; this is the outer ceiling.
+
+**Related, not fixed here:** invitation creation has no server-side rate limit — `InvitationService.maxInvitesPerDay` is enforced only on the client, so direct Firestore writes bypass it and every create fires an outbound email to an arbitrary address. That is what makes this injection surface weaponisable at scale. Tracked as FB-004, raised to High.
 
 **Files changed:**
 - `functions/src/email-templates.ts`
 - `functions/src/email.ts`
 - `functions/src/invitation-email.ts`
+- `firestore.rules`
 
 ---
 
