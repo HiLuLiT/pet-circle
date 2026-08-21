@@ -7,8 +7,16 @@ import '../tokens/colors.dart';
 ///
 /// Usage: `AppSemanticColors.of(context).primary`
 ///
-/// As of Pet Circle v3 (Claude-Design palette), the light theme points at
-/// the `pc*` primitives. The dark theme is a sensible inverted mapping.
+/// As of Pet Circle v3 (Claude-Design palette), the light theme points at the
+/// `pc*` primitives and the dark theme at the `pcDark*` set.
+///
+/// Dark is a **per-role transform**, not an inversion. Each role gets its own
+/// dark value: a wash/tile drops to L* 13-17, a solid accent is roughly held,
+/// and a text/icon accent is lifted — while hue stays put. Critically, no field
+/// falls through to a light-mode primitive; reusing light pastels as dark fills
+/// is what made every badge in the app a floodlight on near-black. See
+/// [AppPrimitives] "Warm Charcoal" for the derivation and the measured ratios,
+/// and test/theme/dark_contrast_test.dart for the assertions.
 @immutable
 class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   const AppSemanticColors({
@@ -35,6 +43,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     // ── PC v3 additions ───────────────────────────────────────────────────
     required this.surfaceRecessed,
     required this.hairline,
+    required this.disabledSurface,
+    required this.disabledOnSurface,
+    required this.knobFill,
     required this.accentPurple,
     required this.accentPurpleTile,
     required this.accentPeriwinkle,
@@ -89,6 +100,18 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   // ── PC v3 additions ────────────────────────────────────────────────────
   final Color surfaceRecessed;
   final Color hairline;
+
+  /// Fill of a disabled filled control (e.g. `PrimaryButton` when
+  /// `onPressed == null`). Distinct from [disabled], which is a *content*
+  /// colour, not a surface.
+  final Color disabledSurface;
+
+  /// Label/icon colour on top of [disabledSurface].
+  final Color disabledOnSurface;
+
+  /// The moving knob of a switch or toggle. Reads as "the lightest thing in the
+  /// control" in both themes, so it cannot be [surface] (which inverts).
+  final Color knobFill;
   final Color accentPurple;
   final Color accentPurpleTile;
   final Color accentPeriwinkle;
@@ -97,8 +120,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color accentButter;
   final Color accentButterTile;
 
-  /// Warm cream tile (#E8E4D8) — toggle off-track, note callouts. Theme-
-  /// independent, like the other accent tiles.
+  /// Warm cream tile — toggle off-track, note callouts. Light #E8E4D8, dark
+  /// #2A2620; it is a *surface*, so it inverts like every other tile.
   final Color accentButterCream;
   final Color accentBlush;
   final Color accentBlushTile;
@@ -144,6 +167,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     textDisabled: AppPrimitives.pcInkTertiary,
     surfaceRecessed: AppPrimitives.pcRecessed,
     hairline: AppPrimitives.pcHairline,
+    disabledSurface: AppPrimitives.pcDisabledSurface,
+    disabledOnSurface: AppPrimitives.pcDisabledOnSurface,
+    knobFill: AppPrimitives.pcSurface,
     accentPurple: AppPrimitives.pcPurple,
     accentPurpleTile: AppPrimitives.pcPurpleTile,
     accentPeriwinkle: AppPrimitives.pcPeriwinkle,
@@ -172,56 +198,65 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     statusInvitedText: AppPrimitives.yellowDarkest,
   );
 
-  // ── Dark theme (inverted) ────────────────────────────────────────────────
+  // ── Dark theme ("Warm Charcoal" — per-role transform, see class doc) ─────
+  // Every field below resolves to a `pcDark*` primitive. If you add a field to
+  // this class, give it a real dark value here — do not let it fall through to
+  // a light primitive.
   static const dark = AppSemanticColors(
-    primary: AppPrimitives.pcPurpleTile,
-    onPrimary: AppPrimitives.pcInk,
-    primaryLight: AppPrimitives.pcPurpleTile,
-    primaryLightest: AppPrimitives.inkDarker,
-    primaryGhost: AppPrimitives.inkDark,
-    surface: AppPrimitives.inkDarker,
-    onSurface: AppPrimitives.pcSurface,
-    background: AppPrimitives.inkDarkest,
-    onBackground: AppPrimitives.pcSurface,
-    error: AppPrimitives.pcBlush,
-    onError: AppPrimitives.pcInk,
-    success: AppPrimitives.pcMint,
-    warning: AppPrimitives.pcButter,
-    info: AppPrimitives.pcPeriwinkle,
-    divider: AppPrimitives.inkBase,
-    disabled: AppPrimitives.inkDark,
-    textPrimary: AppPrimitives.pcSurface,
-    textSecondary: AppPrimitives.skyDark,
-    textTertiary: AppPrimitives.skyBase,
-    textDisabled: AppPrimitives.inkLighter,
-    surfaceRecessed: AppPrimitives.inkDark,
-    hairline: AppPrimitives.inkBase,
-    accentPurple: AppPrimitives.pcPurple,
-    accentPurpleTile: AppPrimitives.pcPurpleTile,
-    accentPeriwinkle: AppPrimitives.pcPeriwinkle,
-    accentPeriwinkleTile: AppPrimitives.pcPeriwinkleTile,
-    accentPeriwinkleChip: AppPrimitives.pcPeriwinkleChip,
-    accentButter: AppPrimitives.pcButter,
-    accentButterTile: AppPrimitives.pcButterTile,
-    accentButterCream: AppPrimitives.pcButterCream,
-    accentBlush: AppPrimitives.pcBlush,
-    accentBlushTile: AppPrimitives.pcBlushTile,
-    accentMint: AppPrimitives.pcMint,
-    accentMintTile: AppPrimitives.pcMintTile,
-    statusNormalBg: AppPrimitives.pcStatusNormalBg,
-    statusNormalDot: AppPrimitives.pcStatusNormalDot,
-    statusNormalText: AppPrimitives.pcStatusNormalText,
-    statusElevatedBg: AppPrimitives.pcStatusElevatedBg,
-    statusElevatedDot: AppPrimitives.pcStatusElevatedDot,
-    statusElevatedText: AppPrimitives.pcStatusElevatedText,
-    statusAlertBg: AppPrimitives.pcStatusAlertBg,
-    statusAlertDot: AppPrimitives.pcStatusAlertDot,
-    statusAlertText: AppPrimitives.pcStatusAlertText,
-    statusActiveBg: AppPrimitives.pcStatusActiveBg,
-    statusActiveDot: AppPrimitives.pcStatusActiveDot,
-    statusActiveText: AppPrimitives.pcStatusActiveText,
-    statusInvitedBg: AppPrimitives.yellowLightest,
-    statusInvitedText: AppPrimitives.yellowDarkest,
+    primary: AppPrimitives.pcDarkPurple,
+    onPrimary: AppPrimitives.pcDarkCanvas,
+    primaryLight: AppPrimitives.pcDarkPurpleLight,
+    primaryLightest: AppPrimitives.pcDarkPurpleWash,
+    primaryGhost: AppPrimitives.pcDarkPurpleGhost,
+    surface: AppPrimitives.pcDarkSurface,
+    onSurface: AppPrimitives.pcDarkInk,
+    background: AppPrimitives.pcDarkCanvas,
+    onBackground: AppPrimitives.pcDarkInk,
+    error: AppPrimitives.pcDarkBlush,
+    onError: AppPrimitives.pcDarkCanvas,
+    success: AppPrimitives.pcDarkMint,
+    warning: AppPrimitives.pcDarkButter,
+    info: AppPrimitives.pcDarkPeriwinkle,
+    divider: AppPrimitives.pcDarkDivider,
+    disabled: AppPrimitives.pcDarkInkDisabled,
+    textPrimary: AppPrimitives.pcDarkInk,
+    textSecondary: AppPrimitives.pcDarkInkSecondary,
+    textTertiary: AppPrimitives.pcDarkInkTertiary,
+    textDisabled: AppPrimitives.pcDarkInkDisabled,
+    surfaceRecessed: AppPrimitives.pcDarkWell,
+    hairline: AppPrimitives.pcDarkHairline,
+    disabledSurface: AppPrimitives.pcDarkElevated,
+    disabledOnSurface: AppPrimitives.pcDarkInkDisabled,
+    knobFill: AppPrimitives.pcDarkInk,
+    // Accents: the *tile* is a dedicated dark wash, the *accent* the bright
+    // foreground. Note accentPurple/accentPurpleTile deliberately swap register
+    // relative to light — pcPurpleTile is the dark foreground.
+    accentPurple: AppPrimitives.pcPurpleTile,
+    accentPurpleTile: AppPrimitives.pcDarkPurpleWash,
+    accentPeriwinkle: AppPrimitives.pcDarkPeriwinkle,
+    accentPeriwinkleTile: AppPrimitives.pcDarkPeriwinkleTile,
+    accentPeriwinkleChip: AppPrimitives.pcDarkPeriwinkleChip,
+    accentButter: AppPrimitives.pcDarkButter,
+    accentButterTile: AppPrimitives.pcDarkButterTile,
+    accentButterCream: AppPrimitives.pcDarkButterCream,
+    accentBlush: AppPrimitives.pcDarkBlush,
+    accentBlushTile: AppPrimitives.pcDarkBlushTile,
+    accentMint: AppPrimitives.pcDarkMint,
+    accentMintTile: AppPrimitives.pcDarkMintTile,
+    statusNormalBg: AppPrimitives.pcDarkPeriwinkleTile,
+    statusNormalDot: AppPrimitives.pcDarkPeriwinkle,
+    statusNormalText: AppPrimitives.pcDarkStatusNormalText,
+    statusElevatedBg: AppPrimitives.pcDarkButterTile,
+    statusElevatedDot: AppPrimitives.pcDarkButter,
+    statusElevatedText: AppPrimitives.pcDarkStatusElevatedText,
+    statusAlertBg: AppPrimitives.pcDarkBlushTile,
+    statusAlertDot: AppPrimitives.pcDarkBlush,
+    statusAlertText: AppPrimitives.pcDarkStatusAlertText,
+    statusActiveBg: AppPrimitives.pcDarkMintTile,
+    statusActiveDot: AppPrimitives.pcDarkMint,
+    statusActiveText: AppPrimitives.pcDarkStatusActiveText,
+    statusInvitedBg: AppPrimitives.pcDarkButterTile,
+    statusInvitedText: AppPrimitives.pcDarkStatusElevatedText,
   );
 
   /// Convenience accessor. Falls back to [light] when no theme extension is
@@ -254,6 +289,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? textDisabled,
     Color? surfaceRecessed,
     Color? hairline,
+    Color? disabledSurface,
+    Color? disabledOnSurface,
+    Color? knobFill,
     Color? accentPurple,
     Color? accentPurpleTile,
     Color? accentPeriwinkle,
@@ -304,6 +342,9 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       textDisabled: textDisabled ?? this.textDisabled,
       surfaceRecessed: surfaceRecessed ?? this.surfaceRecessed,
       hairline: hairline ?? this.hairline,
+      disabledSurface: disabledSurface ?? this.disabledSurface,
+      disabledOnSurface: disabledOnSurface ?? this.disabledOnSurface,
+      knobFill: knobFill ?? this.knobFill,
       accentPurple: accentPurple ?? this.accentPurple,
       accentPurpleTile: accentPurpleTile ?? this.accentPurpleTile,
       accentPeriwinkle: accentPeriwinkle ?? this.accentPeriwinkle,
@@ -359,6 +400,13 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       textDisabled: Color.lerp(textDisabled, other.textDisabled, t)!,
       surfaceRecessed: Color.lerp(surfaceRecessed, other.surfaceRecessed, t)!,
       hairline: Color.lerp(hairline, other.hairline, t)!,
+      disabledSurface: Color.lerp(disabledSurface, other.disabledSurface, t)!,
+      disabledOnSurface: Color.lerp(
+        disabledOnSurface,
+        other.disabledOnSurface,
+        t,
+      )!,
+      knobFill: Color.lerp(knobFill, other.knobFill, t)!,
       accentPurple: Color.lerp(accentPurple, other.accentPurple, t)!,
       accentPurpleTile: Color.lerp(
         accentPurpleTile,

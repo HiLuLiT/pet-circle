@@ -80,12 +80,84 @@ class AppPrimitives {
   static const Color pcStatusActiveDot = Color(0xFF2F6B3E);
   static const Color pcStatusActiveText = Color(0xFF2F6B3E);
 
-  // ── PC v3: Dark-mode surfaces (warm-tinted) ──────────────────────────────
-  static const Color pcDarkBg = Color(0xFF1A1A1A);
-  static const Color pcDarkSurface = Color(0xFF1A1A1A);
-  static const Color pcDarkRecessed = Color(0xFF2A2420);
-  static const Color pcDarkOnSurface = Color(0xFFF5E6E0);
-  static const Color pcDarkOnSurfaceMuted = Color(0xFFB0B0B0);
+  // ── PC v3: Disabled surfaces ─────────────────────────────────────────────
+  // Light-mode disabled button fill + label. Previously hardcoded inside
+  // primary_button.dart; hoisted here so dark mode can override them.
+  static const Color pcDisabledSurface = Color(0xFFE2DED5);
+  static const Color pcDisabledOnSurface = Color(0xFFA7A2AE);
+
+  // ═════════════════════════════════════════════════════════════════════════
+  // PC v3: Dark mode — "Warm Charcoal"
+  // ═════════════════════════════════════════════════════════════════════════
+  // A per-role transform of the light palette, NOT an inversion. Hue is the
+  // invariant: every surface below sits in a 35-45deg warm band — the same band
+  // as the light background pcBg (40deg) — at 9-12% HSL saturation, so the
+  // warmth reads as "warm grey" and never tips into brown. pcDarkInk carries
+  // pcBg's exact hue and saturation, so the dark foreground is the light
+  // background's signature.
+  //
+  // Two rules govern the accents, both measured from shipping token sources
+  // (Radix Colors, Material 3, Primer):
+  //   1. A light-mode pastel is NEVER reused as a dark-mode *fill*. Each candy
+  //      family gets a dedicated dark tile (L* 13-17) for backgrounds.
+  //   2. The light-mode *tile* becomes the dark-mode *foreground* — pcPurpleTile
+  //      is wrong as a dark background but excellent as a dark accent (9.4:1).
+  //
+  // pcDarkInk lands at 15.06:1 on the canvas, deliberately short of the 21:1
+  // sRGB maximum. Pure white on near-black visually vibrates, and that — not
+  // the hue — is what made the previous dark theme read as harsh. 14-16.5:1 is
+  // the band Material 3, Primer and Carbon all independently converge on.
+  //
+  // Ratios in the comments are WCAG 2.x against pcDarkCanvas unless noted, and
+  // are asserted in test/theme/dark_contrast_test.dart.
+
+  // ── Dark: surface ladder (delta L* +2.5 / +3.5 / +4.3) ───────────────────
+  // Elevation is carried by the ladder, not by shadow — shadows barely register
+  // on a dark canvas, which is why the old dark theme had no elevation signal.
+  static const Color pcDarkCanvas = Color(0xFF141310); // L* 5.9  scaffold
+  static const Color pcDarkWell = Color(0xFF1A1815); // L* 8.4  inputs, wells
+  static const Color pcDarkSurface = Color(0xFF211F1B); // L* 11.8 cards
+  static const Color pcDarkElevated = Color(0xFF2A2823); // L* 16.2 sheets
+  static const Color pcDarkHairline = Color(0xFF2E2A24);
+  static const Color pcDarkDivider = Color(0xFF3A352E);
+
+  // ── Dark: text (monotonic by luminance) ──────────────────────────────────
+  static const Color pcDarkInk = Color(0xFFEBE7DF); // 15.06:1  AAA
+  static const Color pcDarkInkSecondary = Color(0xFFABA59A); // 7.59:1  AAA
+  // 6.17:1 on the canvas, and still 4.89:1 on pcDarkElevated — the tightest
+  // pairing in the palette, which is what sets this value.
+  static const Color pcDarkInkTertiary = Color(0xFF9A9489);
+  static const Color pcDarkInkDisabled = Color(0xFF615C54); // 2.80:1 (exempt)
+
+  // ── Dark: brand (purple) ─────────────────────────────────────────────────
+  // Material 3's tone-80 pattern: the light primary lifted in lightness with
+  // hue held (257deg here vs the light theme's 259deg).
+  static const Color pcDarkPurple = Color(0xFFB4A0E8); // 8.08:1
+  static const Color pcDarkPurpleLight = Color(0xFFC9B9F2); // hover / pressed
+  static const Color pcDarkPurpleWash = Color(0xFF251F33); // recessed purple
+  static const Color pcDarkPurpleGhost = Color(0xFF2B2440); // avatar/icon tiles
+
+  // ── Dark: accent tiles (backgrounds — never a light pastel) ──────────────
+  static const Color pcDarkPeriwinkleTile = Color(0xFF1C2337);
+  static const Color pcDarkPeriwinkleChip = Color(0xFF212942);
+  static const Color pcDarkButterTile = Color(0xFF302A18);
+  static const Color pcDarkButterCream = Color(0xFF2A2620);
+  static const Color pcDarkBlushTile = Color(0xFF331E28);
+  static const Color pcDarkMintTile = Color(0xFF1B2E22);
+
+  // ── Dark: accent foregrounds (icons, dots, text) ─────────────────────────
+  static const Color pcDarkPeriwinkle = Color(0xFF9FB6EE); // 9.20:1
+  static const Color pcDarkButter = Color(0xFFE8C97A); // 11.56:1
+  static const Color pcDarkBlush = Color(0xFFF0A0BC); // 9.25:1
+  static const Color pcDarkMint = Color(0xFF8FD3A0); // 10.61:1
+
+  // ── Dark: status pill text ───────────────────────────────────────────────
+  // Pill backgrounds and dots reuse the accent tiles / foregrounds above; only
+  // the text needs its own step, lifted for >=9:1 on its own pill.
+  static const Color pcDarkStatusNormalText = Color(0xFFB6C7F2); // 9.25:1
+  static const Color pcDarkStatusElevatedText = Color(0xFFEFD79A); // 10.11:1
+  static const Color pcDarkStatusAlertText = Color(0xFFF4B8CB); // 9.26:1
+  static const Color pcDarkStatusActiveText = Color(0xFFA8DEB5); // 9.44:1
 
   // ═════════════════════════════════════════════════════════════════════════
   // Legacy v2 palette (kept for compatibility — do not use in new code)
