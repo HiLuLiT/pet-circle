@@ -1,5 +1,8 @@
+import 'package:flutter/material.dart' show ThemeMode;
+
 class UserSettings {
   const UserSettings({
+    this.themeMode = ThemeMode.system,
     this.elevatedThreshold = 30,
     this.criticalThreshold = 40,
     this.pushNotifications = true,
@@ -16,6 +19,10 @@ class UserSettings {
     this.medicationEveningHour = 21,
     this.medicationEveningMinute = 0,
   });
+
+  /// Light / dark / follow-the-OS. Defaults to [ThemeMode.system]: before this
+  /// field existed the app hardcoded light and ignored the OS setting entirely.
+  final ThemeMode themeMode;
 
   final int elevatedThreshold;
   final int criticalThreshold;
@@ -59,6 +66,7 @@ class UserSettings {
 
   factory UserSettings.fromMap(Map<String, dynamic> data) {
     return UserSettings(
+      themeMode: parseThemeMode(data['themeMode']),
       elevatedThreshold: data['elevatedThreshold'] ?? 30,
       criticalThreshold: data['criticalThreshold'] ?? 40,
       pushNotifications: data['pushNotifications'] ?? true,
@@ -84,6 +92,7 @@ class UserSettings {
 
   Map<String, dynamic> toMap() {
     return {
+      'themeMode': themeMode.name,
       'elevatedThreshold': elevatedThreshold,
       'criticalThreshold': criticalThreshold,
       'pushNotifications': pushNotifications,
@@ -102,7 +111,19 @@ class UserSettings {
     };
   }
 
+  /// Tolerant parse of the persisted `themeMode` string. Anything unknown or
+  /// missing — which is every document written before this field existed —
+  /// falls back to [ThemeMode.system].
+  static ThemeMode parseThemeMode(Object? raw) {
+    return switch (raw) {
+      'light' => ThemeMode.light,
+      'dark' => ThemeMode.dark,
+      _ => ThemeMode.system,
+    };
+  }
+
   UserSettings copyWith({
+    ThemeMode? themeMode,
     int? elevatedThreshold,
     int? criticalThreshold,
     bool? pushNotifications,
@@ -120,6 +141,7 @@ class UserSettings {
     int? medicationEveningMinute,
   }) {
     return UserSettings(
+      themeMode: themeMode ?? this.themeMode,
       elevatedThreshold: elevatedThreshold ?? this.elevatedThreshold,
       criticalThreshold: criticalThreshold ?? this.criticalThreshold,
       pushNotifications: pushNotifications ?? this.pushNotifications,

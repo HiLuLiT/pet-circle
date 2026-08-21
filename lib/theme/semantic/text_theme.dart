@@ -12,9 +12,18 @@ import '../tokens/typography.dart';
 /// [ThemeData.textTheme]). In light mode the default is [AppPrimitives.pcInk];
 /// in dark mode the theme provides a light on-surface color automatically.
 ///
-/// "Muted" / secondary styles use [AppPrimitives.pcInkTertiary] (0xFF9A9A9A)
-/// which achieves ≈4.5:1 contrast on both light (`pcSurface`) and dark
-/// (`inkDarker`) surfaces — WCAG AA compliant.
+/// "Muted" / secondary styles use [AppPrimitives.pcInkTertiary] (0xFF9A9A9A).
+/// Re-measured against the real dark surfaces (this comment previously cited
+/// `inkDarker`, which the dark theme never actually painted): 6.60:1 on
+/// `pcDarkCanvas`, 6.30:1 on `pcDarkWell`, 5.85:1 on `pcDarkSurface` and
+/// 5.23:1 on `pcDarkElevated` — AA everywhere, AAA on the canvas. On light
+/// `pcSurface` it is only 2.81:1, which clears AA at large-text sizes only; the
+/// styles using it are 12-13px, so prefer `c.textSecondary` for muted body copy
+/// in new code.
+///
+/// It is also a neutral grey in an otherwise warm palette. Retargeting these
+/// styles onto `pcInkSecondary`/`pcDarkInkSecondary` is a typography change,
+/// deliberately left out of the dark-theme work.
 ///
 /// Call sites that need a specific semantic color (e.g. `c.textPrimary` in a
 /// card) override via `.copyWith(color: ...)` as usual.

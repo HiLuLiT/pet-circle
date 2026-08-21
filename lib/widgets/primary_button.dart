@@ -86,11 +86,6 @@ class PrimaryButton extends StatelessWidget {
     }
   }
 
-  // Disabled-state colors are spec'd inline; they don't live in the token
-  // system because they're shared across all variants in the React source.
-  static const Color _disabledBg = Color(0xFFE2DED5);
-  static const Color _disabledFg = Color(0xFFA7A2AE);
-
   // DS Tertiary label style matches Primary/Secondary: Bold 16/22
   // (AppSemanticTextStyles.pcButton), just with a different fg color.
   static TextStyle _outlinedLabelStyle(Color fg) =>
@@ -136,8 +131,8 @@ class PrimaryButton extends StatelessWidget {
 
     final bg = backgroundColor ?? defaultBg;
     final fg = foregroundColor ?? defaultFg;
-    final effectiveBg = isEnabled ? bg : _disabledBg;
-    final effectiveFg = isEnabled ? fg : _disabledFg;
+    final effectiveBg = isEnabled ? bg : c.disabledSurface;
+    final effectiveFg = isEnabled ? fg : c.disabledOnSurface;
     final isFullWidth = _resolveFullWidth();
 
     // ── Label style — DS Button text is Bold 16/22 for every fill variant ───
@@ -196,9 +191,9 @@ class PrimaryButton extends StatelessWidget {
 
     final ButtonStyle bStyle = TextButton.styleFrom(
       backgroundColor: effectiveBg,
-      disabledBackgroundColor: _disabledBg,
+      disabledBackgroundColor: c.disabledSurface,
       foregroundColor: effectiveFg,
-      disabledForegroundColor: _disabledFg,
+      disabledForegroundColor: c.disabledOnSurface,
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
       minimumSize: const Size(0, 54),
       fixedSize: const Size.fromHeight(54),
@@ -229,7 +224,8 @@ class PrimaryButton extends StatelessWidget {
   // 56h, no horizontal padding, never full-width.
   Widget _buildLink(BuildContext context, AppSemanticColors c) {
     final isEnabled = onPressed != null;
-    final fg = foregroundColor ?? (isEnabled ? c.onSurface : _disabledFg);
+    final fg =
+        foregroundColor ?? (isEnabled ? c.onSurface : c.disabledOnSurface);
 
     final TextStyle baseStyle = _miniLabelStyle(fg);
     final style = textStyle?.copyWith(color: fg) ?? baseStyle;
@@ -266,7 +262,7 @@ class PrimaryButton extends StatelessWidget {
       backgroundColor: Colors.transparent,
       disabledBackgroundColor: Colors.transparent,
       foregroundColor: fg,
-      disabledForegroundColor: _disabledFg,
+      disabledForegroundColor: c.disabledOnSurface,
       padding: EdgeInsets.zero,
       minimumSize: Size.zero,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -286,8 +282,8 @@ class PrimaryButton extends StatelessWidget {
     final isEnabled = onPressed != null;
     final bg = backgroundColor ?? c.primary;
     final fg = foregroundColor ?? c.onPrimary;
-    final effectiveBg = isEnabled ? bg : _disabledBg;
-    final effectiveFg = isEnabled ? fg : _disabledFg;
+    final effectiveBg = isEnabled ? bg : c.disabledSurface;
+    final effectiveFg = isEnabled ? fg : c.disabledOnSurface;
     final isFullWidth = _resolveFullWidth();
 
     final TextStyle baseStyle = _miniLabelStyle(effectiveFg);
@@ -323,9 +319,9 @@ class PrimaryButton extends StatelessWidget {
 
     final ButtonStyle bStyle = TextButton.styleFrom(
       backgroundColor: effectiveBg,
-      disabledBackgroundColor: _disabledBg,
+      disabledBackgroundColor: c.disabledSurface,
       foregroundColor: effectiveFg,
-      disabledForegroundColor: _disabledFg,
+      disabledForegroundColor: c.disabledOnSurface,
       // 24 horizontal / 12 vertical → ≈44h with 20px content.
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       minimumSize: Size.zero,

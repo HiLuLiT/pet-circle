@@ -49,24 +49,20 @@ class NotificationCard extends StatelessWidget {
   /// Optional tap handler. When provided, the card becomes tappable.
   final VoidCallback? onTap;
 
-  // Warm recessed bg used for the "read" state. Slightly warmer than the
-  // global `pcRecessed` token to match the React source 1:1.
-  static const Color _readBg = Color(0xFFEFEADF);
-
-  // Muted title color for the "read" state (per React source).
-  static const Color _readTitleColor = Color(0xFF6E6E6E);
-
   @override
   Widget build(BuildContext context) {
     final colors = AppSemanticColors.of(context);
-    final backgroundColor = unread ? colors.surface : _readBg;
+    // The "read" state is the recessed surface and the muted text colour. Both
+    // were hardcoded light-mode literals, so a read notification rendered as a
+    // cream card with grey text straight over the dark canvas.
+    final backgroundColor = unread ? colors.surface : colors.surfaceRecessed;
     final tileColor = unread
         ? iconTileColor
         : iconTileColor.withValues(alpha: 0.55);
 
     final titleStyle = AppSemanticTextStyles.pcBodyBold.copyWith(
       fontSize: 15.5,
-      color: unread ? colors.onSurface : _readTitleColor,
+      color: unread ? colors.onSurface : colors.textSecondary,
     );
     final bodyStyle = AppSemanticTextStyles.pcLabelMuted.copyWith(
       fontSize: 13.5,

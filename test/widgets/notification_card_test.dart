@@ -121,7 +121,9 @@ void main() {
             .first,
       );
       final decoration = card.decoration as BoxDecoration;
-      expect(decoration.color, const Color(0xFFEFEADF));
+      // Was the hardcoded #EFEADF; now the semantic recessed surface, so the
+      // read state follows the theme instead of staying cream in dark mode.
+      expect(decoration.color, AppSemanticColors.light.surfaceRecessed);
     });
 
     testWidgets('read variant uses muted title color', (tester) async {
@@ -139,7 +141,8 @@ void main() {
       );
 
       final titleWidget = tester.widget<Text>(find.text('Read title'));
-      expect(titleWidget.style?.color, const Color(0xFF6E6E6E));
+      // Was the hardcoded #6E6E6E; now the semantic secondary text colour.
+      expect(titleWidget.style?.color, AppSemanticColors.light.textSecondary);
     });
 
     testWidgets('unread variant uses ink title color', (tester) async {

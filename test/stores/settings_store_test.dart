@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pet_circle/config/app_config.dart' show appThemeMode;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/user_settings.dart';
 import 'package:pet_circle/stores/settings_store.dart';
@@ -385,6 +387,58 @@ void main() {
       await store.updateThresholds();
       expect(store.elevatedThreshold, 30);
       expect(store.criticalThreshold, 40);
+    });
+  });
+
+  group('themeMode', () {
+    tearDown(() => appThemeMode.value = ThemeMode.system);
+
+    test('defaults to system', () {
+      expect(store.themeMode, ThemeMode.system);
+    });
+
+    test('setThemeMode drives the global notifier MaterialApp reads', () {
+      // If these drift apart the app renders one theme while persisting
+      // another, which is exactly what the old bool could not express.
+      store.setThemeMode(ThemeMode.dark);
+      expect(store.themeMode, ThemeMode.dark);
+      expect(appThemeMode.value, ThemeMode.dark);
+    });
+
+    test('setThemeMode notifies listeners', () {
+      var notifications = 0;
+      store.addListener(() => notifications++);
+      store.setThemeMode(ThemeMode.dark);
+      expect(notifications, 1);
+    });
+
+    test('setting the same mode is a no-op', () {
+      store.setThemeMode(ThemeMode.dark);
+      var notifications = 0;
+      store.addListener(() => notifications++);
+      store.setThemeMode(ThemeMode.dark);
+      expect(notifications, 0);
+    });
+
+    test('seedFromAppUser restores a persisted mode on cold start', () {
+      // The BUG-049 regression: dark mode used to reset to light every launch.
+      store.seedFromAppUser(
+        AppUser(
+          uid: 'u1',
+          email: 'a@b.c',
+          role: AppUserRole.owner,
+          settings: const UserSettings(themeMode: ThemeMode.dark),
+        ),
+      );
+      expect(store.themeMode, ThemeMode.dark);
+      expect(appThemeMode.value, ThemeMode.dark);
+    });
+
+    test('reset returns to following the OS', () {
+      store.setThemeMode(ThemeMode.light);
+      store.reset();
+      expect(store.themeMode, ThemeMode.system);
+      expect(appThemeMode.value, ThemeMode.system);
     });
   });
 }

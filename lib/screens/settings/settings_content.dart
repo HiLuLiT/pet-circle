@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/config/app_config.dart'
-    show appDarkMode, kEnableVisionRR;
+    show appThemeMode, kEnableVisionRR;
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
@@ -112,15 +112,32 @@ class _SettingsContentState extends State<SettingsContent>
                   subtitle: l10n.customizeLookAndFeel,
                   child: Column(
                     children: [
-                      SettingsToggleRow(
-                        iconAsset: settingsMoonAsset,
-                        iconTileColor: c.accentPeriwinkleTile,
-                        label: l10n.darkMode,
-                        description: l10n.switchToADarkerTheme,
-                        isOn: appDarkMode.value,
-                        onChanged: () {
-                          appDarkMode.value = !appDarkMode.value;
-                          setState(() {}); // rebuild to reflect toggle state
+                      // Listens rather than sampling appThemeMode.value: the
+                      // mode also changes from seedFromAppUser (sign-in) and
+                      // from the OS while following ThemeMode.system, neither
+                      // of which goes through this row's onChanged.
+                      ValueListenableBuilder<ThemeMode>(
+                        valueListenable: appThemeMode,
+                        builder: (context, mode, _) {
+                          final isDark = switch (mode) {
+                            ThemeMode.dark => true,
+                            ThemeMode.light => false,
+                            ThemeMode.system =>
+                              MediaQuery.platformBrightnessOf(context) ==
+                                  Brightness.dark,
+                          };
+                          return SettingsToggleRow(
+                            iconAsset: settingsMoonAsset,
+                            iconTileColor: c.accentPeriwinkleTile,
+                            label: l10n.darkMode,
+                            description: l10n.switchToADarkerTheme,
+                            isOn: isDark,
+                            // Touching the switch is an explicit choice, so it
+                            // leaves `system` behind rather than toggling it.
+                            onChanged: () => settingsStore.setThemeMode(
+                              isDark ? ThemeMode.light : ThemeMode.dark,
+                            ),
+                          );
                         },
                       ),
                       const SizedBox(height: 12),

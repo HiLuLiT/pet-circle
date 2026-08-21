@@ -980,6 +980,78 @@ Consequences:
 - **Note:** The design preview has the same seam — it restarts a shared 4.2s scene clock. Divergence
   is deliberate: an infinite loop should be continuous, and only the app loops forever.
 
+## BUG-048: A device set to dark mode still opened the app in light
+
+**Found during:** the dark-theme redesign audit (researching why dark mode "felt off").
+**Severity:** Medium
+**Status:** Fixed
+
+**Symptom:** With macOS/iOS/Android set to dark, Pet Circle always launched in light mode. The
+only way to get a dark UI was to find the toggle in Settings. There was also no dark status bar:
+on the (rare) dark screens the status-bar glyphs stayed dark-on-dark and were unreadable.
+
+**Root cause:** `main.dart` assigned the dark theme to `MaterialApp.router`'s **`theme:`** slot and
+never set `darkTheme:` or `themeMode:`. `theme:` is the *light* slot, so Flutter had no dark theme
+to fall back to and `ThemeMode.system` could not work even in principle. Nothing anywhere in
+`lib/` read `MediaQuery.platformBrightnessOf` or `platformBrightness`. Separately, no
+`SystemUiOverlayStyle` was set anywhere in the app, so the OS chrome never followed the theme.
+
+**Fix:** Wired `theme: buildAppTheme()`, `darkTheme: buildDarkTheme()` and `themeMode: _themeMode`
+properly, with `ThemeMode.system` as the new default. Added an `AnnotatedRegion<SystemUiOverlayStyle>`
+around the app so status-bar and navigation-bar glyphs follow the resolved brightness, plus a
+`WidgetsBindingObserver.didChangePlatformBrightness` hook to keep that correct when the OS flips
+while the app is following `system`. The existing 300 ms overlay crossfade was preserved and is now
+driven by `ThemeMode` rather than a bool; it skips the fade when source and target resolve to the
+same brightness, and fades through the destination canvas token instead of pure black/white.
+
+**Files changed:**
+- `lib/main.dart`
+- `lib/config/app_config.dart`
+
+**Regression test:** `test/stores/settings_store_test.dart` → `themeMode` group; the store/notifier
+lockstep assertion is what guarantees MaterialApp and the persisted value cannot disagree.
+
+---
+
+## BUG-049: Dark mode reset to light on every cold start
+
+**Severity:** Medium
+**Status:** Fixed
+**Found during:** same audit as BUG-048.
+
+**Symptom:** Turning on dark mode in Settings worked for the session, but the app came back in
+light mode after every full restart. The Settings toggle could also go stale — it showed the wrong
+position if the theme changed from anywhere other than the toggle itself.
+
+**Root cause:** Two parts. (1) `appDarkMode` was a bare `ValueNotifier<bool>(false)` in
+`app_config.dart` with no persistence, and `UserSettings` had no theme field at all, so the choice
+lived only in memory. (2) `settings_content.dart` sampled `appDarkMode.value` directly in `build`
+and paired the mutation with a local `setState`, so the row only re-rendered for its own taps.
+
+**Fix:** Widened the notifier to `ValueNotifier<ThemeMode>` (needed for BUG-048 regardless) and
+added a `themeMode` field to `UserSettings`, serialised as `'system'`/`'light'`/`'dark'` with a
+tolerant parse so the ~all documents written before this field existed deserialise to `system`
+rather than throwing. `settingsStore.setThemeMode()` persists through the existing `_persist()`
+path to `/users/{uid}.settings` and is seeded back in `seedFromAppUser`; a private `_setThemeMode`
+keeps the store field and the global notifier in lockstep. The Settings row now sits in a
+`ValueListenableBuilder`. Toggling it is treated as an explicit choice, so it resolves to
+`light`/`dark` and leaves `system` behind.
+
+No `firestore.rules` change was needed — the rules never enumerate keys inside the `settings` map.
+
+**Files changed:**
+- `lib/models/user_settings.dart`
+- `lib/config/app_config.dart`
+- `lib/stores/settings_store.dart`
+- `lib/screens/settings/settings_content.dart`
+- `lib/main.dart`
+
+**Regression test:** `test/models/user_settings_test.dart` → `themeMode` group (round-trip for every
+value, plus the legacy-document and malformed-input fallbacks);
+`test/stores/settings_store_test.dart` → `seedFromAppUser restores a persisted mode on cold start`.
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

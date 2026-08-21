@@ -27,7 +27,9 @@ import 'package:pet_circle/services/web_push_notification_service.dart';
 import 'package:pet_circle/services/web_reminder_service.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/utils/error_handler.dart';
+import 'package:flutter/services.dart';
 import 'package:pet_circle/config/app_config.dart';
+import 'package:pet_circle/theme/tokens/colors.dart';
 
 /// Application-wide GoRouter instance.
 late final GoRouter router;
@@ -277,16 +279,31 @@ class PetCircleApp extends StatefulWidget {
 }
 
 class _PetCircleAppState extends State<PetCircleApp>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   late final AnimationController _overlayController;
-  bool _isDark = false;
+
+  /// The mode MaterialApp is currently rendering. Trails [appThemeMode] by half
+  /// the crossfade so the swap lands under the overlay at full opacity.
+  ThemeMode _themeMode = ThemeMode.system;
   bool _themeSwapped = false;
-  Color _overlayColor = Colors.black;
+  Color _overlayColor = AppPrimitives.pcDarkCanvas;
+
+  /// Resolves [ThemeMode.system] against the OS. Reads the platform dispatcher
+  /// rather than MediaQuery because this State sits *above* MaterialApp, so
+  /// there is no MediaQuery in scope here.
+  static bool _isDarkFor(ThemeMode mode) => switch (mode) {
+    ThemeMode.light => false,
+    ThemeMode.dark => true,
+    ThemeMode.system =>
+      WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+          Brightness.dark,
+  };
 
   @override
   void initState() {
     super.initState();
-    _isDark = appDarkMode.value;
+    WidgetsBinding.instance.addObserver(this);
+    _themeMode = appThemeMode.value;
     _overlayController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -298,68 +315,111 @@ class _PetCircleAppState extends State<PetCircleApp>
         _themeSwapped = false;
       }
     });
-    appDarkMode.addListener(_onDarkModeToggled);
+    appThemeMode.addListener(_onThemeModeChanged);
   }
 
-  void _onDarkModeToggled() {
+  void _onThemeModeChanged() {
+    final target = appThemeMode.value;
+    // Modes that resolve to the same brightness (system -> explicit dark while
+    // the OS is already dark) change nothing on screen, so crossfading would
+    // just flash the canvas for no reason.
+    if (_isDarkFor(target) == _isDarkFor(_themeMode)) {
+      setState(() => _themeMode = target);
+      return;
+    }
     _themeSwapped = false;
-    _overlayColor = appDarkMode.value ? Colors.black : Colors.white;
+    // Fade through the destination canvas rather than pure black/white — the
+    // point of this palette is that it has no harsh extremes.
+    _overlayColor = _isDarkFor(target)
+        ? AppPrimitives.pcDarkCanvas
+        : AppPrimitives.pcBg;
     _overlayController.forward(from: 0.0);
   }
 
   void _swapThemeAtMidpoint() {
     if (_overlayController.value >= 0.5 && !_themeSwapped) {
       _themeSwapped = true;
-      setState(() => _isDark = appDarkMode.value);
+      setState(() => _themeMode = appThemeMode.value);
     }
   }
 
   @override
+  void didChangePlatformBrightness() {
+    // MaterialApp re-resolves ThemeMode.system itself; this only keeps the
+    // status-bar overlay style in sync with the new brightness.
+    if (_themeMode == ThemeMode.system) setState(() {});
+  }
+
+  @override
   void dispose() {
-    appDarkMode.removeListener(_onDarkModeToggled);
+    appThemeMode.removeListener(_onThemeModeChanged);
+    WidgetsBinding.instance.removeObserver(this);
     _overlayController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Stack(
-        children: [
-          ValueListenableBuilder<Locale>(
-            valueListenable: appLocale,
-            builder: (context, locale, _) => MaterialApp.router(
-              routerConfig: router,
-              title: 'Pet Circle',
-              debugShowCheckedModeBanner: false,
-              theme: _isDark ? buildDarkTheme() : buildAppTheme(),
-              themeAnimationDuration: Duration.zero,
-              locale: locale,
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: const [Locale('en'), Locale('he')],
-            ),
-          ),
-          Positioned.fill(
-            child: IgnorePointer(
-              child: AnimatedBuilder(
-                animation: _overlayController,
-                builder: (context, _) {
-                  final v = _overlayController.value;
-                  final fade = v <= 0.5 ? v * 2 : (1.0 - v) * 2;
-                  return ColoredBox(
-                    color: _overlayColor.withValues(alpha: fade * 0.35),
-                  );
-                },
+    final isDark = _isDarkFor(_themeMode);
+    // No SystemUiOverlayStyle was set anywhere in lib/, so on a dark scaffold
+    // the status-bar glyphs stayed dark-on-dark.
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: isDark
+            ? AppPrimitives.pcDarkCanvas
+            : AppPrimitives.pcBg,
+        systemNavigationBarIconBrightness: isDark
+            ? Brightness.light
+            : Brightness.dark,
+      ),
+      child: Directionality(
+        textDirection: TextDirection.ltr,
+        child: Stack(
+          children: [
+            ValueListenableBuilder<Locale>(
+              valueListenable: appLocale,
+              builder: (context, locale, _) => MaterialApp.router(
+                routerConfig: router,
+                title: 'Pet Circle',
+                debugShowCheckedModeBanner: false,
+                theme: buildAppTheme(),
+                darkTheme: buildDarkTheme(),
+                // The dark theme used to be assigned to `theme:` while
+                // `darkTheme`/`themeMode` were never set, so Flutter had no dark
+                // theme to fall back to and ThemeMode.system could not work.
+                themeMode: _themeMode,
+                // Flutter's own theme lerp stays off: the 300ms overlay
+                // crossfade below does the transition instead.
+                themeAnimationDuration: Duration.zero,
+                locale: locale,
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: const [Locale('en'), Locale('he')],
               ),
             ),
-          ),
-        ],
+            Positioned.fill(
+              child: IgnorePointer(
+                child: AnimatedBuilder(
+                  animation: _overlayController,
+                  builder: (context, _) {
+                    final v = _overlayController.value;
+                    final fade = v <= 0.5 ? v * 2 : (1.0 - v) * 2;
+                    return ColoredBox(
+                      color: _overlayColor.withValues(alpha: fade * 0.35),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
