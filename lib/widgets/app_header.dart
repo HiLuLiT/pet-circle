@@ -60,7 +60,8 @@ class AppHeader extends StatelessWidget {
                   ),
                 ),
                 if (onPetSelectorTap != null) ...[
-                  const SizedBox(width: AppSpacingTokens.xs),
+                  // Figma 442:6751 gap between pet name and chevron is 8px.
+                  const SizedBox(width: AppSpacingTokens.sm),
                   Icon(
                     Icons.keyboard_arrow_down,
                     size: 24,

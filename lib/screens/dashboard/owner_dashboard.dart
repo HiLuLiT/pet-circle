@@ -267,6 +267,8 @@ class OwnerDashboard extends StatelessWidget {
                           AvatarStack(
                             avatars: pet.careCircle,
                             borderColor: c.surface,
+                            // Figma 442:8959 avatars are 28px.
+                            avatarSize: 28,
                           ),
                         ],
                       ),
