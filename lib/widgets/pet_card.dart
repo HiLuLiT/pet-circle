@@ -12,7 +12,7 @@ import 'package:pet_circle/widgets/status_badge.dart';
 ///   hero pet card (Figma node 402-1978).
 enum PetCardSize { hero, compact }
 
-/// Shared pet card — Figma "Pet Card" (node 442:8872).
+/// Shared pet card — Figma "Pet Card" (node 442:8893).
 ///
 /// A purple-tile card used across the owner, vet and care-circle dashboards.
 /// The base layout matches the Figma design:
@@ -33,17 +33,17 @@ enum PetCardSize { hero, compact }
 ///
 /// Design-token choices (documented because the raw Figma values fall between
 /// tokens):
-///   * Card radius — Figma node is `20`; the nearest semantic radius token is
-///     [AppRadiiTokens.pcCard] (`16`), which is far closer than
-///     [AppRadiiTokens.pcTile] (`30`). We use `pcCard`.
+///   * Card radius — Figma node 442:8893 is `16`, matched exactly by
+///     [AppRadiiTokens.pcCard].
 ///   * Padding — Figma node is `16`; matched exactly with
 ///     [AppSpacingTokens.md] (`16`).
 ///   * Name — Figma "Display/M" is `28px bold`; the default [PetCardSize.compact]
 ///     uses the nearest semantic style [AppSemanticTextStyles.title3]
 ///     (`24px bold`). Pass [PetCardSize.hero] to use the exact
 ///     [AppSemanticTextStyles.pcDisplay] (`28px bold`) match instead.
-///   * Subtitle — Figma "Label/M Regular" (`14px`) maps cleanly to
-///     [AppSemanticTextStyles.pcLabelMuted].
+///   * Subtitle — Figma "Label/M Regular" (`14px`) maps to
+///     [AppSemanticTextStyles.pcLabelMuted], recolored to `textPrimary`
+///     because the Figma node uses Neutrals/Ink, not a muted grey.
 class PetCard extends StatelessWidget {
   const PetCard({
     super.key,
@@ -132,11 +132,18 @@ class PetCard extends StatelessWidget {
                               .copyWith(color: c.textPrimary),
                     ),
                     const SizedBox(height: AppSpacingTokens.xs),
-                    Text(subtitle, style: AppSemanticTextStyles.pcLabelMuted),
+                    Text(
+                      subtitle,
+                      // Figma 442:8893 renders the subtitle in Neutrals/Ink
+                      // (#161616), the same color as the name — not the muted
+                      // tertiary grey that pcLabelMuted defaults to.
+                      style: AppSemanticTextStyles.pcLabelMuted.copyWith(
+                        color: c.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              const SizedBox(width: AppSpacingTokens.sm),
               SizedBox(
                 width: _mediaSize,
                 height: _mediaSize,

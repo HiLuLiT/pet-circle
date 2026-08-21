@@ -11,12 +11,12 @@ import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/utils/formatters.dart';
-import 'package:pet_circle/utils/mascot_mapper.dart';
 import 'package:pet_circle/utils/pet_delete_dialog.dart';
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/widgets/app_card.dart';
 import 'package:pet_circle/widgets/avatar_stack.dart';
-import 'package:pet_circle/widgets/mascot.dart';
+import 'package:pet_circle/theme/app_assets.dart';
+import 'package:pet_circle/widgets/app_image.dart';
 import 'package:pet_circle/widgets/pet_card.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
@@ -43,18 +43,6 @@ class OwnerDashboard extends StatelessWidget {
       useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => AddReminderSheet(reminder: reminder),
-    );
-  }
-
-  Future<void> _deleteReminder(BuildContext context, Reminder reminder) async {
-    final access = petStore.accessForActivePet();
-    if (!access.canManageMedication) return;
-    final petId = petStore.activePet?.id ?? '';
-    if (petId.isEmpty) return;
-    await reminderStore.removeReminder(petId, reminder.id);
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(AppLocalizations.of(context)!.reminderDeleted)),
     );
   }
 
@@ -198,10 +186,17 @@ class OwnerDashboard extends StatelessWidget {
                       status: StatusBadgeStatus.active,
                       statusLabel: l10n.active,
                       size: PetCardSize.hero,
-                      media: Mascot(
-                        breed: mascotBreedFor(pet.breedAndAge),
-                        color: c.accentPurple,
-                        size: 90,
+                      // Figma 442:8893 renders a 101.198x90 dog artwork inside
+                      // the 90x90 media frame, overflowing it slightly.
+                      // OverflowBox permits that without a layout overflow.
+                      media: const OverflowBox(
+                        maxWidth: 101.2,
+                        child: AppImage.asset(
+                          AppAssets.petCardDog,
+                          width: 101.2,
+                          height: 90,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                       onLongPress: access.canDeletePet
                           ? () => confirmDeletePet(context, pet)
@@ -239,7 +234,7 @@ class OwnerDashboard extends StatelessWidget {
                                         .copyWith(color: c.textPrimary),
                                   ),
                                   Text(
-                                    l10n.latestReading,
+                                    l10n.heartRate,
                                     style: AppSemanticTextStyles.labelSRegular
                                         .copyWith(color: c.textTertiary),
                                   ),
@@ -307,7 +302,7 @@ class OwnerDashboard extends StatelessWidget {
                           if (reminders.isEmpty)
                             Padding(
                               padding: const EdgeInsets.only(
-                                top: AppSpacingTokens.md,
+                                top: AppSpacingTokens.pcMd,
                               ),
                               child: Text(
                                 l10n.noRemindersYet,
@@ -318,13 +313,13 @@ class OwnerDashboard extends StatelessWidget {
                             ...reminders.map(
                               (reminder) => Padding(
                                 padding: const EdgeInsets.only(
-                                  top: AppSpacingTokens.md,
+                                  top: AppSpacingTokens.pcMd,
                                 ),
                                 child: _ReminderTile(
                                   reminder: reminder,
                                   petName: pet.name,
-                                  onDelete: () =>
-                                      _deleteReminder(context, reminder),
+                                  onTap: () =>
+                                      _openReminderSheet(context, reminder),
                                 ),
                               ),
                             ),
@@ -374,75 +369,79 @@ class _ReminderTile extends StatelessWidget {
   const _ReminderTile({
     required this.reminder,
     required this.petName,
-    this.onDelete,
+    this.onTap,
   });
 
   final Reminder reminder;
   final String petName;
-  final VoidCallback? onDelete;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     final l10n = AppLocalizations.of(context)!;
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacingTokens.md),
-      decoration: BoxDecoration(
-        color: c.background,
-        borderRadius: BorderRadius.circular(AppRadiiTokens.pcCard),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                formatReminderDate(reminder.date, l10n.localeName),
-                style: AppSemanticTextStyles.bodySm.copyWith(
-                  color: c.textSecondary,
-                ),
-              ),
-              const SizedBox(width: AppSpacingTokens.sm),
-              _PetChip(petName: petName),
-            ],
-          ),
-          const SizedBox(height: AppSpacingTokens.sm),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      reminder.title,
-                      style: AppSemanticTextStyles.pcBodySemibold.copyWith(
-                        color: c.textPrimary,
-                      ),
-                    ),
-                    if (reminder.detail != null && reminder.detail!.isNotEmpty)
-                      Text(
-                        reminder.detail!,
-                        style: AppSemanticTextStyles.bodySm.copyWith(
-                          color: c.textSecondary,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              if (onDelete != null)
-                GestureDetector(
-                  onTap: onDelete,
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: AppSpacingTokens.sm),
-                    child: Icon(Icons.close, size: 18, color: c.textTertiary),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppSpacingTokens.md),
+        decoration: BoxDecoration(
+          color: c.background,
+          borderRadius: BorderRadius.circular(AppRadiiTokens.pcCard),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Text(
+                  formatReminderDate(reminder.date, l10n.localeName),
+                  style: AppSemanticTextStyles.bodySm.copyWith(
+                    color: c.textSecondary,
                   ),
                 ),
-            ],
-          ),
-        ],
+                const SizedBox(width: AppSpacingTokens.sm),
+                _PetChip(petName: petName),
+              ],
+            ),
+            const SizedBox(height: AppSpacingTokens.sm),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        reminder.title,
+                        style: AppSemanticTextStyles.pcBodySemibold.copyWith(
+                          color: c.textPrimary,
+                        ),
+                      ),
+                      if (reminder.detail != null &&
+                          reminder.detail!.isNotEmpty)
+                        Text(
+                          reminder.detail!,
+                          style: AppSemanticTextStyles.bodySm.copyWith(
+                            color: c.textSecondary,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: AppSpacingTokens.sm),
+                  child: Icon(
+                    Icons.chevron_right,
+                    size: 24,
+                    color: c.textTertiary,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -460,7 +459,11 @@ class _PetChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      // Figma 469:1007 pill: 10px horizontal, 4px vertical.
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacingTokens.pcSm,
+        vertical: AppSpacingTokens.xs,
+      ),
       decoration: BoxDecoration(
         color: c.accentPurpleTile,
         borderRadius: BorderRadius.circular(AppRadiiTokens.pcPill),

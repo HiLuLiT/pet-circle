@@ -1556,6 +1556,12 @@ abstract class AppLocalizations {
   /// **'Latest Reading'**
   String get latestReading;
 
+  /// No description provided for @heartRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Heart rate'**
+  String get heartRate;
+
   /// No description provided for @lastMeasured.
   ///
   /// In en, this message translates to:

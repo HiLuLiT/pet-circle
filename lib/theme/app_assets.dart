@@ -16,6 +16,9 @@ class AppAssets {
   /// "Heart animation for dog" (dog.png / heart.png). [welcomeHero] is the
   /// same artwork pre-composited, kept as the reduced-motion still.
   static const welcomeDogLayer = 'assets/figma/welcome_dog.png';
+
+  /// Pet-card dog artwork — Figma node 442:8893 (renders at 101.198x90).
+  static const petCardDog = 'assets/figma/pet_card_dog.png';
   static const welcomeHeartLayer = 'assets/figma/welcome_heart.png';
   static const googleLogo = 'assets/figma/google_logo.png';
   static const appLogo = 'assets/figma/app_logo.svg';

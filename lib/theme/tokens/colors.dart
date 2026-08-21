@@ -76,9 +76,11 @@ class AppPrimitives {
   static const Color pcStatusAlertText = Color(0xFFB14C77);
 
   // ── PC v3: Status — Active (mint) ────────────────────────────────────────
-  static const Color pcStatusActiveBg = Color(0xFFD7EECB);
+  // Figma 442:8893 Pills/Active = Candy/Mint/Tile (#C2E8C8).
+  static const Color pcStatusActiveBg = Color(0xFFC2E8C8);
   static const Color pcStatusActiveDot = Color(0xFF2F6B3E);
-  static const Color pcStatusActiveText = Color(0xFF2F6B3E);
+  // Figma 442:8893 Pills/Active text = Candy/Mint/Accent (#46A05F).
+  static const Color pcStatusActiveText = Color(0xFF46A05F);
 
   // ── PC v3: Disabled surfaces ─────────────────────────────────────────────
   // Light-mode disabled button fill + label. Previously hardcoded inside

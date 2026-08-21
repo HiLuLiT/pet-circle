@@ -90,7 +90,7 @@ class _InviteScreenState extends State<InviteScreen> {
 
     if (_isProcessing) {
       return Scaffold(
-        backgroundColor: c.surface,
+        backgroundColor: c.background,
         body: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -109,7 +109,7 @@ class _InviteScreenState extends State<InviteScreen> {
 
     // Error state — show message and a button to continue.
     return Scaffold(
-      backgroundColor: c.surface,
+      backgroundColor: c.background,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(32),

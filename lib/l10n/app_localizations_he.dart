@@ -777,6 +777,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get latestReading => 'קריאה אחרונה';
 
   @override
+  String get heartRate => 'קצב לב';
+
+  @override
   String get lastMeasured => 'מדידה אחרונה';
 
   @override

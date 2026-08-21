@@ -258,7 +258,8 @@ void main() {
 
       final text = tester.widget<Text>(find.text('Token'));
       expect(text.style?.fontSize, 13);
-      expect(text.style?.fontWeight, FontWeight.w700);
+      // Figma "Pills" uses Label/S SemiBold (600), not Bold.
+      expect(text.style?.fontWeight, FontWeight.w600);
       expect(text.style?.fontFamily, 'Instrument Sans');
     });
 

@@ -264,6 +264,7 @@
   "status": "סטטוס",
 
   "latestReading": "קריאה אחרונה",
+  "heartRate": "קצב לב",
   "lastMeasured": "מדידה אחרונה",
   "viewGraph": "צפה בגרף",
   "clinicalNotes": "הערות קליניות",

@@ -92,7 +92,10 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     fontVariations: axesBold,
     height: 36 / 28,
-    letterSpacing: -0.5,
+    // Figma reports Display/M letter spacing as -0.5 *percent*, which the
+    // rendered node resolves to -0.14px at 28px (28 * -0.005). Flutter's
+    // letterSpacing is in logical px, so -0.5 was ~3.5x too tight.
+    letterSpacing: -0.14,
   );
 
   // ── PC v3: Heading — Bold only ──────────────────────────────────────────

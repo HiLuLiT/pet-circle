@@ -226,10 +226,10 @@ class MessagesScreen extends StatelessWidget {
         );
 
         if (!showScaffold) {
-          return Container(color: c.surface, child: content);
+          return Container(color: c.background, child: content);
         }
 
-        return Scaffold(backgroundColor: c.surface, body: content);
+        return Scaffold(backgroundColor: c.background, body: content);
       },
     );
   }
