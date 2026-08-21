@@ -905,6 +905,35 @@ Escaping alone turned out to be insufficient. The first pass at this fix escaped
 
 ---
 
+
+### Correction (2026-08-21, later the same session)
+
+The root cause above is **wrong**, and the correction matters more than the original entry.
+
+Both versions of `heart.png` stored in the design project were re-extracted straight from this
+session's transcript (so the bytes never passed through a retyping step) and validated: every
+chunk CRC32 is correct and the zlib stream's adler32 is valid in **both**. The source asset was
+never damaged.
+
+What actually happened: the base64 returned by `DesignSync get_file` was transcribed by the agent
+into a file, and that transcription dropped/altered bytes. The resulting local file was corrupt,
+the `zlib: incorrect data check` was real — but it was self-inflicted in transit, and the
+"re-fetch returned byte-identical content" claim was a mis-comparison that appeared to exonerate
+the pipeline and indict the source. The same retyping failure recurred later in the session and
+failed loudly with `binascii.Error: Incorrect padding`, which is what exposed the original
+misdiagnosis.
+
+Consequences:
+- The "repair" re-encoded an asset that was already fine, and the re-encode was then kept in
+  preference to the design's newer artwork — shipping a visibly wrong heart (pale `#E5A1A3`,
+  49% opaque coverage, instead of the redrawn saturated `#D8696C` at 65%). Fixed separately.
+- **Rule:** never transcribe binary out of a tool result. Extract it programmatically from the
+  transcript, or have the tool write to disk. Compare **pixels, not byte counts or dimensions**,
+  before concluding two assets are the same image.
+- `test/assets/asset_integrity_test.dart` still earns its place: it catches a corrupt asset
+  however it got that way, which is what a guard should do.
+
+
 ## BUG-032: `welcome_illustration.png` is an SVG with a `.png` extension
 
 - **Found during:** the new `test/assets/asset_integrity_test.dart` guard added after BUG-031 — it failed on its first run.

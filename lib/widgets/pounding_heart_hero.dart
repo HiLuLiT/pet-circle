@@ -192,11 +192,16 @@ class _PoundingHeartHeroState extends State<PoundingHeartHero>
 
   /// Rendered size of the heart layer, from `heart-scene.jsx`.
   ///
-  /// The committed `welcome_heart.png` is 43x43 — deliberately larger than this
-  /// box. The design project re-exported the heart at 29x29 (i.e. 1x), but the
-  /// repo already holds a clean 43x43 copy, so painting that into a 29pt box
-  /// gives ~1.48x density instead of 1x. Do not "fix" this by downloading the
-  /// smaller asset.
+  /// `welcome_heart.png` is the matching 29x29 export, so this paints 1:1.
+  ///
+  /// The earlier 43x43 asset was NOT merely a larger version of this one — it
+  /// was a different drawing (49% opaque coverage and a pale #E5A1A3 average,
+  /// versus 65% and a saturated #D8696C here). Keeping it "for the extra
+  /// density" silently shipped the wrong artwork. Compare pixels, not
+  /// dimensions, before deciding an asset is redundant.
+  ///
+  /// This does mean the heart is 1x. A 2x/3x export from the design project is
+  /// the outstanding fix; do not substitute an older asset for it.
   static const double _heartSize = 29;
 }
 
