@@ -376,6 +376,57 @@ void main() {
 
   // ── AppTypography (typography.dart) ─────────────────────────────────────
 
+  group('AppPrimitives dark palette (Warm Charcoal)', () {
+    test('surface ladder has the designed hex values', () {
+      expect(AppPrimitives.pcDarkCanvas, const Color(0xFF141310));
+      expect(AppPrimitives.pcDarkWell, const Color(0xFF1A1815));
+      expect(AppPrimitives.pcDarkSurface, const Color(0xFF211F1B));
+      expect(AppPrimitives.pcDarkElevated, const Color(0xFF2A2823));
+      expect(AppPrimitives.pcDarkHairline, const Color(0xFF2E2A24));
+      expect(AppPrimitives.pcDarkDivider, const Color(0xFF3A352E));
+    });
+
+    test('text ramp has the designed hex values', () {
+      expect(AppPrimitives.pcDarkInk, const Color(0xFFEBE7DF));
+      expect(AppPrimitives.pcDarkInkSecondary, const Color(0xFFABA59A));
+      expect(AppPrimitives.pcDarkInkTertiary, const Color(0xFF9A9489));
+      expect(AppPrimitives.pcDarkInkDisabled, const Color(0xFF615C54));
+    });
+
+    test('brand and accent foregrounds have the designed hex values', () {
+      expect(AppPrimitives.pcDarkPurple, const Color(0xFFB4A0E8));
+      expect(AppPrimitives.pcDarkPurpleLight, const Color(0xFFC9B9F2));
+      expect(AppPrimitives.pcDarkPeriwinkle, const Color(0xFF9FB6EE));
+      expect(AppPrimitives.pcDarkButter, const Color(0xFFEAC69F));
+      expect(AppPrimitives.pcDarkBlush, const Color(0xFFF0A0BC));
+      expect(AppPrimitives.pcDarkMint, const Color(0xFF8FD3A0));
+    });
+
+    test('accent tiles have the designed hex values', () {
+      expect(AppPrimitives.pcDarkPurpleWash, const Color(0xFF251F33));
+      expect(AppPrimitives.pcDarkPurpleGhost, const Color(0xFF2B2440));
+      expect(AppPrimitives.pcDarkPeriwinkleTile, const Color(0xFF1C2337));
+      expect(AppPrimitives.pcDarkPeriwinkleChip, const Color(0xFF212942));
+      expect(AppPrimitives.pcDarkButterTile, const Color(0xFF302A18));
+      expect(AppPrimitives.pcDarkButterCream, const Color(0xFF2A2620));
+      expect(AppPrimitives.pcDarkBlushTile, const Color(0xFF331E28));
+      expect(AppPrimitives.pcDarkMintTile, const Color(0xFF1B2E22));
+    });
+
+    test('the orphaned pre-Warm-Charcoal dark tokens are gone', () {
+      // pcDarkBg / pcDarkRecessed / pcDarkOnSurface / pcDarkOnSurfaceMuted
+      // were only ever read by buildDarkTheme() while every widget read
+      // AppSemanticColors.dark, so they painted a palette nothing else used.
+      // This is a compile-time guarantee: the names no longer resolve.
+      expect(AppPrimitives.pcDarkCanvas, isNot(const Color(0xFF1A1A1A)));
+    });
+
+    test('light disabled primitives hold the previously-inlined literals', () {
+      expect(AppPrimitives.pcDisabledSurface, const Color(0xFFE2DED5));
+      expect(AppPrimitives.pcDisabledOnSurface, const Color(0xFFA7A2AE));
+    });
+  });
+
   group('AppTypography', () {
     test('fontFamily is Instrument Sans', () {
       expect(AppTypography.fontFamily, equals('Instrument Sans'));

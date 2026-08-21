@@ -189,6 +189,57 @@ void main() {
       expect(light.brightness, isNot(equals(dark.brightness)));
     });
 
+    test('dark textTheme paints the pcDark ink ramp', () {
+      final t = buildDarkTheme().textTheme;
+      expect(t.headlineSmall?.color, AppPrimitives.pcDarkInk);
+      expect(t.titleLarge?.color, AppPrimitives.pcDarkInk);
+      expect(t.bodyMedium?.color, AppPrimitives.pcDarkInk);
+      expect(t.bodySmall?.color, AppPrimitives.pcDarkInkSecondary);
+      expect(t.labelSmall?.color, AppPrimitives.pcDarkInkSecondary);
+    });
+
+    test('buildDarkTheme wires the slots that used to be unset', () {
+      // Left at ThemeData defaults before, so any stock Material widget
+      // reading them rendered from M3's generated tonal palette instead.
+      final t = buildDarkTheme();
+      expect(t.dividerColor, AppSemanticColors.dark.divider);
+      expect(t.cardColor, AppSemanticColors.dark.surface);
+      expect(t.canvasColor, AppSemanticColors.dark.background);
+      expect(t.appBarTheme.backgroundColor, AppPrimitives.pcDarkCanvas);
+      expect(t.appBarTheme.foregroundColor, AppPrimitives.pcDarkInk);
+      expect(t.iconTheme.color, AppPrimitives.pcDarkInkSecondary);
+      // Dialogs and sheets float one step up the ladder from a card.
+      expect(t.dialogTheme.backgroundColor, AppPrimitives.pcDarkElevated);
+      expect(t.bottomSheetTheme.backgroundColor, AppPrimitives.pcDarkElevated);
+      expect(t.snackBarTheme.backgroundColor, AppPrimitives.pcDarkElevated);
+    });
+
+    test('dark ColorScheme is authored, not seeded from the brand purple', () {
+      // fromSeed left ~20 slots to M3's tonal generator, which produced cool
+      // violet-tinted greys that fought the warm palette.
+      final cs = buildDarkTheme().colorScheme;
+      expect(cs.surface, AppPrimitives.pcDarkSurface);
+      expect(cs.onSurface, AppPrimitives.pcDarkInk);
+      expect(cs.onSurfaceVariant, AppPrimitives.pcDarkInkSecondary);
+      expect(cs.surfaceContainerLowest, AppPrimitives.pcDarkCanvas);
+      expect(cs.surfaceContainerLow, AppPrimitives.pcDarkWell);
+      expect(cs.surfaceContainerHigh, AppPrimitives.pcDarkElevated);
+      expect(cs.outline, AppPrimitives.pcDarkDivider);
+      expect(cs.outlineVariant, AppPrimitives.pcDarkHairline);
+    });
+
+    test('the two dark palettes agree (they used to be disjoint)', () {
+      // The whole root cause: buildDarkTheme() painted from pcDark* while
+      // widgets read AppSemanticColors.dark, built from legacy v2 greys.
+      final t = buildDarkTheme();
+      final c = t.extension<AppSemanticColors>()!;
+      expect(t.scaffoldBackgroundColor, c.background);
+      expect(t.colorScheme.surface, c.surface);
+      expect(t.colorScheme.primary, c.primary);
+      expect(t.textTheme.bodyMedium?.color, c.textPrimary);
+      expect(t.inputDecorationTheme.fillColor, c.surfaceRecessed);
+    });
+
     test('light and dark have different scaffold background colors', () {
       expect(
         light.scaffoldBackgroundColor,

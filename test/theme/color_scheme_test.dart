@@ -214,6 +214,51 @@ void main() {
       });
     });
 
+    group('disabled / knob fields (hoisted out of widgets)', () {
+      test('light values are byte-identical to the literals they replaced', () {
+        // primary_button.dart inlined these, so light mode must not shift.
+        expect(
+          AppSemanticColors.light.disabledSurface,
+          const Color(0xFFE2DED5),
+        );
+        expect(
+          AppSemanticColors.light.disabledOnSurface,
+          const Color(0xFFA7A2AE),
+        );
+        expect(AppSemanticColors.light.knobFill, const Color(0xFFFFFFFF));
+      });
+
+      test('dark values are real dark values', () {
+        expect(
+          AppSemanticColors.dark.disabledSurface,
+          AppPrimitives.pcDarkElevated,
+        );
+        expect(
+          AppSemanticColors.dark.disabledOnSurface,
+          AppPrimitives.pcDarkInkDisabled,
+        );
+        expect(AppSemanticColors.dark.knobFill, AppPrimitives.pcDarkInk);
+      });
+
+      test('copyWith and lerp cover the new fields', () {
+        final swapped = AppSemanticColors.light.copyWith(
+          disabledSurface: const Color(0xFF010203),
+          disabledOnSurface: const Color(0xFF040506),
+          knobFill: const Color(0xFF070809),
+        );
+        expect(swapped.disabledSurface, const Color(0xFF010203));
+        expect(swapped.disabledOnSurface, const Color(0xFF040506));
+        expect(swapped.knobFill, const Color(0xFF070809));
+
+        // lerp at t=1 must reach the target for every new field, otherwise the
+        // field was added to the constructor but forgotten in lerp.
+        final end = AppSemanticColors.light.lerp(AppSemanticColors.dark, 1.0);
+        expect(end.disabledSurface, AppSemanticColors.dark.disabledSurface);
+        expect(end.disabledOnSurface, AppSemanticColors.dark.disabledOnSurface);
+        expect(end.knobFill, AppSemanticColors.dark.knobFill);
+      });
+    });
+
     group('dark constant', () {
       test('primary is pcDarkPurple (M3 tone-80 lift, hue held)', () {
         expect(

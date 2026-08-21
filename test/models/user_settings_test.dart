@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart' show ThemeMode;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/models/user_settings.dart';
 
@@ -396,6 +397,54 @@ void main() {
 
       expect(settings.elevatedThreshold, 999);
       expect(settings.criticalThreshold, 9999);
+    });
+  });
+
+  group('themeMode', () {
+    test('defaults to system so the OS setting is honoured', () {
+      expect(const UserSettings().themeMode, ThemeMode.system);
+    });
+
+    test('round-trips through toMap/fromMap for every value', () {
+      for (final mode in ThemeMode.values) {
+        final restored = UserSettings.fromMap(
+          UserSettings(themeMode: mode).toMap(),
+        );
+        expect(restored.themeMode, mode, reason: 'round-trip failed for $mode');
+      }
+    });
+
+    test('serialises as a readable string, not an enum index', () {
+      expect(
+        const UserSettings(themeMode: ThemeMode.dark).toMap()['themeMode'],
+        'dark',
+      );
+    });
+
+    test('documents written before this field existed parse to system', () {
+      // The real migration case: every existing /users/{uid}.settings map.
+      expect(UserSettings.fromMap(const {}).themeMode, ThemeMode.system);
+    });
+
+    test('an unknown or malformed value falls back to system', () {
+      for (final bad in <Object?>[null, 'sepia', 42, true, '']) {
+        expect(
+          UserSettings.fromMap({'themeMode': bad}).themeMode,
+          ThemeMode.system,
+          reason: 'did not fall back for $bad',
+        );
+      }
+    });
+
+    test('copyWith carries and overrides themeMode', () {
+      const base = UserSettings(themeMode: ThemeMode.dark);
+      expect(base.copyWith().themeMode, ThemeMode.dark);
+      expect(
+        base.copyWith(themeMode: ThemeMode.light).themeMode,
+        ThemeMode.light,
+      );
+      // Unrelated changes must not silently reset it.
+      expect(base.copyWith(elevatedThreshold: 33).themeMode, ThemeMode.dark);
     });
   });
 }

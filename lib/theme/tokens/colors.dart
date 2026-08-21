@@ -147,7 +147,10 @@ class AppPrimitives {
 
   // ── Dark: accent foregrounds (icons, dots, text) ─────────────────────────
   static const Color pcDarkPeriwinkle = Color(0xFF9FB6EE); // 9.20:1
-  static const Color pcDarkButter = Color(0xFFE8C97A); // 11.56:1
+  // Hue-matched to the light pcButter amber (31.2deg vs 30.6deg). An earlier
+  // #E8C97A sat at 43deg, so dark 'warning' read yellow-gold where light read
+  // amber — the only role in the palette whose hue drifted.
+  static const Color pcDarkButter = Color(0xFFEAC69F); // 11.57:1
   static const Color pcDarkBlush = Color(0xFFF0A0BC); // 9.25:1
   static const Color pcDarkMint = Color(0xFF8FD3A0); // 10.61:1
 
@@ -155,7 +158,7 @@ class AppPrimitives {
   // Pill backgrounds and dots reuse the accent tiles / foregrounds above; only
   // the text needs its own step, lifted for >=9:1 on its own pill.
   static const Color pcDarkStatusNormalText = Color(0xFFB6C7F2); // 9.25:1
-  static const Color pcDarkStatusElevatedText = Color(0xFFEFD79A); // 10.11:1
+  static const Color pcDarkStatusElevatedText = Color(0xFFF1D2B1); // 9.93:1
   static const Color pcDarkStatusAlertText = Color(0xFFF4B8CB); // 9.26:1
   static const Color pcDarkStatusActiveText = Color(0xFFA8DEB5); // 9.44:1
 
