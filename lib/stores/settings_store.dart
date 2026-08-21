@@ -1,5 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
+import 'package:flutter/material.dart' show ThemeMode;
+import 'package:pet_circle/config/app_config.dart'
+    show appThemeMode, kEnableFirebase;
 import 'package:pet_circle/models/app_user.dart';
 import 'package:pet_circle/models/user_settings.dart';
 import 'package:pet_circle/repositories/user_repository.dart';
@@ -35,6 +37,7 @@ class SettingsStore extends ChangeNotifier {
   /// Set by main.dart to schedule/cancel the recurring local notification.
   WeeklySummaryCallback? onWeeklySummaryChanged;
 
+  ThemeMode _themeMode = ThemeMode.system;
   int _elevatedThreshold = 30;
   int _criticalThreshold = 40;
   bool _pushNotifications = true;
@@ -51,6 +54,7 @@ class SettingsStore extends ChangeNotifier {
   int _medicationEveningHour = 21;
   int _medicationEveningMinute = 0;
 
+  ThemeMode get themeMode => _themeMode;
   int get elevatedThreshold => _elevatedThreshold;
   int get criticalThreshold => _criticalThreshold;
   bool get pushNotifications => _pushNotifications;
@@ -69,6 +73,7 @@ class SettingsStore extends ChangeNotifier {
   int get medicationEveningMinute => _medicationEveningMinute;
 
   void reset() {
+    _setThemeMode(ThemeMode.system);
     _elevatedThreshold = 30;
     _criticalThreshold = 40;
     _pushNotifications = true;
@@ -89,6 +94,7 @@ class SettingsStore extends ChangeNotifier {
 
   void seedFromAppUser(AppUser appUser) {
     final settings = appUser.settings;
+    _setThemeMode(settings.themeMode);
     _elevatedThreshold = settings.elevatedThreshold;
     _criticalThreshold = settings.criticalThreshold;
     _pushNotifications = settings.pushNotifications;
@@ -105,6 +111,21 @@ class SettingsStore extends ChangeNotifier {
     _medicationEveningHour = settings.medicationEveningHour;
     _medicationEveningMinute = settings.medicationEveningMinute;
     notifyListeners();
+  }
+
+  /// Keeps the store field and the global [appThemeMode] notifier in lockstep.
+  /// Every path that changes the theme goes through here, so MaterialApp can
+  /// never disagree with what is persisted.
+  void _setThemeMode(ThemeMode mode) {
+    _themeMode = mode;
+    appThemeMode.value = mode;
+  }
+
+  Future<void> setThemeMode(ThemeMode mode) async {
+    if (mode == _themeMode) return;
+    _setThemeMode(mode);
+    notifyListeners();
+    await _persist();
   }
 
   Future<void> updateThresholds({int? elevated, int? critical}) async {
@@ -241,6 +262,7 @@ class SettingsStore extends ChangeNotifier {
 
   UserSettings _snapshot() {
     return UserSettings(
+      themeMode: _themeMode,
       elevatedThreshold: _elevatedThreshold,
       criticalThreshold: _criticalThreshold,
       pushNotifications: _pushNotifications,
