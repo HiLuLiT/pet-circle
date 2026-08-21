@@ -905,6 +905,22 @@ Escaping alone turned out to be insufficient. The first pass at this fix escaped
 
 ---
 
+## BUG-032: `welcome_illustration.png` is an SVG with a `.png` extension
+
+- **Found during:** the new `test/assets/asset_integrity_test.dart` guard added after BUG-031 — it failed on its first run.
+- **Severity:** Low
+- **Status:** Fixed
+- **Symptom:** No user-visible symptom today, because nothing references the file. Any future
+  `Image.asset('assets/figma/welcome_illustration.png')` would have thrown
+  `Exception: Invalid image data`, or shown a silent fallback via `AppImage`.
+- **Root cause:** The file was committed in April with PNG naming but SVG content (`<svg
+  preserveAspectRatio=...`). `pubspec.yaml` registers `assets/figma/` as a whole *directory*, so
+  the 12 KB orphan is bundled into every build regardless of the misnaming.
+- **Fix:** `git mv` to `welcome_illustration.svg`. Left in place rather than deleted — it is
+  unreferenced dead weight, but removing a design asset is the owner's call.
+- **Files changed:** `assets/figma/welcome_illustration.png` -> `assets/figma/welcome_illustration.svg`
+- **Follow-up:** The file is unreferenced in `lib/` and `test/`. Delete it, or wire it up.
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]
@@ -921,6 +937,7 @@ Escaping alone turned out to be insufficient. The first pass at this fix escaped
 
 **Files changed:**
 - `path/to/file.dart`
+
 
 ---
 -->

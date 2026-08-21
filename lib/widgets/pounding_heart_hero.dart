@@ -134,8 +134,8 @@ class _PoundingHeartHeroState extends State<PoundingHeartHero>
     return Transform.translate(
       offset: Offset(0, drift * 0.3),
       child: Stack(
-        // The heart sits 2px above the box and lifts further on each beat, so
-        // it must be free to paint outside these bounds.
+        // The heart's glow is a blurred copy that spreads well past the
+        // layer's own bounds, so it must be free to paint outside these.
         clipBehavior: Clip.none,
         children: [
           Transform.scale(
@@ -149,16 +149,17 @@ class _PoundingHeartHeroState extends State<PoundingHeartHero>
             ),
           ),
           Positioned(
-            left: 125,
-            top: -2,
+            left: 131,
+            top: 6,
             width: _heartSize,
             height: _heartSize,
             child: Transform.translate(
               offset: Offset(0, lift + drift),
               child: Transform.scale(
-                // transformOrigin: 50% 55% in the source.
+                // transformOrigin: 50% 58% in the source. Flutter's Alignment
+                // y maps as 2 * fraction - 1, so 0.58 -> 0.16.
                 scale: scale,
-                alignment: const Alignment(0, 0.1),
+                alignment: const Alignment(0, 0.16),
                 child: _Heart(beat: beat, glow: glow),
               ),
             ),
@@ -168,7 +169,14 @@ class _PoundingHeartHeroState extends State<PoundingHeartHero>
     );
   }
 
-  static const double _heartSize = 43;
+  /// Rendered size of the heart layer, from `heart-scene.jsx`.
+  ///
+  /// The committed `welcome_heart.png` is 43x43 — deliberately larger than this
+  /// box. The design project re-exported the heart at 29x29 (i.e. 1x), but the
+  /// repo already holds a clean 43x43 copy, so painting that into a 29pt box
+  /// gives ~1.48x density instead of 1x. Do not "fix" this by downloading the
+  /// smaller asset.
+  static const double _heartSize = 29;
 }
 
 /// The heart plus its pulsing glow.
