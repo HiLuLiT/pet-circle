@@ -139,10 +139,16 @@ void main() {
         );
         expect(AppPrimitives.pcButterCream, equals(const Color(0xFFE8E4D8)));
       });
-      test('accentButterCream is theme-independent (dark == light)', () {
+      test('accentButterCream inverts for dark (it is a surface)', () {
+        // Previously asserted dark == light, which locked in the defect: a
+        // cream toggle track and cream note callouts on the dark canvas.
         expect(
           AppSemanticColors.dark.accentButterCream,
-          equals(AppSemanticColors.light.accentButterCream),
+          equals(AppPrimitives.pcDarkButterCream),
+        );
+        expect(
+          AppSemanticColors.dark.accentButterCream,
+          isNot(equals(AppSemanticColors.light.accentButterCream)),
         );
       });
       test('accentBlush is pcBlush', () {
@@ -209,40 +215,66 @@ void main() {
     });
 
     group('dark constant', () {
-      test('primary is pcPurpleTile (lighter for dark theme)', () {
+      test('primary is pcDarkPurple (M3 tone-80 lift, hue held)', () {
         expect(
           AppSemanticColors.dark.primary,
-          equals(AppPrimitives.pcPurpleTile),
+          equals(AppPrimitives.pcDarkPurple),
         );
       });
 
-      test('onPrimary is pcInk', () {
-        expect(AppSemanticColors.dark.onPrimary, equals(AppPrimitives.pcInk));
+      test('onPrimary is pcDarkCanvas', () {
+        expect(
+          AppSemanticColors.dark.onPrimary,
+          equals(AppPrimitives.pcDarkCanvas),
+        );
       });
 
-      test('surface is inkDarker', () {
-        expect(AppSemanticColors.dark.surface, equals(AppPrimitives.inkDarker));
+      test('surface is pcDarkSurface', () {
+        expect(
+          AppSemanticColors.dark.surface,
+          equals(AppPrimitives.pcDarkSurface),
+        );
       });
 
-      test('background is inkDarkest', () {
+      test('background is pcDarkCanvas', () {
         expect(
           AppSemanticColors.dark.background,
-          equals(AppPrimitives.inkDarkest),
+          equals(AppPrimitives.pcDarkCanvas),
         );
       });
 
-      test('error is pcBlush', () {
-        expect(AppSemanticColors.dark.error, equals(AppPrimitives.pcBlush));
+      test('primaryLight no longer collapses onto primary', () {
+        // The old dark constant pointed both at pcPurpleTile, so hover and
+        // pressed states were invisible.
+        expect(
+          AppSemanticColors.dark.primaryLight,
+          isNot(equals(AppSemanticColors.dark.primary)),
+        );
       });
 
-      test('success is pcMint', () {
-        expect(AppSemanticColors.dark.success, equals(AppPrimitives.pcMint));
+      test('error is pcDarkBlush, not the light pcBlush', () {
+        expect(AppSemanticColors.dark.error, equals(AppPrimitives.pcDarkBlush));
+        expect(
+          AppSemanticColors.dark.error,
+          isNot(equals(AppSemanticColors.light.error)),
+        );
       });
 
-      test('textPrimary is pcSurface', () {
+      test('success is pcDarkMint, not the light pcMint', () {
+        expect(
+          AppSemanticColors.dark.success,
+          equals(AppPrimitives.pcDarkMint),
+        );
+        expect(
+          AppSemanticColors.dark.success,
+          isNot(equals(AppSemanticColors.light.success)),
+        );
+      });
+
+      test('textPrimary is pcDarkInk, deliberately not pure white', () {
         expect(
           AppSemanticColors.dark.textPrimary,
-          equals(AppPrimitives.pcSurface),
+          equals(AppPrimitives.pcDarkInk),
         );
       });
     });
@@ -381,7 +413,7 @@ void main() {
         );
 
         expect(resolved, isNotNull);
-        expect(resolved!.primary, equals(AppPrimitives.pcPurpleTile));
+        expect(resolved!.primary, equals(AppPrimitives.pcDarkPurple));
       });
 
       testWidgets(

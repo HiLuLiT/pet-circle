@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 
 void main() {
   group('buildAppTheme()', () {
@@ -88,9 +89,9 @@ void main() {
         expect(theme.inputDecorationTheme.border, isA<OutlineInputBorder>());
       });
 
-      test('border has borderRadius of 14 (PC v3 field radius)', () {
+      test('border uses the DS field radius (12)', () {
         final border = theme.inputDecorationTheme.border as OutlineInputBorder;
-        expect(border.borderRadius, equals(BorderRadius.circular(14)));
+        expect(border.borderRadius, equals(AppRadiiTokens.borderRadiusField));
       });
 
       test('border side is none', () {
@@ -116,7 +117,7 @@ void main() {
     });
 
     test('scaffold background is dark', () {
-      expect(theme.scaffoldBackgroundColor, equals(const Color(0xFF1A1A1A)));
+      expect(theme.scaffoldBackgroundColor, equals(AppPrimitives.pcDarkCanvas));
     });
 
     test('contains AppSemanticColors extension', () {
@@ -156,16 +157,21 @@ void main() {
         expect(theme.inputDecorationTheme.filled, isTrue);
       });
 
-      test('fill color is dark', () {
+      test('fill color is the well, one step below the card surface', () {
         expect(
           theme.inputDecorationTheme.fillColor,
-          equals(const Color(0xFF2A2420)),
+          equals(AppPrimitives.pcDarkWell),
+        );
+        // An input is recessed, so it must be darker than the card it sits on.
+        expect(
+          AppPrimitives.pcDarkWell.computeLuminance(),
+          lessThan(AppPrimitives.pcDarkSurface.computeLuminance()),
         );
       });
 
-      test('border is OutlineInputBorder with radius 14 (PC v3)', () {
+      test('border is OutlineInputBorder at the DS field radius (12)', () {
         final border = theme.inputDecorationTheme.border as OutlineInputBorder;
-        expect(border.borderRadius, equals(BorderRadius.circular(14)));
+        expect(border.borderRadius, equals(AppRadiiTokens.borderRadiusField));
       });
     });
   });
@@ -238,7 +244,7 @@ void main() {
           home: Builder(
             builder: (context) {
               final colors = AppSemanticColors.of(context);
-              expect(colors.primary, equals(AppPrimitives.pcPurpleTile));
+              expect(colors.primary, equals(AppPrimitives.pcDarkPurple));
               return const SizedBox();
             },
           ),

@@ -64,8 +64,10 @@ class AppToggle extends StatelessWidget {
             child: Container(
               width: _knobSize,
               height: _knobSize,
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                // Not `surface`: the knob must stay the lightest thing in the
+                // control, and `surface` inverts to a dark card in dark mode.
+                color: semanticColors.knobFill,
                 shape: BoxShape.circle,
               ),
             ),

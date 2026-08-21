@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/shadows.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/user_avatar.dart';
 
@@ -79,13 +80,7 @@ class AppHeader extends StatelessWidget {
             decoration: BoxDecoration(
               color: c.surface,
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 4,
-                  offset: const Offset(0, 1),
-                ),
-              ],
+              boxShadow: AppShadowTokens.smallOf(context),
             ),
             child: Icon(
               Icons.notifications_none,

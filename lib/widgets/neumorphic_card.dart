@@ -34,7 +34,7 @@ class NeumorphicCard extends StatelessWidget {
         // drop shadow; raised cards use the small elevation shadow.
         color: color ?? (inner ? c.surfaceRecessed : c.surface),
         borderRadius: cardRadius,
-        boxShadow: inner ? const [] : AppShadowTokens.small,
+        boxShadow: inner ? const [] : AppShadowTokens.smallOf(context),
       ),
       child: child,
     );
