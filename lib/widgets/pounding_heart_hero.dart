@@ -14,6 +14,17 @@ import 'package:pet_circle/widgets/app_image.dart';
 /// the layer geometry and every magic number below come from that source, so
 /// keep them in sync with it rather than tuning them here.
 ///
+/// To re-sync: `DesignSync get_file` with
+/// `projectId: 195022dd-b437-4918-bb96-c2fec727e012`, `path: heart-scene.jsx`,
+/// then diff its constants against the ones below. The project does *not*
+/// appear in `list_projects` — that method only returns writable design-system
+/// projects — so it must be addressed by this ID directly.
+///
+/// Motion changes are a numbers diff and safe to port. Artwork changes are not:
+/// the design exports at 1x, and image bytes cannot round-trip through an
+/// agent's context without corruption, so prefer the higher-resolution copy
+/// already committed here. See BUG-031.
+///
 /// Two deliberate departures from the design preview:
 ///  * The preview's `scale(1.75)` and `translateY(8px)` only sized the artwork
 ///    to fill its 640x360 preview stage, so they are dropped — here the hero
