@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/tokens/colors.dart';
+import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/theme/tokens/typography.dart';
 
 /// Parity guard between the Figma Design System and the Dart token layer.
@@ -67,6 +68,58 @@ void main() {
     test('Active pill uses Candy/Mint tile + accent', () {
       expect(AppPrimitives.pcStatusActiveBg, AppPrimitives.pcMintTile);
       expect(AppPrimitives.pcStatusActiveText, AppPrimitives.pcMint);
+    });
+  });
+
+  group('Figma DS parity — spacing', () {
+    // Measured across Figma nodes 442:6747, 407:3528, 442:8893, 442:8959 and
+    // 426:1182. The old pc* scale (6/10/14/18/24) covered only 24 of these.
+    test('every spacing value used in Figma has a token', () {
+      const figmaSteps = <double>[4, 8, 12, 16, 20, 24, 28, 32];
+      const scale = <double>[
+        AppSpacingTokens.pcXs,
+        AppSpacingTokens.pcSm,
+        AppSpacingTokens.pcMd,
+        AppSpacingTokens.pcLg,
+        AppSpacingTokens.pcXl,
+        AppSpacingTokens.pc2Xl,
+        AppSpacingTokens.pc20,
+        AppSpacingTokens.pc28,
+      ];
+      for (final step in figmaSteps) {
+        expect(
+          scale,
+          contains(step),
+          reason:
+              '${step}px is used in the Figma home nodes but no spacing '
+              'token resolves to it.',
+        );
+      }
+    });
+
+    test('core scale is the Figma rhythm', () {
+      expect(AppSpacingTokens.pcXs, 4);
+      expect(AppSpacingTokens.pcSm, 8);
+      expect(AppSpacingTokens.pcMd, 12);
+      expect(AppSpacingTokens.pcLg, 16);
+      expect(AppSpacingTokens.pcXl, 24);
+      expect(AppSpacingTokens.pc2Xl, 32);
+    });
+
+    test('legacy names alias onto the Figma-aligned scale', () {
+      expect(AppSpacingTokens.xs, AppSpacingTokens.pcXs);
+      expect(AppSpacingTokens.sm, AppSpacingTokens.pcSm);
+      expect(AppSpacingTokens.md, AppSpacingTokens.pcLg);
+      expect(AppSpacingTokens.lg, AppSpacingTokens.pcXl);
+      expect(AppSpacingTokens.xl, AppSpacingTokens.pc2Xl);
+    });
+  });
+
+  group('Figma DS parity — radii', () {
+    test('field / card / pill radii match Figma', () {
+      expect(AppRadiiTokens.pcField, 12);
+      expect(AppRadiiTokens.pcCard, 16);
+      expect(AppRadiiTokens.pcPill, greaterThanOrEqualTo(999));
     });
   });
 

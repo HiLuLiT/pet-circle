@@ -339,7 +339,7 @@ class OwnerDashboard extends StatelessWidget {
                         AppRoutes.shell(tab: AppRoutes.tabMeasure),
                       ),
                     ),
-                    const SizedBox(height: AppSpacingTokens.md),
+                    const SizedBox(height: AppSpacingTokens.pcMd),
                     PrimaryButton(
                       label: l10n.trends,
                       variant: PrimaryButtonVariant.outlined,

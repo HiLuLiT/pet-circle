@@ -13,6 +13,7 @@ class UserAvatar extends StatelessWidget {
     this.onTap,
     this.backgroundColor,
     this.foregroundColor,
+    this.textStyle,
   });
 
   final String name;
@@ -28,6 +29,12 @@ class UserAvatar extends StatelessWidget {
   /// provided.
   final Color? foregroundColor;
 
+  /// Overrides the initials text style. Figma sizes initials per context
+  /// rather than proportionally — the 32px header avatar uses Label/S Bold
+  /// 13/18 (node 442:6750) while the 28px care-circle avatars use Caption/XS
+  /// 10/14 (node 442:8952). Defaults to the proportional fallback.
+  final TextStyle? textStyle;
+
   String get _initials {
     final parts = name
         .trim()
@@ -41,6 +48,19 @@ class UserAvatar extends StatelessWidget {
 
   bool get _hasNetworkImage =>
       imageUrl != null && imageUrl!.isNotEmpty && imageUrl!.startsWith('http');
+
+  /// Initials style: an explicit [textStyle] when given (recolored to the
+  /// avatar's foreground), otherwise the proportional fallback.
+  TextStyle _initialsStyle(AppSemanticColors c) {
+    final color = foregroundColor ?? c.textPrimary;
+    final override = textStyle;
+    if (override != null) return override.copyWith(color: color);
+    return AppSemanticTextStyles.labelSm.copyWith(
+      color: color,
+      fontSize: size * 0.38,
+      height: 1,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,27 +83,10 @@ class UserAvatar extends StatelessWidget {
                   fit: BoxFit.cover,
                   width: size,
                   height: size,
-                  errorBuilder: (_, __, ___) => Center(
-                    child: Text(
-                      _initials,
-                      style: AppSemanticTextStyles.labelSm.copyWith(
-                        color: foregroundColor ?? c.textPrimary,
-                        fontSize: size * 0.38,
-                        height: 1,
-                      ),
-                    ),
-                  ),
+                  errorBuilder: (_, __, ___) =>
+                      Center(child: Text(_initials, style: _initialsStyle(c))),
                 )
-              : Center(
-                  child: Text(
-                    _initials,
-                    style: AppSemanticTextStyles.labelSm.copyWith(
-                      color: foregroundColor ?? c.textPrimary,
-                      fontSize: size * 0.38,
-                      height: 1,
-                    ),
-                  ),
-                ),
+              : Center(child: Text(_initials, style: _initialsStyle(c))),
         ),
       ),
     );

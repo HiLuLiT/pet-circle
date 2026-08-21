@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
-import 'package:pet_circle/theme/tokens/shadows.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/user_avatar.dart';
 
@@ -33,60 +32,75 @@ class AppHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // Left: User avatar -> opens settings
-        UserAvatar(
-          name: userName,
-          imageUrl: userImageUrl,
-          size: 32,
-          backgroundColor: c.accentPurpleTile,
-          foregroundColor: c.primary,
-          onTap: onAvatarTap,
-        ),
-        // Center: Pet selector (optional)
-        if (petName != null)
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: onPetSelectorTap,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Flexible(
-                  child: Text(
-                    petName!,
-                    style: AppSemanticTextStyles.headingH2.copyWith(
-                      color: c.textPrimary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+        // Figma 442:6748 — the avatar and pet selector are ONE left-aligned
+        // group with a 12px gap, not two children spread apart by
+        // spaceBetween (which pushed the pet name to the centre).
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            UserAvatar(
+              name: userName,
+              imageUrl: userImageUrl,
+              size: 32,
+              backgroundColor: c.accentPurpleTile,
+              foregroundColor: c.primary,
+              // Figma 442:6750 — the initial is Label/S Bold 13/18.
+              textStyle: AppSemanticTextStyles.labelSBold,
+              onTap: onAvatarTap,
+            ),
+            if (petName != null) ...[
+              const SizedBox(width: AppSpacingTokens.pcMd),
+              Flexible(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: onPetSelectorTap,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          petName!,
+                          style: AppSemanticTextStyles.headingH2.copyWith(
+                            color: c.textPrimary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      if (onPetSelectorTap != null) ...[
+                        // Figma 442:6751 gap is 8px.
+                        const SizedBox(width: AppSpacingTokens.pcSm),
+                        Icon(
+                          Icons.keyboard_arrow_down,
+                          size: 24,
+                          color: c.textPrimary,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                if (onPetSelectorTap != null) ...[
-                  // Figma 442:6751 gap between pet name and chevron is 8px.
-                  const SizedBox(width: AppSpacingTokens.sm),
-                  Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 24,
-                    color: c.textPrimary,
-                  ),
-                ],
-              ],
-            ),
-          ),
-        // Right: Notification bell
+              ),
+            ],
+          ],
+        ),
+        // Right: notification bell. Figma 442:8694 is a white pill with 12px
+        // padding around a 16.615px glyph (40.615 total) and NO shadow.
         GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: onNotificationTap,
           child: Container(
-            width: 40,
-            height: 40,
+            padding: const EdgeInsets.all(AppSpacingTokens.pcMd),
             decoration: BoxDecoration(
               color: c.surface,
-              shape: BoxShape.circle,
-              boxShadow: AppShadowTokens.smallOf(context),
+              // Figma specifies a pill with NO shadow. main had tokenized the
+              // old hardcoded black-8% shadow to AppShadowTokens.smallOf() for
+              // dark mode; dropping the shadow entirely satisfies that intent
+              // too (no light-pinned literal) while matching the design.
+              borderRadius: AppRadiiTokens.borderRadiusPill,
             ),
             child: Icon(
               Icons.notifications_none,
               color: c.textPrimary,
-              size: 20,
+              size: 16.615,
             ),
           ),
         ),

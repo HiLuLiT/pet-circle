@@ -88,28 +88,32 @@ void main() {
     });
 
     // ── Theme token verification ──────────────────────────────────────────
-    testWidgets('notification bell bg uses surface with a drop shadow', (
+    testWidgets('notification bell is a white pill with no shadow', (
       tester,
     ) async {
       await tester.pumpWidget(testApp(const AppHeader(userName: 'Alice')));
 
-      // Find the decorated container for the bell icon
-      final containers = tester
-          .widgetList<Container>(find.byType(Container))
-          .where((c) {
-            final dec = c.decoration;
-            if (dec is BoxDecoration && dec.shape == BoxShape.circle) {
-              return dec.color == AppSemanticColors.light.surface &&
-                  (dec.boxShadow?.isNotEmpty ?? false);
-            }
-            return false;
-          });
+      // Figma 442:8694 is a white pill with 12px padding around a 16.615px
+      // glyph and NO shadow — the previous drop shadow was not in the design.
+      final bells = tester.widgetList<Container>(find.byType(Container)).where((
+        c,
+      ) {
+        final dec = c.decoration;
+        return dec is BoxDecoration &&
+            dec.color == AppSemanticColors.light.surface &&
+            dec.borderRadius != null;
+      }).toList();
+      expect(bells, isNotEmpty, reason: 'bell pill not found');
+      final dec = bells.first.decoration! as BoxDecoration;
       expect(
-        containers.isNotEmpty,
-        isTrue,
-        reason:
-            'Notification bell should use a white surface background with a shadow',
+        dec.boxShadow ?? const <BoxShadow>[],
+        isEmpty,
+        reason: 'Figma 442:8694 specifies no shadow on the bell',
       );
+      expect(bells.first.padding, const EdgeInsets.all(12));
+
+      final icon = tester.widget<Icon>(find.byIcon(Icons.notifications_none));
+      expect(icon.size, closeTo(16.615, 0.001));
     });
 
     testWidgets('notification icon uses textPrimary color', (tester) async {

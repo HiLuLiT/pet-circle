@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/typography.dart';
 
 /// Horizontal alignment of the overlapping avatars within the stack.
 enum AvatarStackAlignment { left, right }
@@ -169,7 +170,8 @@ class _Initials extends StatelessWidget {
         text,
         style: AppSemanticTextStyles.labelSm.copyWith(
           color: c.textSecondary,
-          fontSize: size * 0.38,
+          // Figma 442:8952 — Caption/XS is a flat 10px, not proportional.
+          fontSize: AppTypography.pcCaptionXsBold.fontSize,
           height: 1,
         ),
       ),
