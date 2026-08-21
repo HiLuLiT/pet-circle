@@ -55,7 +55,16 @@ class AppRoutes {
 
 /// Routes that are exempt from the auth-gate redirect (they handle their own
 /// auth logic or are public).
-const _publicPaths = {'/', '/auth-gate', '/signup', '/login', '/verify-otp', '/welcome', '/invite', '/onboarding'};
+const _publicPaths = {
+  '/',
+  '/auth-gate',
+  '/signup',
+  '/login',
+  '/verify-otp',
+  '/welcome',
+  '/invite',
+  '/onboarding',
+};
 
 /// Stashed route the user was trying to reach before being bounced to auth-gate.
 /// Consumed once by [AuthGate] after successful authentication.
@@ -131,30 +140,25 @@ GoRouter buildRouter() {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (_, _) => const LandingScreen(),
-      ),
-      GoRoute(
-        path: '/auth-gate',
-        builder: (_, _) => const AuthGate(),
-      ),
+      GoRoute(path: '/', builder: (_, _) => const LandingScreen()),
+      GoRoute(path: '/auth-gate', builder: (_, _) => const AuthGate()),
       GoRoute(path: '/signup', builder: (_, _) => const CreateAccountScreen()),
       GoRoute(path: '/login', builder: (_, _) => const LoginScreen()),
       GoRoute(
         path: '/verify-otp',
         builder: (_, state) {
-          final email = Uri.decodeComponent(state.uri.queryParameters['email'] ?? '');
+          final email = Uri.decodeComponent(
+            state.uri.queryParameters['email'] ?? '',
+          );
           final isSignup = state.uri.queryParameters['signup'] == 'true';
           final nameParam = state.uri.queryParameters['name'];
-          final name = nameParam != null ? Uri.decodeComponent(nameParam) : null;
+          final name = nameParam != null
+              ? Uri.decodeComponent(nameParam)
+              : null;
           return VerifyOtpScreen(email: email, isSignup: isSignup, name: name);
         },
       ),
-      GoRoute(
-        path: '/onboarding',
-        builder: (_, _) => const OnboardingFlow(),
-      ),
+      GoRoute(path: '/onboarding', builder: (_, _) => const OnboardingFlow()),
       GoRoute(
         path: '/invite',
         builder: (_, state) {
@@ -176,10 +180,7 @@ GoRouter buildRouter() {
           return null;
         },
       ),
-      GoRoute(
-        path: '/vet-dashboard',
-        builder: (_, _) => const VetDashboard(),
-      ),
+      GoRoute(path: '/vet-dashboard', builder: (_, _) => const VetDashboard()),
       GoRoute(
         path: '/shell',
         builder: (_, state) {

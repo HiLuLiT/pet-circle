@@ -32,8 +32,10 @@ class ResponsiveGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final count =
-            (width / minItemWidth).floor().clamp(1, maxCrossAxisCount);
+        final count = (width / minItemWidth).floor().clamp(
+          1,
+          maxCrossAxisCount,
+        );
         return GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),

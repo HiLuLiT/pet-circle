@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, TargetPlatform;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -11,7 +12,8 @@ import 'package:pet_circle/services/abstract_reminder_service.dart';
 
 @pragma('vm:entry-point')
 void _onDidReceiveBackgroundNotificationResponse(
-    NotificationResponse response) {
+  NotificationResponse response,
+) {
   // Background handler runs in a separate isolate on Android — static fields
   // written here are NOT visible to the main isolate.  The main isolate uses
   // getNotificationAppLaunchDetails() instead to recover the tap payload.
@@ -65,8 +67,9 @@ class ReminderService implements AbstractReminderService {
     final local = tz.local;
     tz.setLocalLocation(local);
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
     const darwinSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
@@ -96,14 +99,17 @@ class ReminderService implements AbstractReminderService {
         defaultTargetPlatform == TargetPlatform.macOS) {
       final result = await _plugin
           .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin>()
+            IOSFlutterLocalNotificationsPlugin
+          >()
           ?.requestPermissions(alert: true, badge: true, sound: true);
       return result ?? false;
     }
 
     if (defaultTargetPlatform == TargetPlatform.android) {
-      final android = _plugin.resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>();
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin
+          >();
       final granted = await android?.requestNotificationsPermission();
       return granted ?? false;
     }
@@ -391,14 +397,16 @@ class ReminderService implements AbstractReminderService {
 
   /// Next occurrence of a specific weekday and time.
   /// [weekday] uses ISO 8601: 1=Monday..7=Sunday.
-  tz.TZDateTime _nextInstanceOfDayAndTime(
-    int weekday,
-    int hour,
-    int minute,
-  ) {
+  tz.TZDateTime _nextInstanceOfDayAndTime(int weekday, int hour, int minute) {
     final now = tz.TZDateTime.now(tz.local);
-    var scheduled =
-        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
+    var scheduled = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
     // Advance to the target weekday.
     while (scheduled.weekday != weekday) {
       scheduled = scheduled.add(const Duration(days: 1));

@@ -45,7 +45,8 @@ class _InviteScreenState extends State<InviteScreen> {
       uid: appUser.uid,
       email: appUser.email,
       displayName: appUser.displayName ?? appUser.email,
-      avatarUrl: appUser.photoUrl ??
+      avatarUrl:
+          appUser.photoUrl ??
           'https://ui-avatars.com/api/?name=${Uri.encodeComponent(appUser.displayName ?? appUser.email)}&background=E8B4B8&color=5B2C3F',
     );
 

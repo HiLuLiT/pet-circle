@@ -1,10 +1,6 @@
 import 'package:pet_circle/models/pet.dart';
 
-enum UserRole {
-  vet,
-  owner,
-  caregiver,
-}
+enum UserRole { vet, owner, caregiver }
 
 class User {
   User({

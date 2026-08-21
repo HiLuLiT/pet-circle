@@ -50,8 +50,7 @@ class ProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppSemanticColors.of(context);
     final clamped = value.clamp(0.0, 1.0);
-    final BorderRadius radius =
-        BorderRadius.circular(AppRadiiTokens.pcPill);
+    final BorderRadius radius = BorderRadius.circular(AppRadiiTokens.pcPill);
     final Color track = trackColor ?? colors.surfaceRecessed;
     final Color fill = fillColor ?? colors.primary;
 
@@ -62,20 +61,14 @@ class ProgressBar extends StatelessWidget {
           children: [
             Container(
               height: height,
-              decoration: BoxDecoration(
-                color: track,
-                borderRadius: radius,
-              ),
+              decoration: BoxDecoration(color: track, borderRadius: radius),
             ),
             FractionallySizedBox(
               alignment: AlignmentDirectional.centerStart,
               widthFactor: clamped,
               child: Container(
                 height: height,
-                decoration: BoxDecoration(
-                  color: fill,
-                  borderRadius: radius,
-                ),
+                decoration: BoxDecoration(color: fill, borderRadius: radius),
               ),
             ),
           ],

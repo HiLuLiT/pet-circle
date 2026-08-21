@@ -28,8 +28,10 @@ class VerifyOtpScreen extends StatefulWidget {
 }
 
 class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
-  final List<TextEditingController> _controllers =
-      List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> _controllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   final List<FocusNode> _rawFocusNodes = List.generate(6, (_) => FocusNode());
 
@@ -108,10 +110,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
       _error = null;
     });
 
-    final result = await OtpService.verifyOtp(
-      email: widget.email,
-      code: code,
-    );
+    final result = await OtpService.verifyOtp(email: widget.email, code: code);
 
     if (!mounted) return;
 
@@ -132,7 +131,8 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     } else {
       setState(() {
         _isVerifying = false;
-        _error = result.error ?? AppLocalizations.of(context)!.verificationFailed;
+        _error =
+            result.error ?? AppLocalizations.of(context)!.verificationFailed;
         for (final c in _controllers) {
           c.clear();
         }
@@ -262,13 +262,13 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                             // and making the digit look smaller/off-center
                             // than the Figma spec. buildCounter fully drops
                             // the reserved space.
-                            buildCounter: (
-                              context, {
-                              required currentLength,
-                              required isFocused,
-                              maxLength,
-                            }) =>
-                                null,
+                            buildCounter:
+                                (
+                                  context, {
+                                  required currentLength,
+                                  required isFocused,
+                                  maxLength,
+                                }) => null,
                             style: AppSemanticTextStyles.headingH2.copyWith(
                               color: c.textPrimary,
                             ),
@@ -307,8 +307,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                                 ),
                               ),
                             ),
-                            onChanged: (value) =>
-                                _onDigitChanged(index, value),
+                            onChanged: (value) => _onDigitChanged(index, value),
                           ),
                         ),
                       );
@@ -331,9 +330,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                     ),
                   const SizedBox(height: AppSpacingTokens.md + 4),
                   if (_isResending)
-                    Center(
-                      child: CircularProgressIndicator(color: c.primary),
-                    )
+                    Center(child: CircularProgressIndicator(color: c.primary))
                   else if (_canResend)
                     Center(
                       child: TextButton(
@@ -370,7 +367,9 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
                           context.pop();
                         } else {
                           context.go(
-                            widget.isSignup ? AppRoutes.signup : AppRoutes.login,
+                            widget.isSignup
+                                ? AppRoutes.signup
+                                : AppRoutes.login,
                           );
                         }
                       },

@@ -53,16 +53,24 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.lock_outline, size: 48, color: c.textPrimary.withValues(alpha: 0.3)),
+                  Icon(
+                    Icons.lock_outline,
+                    size: 48,
+                    color: c.textPrimary.withValues(alpha: 0.3),
+                  ),
                   const SizedBox(height: AppSpacingTokens.md),
                   Text(
                     l10n.viewer,
-                    style: AppSemanticTextStyles.headingH2.copyWith(color: c.textPrimary),
+                    style: AppSemanticTextStyles.headingH2.copyWith(
+                      color: c.textPrimary,
+                    ),
                   ),
                   const SizedBox(height: AppSpacingTokens.sm),
                   Text(
                     l10n.viewerMeasurementRestriction,
-                    style: AppSemanticTextStyles.pcBody.copyWith(color: c.textPrimary),
+                    style: AppSemanticTextStyles.pcBody.copyWith(
+                      color: c.textPrimary,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -73,7 +81,10 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
           if (!widget.showScaffold) {
             return Container(color: c.background, child: noPermissionContent);
           }
-          return Scaffold(backgroundColor: c.background, body: noPermissionContent);
+          return Scaffold(
+            backgroundColor: c.background,
+            body: noPermissionContent,
+          );
         }
 
         final content = SafeArea(
@@ -86,7 +97,9 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
             child: Align(
               alignment: Alignment.topCenter,
               child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
+                constraints: BoxConstraints(
+                  maxWidth: responsiveMaxWidth(context),
+                ),
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +121,9 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                               ? l10n.visionRRMode
                               : l10n.manualMode,
                           onChanged: (label) => setState(
-                            () => _selectedTab = label == l10n.visionRRMode ? 1 : 0,
+                            () => _selectedTab = label == l10n.visionRRMode
+                                ? 1
+                                : 0,
                           ),
                         ),
                         const SizedBox(height: AppSpacingTokens.pcLg),
@@ -134,10 +149,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
           return Container(color: c.background, child: content);
         }
 
-        return Scaffold(
-          backgroundColor: c.background,
-          body: content,
-        );
+        return Scaffold(backgroundColor: c.background, body: content);
       },
     );
   }
@@ -386,10 +398,7 @@ class _ManualModeState extends State<_ManualMode>
 
     measurementStore.addMeasurement(
       petId,
-      Measurement(
-        bpm: bpm,
-        recordedAt: DateTime.now(),
-      ),
+      Measurement(bpm: bpm, recordedAt: DateTime.now()),
     );
 
     setState(() {
@@ -505,7 +514,9 @@ class _TimerCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _DurationProgressTrack(
-                  value: selectedDuration == 0 ? 0.0 : elapsed / selectedDuration,
+                  value: selectedDuration == 0
+                      ? 0.0
+                      : elapsed / selectedDuration,
                 ),
               ),
               const SizedBox(width: AppSpacingTokens.pcMd),
@@ -538,10 +549,8 @@ class _TimerCard extends StatelessWidget {
               onTap: onTap,
               child: AnimatedBuilder(
                 animation: scaleAnimation,
-                builder: (context, child) => Transform.scale(
-                  scale: scaleAnimation.value,
-                  child: child,
-                ),
+                builder: (context, child) =>
+                    Transform.scale(scale: scaleAnimation.value, child: child),
                 child: Container(
                   width: 200,
                   height: 200,
@@ -560,13 +569,16 @@ class _TimerCard extends StatelessWidget {
                         : Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.favorite, size: 49, color: c.accentBlush),
+                              Icon(
+                                Icons.favorite,
+                                size: 49,
+                                color: c.accentBlush,
+                              ),
                               const SizedBox(height: AppSpacingTokens.sm),
                               Text(
                                 l10n.tapToBegin,
-                                style: AppSemanticTextStyles.labelLSemibold.copyWith(
-                                  color: c.accentBlush,
-                                ),
+                                style: AppSemanticTextStyles.labelLSemibold
+                                    .copyWith(color: c.accentBlush),
                               ),
                             ],
                           ),
@@ -660,14 +672,20 @@ class _DurationProgressTrack extends StatelessWidget {
           children: [
             Container(
               height: 4,
-              decoration: BoxDecoration(color: c.accentBlushTile, borderRadius: radius),
+              decoration: BoxDecoration(
+                color: c.accentBlushTile,
+                borderRadius: radius,
+              ),
             ),
             FractionallySizedBox(
               alignment: AlignmentDirectional.centerStart,
               widthFactor: clamped,
               child: Container(
                 height: 4,
-                decoration: BoxDecoration(color: c.accentBlush, borderRadius: radius),
+                decoration: BoxDecoration(
+                  color: c.accentBlush,
+                  borderRadius: radius,
+                ),
               ),
             ),
           ],
@@ -732,13 +750,17 @@ class _ResultCard extends StatelessWidget {
               const SizedBox(height: AppSpacingTokens.pcMd),
               Text(
                 l10n.measurementComplete,
-                style: AppSemanticTextStyles.pcCaption.copyWith(color: c.textPrimary),
+                style: AppSemanticTextStyles.pcCaption.copyWith(
+                  color: c.textPrimary,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacingTokens.xs),
               Text(
                 '$bpm',
-                style: AppSemanticTextStyles.pcDisplayXxl.copyWith(color: c.accentBlush),
+                style: AppSemanticTextStyles.pcDisplayXxl.copyWith(
+                  color: c.accentBlush,
+                ),
                 textAlign: TextAlign.center,
               ),
               Text(
@@ -787,9 +809,7 @@ class _VisionMode extends StatelessWidget {
             style: AppSemanticTextStyles.pcBody,
           ),
           const SizedBox(height: AppSpacingTokens.pcLg),
-          Center(
-            child: Icon(Icons.videocam, size: 64, color: c.textPrimary),
-          ),
+          Center(child: Icon(Icons.videocam, size: 64, color: c.textPrimary)),
         ],
       ),
     );

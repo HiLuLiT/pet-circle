@@ -34,8 +34,7 @@ class Medication {
 
   /// True when this medication should fire an end-of-course reminder:
   /// it is active, reminders are enabled, and an end date is set.
-  bool get hasEndReminder =>
-      isActive && remindersEnabled && endDate != null;
+  bool get hasEndReminder => isActive && remindersEnabled && endDate != null;
 
   Map<String, dynamic> toFirestore() {
     return {

@@ -8,7 +8,15 @@ import 'package:pet_circle/widgets/note_callout.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 class OnboardingStep2 extends StatefulWidget {
-  const OnboardingStep2({super.key, this.onBack, this.onNext, this.nextLabel, this.onClose, this.onDiagnosisChanged, this.initialDiagnosis});
+  const OnboardingStep2({
+    super.key,
+    this.onBack,
+    this.onNext,
+    this.nextLabel,
+    this.onClose,
+    this.onDiagnosisChanged,
+    this.initialDiagnosis,
+  });
 
   final VoidCallback? onBack;
   final VoidCallback? onNext;
@@ -30,7 +38,9 @@ class _OnboardingStep2State extends State<OnboardingStep2>
   @override
   void initState() {
     super.initState();
-    _diagnosisController = TextEditingController(text: widget.initialDiagnosis ?? '');
+    _diagnosisController = TextEditingController(
+      text: widget.initialDiagnosis ?? '',
+    );
   }
 
   @override
@@ -89,10 +99,7 @@ class _OnboardingStep2State extends State<OnboardingStep2>
             onChanged: widget.onDiagnosisChanged,
           ),
           const SizedBox(height: AppSpacingTokens.md),
-          NoteCallout(
-            title: l10n.noteLabel,
-            body: l10n.diagnosisNote,
-          ),
+          NoteCallout(title: l10n.noteLabel, body: l10n.diagnosisNote),
         ],
       ),
     );

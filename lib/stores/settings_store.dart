@@ -11,12 +11,13 @@ final settingsStore = SettingsStore();
 typedef PushToggleCallback = Future<void> Function(bool enabled);
 
 /// Callback type for when measurement reminder settings change.
-typedef MeasurementReminderCallback = Future<void> Function({
-  required List<int> days,
-  required int hour,
-  required int minute,
-  required bool enabled,
-});
+typedef MeasurementReminderCallback =
+    Future<void> Function({
+      required List<int> days,
+      required int hour,
+      required int minute,
+      required bool enabled,
+    });
 
 /// Callback type for when the weekly summary nudge toggle changes.
 typedef WeeklySummaryCallback = Future<void> Function(bool enabled);
@@ -262,8 +263,6 @@ class SettingsStore extends ChangeNotifier {
     if (!kEnableFirebase) return;
     final uid = userStore.currentUserUid;
     if (uid == null || uid.isEmpty) return;
-    await userRepository.updateUser(uid, {
-      'settings': _snapshot().toMap(),
-    });
+    await userRepository.updateUser(uid, {'settings': _snapshot().toMap()});
   }
 }

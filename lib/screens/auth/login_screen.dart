@@ -46,7 +46,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!kEnableFirebase) {
       if (!mounted) return;
-      context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=false');
+      context.go(
+        '${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=false',
+      );
       return;
     }
 
@@ -54,7 +56,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final result = await OtpService.sendOtp(email: email);
       if (!mounted) return;
       if (result.success) {
-        context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=false');
+        context.go(
+          '${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=false',
+        );
       } else {
         setState(() {
           _isLoading = false;
@@ -82,9 +86,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (result.success) {
       context.go(AppRoutes.authGate);
     } else if (result.error != null && result.error != 'Sign in cancelled') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.error!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.error!)));
     }
   }
 
@@ -93,7 +97,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (kIsWeb) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.appleSignInNotAvailableOnWeb)),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.appleSignInNotAvailableOnWeb,
+          ),
+        ),
       );
       return;
     }
@@ -108,12 +116,11 @@ class _LoginScreenState extends State<LoginScreen> {
     if (result.success) {
       context.go(AppRoutes.authGate);
     } else if (result.error != null && result.error != 'Sign in cancelled') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.error!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.error!)));
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +146,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: c.primaryGhost,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.person_outline, size: 36, color: c.primary),
+                    child: Icon(
+                      Icons.person_outline,
+                      size: 36,
+                      color: c.primary,
+                    ),
                   ),
                   const SizedBox(height: AppSpacingTokens.sm + 4),
                   Text(
@@ -182,7 +193,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             if (value == null || value.trim().isEmpty) {
                               return l10n.pleaseEnterEmail;
                             }
-                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value.trim())) {
+                            if (!RegExp(
+                              r'^[^@]+@[^@]+\.[^@]+$',
+                            ).hasMatch(value.trim())) {
                               return l10n.enterValidEmail;
                             }
                             return null;
@@ -240,7 +253,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: AppSpacingTokens.md + 4),
                   SocialButton(
-                    icon: Image.asset(AppAssets.googleLogo, width: 20, height: 20),
+                    icon: Image.asset(
+                      AppAssets.googleLogo,
+                      width: 20,
+                      height: 20,
+                    ),
                     label: l10n.continueWithGoogle,
                     onTap: _isLoading ? null : _handleGoogleSignIn,
                   ),
@@ -252,7 +269,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: AppSpacingTokens.lg),
                   TextButton(
-                    onPressed: _isLoading ? null : () => context.push(AppRoutes.signup),
+                    onPressed: _isLoading
+                        ? null
+                        : () => context.push(AppRoutes.signup),
                     child: Text.rich(
                       TextSpan(
                         text: '${l10n.dontHaveAccount} ',

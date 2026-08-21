@@ -60,8 +60,9 @@ class NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppSemanticColors.of(context);
     final backgroundColor = unread ? colors.surface : _readBg;
-    final tileColor =
-        unread ? iconTileColor : iconTileColor.withValues(alpha: 0.55);
+    final tileColor = unread
+        ? iconTileColor
+        : iconTileColor.withValues(alpha: 0.55);
 
     final titleStyle = AppSemanticTextStyles.pcBodyBold.copyWith(
       fontSize: 15.5,
@@ -95,12 +96,7 @@ class NotificationCard extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: titleStyle,
-                      ),
-                    ),
+                    Expanded(child: Text(title, style: titleStyle)),
                     if (unread) ...[
                       const SizedBox(width: 8),
                       _UnreadDot(color: colors.accentPurple),
@@ -127,10 +123,7 @@ class NotificationCard extends StatelessWidget {
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(AppRadiiTokens.pcCard),
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: card,
-      ),
+      child: InkWell(onTap: onTap, child: card),
     );
   }
 }
@@ -146,10 +139,7 @@ class _IconTile extends StatelessWidget {
     return Container(
       width: 44,
       height: 44,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color,
-      ),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
       child: Center(child: child),
     );
   }
@@ -166,10 +156,7 @@ class _UnreadDot extends StatelessWidget {
       key: const ValueKey('notification_card.unread_dot'),
       width: 9,
       height: 9,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: color,
-      ),
+      decoration: BoxDecoration(shape: BoxShape.circle, color: color),
     );
   }
 }

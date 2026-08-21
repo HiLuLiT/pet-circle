@@ -70,9 +70,7 @@ class AvatarStack extends StatelessWidget {
         children: [
           for (var i = 0; i < count; i++)
             Positioned(
-              left: alignment == AvatarStackAlignment.left
-                  ? i * step
-                  : null,
+              left: alignment == AvatarStackAlignment.left ? i * step : null,
               right: alignment == AvatarStackAlignment.right
                   ? edgePad + i * step
                   : null,

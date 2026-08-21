@@ -29,15 +29,14 @@ class AppFilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppSemanticColors.of(context);
-    final Color background =
-        selected ? colors.accentPeriwinkleChip : colors.surfaceRecessed;
+    final Color background = selected
+        ? colors.accentPeriwinkleChip
+        : colors.surfaceRecessed;
     // Both states use on-palette ink; selected reads slightly stronger via
     // the chip background contrast.
-    final Color textColor =
-        selected ? colors.onSurface : colors.textPrimary;
+    final Color textColor = selected ? colors.onSurface : colors.textPrimary;
 
-    final BorderRadius radius =
-        BorderRadius.circular(AppRadiiTokens.pcPill);
+    final BorderRadius radius = BorderRadius.circular(AppRadiiTokens.pcPill);
 
     return Material(
       color: Colors.transparent,
@@ -46,15 +45,10 @@ class AppFilterChip extends StatelessWidget {
         borderRadius: radius,
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-          decoration: BoxDecoration(
-            color: background,
-            borderRadius: radius,
-          ),
+          decoration: BoxDecoration(color: background, borderRadius: radius),
           child: Text(
             label,
-            style: AppTypography.pcLabelSemibold.copyWith(
-              color: textColor,
-            ),
+            style: AppTypography.pcLabelSemibold.copyWith(color: textColor),
           ),
         ),
       ),

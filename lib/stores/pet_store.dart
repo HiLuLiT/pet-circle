@@ -24,9 +24,11 @@ class PetStore extends ChangeNotifier {
   List<Pet> get ownerPets => List.unmodifiable(_ownerPets);
   List<Pet> get allClinicPets => List.unmodifiable(_clinicPets);
   bool get isLoading => _isLoading;
+
   /// The UID currently subscribed to, or null if no subscription is active.
   String? get currentSubscribedUid => _subscribedUid;
-  int get activePetIndex => _activePetIndex.clamp(0, _ownerPets.isEmpty ? 0 : _ownerPets.length - 1);
+  int get activePetIndex =>
+      _activePetIndex.clamp(0, _ownerPets.isEmpty ? 0 : _ownerPets.length - 1);
 
   Pet? get activePet => _ownerPets.isEmpty ? null : _ownerPets[activePetIndex];
 
@@ -36,19 +38,18 @@ class PetStore extends ChangeNotifier {
   }
 
   void setActivePet(Pet pet) {
-    final index = _ownerPets.indexWhere((candidate) =>
-        (candidate.id != null && candidate.id == pet.id) ||
-        candidate.name == pet.name);
+    final index = _ownerPets.indexWhere(
+      (candidate) =>
+          (candidate.id != null && candidate.id == pet.id) ||
+          candidate.name == pet.name,
+    );
     if (index == -1) return;
     _activePetIndex = index;
     notifyListeners();
   }
 
   /// Seed from mock data (when kEnableFirebase == false).
-  void seed({
-    required List<Pet> ownerPets,
-    required List<Pet> clinicPets,
-  }) {
+  void seed({required List<Pet> ownerPets, required List<Pet> clinicPets}) {
     _ownerPets = ownerPets.map(_withFallbackId).toList();
     _clinicPets = clinicPets.map(_withFallbackId).toList();
     _activePetIndex = activePetIndex;
@@ -68,13 +69,16 @@ class PetStore extends ChangeNotifier {
       // Filter out pets that are pending deletion to avoid race conditions.
       final filtered = _pendingDeletes.isEmpty
           ? pets
-          : pets.where((p) => p.id == null || !_pendingDeletes.contains(p.id)).toList();
+          : pets
+                .where((p) => p.id == null || !_pendingDeletes.contains(p.id))
+                .toList();
       final previousActivePetId = activePet?.id;
       _ownerPets = List.of(filtered);
       _clinicPets = List.of(filtered);
       if (previousActivePetId != null) {
-        final newIndex =
-            _ownerPets.indexWhere((pet) => pet.id == previousActivePetId);
+        final newIndex = _ownerPets.indexWhere(
+          (pet) => pet.id == previousActivePetId,
+        );
         _activePetIndex = newIndex == -1 ? 0 : newIndex;
       } else {
         _activePetIndex = activePetIndex;
@@ -142,7 +146,9 @@ class PetStore extends ChangeNotifier {
 
   Pet _withFallbackId(Pet pet) {
     if (pet.id != null && pet.id!.isNotEmpty) return pet;
-    return pet.copyWith(id: 'mock-${pet.name.toLowerCase().replaceAll(' ', '-')}');
+    return pet.copyWith(
+      id: 'mock-${pet.name.toLowerCase().replaceAll(' ', '-')}',
+    );
   }
 
   /// Create a pet and persist to Firestore when Firebase is enabled.
@@ -208,9 +214,11 @@ class PetStore extends ChangeNotifier {
 
   void _replacePetLocal(Pet updated) {
     for (final list in [_ownerPets, _clinicPets]) {
-      final idx = list.indexWhere((pet) =>
-          (updated.id != null && pet.id == updated.id) ||
-          pet.name == updated.name);
+      final idx = list.indexWhere(
+        (pet) =>
+            (updated.id != null && pet.id == updated.id) ||
+            pet.name == updated.name,
+      );
       if (idx != -1) {
         list[idx] = updated;
       }
@@ -228,7 +236,9 @@ class PetStore extends ChangeNotifier {
     if (petId != null) _pendingDeletes.add(petId);
 
     final removedOwner = ownerIdx != -1 ? _ownerPets.removeAt(ownerIdx) : null;
-    final removedClinic = clinicIdx != -1 ? _clinicPets.removeAt(clinicIdx) : null;
+    final removedClinic = clinicIdx != -1
+        ? _clinicPets.removeAt(clinicIdx)
+        : null;
     if (removedOwner != null || removedClinic != null) notifyListeners();
 
     if (kEnableFirebase && petId != null) {
@@ -244,7 +254,10 @@ class PetStore extends ChangeNotifier {
           _ownerPets.insert(ownerIdx.clamp(0, _ownerPets.length), removedOwner);
         }
         if (removedClinic != null) {
-          _clinicPets.insert(clinicIdx.clamp(0, _clinicPets.length), removedClinic);
+          _clinicPets.insert(
+            clinicIdx.clamp(0, _clinicPets.length),
+            removedClinic,
+          );
         }
         notifyListeners();
         rethrow;
@@ -333,7 +346,11 @@ class PetStore extends ChangeNotifier {
 
   /// Remove a care circle member. Updates local state immediately (optimistic),
   /// then persists to Firestore. Rolls back on error.
-  Future<void> removeCareCircleMemberByUid(String petName, String? uid, String memberName) async {
+  Future<void> removeCareCircleMemberByUid(
+    String petName,
+    String? uid,
+    String memberName,
+  ) async {
     final pet = getPetByName(petName);
 
     // Always update local state first for immediate UI feedback
@@ -351,10 +368,15 @@ class PetStore extends ChangeNotifier {
   }
 
   @Deprecated('Use removeCareCircleMemberByUid instead')
-  Future<void> removeCareCircleMemberWithFirestore(String petName, String memberName) async {
+  Future<void> removeCareCircleMemberWithFirestore(
+    String petName,
+    String memberName,
+  ) async {
     final pet = getPetByName(petName);
     if (kEnableFirebase && pet?.id != null) {
-      final member = pet!.careCircle.where((m) => m.name == memberName).firstOrNull;
+      final member = pet!.careCircle
+          .where((m) => m.name == memberName)
+          .firstOrNull;
       if (member?.uid != null) {
         await PetService.removeCareCircleMember(pet.id!, member!.uid!);
         return;
@@ -373,7 +395,9 @@ class PetStore extends ChangeNotifier {
       if (idx != -1) {
         final pet = list[idx];
         list[idx] = pet.copyWith(
-          careCircle: pet.careCircle.where((m) => m.name != memberName).toList(),
+          careCircle: pet.careCircle
+              .where((m) => m.name != memberName)
+              .toList(),
         );
       }
     }

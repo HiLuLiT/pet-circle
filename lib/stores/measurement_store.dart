@@ -52,9 +52,11 @@ class MeasurementStore extends ChangeNotifier {
     final list = _measurements[petId];
     if (list == null) return;
 
-    final idx = list.indexWhere((m) =>
-        m.bpm == measurement.bpm &&
-        m.recordedAt.isAtSameMomentAs(measurement.recordedAt));
+    final idx = list.indexWhere(
+      (m) =>
+          m.bpm == measurement.bpm &&
+          m.recordedAt.isAtSameMomentAs(measurement.recordedAt),
+    );
     if (idx == -1) return;
 
     list.removeAt(idx);
@@ -88,11 +90,13 @@ class MeasurementStore extends ChangeNotifier {
     for (final id in petIds) {
       if (_pendingWritePetIds.contains(id)) continue;
       futures.add(
-        MeasurementService.fetch(id).then((list) {
-          _measurements[id] = list;
-        }).catchError((Object e) {
-          debugPrint('[MeasurementStore] Failed to fetch for pet $id: $e');
-        }),
+        MeasurementService.fetch(id)
+            .then((list) {
+              _measurements[id] = list;
+            })
+            .catchError((Object e) {
+              debugPrint('[MeasurementStore] Failed to fetch for pet $id: $e');
+            }),
       );
     }
     await Future.wait(futures);

@@ -55,9 +55,11 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     _startDate = med?.startDate;
     _endDate = med?.endDate;
     _startDateController = TextEditingController(
-        text: _startDate != null ? _formatDate(_startDate!) : '');
+      text: _startDate != null ? _formatDate(_startDate!) : '',
+    );
     _endDateController = TextEditingController(
-        text: _endDate != null ? _formatDate(_endDate!) : '');
+      text: _endDate != null ? _formatDate(_endDate!) : '',
+    );
 
     _notesController = TextEditingController(text: med?.notes ?? '');
   }
@@ -74,7 +76,9 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
 
   Future<void> _pickDate({required bool isStart}) async {
     final now = DateTime.now();
-    final initial = isStart ? (_startDate ?? now) : (_endDate ?? _startDate ?? now);
+    final initial = isStart
+        ? (_startDate ?? now)
+        : (_endDate ?? _startDate ?? now);
     final firstDate = isStart ? DateTime(2000) : (_startDate ?? DateTime(2000));
 
     final picked = await showDatePicker(
@@ -140,8 +144,9 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                 petStore.activePet?.name ?? updated.name, updated.name),
           );
         } else {
-          ReminderService.instance
-              .cancelMedicationReminder(widget.medication!.id);
+          ReminderService.instance.cancelMedicationReminder(
+            widget.medication!.id,
+          );
         }
       }
     } else {
@@ -170,8 +175,10 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     navigator.pop();
     messenger.showSnackBar(
       SnackBar(
-          content: Text(
-              _isEditing ? l10n.medicationUpdated : l10n.medicationAdded)),
+        content: Text(
+          _isEditing ? l10n.medicationUpdated : l10n.medicationAdded,
+        ),
+      ),
     );
   }
 
@@ -201,10 +208,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(
-              l10n.delete,
-              style: TextStyle(color: c.error),
-            ),
+            child: Text(l10n.delete, style: TextStyle(color: c.error)),
           ),
         ],
       ),
@@ -216,9 +220,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     if (!mounted) return;
 
     navigator.pop();
-    messenger.showSnackBar(
-      SnackBar(content: Text(l10n.medicationDeleted)),
-    );
+    messenger.showSnackBar(SnackBar(content: Text(l10n.medicationDeleted)));
   }
 
   @override
@@ -240,14 +242,19 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         ),
         decoration: BoxDecoration(
           color: c.background,
-          borderRadius:
-              BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.pcCard)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadiiTokens.pcCard),
+          ),
         ),
         child: SafeArea(
           top: false,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(AppSpacingTokens.pcXl,
-                AppSpacingTokens.pcLg, AppSpacingTokens.pcXl, AppSpacingTokens.pcXl),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacingTokens.pcXl,
+              AppSpacingTokens.pcLg,
+              AppSpacingTokens.pcXl,
+              AppSpacingTokens.pcXl,
+            ),
             child: Form(
               key: _formKey,
               child: Column(
@@ -272,7 +279,10 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                           tooltip: l10n.deleteMedication,
                         ),
                       RoundIconButton(
-                        icon: Icon(Icons.keyboard_arrow_up, color: c.textPrimary),
+                        icon: Icon(
+                          Icons.keyboard_arrow_up,
+                          color: c.textPrimary,
+                        ),
                         variant: RoundIconButtonVariant.ghost,
                         size: 36,
                         iconSize: 24,
@@ -285,9 +295,11 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                   Text(
                     _isEditing
                         ? l10n.updateMedicationDescription(
-                            petStore.activePet?.name ?? l10n.petName)
+                            petStore.activePet?.name ?? l10n.petName,
+                          )
                         : l10n.addMedicationDescription(
-                            petStore.activePet?.name ?? l10n.petName),
+                            petStore.activePet?.name ?? l10n.petName,
+                          ),
                     style: AppSemanticTextStyles.pcBodyMuted,
                   ),
                   const SizedBox(height: AppSpacingTokens.pcXl),
@@ -312,8 +324,7 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                   FrequencyChipSelector(
                     label: l10n.frequencyRequired,
                     value: _frequency,
-                    onChanged: (value) =>
-                        setState(() => _frequency = value),
+                    onChanged: (value) => setState(() => _frequency = value),
                   ),
                   const SizedBox(height: AppSpacingTokens.pcMd),
                   Row(
@@ -373,4 +384,3 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     );
   }
 }
-

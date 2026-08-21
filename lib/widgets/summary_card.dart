@@ -45,9 +45,7 @@ class SummaryCard extends StatelessWidget {
               color: iconColor,
               borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
             ),
-            child: Center(
-              child: Icon(icon, size: 24, color: c.textPrimary),
-            ),
+            child: Center(child: Icon(icon, size: 24, color: c.textPrimary)),
           ),
           const SizedBox(width: AppSpacingTokens.md),
           Column(
@@ -56,8 +54,9 @@ class SummaryCard extends StatelessWidget {
             children: [
               Text(
                 value,
-                style: AppSemanticTextStyles.headingLg
-                    .copyWith(color: c.textPrimary),
+                style: AppSemanticTextStyles.headingLg.copyWith(
+                  color: c.textPrimary,
+                ),
               ),
               Text(label, style: AppSemanticTextStyles.bodyMuted),
             ],

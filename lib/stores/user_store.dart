@@ -39,7 +39,8 @@ class UserStore extends ChangeNotifier {
       name: appUser.displayName ?? '',
       email: appUser.email,
       role: appUser.isVet ? UserRole.vet : UserRole.owner,
-      avatarUrl: appUser.photoUrl ??
+      avatarUrl:
+          appUser.photoUrl ??
           'https://ui-avatars.com/api/?name=${Uri.encodeComponent(appUser.displayName ?? appUser.email)}&background=E8B4B8&color=5B2C3F',
     );
     notifyListeners();

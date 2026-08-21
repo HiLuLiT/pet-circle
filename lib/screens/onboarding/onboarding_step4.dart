@@ -101,8 +101,9 @@ class _OnboardingStep4State extends State<OnboardingStep4>
     final user = await userStore.findUserByEmail(email);
     setState(() {
       _foundVet = null;
-      _vetLookupState =
-          user != null ? _VetLookupState.notVet : _VetLookupState.notFound;
+      _vetLookupState = user != null
+          ? _VetLookupState.notVet
+          : _VetLookupState.notFound;
     });
   }
 
@@ -164,8 +165,9 @@ class _OnboardingStep4State extends State<OnboardingStep4>
         ),
         backgroundColor: email.isNotEmpty ? c.primary : c.error,
         behavior: SnackBarBehavior.floating,
-        shape:
-            RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusCard),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadiiTokens.borderRadiusCard,
+        ),
         margin: const EdgeInsets.all(AppSpacingTokens.pcMd),
       ),
     );
@@ -226,16 +228,20 @@ class _OnboardingStep4State extends State<OnboardingStep4>
           ],
         ),
         const SizedBox(height: AppSpacingTokens.pcSm),
-        Text(l10n.inviteYourVetDesc,
-            style: AppSemanticTextStyles.pcBody.copyWith(color: c.textSecondary)),
+        Text(
+          l10n.inviteYourVetDesc,
+          style: AppSemanticTextStyles.pcBody.copyWith(color: c.textSecondary),
+        ),
         const SizedBox(height: AppSpacingTokens.pcMd),
 
         // Added vets list
         if (_addedVets.isNotEmpty) ...[
-          ..._addedVets.map((vet) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacingTokens.pcSm),
-                child: _VetInviteRow(invite: vet),
-              )),
+          ..._addedVets.map(
+            (vet) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacingTokens.pcSm),
+              child: _VetInviteRow(invite: vet),
+            ),
+          ),
           const SizedBox(height: AppSpacingTokens.pcSm),
         ],
 
@@ -309,9 +315,12 @@ class _OnboardingStep4State extends State<OnboardingStep4>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(l10n.vetFound,
-                        style: AppSemanticTextStyles.pcCaption
-                            .copyWith(color: c.primary)),
+                    Text(
+                      l10n.vetFound,
+                      style: AppSemanticTextStyles.pcCaption.copyWith(
+                        color: c.primary,
+                      ),
+                    ),
                     Text(
                       _foundVet?.displayName ?? _vetEmailController.text,
                       style: AppSemanticTextStyles.pcBodyBold,
@@ -342,7 +351,9 @@ class _OnboardingStep4State extends State<OnboardingStep4>
               Expanded(
                 child: Text(
                   l10n.notAVetAccount,
-                  style: AppSemanticTextStyles.pcCaption.copyWith(color: c.error),
+                  style: AppSemanticTextStyles.pcCaption.copyWith(
+                    color: c.error,
+                  ),
                 ),
               ),
             ],
@@ -372,10 +383,7 @@ class _OnboardingStep4State extends State<OnboardingStep4>
                 ],
               ),
               const SizedBox(height: AppSpacingTokens.pcSm),
-              PrimaryButton(
-                label: l10n.sendVetInvite,
-                onPressed: _addVet,
-              ),
+              PrimaryButton(label: l10n.sendVetInvite, onPressed: _addVet),
             ],
           ),
         );
@@ -388,14 +396,18 @@ class _OnboardingStep4State extends State<OnboardingStep4>
       children: [
         Text(l10n.inviteYourCareCircle, style: AppSemanticTextStyles.headingH2),
         const SizedBox(height: AppSpacingTokens.pcSm),
-        Text(l10n.inviteCareCircleDescription,
-            style: AppSemanticTextStyles.pcBody.copyWith(color: c.textSecondary)),
+        Text(
+          l10n.inviteCareCircleDescription,
+          style: AppSemanticTextStyles.pcBody.copyWith(color: c.textSecondary),
+        ),
         const SizedBox(height: AppSpacingTokens.pcMd),
         if (_invites.isNotEmpty) ...[
-          ..._invites.map((invite) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacingTokens.pcSm),
-                child: _InviteRow(invite: invite),
-              )),
+          ..._invites.map(
+            (invite) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacingTokens.pcSm),
+              child: _InviteRow(invite: invite),
+            ),
+          ),
           const SizedBox(height: AppSpacingTokens.pcSm),
         ],
         _InputRow(
@@ -468,14 +480,14 @@ class _VetInviteRow extends StatelessWidget {
                     style: AppSemanticTextStyles.pcCaptionMuted,
                     overflow: TextOverflow.ellipsis,
                   ),
-                Text(
-                  l10n.pending,
-                  style: AppSemanticTextStyles.pcCaptionMuted,
-                ),
+                Text(l10n.pending, style: AppSemanticTextStyles.pcCaptionMuted),
               ],
             ),
           ),
-          StatusBadge(label: l10n.veterinarian, status: StatusBadgeStatus.normal),
+          StatusBadge(
+            label: l10n.veterinarian,
+            status: StatusBadgeStatus.normal,
+          ),
         ],
       ),
     );
@@ -520,7 +532,9 @@ class _VetEmailInput extends StatelessWidget {
             PrimaryButton(
               variant: PrimaryButtonVariant.miniPrimary,
               label: l10n.lookUpVet,
-              onPressed: lookupState == _VetLookupState.loading ? null : onLookUp,
+              onPressed: lookupState == _VetLookupState.loading
+                  ? null
+                  : onLookUp,
             ),
           ],
         ),
@@ -552,10 +566,7 @@ class _InviteRow extends StatelessWidget {
                   style: AppSemanticTextStyles.pcBody,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  l10n.pending,
-                  style: AppSemanticTextStyles.pcCaptionMuted,
-                ),
+                Text(l10n.pending, style: AppSemanticTextStyles.pcCaptionMuted),
               ],
             ),
           ),
@@ -587,10 +598,7 @@ class _InputRow extends StatelessWidget {
         TextField(
           controller: controller,
           keyboardType: TextInputType.emailAddress,
-          decoration: appInputDecoration(
-            context,
-            hintText: hint,
-          ),
+          decoration: appInputDecoration(context, hintText: hint),
           style: AppSemanticTextStyles.pcBody,
         ),
       ],

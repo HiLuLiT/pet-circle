@@ -55,14 +55,13 @@ class CareCircleMember {
   }
 
   Map<String, dynamic> toFirestore() {
-    return {
-      'role': role.name,
-      'name': name,
-      'avatarUrl': avatarUrl,
-    };
+    return {'role': role.name, 'name': name, 'avatarUrl': avatarUrl};
   }
 
-  factory CareCircleMember.fromFirestore(String uid, Map<String, dynamic> data) {
+  factory CareCircleMember.fromFirestore(
+    String uid,
+    Map<String, dynamic> data,
+  ) {
     return CareCircleMember(
       uid: uid,
       name: data['name'] ?? '',

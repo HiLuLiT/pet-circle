@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
+import 'package:flutter/foundation.dart'
+    show kIsWeb, defaultTargetPlatform, TargetPlatform;
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:pet_circle/models/app_user.dart';
@@ -224,7 +225,8 @@ class AuthService {
       if (isNewUser && role != null) {
         // Apple may provide name only on first sign in
         final displayName = appleCredential.givenName != null
-            ? '${appleCredential.givenName} ${appleCredential.familyName ?? ''}'.trim()
+            ? '${appleCredential.givenName} ${appleCredential.familyName ?? ''}'
+                  .trim()
             : user.displayName;
 
         await UserService.createUser(

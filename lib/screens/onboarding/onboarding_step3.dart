@@ -9,7 +9,16 @@ import 'package:pet_circle/widgets/onboarding_shell.dart';
 import 'package:pet_circle/widgets/radio_card.dart';
 
 class OnboardingStep3 extends StatefulWidget {
-  const OnboardingStep3({super.key, this.onBack, this.onNext, this.nextLabel, this.onClose, this.onTargetRateChanged, this.initialTargetRate, this.isNextLoading = false});
+  const OnboardingStep3({
+    super.key,
+    this.onBack,
+    this.onNext,
+    this.nextLabel,
+    this.onClose,
+    this.onTargetRateChanged,
+    this.initialTargetRate,
+    this.isNextLoading = false,
+  });
 
   final VoidCallback? onBack;
   final VoidCallback? onNext;
@@ -23,7 +32,8 @@ class OnboardingStep3 extends StatefulWidget {
   State<OnboardingStep3> createState() => _OnboardingStep3State();
 }
 
-class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAliveClientMixin {
+class _OnboardingStep3State extends State<OnboardingStep3>
+    with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -69,12 +79,16 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
         children: [
           Text(
             l10n.targetRespiratoryRate,
-            style: AppSemanticTextStyles.headingH2.copyWith(color: c.textPrimary),
+            style: AppSemanticTextStyles.headingH2.copyWith(
+              color: c.textPrimary,
+            ),
           ),
           const SizedBox(height: AppSpacingTokens.sm),
           Text(
             l10n.targetRateDescription,
-            style: AppSemanticTextStyles.labelLRegular.copyWith(color: c.textSecondary),
+            style: AppSemanticTextStyles.labelLRegular.copyWith(
+              color: c.textSecondary,
+            ),
           ),
           const SizedBox(height: AppSpacingTokens.md),
           RadioCard(
@@ -119,7 +133,8 @@ class _OnboardingStep3State extends State<OnboardingStep3> with AutomaticKeepAli
                       ],
                       onChanged: (value) {
                         final rate = int.tryParse(value);
-                        if (rate != null) widget.onTargetRateChanged?.call(rate);
+                        if (rate != null)
+                          widget.onTargetRateChanged?.call(rate);
                       },
                       decoration: appInputDecoration(
                         context,

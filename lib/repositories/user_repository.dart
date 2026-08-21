@@ -30,14 +30,13 @@ class FirestoreUserRepository implements UserRepository {
     required AppUserRole role,
     String? displayName,
     String? photoUrl,
-  }) =>
-      UserService.createUser(
-        uid: uid,
-        email: email,
-        role: role,
-        displayName: displayName,
-        photoUrl: photoUrl,
-      );
+  }) => UserService.createUser(
+    uid: uid,
+    email: email,
+    role: role,
+    displayName: displayName,
+    photoUrl: photoUrl,
+  );
 
   @override
   Future<void> updateUser(String uid, Map<String, dynamic> data) =>

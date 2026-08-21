@@ -79,17 +79,18 @@ class OnboardingShell extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: AppSpacingTokens.pcLg + 2),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: child,
-                      ),
-                    ),
+                    Expanded(child: SingleChildScrollView(child: child)),
                   ],
                 ),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(32, AppSpacingTokens.pcMd, 32, 32),
+              padding: const EdgeInsets.fromLTRB(
+                32,
+                AppSpacingTokens.pcMd,
+                32,
+                32,
+              ),
               child: Row(
                 children: [
                   if (onBack != null) ...[

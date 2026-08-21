@@ -32,7 +32,9 @@ class AppUser {
 
   factory AppUser.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
-    final settingsData = Map<String, dynamic>.from(data['settings'] ?? const {});
+    final settingsData = Map<String, dynamic>.from(
+      data['settings'] ?? const {},
+    );
     return AppUser(
       uid: doc.id,
       email: data['email'] ?? '',
@@ -54,7 +56,9 @@ class AppUser {
       'role': role == AppUserRole.vet ? 'vet' : 'owner',
       'displayName': displayName,
       'photoUrl': photoUrl,
-      'createdAt': createdAt != null ? Timestamp.fromDate(createdAt!) : FieldValue.serverTimestamp(),
+      'createdAt': createdAt != null
+          ? Timestamp.fromDate(createdAt!)
+          : FieldValue.serverTimestamp(),
       'petIds': petIds,
       'settings': settings.toMap(),
       'hasCompletedOnboarding': hasCompletedOnboarding,
@@ -81,7 +85,8 @@ class AppUser {
       createdAt: createdAt ?? this.createdAt,
       petIds: petIds ?? this.petIds,
       settings: settings ?? this.settings,
-      hasCompletedOnboarding: hasCompletedOnboarding ?? this.hasCompletedOnboarding,
+      hasCompletedOnboarding:
+          hasCompletedOnboarding ?? this.hasCompletedOnboarding,
     );
   }
 }

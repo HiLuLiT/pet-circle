@@ -73,13 +73,16 @@ class DatePickerField extends StatelessWidget {
           onTap: onTap,
           validator: validator,
           autovalidateMode: AutovalidateMode.onUserInteraction,
-          decoration: appInputDecoration(
-            context,
-            hintText: l10n.dateFormatHint,
-            prefixIcon: Icon(Icons.calendar_today, color: c.textTertiary),
-          ).copyWith(
-            errorStyle: AppSemanticTextStyles.caption.copyWith(color: c.error),
-          ),
+          decoration:
+              appInputDecoration(
+                context,
+                hintText: l10n.dateFormatHint,
+                prefixIcon: Icon(Icons.calendar_today, color: c.textTertiary),
+              ).copyWith(
+                errorStyle: AppSemanticTextStyles.caption.copyWith(
+                  color: c.error,
+                ),
+              ),
         ),
       ],
     );
@@ -132,8 +135,9 @@ class _DropdownFieldState extends State<DropdownField> {
     ];
 
     final selectedIndex = _canonicalValues.indexOf(widget.value);
-    final selectedLabel =
-        selectedIndex >= 0 ? displayLabels[selectedIndex] : null;
+    final selectedLabel = selectedIndex >= 0
+        ? displayLabels[selectedIndex]
+        : null;
 
     return AppDropdown(
       label: widget.label,
@@ -233,7 +237,9 @@ class _FrequencyChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? colors.accentPeriwinkleTile : colors.accentButterCream,
+          color: selected
+              ? colors.accentPeriwinkleTile
+              : colors.accentButterCream,
           borderRadius: AppRadiiTokens.borderRadiusPill,
         ),
         child: Text(
@@ -278,4 +284,3 @@ class ValidatedTextArea extends StatelessWidget {
     );
   }
 }
-

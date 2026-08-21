@@ -14,7 +14,8 @@ class MockData {
     name: 'Dr. Smith',
     email: 'dr.smith@petclinic.com',
     role: UserRole.vet,
-    avatarUrl: 'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
+    avatarUrl:
+        'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
   );
 
   static final currentOwnerUser = User(
@@ -22,43 +23,50 @@ class MockData {
     name: 'Hila',
     email: 'hila@example.com',
     role: UserRole.owner,
-    avatarUrl: 'https://ui-avatars.com/api/?name=Hila&size=128&rounded=true&background=E8B4B8&color=5B2C3F',
+    avatarUrl:
+        'https://ui-avatars.com/api/?name=Hila&size=128&rounded=true&background=E8B4B8&color=5B2C3F',
   );
 
   // ── Care Circle Members ────────────────────────────────────────────────────
   static final hilaOwner = CareCircleMember(
     name: 'Hila',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Hila&size=128&rounded=true&background=E8B4B8&color=5B2C3F',
+    avatarUrl:
+        'https://ui-avatars.com/api/?name=Hila&size=128&rounded=true&background=E8B4B8&color=5B2C3F',
     role: CareCircleRole.owner,
   );
 
   static final drSmithVet = CareCircleMember(
     name: 'Dr. Smith',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
+    avatarUrl:
+        'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
     role: CareCircleRole.member,
   );
 
   static final sarahMember = CareCircleMember(
     name: 'Sarah',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Sarah&size=128&rounded=true&background=7FBA7A&color=fff',
+    avatarUrl:
+        'https://ui-avatars.com/api/?name=Sarah&size=128&rounded=true&background=7FBA7A&color=fff',
     role: CareCircleRole.member,
   );
 
   static final maxOwner = CareCircleMember(
     name: 'John',
-    avatarUrl: 'https://ui-avatars.com/api/?name=John&size=128&rounded=true&background=5B9BD5&color=fff',
+    avatarUrl:
+        'https://ui-avatars.com/api/?name=John&size=128&rounded=true&background=5B9BD5&color=fff',
     role: CareCircleRole.owner,
   );
 
   static final lunaOwner = CareCircleMember(
     name: 'Emily',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Emily&size=128&rounded=true&background=F39C12&color=fff',
+    avatarUrl:
+        'https://ui-avatars.com/api/?name=Emily&size=128&rounded=true&background=F39C12&color=fff',
     role: CareCircleRole.owner,
   );
 
   static final rockyOwner = CareCircleMember(
     name: 'Mike',
-    avatarUrl: 'https://ui-avatars.com/api/?name=Mike&size=128&rounded=true&background=9B59B6&color=fff',
+    avatarUrl:
+        'https://ui-avatars.com/api/?name=Mike&size=128&rounded=true&background=9B59B6&color=fff',
     role: CareCircleRole.owner,
   );
 
@@ -67,15 +75,19 @@ class MockData {
     ClinicalNote(
       id: 'note-1',
       authorName: 'Dr. Smith',
-      authorAvatarUrl: 'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
-      content: 'Respiratory rate stable. Continue monitoring daily. Heart murmur grade 2/6 unchanged.',
+      authorAvatarUrl:
+          'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
+      content:
+          'Respiratory rate stable. Continue monitoring daily. Heart murmur grade 2/6 unchanged.',
       createdAt: DateTime.now().subtract(const Duration(days: 2)),
     ),
     ClinicalNote(
       id: 'note-2',
       authorName: 'Dr. Smith',
-      authorAvatarUrl: 'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
-      content: 'Follow-up visit scheduled for next week. Owner reports good appetite and energy levels.',
+      authorAvatarUrl:
+          'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
+      content:
+          'Follow-up visit scheduled for next week. Owner reports good appetite and energy levels.',
       createdAt: DateTime.now().subtract(const Duration(days: 7)),
     ),
   ];
@@ -84,8 +96,10 @@ class MockData {
     ClinicalNote(
       id: 'note-3',
       authorName: 'Dr. Smith',
-      authorAvatarUrl: 'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
-      content: 'Slight elevation in SRR. Recommend increasing measurement frequency to twice daily.',
+      authorAvatarUrl:
+          'https://ui-avatars.com/api/?name=Dr+Smith&size=128&rounded=true&background=5B2C3F&color=fff',
+      content:
+          'Slight elevation in SRR. Recommend increasing measurement frequency to twice daily.',
       createdAt: DateTime.now().subtract(const Duration(hours: 6)),
     ),
   ];
@@ -112,15 +126,35 @@ class MockData {
 
   // ── Measurement History ────────────────────────────────────────────────────
   static final princessMeasurements = [
-    Measurement(bpm: 22, recordedAt: DateTime.now().subtract(const Duration(hours: 2)), recordedAtLabel: '2 hours ago'),
-    Measurement(bpm: 24, recordedAt: DateTime.now().subtract(const Duration(days: 1)), recordedAtLabel: 'Yesterday'),
-    Measurement(bpm: 21, recordedAt: DateTime.now().subtract(const Duration(days: 2)), recordedAtLabel: '2 days ago'),
-    Measurement(bpm: 23, recordedAt: DateTime.now().subtract(const Duration(days: 3)), recordedAtLabel: '3 days ago'),
-    Measurement(bpm: 25, recordedAt: DateTime.now().subtract(const Duration(days: 4)), recordedAtLabel: '4 days ago'),
+    Measurement(
+      bpm: 22,
+      recordedAt: DateTime.now().subtract(const Duration(hours: 2)),
+      recordedAtLabel: '2 hours ago',
+    ),
+    Measurement(
+      bpm: 24,
+      recordedAt: DateTime.now().subtract(const Duration(days: 1)),
+      recordedAtLabel: 'Yesterday',
+    ),
+    Measurement(
+      bpm: 21,
+      recordedAt: DateTime.now().subtract(const Duration(days: 2)),
+      recordedAtLabel: '2 days ago',
+    ),
+    Measurement(
+      bpm: 23,
+      recordedAt: DateTime.now().subtract(const Duration(days: 3)),
+      recordedAtLabel: '3 days ago',
+    ),
+    Measurement(
+      bpm: 25,
+      recordedAt: DateTime.now().subtract(const Duration(days: 4)),
+      recordedAtLabel: '4 days ago',
+    ),
   ];
 
   // ── Pets ───────────────────────────────────────────────────────────────────
-  
+
   // Princess - owned by Hila
   static final princess = Pet(
     name: 'Princess',
@@ -128,7 +162,11 @@ class MockData {
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
     statusColorHex: AppPrimitives.blueBase.toARGB32(),
-    latestMeasurement: Measurement(bpm: 22, recordedAt: DateTime.now().subtract(const Duration(hours: 2)), recordedAtLabel: '2 hours ago'),
+    latestMeasurement: Measurement(
+      bpm: 22,
+      recordedAt: DateTime.now().subtract(const Duration(hours: 2)),
+      recordedAtLabel: '2 hours ago',
+    ),
     careCircle: [hilaOwner, drSmithVet, sarahMember],
   );
 
@@ -139,7 +177,11 @@ class MockData {
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Elevated',
     statusColorHex: AppPrimitives.redBase.toARGB32(),
-    latestMeasurement: Measurement(bpm: 32, recordedAt: DateTime.now().subtract(const Duration(minutes: 30)), recordedAtLabel: '30 min ago'),
+    latestMeasurement: Measurement(
+      bpm: 32,
+      recordedAt: DateTime.now().subtract(const Duration(minutes: 30)),
+      recordedAtLabel: '30 min ago',
+    ),
     careCircle: [maxOwner, drSmithVet],
   );
 
@@ -150,7 +192,11 @@ class MockData {
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
     statusColorHex: AppPrimitives.blueBase.toARGB32(),
-    latestMeasurement: Measurement(bpm: 24, recordedAt: DateTime.now().subtract(const Duration(hours: 1)), recordedAtLabel: '1 hour ago'),
+    latestMeasurement: Measurement(
+      bpm: 24,
+      recordedAt: DateTime.now().subtract(const Duration(hours: 1)),
+      recordedAtLabel: '1 hour ago',
+    ),
     careCircle: [lunaOwner, drSmithVet],
   );
 
@@ -161,12 +207,16 @@ class MockData {
     imageUrl: AppAssets.petPlaceholder,
     statusLabel: 'Normal',
     statusColorHex: AppPrimitives.blueBase.toARGB32(),
-    latestMeasurement: Measurement(bpm: 18, recordedAt: DateTime.now().subtract(const Duration(days: 1)), recordedAtLabel: '1 day ago'),
+    latestMeasurement: Measurement(
+      bpm: 18,
+      recordedAt: DateTime.now().subtract(const Duration(days: 1)),
+      recordedAtLabel: '1 day ago',
+    ),
     careCircle: [rockyOwner, drSmithVet],
   );
 
   // ── Pet Lists by User Context ──────────────────────────────────────────────
-  
+
   /// All pets visible to the vet (entire clinic)
   static final vetClinicPets = [princess, max, luna, rocky];
 

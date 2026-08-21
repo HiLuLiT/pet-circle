@@ -67,6 +67,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color onPrimary;
   final Color primaryLight;
   final Color primaryLightest;
+
   /// Candy/Purple/Ghost (#E7E7FF) — pale wash for avatar tiles / icon
   /// backdrops. Distinct from [primaryLightest] (recessed surface wash).
   final Color primaryGhost;
@@ -95,6 +96,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color accentPeriwinkleChip;
   final Color accentButter;
   final Color accentButterTile;
+
   /// Warm cream tile (#E8E4D8) — toggle off-track, note callouts. Theme-
   /// independent, like the other accent tiles.
   final Color accentButterCream;
@@ -338,8 +340,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       primary: Color.lerp(primary, other.primary, t)!,
       onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
       primaryLight: Color.lerp(primaryLight, other.primaryLight, t)!,
-      primaryLightest:
-          Color.lerp(primaryLightest, other.primaryLightest, t)!,
+      primaryLightest: Color.lerp(primaryLightest, other.primaryLightest, t)!,
       primaryGhost: Color.lerp(primaryGhost, other.primaryGhost, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
       onSurface: Color.lerp(onSurface, other.onSurface, t)!,
@@ -356,49 +357,82 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       textSecondary: Color.lerp(textSecondary, other.textSecondary, t)!,
       textTertiary: Color.lerp(textTertiary, other.textTertiary, t)!,
       textDisabled: Color.lerp(textDisabled, other.textDisabled, t)!,
-      surfaceRecessed:
-          Color.lerp(surfaceRecessed, other.surfaceRecessed, t)!,
+      surfaceRecessed: Color.lerp(surfaceRecessed, other.surfaceRecessed, t)!,
       hairline: Color.lerp(hairline, other.hairline, t)!,
       accentPurple: Color.lerp(accentPurple, other.accentPurple, t)!,
-      accentPurpleTile:
-          Color.lerp(accentPurpleTile, other.accentPurpleTile, t)!,
-      accentPeriwinkle:
-          Color.lerp(accentPeriwinkle, other.accentPeriwinkle, t)!,
-      accentPeriwinkleTile:
-          Color.lerp(accentPeriwinkleTile, other.accentPeriwinkleTile, t)!,
-      accentPeriwinkleChip:
-          Color.lerp(accentPeriwinkleChip, other.accentPeriwinkleChip, t)!,
+      accentPurpleTile: Color.lerp(
+        accentPurpleTile,
+        other.accentPurpleTile,
+        t,
+      )!,
+      accentPeriwinkle: Color.lerp(
+        accentPeriwinkle,
+        other.accentPeriwinkle,
+        t,
+      )!,
+      accentPeriwinkleTile: Color.lerp(
+        accentPeriwinkleTile,
+        other.accentPeriwinkleTile,
+        t,
+      )!,
+      accentPeriwinkleChip: Color.lerp(
+        accentPeriwinkleChip,
+        other.accentPeriwinkleChip,
+        t,
+      )!,
       accentButter: Color.lerp(accentButter, other.accentButter, t)!,
-      accentButterTile:
-          Color.lerp(accentButterTile, other.accentButterTile, t)!,
-      accentButterCream:
-          Color.lerp(accentButterCream, other.accentButterCream, t)!,
+      accentButterTile: Color.lerp(
+        accentButterTile,
+        other.accentButterTile,
+        t,
+      )!,
+      accentButterCream: Color.lerp(
+        accentButterCream,
+        other.accentButterCream,
+        t,
+      )!,
       accentBlush: Color.lerp(accentBlush, other.accentBlush, t)!,
-      accentBlushTile:
-          Color.lerp(accentBlushTile, other.accentBlushTile, t)!,
+      accentBlushTile: Color.lerp(accentBlushTile, other.accentBlushTile, t)!,
       accentMint: Color.lerp(accentMint, other.accentMint, t)!,
       accentMintTile: Color.lerp(accentMintTile, other.accentMintTile, t)!,
       statusNormalBg: Color.lerp(statusNormalBg, other.statusNormalBg, t)!,
       statusNormalDot: Color.lerp(statusNormalDot, other.statusNormalDot, t)!,
-      statusNormalText:
-          Color.lerp(statusNormalText, other.statusNormalText, t)!,
-      statusElevatedBg:
-          Color.lerp(statusElevatedBg, other.statusElevatedBg, t)!,
-      statusElevatedDot:
-          Color.lerp(statusElevatedDot, other.statusElevatedDot, t)!,
-      statusElevatedText:
-          Color.lerp(statusElevatedText, other.statusElevatedText, t)!,
+      statusNormalText: Color.lerp(
+        statusNormalText,
+        other.statusNormalText,
+        t,
+      )!,
+      statusElevatedBg: Color.lerp(
+        statusElevatedBg,
+        other.statusElevatedBg,
+        t,
+      )!,
+      statusElevatedDot: Color.lerp(
+        statusElevatedDot,
+        other.statusElevatedDot,
+        t,
+      )!,
+      statusElevatedText: Color.lerp(
+        statusElevatedText,
+        other.statusElevatedText,
+        t,
+      )!,
       statusAlertBg: Color.lerp(statusAlertBg, other.statusAlertBg, t)!,
       statusAlertDot: Color.lerp(statusAlertDot, other.statusAlertDot, t)!,
-      statusAlertText:
-          Color.lerp(statusAlertText, other.statusAlertText, t)!,
+      statusAlertText: Color.lerp(statusAlertText, other.statusAlertText, t)!,
       statusActiveBg: Color.lerp(statusActiveBg, other.statusActiveBg, t)!,
       statusActiveDot: Color.lerp(statusActiveDot, other.statusActiveDot, t)!,
-      statusActiveText:
-          Color.lerp(statusActiveText, other.statusActiveText, t)!,
+      statusActiveText: Color.lerp(
+        statusActiveText,
+        other.statusActiveText,
+        t,
+      )!,
       statusInvitedBg: Color.lerp(statusInvitedBg, other.statusInvitedBg, t)!,
-      statusInvitedText:
-          Color.lerp(statusInvitedText, other.statusInvitedText, t)!,
+      statusInvitedText: Color.lerp(
+        statusInvitedText,
+        other.statusInvitedText,
+        t,
+      )!,
     );
   }
 }

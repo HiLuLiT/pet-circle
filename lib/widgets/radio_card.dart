@@ -125,8 +125,7 @@ class _RadioDot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppSemanticColors.of(context);
-    final ringColor =
-        selected ? colors.accentPurple : colors.hairline;
+    final ringColor = selected ? colors.accentPurple : colors.hairline;
 
     return Container(
       width: RadioCard._outerDotSize,

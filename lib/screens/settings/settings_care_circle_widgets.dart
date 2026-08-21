@@ -25,7 +25,11 @@ class InviteButton extends StatelessWidget {
       label: l10n.inviteAnother,
       variant: PrimaryButtonVariant.secondary,
       onPressed: onTap,
-      trailingIcon: SvgPicture.asset(settingsInviteAsset, width: 24, height: 24),
+      trailingIcon: SvgPicture.asset(
+        settingsInviteAsset,
+        width: 24,
+        height: 24,
+      ),
     );
   }
 }
@@ -79,10 +83,7 @@ class CareCircleItem extends StatelessWidget {
                   children: [
                     _RolePill(label: roleLabel, backgroundColor: roleColor),
                     const SizedBox(width: 4),
-                    StatusBadge(
-                      label: statusLabel,
-                      status: status,
-                    ),
+                    StatusBadge(label: statusLabel, status: status),
                   ],
                 ),
               ],
@@ -119,10 +120,7 @@ class CareCircleItem extends StatelessWidget {
 /// the DS role-pill/text-color pairing (blush bg -> blush text, white bg ->
 /// tertiary text).
 class _RolePill extends StatelessWidget {
-  const _RolePill({
-    required this.label,
-    required this.backgroundColor,
-  });
+  const _RolePill({required this.label, required this.backgroundColor});
 
   final String label;
   final Color backgroundColor;
@@ -176,7 +174,11 @@ class ConfigureRow extends StatelessWidget {
                 color: c.accentBlushTile,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.warning_amber_rounded, color: c.accentBlush, size: 24),
+              child: Icon(
+                Icons.warning_amber_rounded,
+                color: c.accentBlush,
+                size: 24,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(

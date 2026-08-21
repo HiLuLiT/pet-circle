@@ -31,7 +31,9 @@ class AppErrorHandler {
   void _handleFlutterError(FlutterErrorDetails details) {
     // Retain default presentation (red screen in debug, grey box in release).
     FlutterError.presentError(details);
-    debugPrint('[AppErrorHandler] FlutterError: ${details.exceptionAsString()}');
+    debugPrint(
+      '[AppErrorHandler] FlutterError: ${details.exceptionAsString()}',
+    );
     if (details.stack != null) {
       debugPrint('[AppErrorHandler] Stack:\n${details.stack}');
     }
@@ -68,10 +70,7 @@ class AppErrorHandler {
   /// Requires a valid [BuildContext] with a [ScaffoldMessenger] ancestor.
   void showUserError(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-      ),
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
     );
   }
 

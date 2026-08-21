@@ -63,10 +63,7 @@ class SettingsCard extends StatelessWidget {
                   ],
                 ),
               ),
-              if (trailing != null) ...[
-                const SizedBox(width: 12),
-                trailing!,
-              ],
+              if (trailing != null) ...[const SizedBox(width: 12), trailing!],
             ],
           ),
           const SizedBox(height: 16),
@@ -123,7 +120,11 @@ class SettingsToggleRow extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Center(
-                      child: SvgPicture.asset(iconAsset!, width: 24, height: 24),
+                      child: SvgPicture.asset(
+                        iconAsset!,
+                        width: 24,
+                        height: 24,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -193,7 +194,11 @@ class LanguageRow extends StatelessWidget {
                       shape: BoxShape.circle,
                     ),
                     child: Center(
-                      child: SvgPicture.asset(settingsGlobeAsset, width: 24, height: 24),
+                      child: SvgPicture.asset(
+                        settingsGlobeAsset,
+                        width: 24,
+                        height: 24,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -298,7 +303,9 @@ class ActionRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDisabled ? c.background.withValues(alpha: 0.7) : c.background,
+          color: isDisabled
+              ? c.background.withValues(alpha: 0.7)
+              : c.background,
           borderRadius: AppRadiiTokens.borderRadiusCard,
         ),
         child: Row(

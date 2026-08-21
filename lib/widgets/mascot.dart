@@ -106,15 +106,7 @@ class Mascot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String svg = buildMascotSvg(
-      breed: breed,
-      color: color,
-      size: size,
-    );
-    return SvgPicture.string(
-      svg,
-      width: size,
-      height: size,
-    );
+    final String svg = buildMascotSvg(breed: breed, color: color, size: size);
+    return SvgPicture.string(svg, width: size, height: size);
   }
 }

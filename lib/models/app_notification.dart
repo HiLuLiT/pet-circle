@@ -1,11 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum NotificationType {
-  measurement,
-  medication,
-  careCircle,
-  report,
-}
+enum NotificationType { measurement, medication, careCircle, report }
 
 class AppNotification {
   const AppNotification({
@@ -78,7 +73,8 @@ class AppNotification {
       petId: data['petId'],
       titleKey: data['titleKey'],
       bodyKey: data['bodyKey'],
-      args: (data['args'] as List?)?.map((e) => e.toString()).toList() ??
+      args:
+          (data['args'] as List?)?.map((e) => e.toString()).toList() ??
           const [],
     );
   }
@@ -113,7 +109,9 @@ class AppNotification {
     );
   }
 
-  @Deprecated('Use formatTimeAgoShort(notification.createdAt) from utils/formatters.dart')
+  @Deprecated(
+    'Use formatTimeAgoShort(notification.createdAt) from utils/formatters.dart',
+  )
   String get timeAgo {
     final now = DateTime.now();
     final diff = now.difference(createdAt);

@@ -85,7 +85,10 @@ class MedicationStore extends ChangeNotifier {
   }
 
   Future<void> updateMedication(
-      String petId, String medicationId, Medication updated) async {
+    String petId,
+    String medicationId,
+    Medication updated,
+  ) async {
     final list = _medications[petId];
     if (list == null) return;
     final idx = list.indexWhere((m) => m.id == medicationId);
@@ -98,7 +101,11 @@ class MedicationStore extends ChangeNotifier {
     final uid = userStore.currentUserUid;
     if (kEnableFirebase && uid != null && uid.isNotEmpty) {
       try {
-        await MedicationService.update(uid, medicationId, updated.toFirestore());
+        await MedicationService.update(
+          uid,
+          medicationId,
+          updated.toFirestore(),
+        );
       } catch (e) {
         list[idx] = previous;
         notifyListeners();
@@ -129,8 +136,9 @@ class MedicationStore extends ChangeNotifier {
     final uid = userStore.currentUserUid;
     if (kEnableFirebase && uid != null && uid.isNotEmpty) {
       try {
-        await MedicationService.update(
-            uid, medicationId, {'isActive': toggled.isActive});
+        await MedicationService.update(uid, medicationId, {
+          'isActive': toggled.isActive,
+        });
       } catch (e) {
         list[idx] = previous;
         notifyListeners();
@@ -144,9 +152,8 @@ class MedicationStore extends ChangeNotifier {
   }
 
   /// All medications across all pets, regardless of active state.
-  List<Medication> get allMedications => List.unmodifiable(
-        _medications.values.expand((meds) => meds).toList(),
-      );
+  List<Medication> get allMedications =>
+      List.unmodifiable(_medications.values.expand((meds) => meds).toList());
 
   /// Active medications (across all pets) that have an end-date reminder.
   List<Medication> getMedicationsWithEndReminder() {

@@ -48,12 +48,14 @@ void main() async {
     authProvider.init();
   }
 
-  final AbstractReminderService reminderService =
-      kIsWeb ? WebReminderService() : ReminderService.instance;
+  final AbstractReminderService reminderService = kIsWeb
+      ? WebReminderService()
+      : ReminderService.instance;
   await reminderService.init();
 
-  pushService =
-      kIsWeb ? WebPushNotificationService() : PushNotificationService.instance;
+  pushService = kIsWeb
+      ? WebPushNotificationService()
+      : PushNotificationService.instance;
   if (kEnableFirebase) {
     await pushService.init();
   }
@@ -99,21 +101,22 @@ void main() async {
   };
 
   // Wire measurement reminder settings changes to reschedule notifications.
-  settingsStore.onMeasurementReminderChanged = ({
-    required List<int> days,
-    required int hour,
-    required int minute,
-    required bool enabled,
-  }) async {
-    await reminderService.cancelMeasurementReminder();
-    if (enabled) {
-      await reminderService.scheduleMeasurementReminder(
-        days: days,
-        hour: hour,
-        minute: minute,
-      );
-    }
-  };
+  settingsStore.onMeasurementReminderChanged =
+      ({
+        required List<int> days,
+        required int hour,
+        required int minute,
+        required bool enabled,
+      }) async {
+        await reminderService.cancelMeasurementReminder();
+        if (enabled) {
+          await reminderService.scheduleMeasurementReminder(
+            days: days,
+            hour: hour,
+            minute: minute,
+          );
+        }
+      };
 
   // Wire the weekly summary toggle to schedule/cancel the recurring nudge.
   settingsStore.onWeeklySummaryChanged = (enabled) async {
@@ -197,9 +200,7 @@ void _seedMockStores() {
   final princessId = petStore.getPetByName('Princess')?.id ?? 'mock-princess';
   final maxId = petStore.getPetByName('Max')?.id ?? 'mock-max';
 
-  measurementStore.seed({
-    princessId: MockData.princessMeasurements,
-  });
+  measurementStore.seed({princessId: MockData.princessMeasurements});
 
   noteStore.seed({
     princessId: MockData.princessNotes,
@@ -341,10 +342,7 @@ class _PetCircleAppState extends State<PetCircleApp>
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
-              supportedLocales: const [
-                Locale('en'),
-                Locale('he'),
-              ],
+              supportedLocales: const [Locale('en'), Locale('he')],
             ),
           ),
           Positioned.fill(

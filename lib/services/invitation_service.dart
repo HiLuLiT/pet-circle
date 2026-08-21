@@ -12,7 +12,8 @@ class InvitationService {
   static const int maxInvitesPerDay = 20;
 
   static String _generateToken() {
-    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const chars =
+        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     final random = Random.secure();
     return List.generate(32, (_) => chars[random.nextInt(chars.length)]).join();
   }
@@ -93,7 +94,10 @@ class InvitationService {
           );
         }
         if (invitation.invitedEmail.toLowerCase() != normalizedEmail) {
-          return AcceptResult(success: false, errorCode: 'invitationNotAuthorized');
+          return AcceptResult(
+            success: false,
+            errorCode: 'invitationNotAuthorized',
+          );
         }
 
         final petRef = _petsCollection.doc(invitation.petId);
@@ -103,18 +107,27 @@ class InvitationService {
         }
 
         final petData = petDoc.data() as Map<String, dynamic>;
-        final pendingInvites =
-            Map<String, dynamic>.from(petData['pendingInvites'] as Map? ?? const {});
-        final pendingInvite =
-            Map<String, dynamic>.from(pendingInvites[token] as Map? ?? const {});
+        final pendingInvites = Map<String, dynamic>.from(
+          petData['pendingInvites'] as Map? ?? const {},
+        );
+        final pendingInvite = Map<String, dynamic>.from(
+          pendingInvites[token] as Map? ?? const {},
+        );
         if (pendingInvite.isEmpty) {
-          return AcceptResult(success: false, errorCode: 'invitationNoLongerValid');
+          return AcceptResult(
+            success: false,
+            errorCode: 'invitationNoLongerValid',
+          );
         }
 
-        final pendingEmail =
-            (pendingInvite['invitedEmail'] as String? ?? '').trim().toLowerCase();
+        final pendingEmail = (pendingInvite['invitedEmail'] as String? ?? '')
+            .trim()
+            .toLowerCase();
         if (pendingEmail != normalizedEmail) {
-          return AcceptResult(success: false, errorCode: 'invitationNotAuthorized');
+          return AcceptResult(
+            success: false,
+            errorCode: 'invitationNotAuthorized',
+          );
         }
 
         final expiresAt = (pendingInvite['expiresAt'] as Timestamp?)?.toDate();
@@ -123,10 +136,12 @@ class InvitationService {
         }
 
         final memberUids = List<String>.from(
-          (petData['memberUids'] as List<dynamic>? ?? const []).whereType<String>(),
+          (petData['memberUids'] as List<dynamic>? ?? const [])
+              .whereType<String>(),
         );
-        final careCircle =
-            Map<String, dynamic>.from(petData['careCircle'] as Map? ?? const {});
+        final careCircle = Map<String, dynamic>.from(
+          petData['careCircle'] as Map? ?? const {},
+        );
 
         if (!memberUids.contains(uid)) {
           memberUids.add(uid);
@@ -174,7 +189,9 @@ class InvitationService {
   }
 
   /// Get all pending invitations for an email address.
-  static Future<List<Invitation>> getPendingInvitationsForEmail(String email) async {
+  static Future<List<Invitation>> getPendingInvitationsForEmail(
+    String email,
+  ) async {
     final snapshot = await _invitationsCollection
         .where('invitedEmail', isEqualTo: email.toLowerCase())
         .where('status', isEqualTo: InvitationStatus.pending.name)
