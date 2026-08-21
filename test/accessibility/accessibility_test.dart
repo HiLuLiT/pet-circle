@@ -18,11 +18,12 @@ Widget _wrap(Widget child) {
 
 void main() {
   group('PrimaryButton accessibility', () {
-    testWidgets('has a Semantics node with the button label text',
-        (tester) async {
-      await tester.pumpWidget(_wrap(
-        PrimaryButton(label: 'Save', onPressed: () {}),
-      ));
+    testWidgets('has a Semantics node with the button label text', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(PrimaryButton(label: 'Save', onPressed: () {})),
+      );
 
       // ElevatedButton automatically creates a Semantics node whose label
       // matches the child Text widget.
@@ -31,9 +32,9 @@ void main() {
     });
 
     testWidgets('disabled button has disabled semantics', (tester) async {
-      await tester.pumpWidget(_wrap(
-        const PrimaryButton(label: 'Submit', onPressed: null),
-      ));
+      await tester.pumpWidget(
+        _wrap(const PrimaryButton(label: 'Submit', onPressed: null)),
+      );
 
       final semanticsNode = tester.getSemantics(find.text('Submit'));
       final data = semanticsNode.getSemanticsData();
@@ -44,12 +45,7 @@ void main() {
 
   group('BottomNavBar accessibility', () {
     Widget buildNav({int selectedIndex = 0}) {
-      return _wrap(
-        BottomNavBar(
-          selectedIndex: selectedIndex,
-          onTap: (_) {},
-        ),
-      );
+      return _wrap(BottomNavBar(selectedIndex: selectedIndex, onTap: (_) {}));
     }
 
     testWidgets('Home nav item has semantic label "Home"', (tester) async {
@@ -76,8 +72,9 @@ void main() {
       );
     });
 
-    testWidgets('Circle nav item is hidden behind kEnableCircleTab',
-        (tester) async {
+    testWidgets('Circle nav item is hidden behind kEnableCircleTab', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildNav());
       await tester.pump();
 
@@ -88,8 +85,7 @@ void main() {
       );
     });
 
-    testWidgets('Mesure nav item has semantic label "Measure"',
-        (tester) async {
+    testWidgets('Mesure nav item has semantic label "Measure"', (tester) async {
       await tester.pumpWidget(buildNav());
       await tester.pump();
 
@@ -100,8 +96,9 @@ void main() {
       );
     });
 
-    testWidgets('Medicine nav item has semantic label "Medication"',
-        (tester) async {
+    testWidgets('Medicine nav item has semantic label "Medication"', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildNav());
       await tester.pump();
 
@@ -112,8 +109,9 @@ void main() {
       );
     });
 
-    testWidgets('all four semantic labels present simultaneously',
-        (tester) async {
+    testWidgets('all four semantic labels present simultaneously', (
+      tester,
+    ) async {
       await tester.pumpWidget(buildNav(selectedIndex: 2));
       await tester.pump();
 

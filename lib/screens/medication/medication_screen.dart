@@ -368,7 +368,8 @@ class _ActiveMedicationsList extends StatelessWidget {
 StatusBadge _medicationBadge(Medication med, AppLocalizations l10n) {
   final now = DateTime.now();
   final isPastDue =
-      med.endDate != null && med.endDate!.isBefore(DateTime(now.year, now.month, now.day));
+      med.endDate != null &&
+      med.endDate!.isBefore(DateTime(now.year, now.month, now.day));
   if (isPastDue && !med.isActive) {
     return StatusBadge(label: l10n.expired, status: StatusBadgeStatus.alert);
   }

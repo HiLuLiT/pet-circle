@@ -21,10 +21,7 @@ Pet _makePet({
     imageUrl: 'https://example.com/$name.png',
     statusLabel: 'Normal',
     statusColorHex: 0xFF75ACFF,
-    latestMeasurement: Measurement(
-      bpm: 22,
-      recordedAt: DateTime(2025, 1, 1),
-    ),
+    latestMeasurement: Measurement(bpm: 22, recordedAt: DateTime(2025, 1, 1)),
     careCircle: careCircle,
     ownerId: ownerId,
   );
@@ -33,13 +30,15 @@ Pet _makePet({
 void main() {
   setUp(() {
     // Seed userStore with a known owner user for each test.
-    userStore.seed(User(
-      id: 'uid-owner',
-      name: 'Hila',
-      email: 'hila@example.com',
-      role: UserRole.owner,
-      avatarUrl: 'https://example.com/avatar.png',
-    ));
+    userStore.seed(
+      User(
+        id: 'uid-owner',
+        name: 'Hila',
+        email: 'hila@example.com',
+        role: UserRole.owner,
+        avatarUrl: 'https://example.com/avatar.png',
+      ),
+    );
   });
 
   tearDown(() {

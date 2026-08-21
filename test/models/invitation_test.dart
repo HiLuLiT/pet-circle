@@ -84,9 +84,7 @@ void main() {
     });
 
     test('isPending returns false when status is accepted', () {
-      final invitation = _makeInvitation(
-        status: InvitationStatus.accepted,
-      );
+      final invitation = _makeInvitation(status: InvitationStatus.accepted);
 
       expect(invitation.isPending, isFalse);
     });
@@ -101,9 +99,7 @@ void main() {
     });
 
     test('isPending returns false when cancelled', () {
-      final invitation = _makeInvitation(
-        status: InvitationStatus.cancelled,
-      );
+      final invitation = _makeInvitation(status: InvitationStatus.cancelled);
 
       expect(invitation.isPending, isFalse);
     });

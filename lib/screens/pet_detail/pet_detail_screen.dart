@@ -5,7 +5,8 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/clinical_note.dart';
 import 'package:pet_circle/models/pet.dart';
 import 'package:pet_circle/screens/pet_detail/pet_detail_sections.dart';
-import 'package:pet_circle/screens/settings/settings_widgets.dart' show settingsTrashAsset;
+import 'package:pet_circle/screens/settings/settings_widgets.dart'
+    show settingsTrashAsset;
 import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
@@ -32,8 +33,7 @@ class PetDetailScreen extends StatefulWidget {
 class _PetDetailScreenState extends State<PetDetailScreen> {
   final _noteController = TextEditingController();
 
-  Pet get _pet =>
-      petStore.getPetById(widget.pet.id ?? '') ?? widget.pet;
+  Pet get _pet => petStore.getPetById(widget.pet.id ?? '') ?? widget.pet;
 
   @override
   void dispose() {
@@ -56,11 +56,15 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: Container(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.85,
+          ),
           padding: const EdgeInsets.all(AppSpacingTokens.lg),
           decoration: BoxDecoration(
             color: c.background,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppRadiiTokens.lg),
+            ),
           ),
           child: SingleChildScrollView(
             child: Column(
@@ -70,9 +74,12 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(l10n.editPet,
-                        style: AppSemanticTextStyles.headingLg
-                            .copyWith(color: c.textPrimary)),
+                    Text(
+                      l10n.editPet,
+                      style: AppSemanticTextStyles.headingLg.copyWith(
+                        color: c.textPrimary,
+                      ),
+                    ),
                     if (access.canDeletePet)
                       GestureDetector(
                         onTap: () {
@@ -134,7 +141,9 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                         final navigator = Navigator.of(ctx);
                         final messenger = ScaffoldMessenger.of(context);
                         final updated = _pet.copyWith(
-                          name: nameCtrl.text.isNotEmpty ? nameCtrl.text : _pet.name,
+                          name: nameCtrl.text.isNotEmpty
+                              ? nameCtrl.text
+                              : _pet.name,
                           breedAndAge: selectedBreed.isNotEmpty
                               ? selectedBreed
                               : _pet.breedAndAge,
@@ -148,8 +157,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                           SnackBar(content: Text(l10n.petUpdated)),
                         );
                       },
-                      style: TextButton.styleFrom(backgroundColor: c.primaryLight),
-                      child: Text(l10n.save, style: TextStyle(color: c.textPrimary)),
+                      style: TextButton.styleFrom(
+                        backgroundColor: c.primaryLight,
+                      ),
+                      child: Text(
+                        l10n.save,
+                        style: TextStyle(color: c.textPrimary),
+                      ),
                     ),
                   ],
                 ),
@@ -283,7 +297,9 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                   const SizedBox(height: AppSpacingTokens.sm),
                   Text(
                     _pet.name,
-                    style: AppSemanticTextStyles.title2.copyWith(color: c.background),
+                    style: AppSemanticTextStyles.title2.copyWith(
+                      color: c.background,
+                    ),
                   ),
                   Text(
                     _pet.breedAndAge,

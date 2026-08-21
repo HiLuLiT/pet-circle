@@ -47,8 +47,9 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
     _detailController = TextEditingController(text: reminder?.detail ?? '');
 
     _date = reminder?.date;
-    _dateController =
-        TextEditingController(text: _date != null ? _formatDate(_date!) : '');
+    _dateController = TextEditingController(
+      text: _date != null ? _formatDate(_date!) : '',
+    );
   }
 
   @override
@@ -100,8 +101,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
           detail: detail.isNotEmpty ? detail : null,
           clearDetail: detail.isEmpty,
         );
-        await reminderStore.updateReminder(
-            petId, widget.reminder!.id, updated);
+        await reminderStore.updateReminder(petId, widget.reminder!.id, updated);
       } else {
         final newReminder = Reminder(
           id: 'rem-${DateTime.now().millisecondsSinceEpoch}',
@@ -117,8 +117,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
       navigator.pop();
       messenger.showSnackBar(
         SnackBar(
-          content:
-              Text(_isEditing ? l10n.reminderUpdated : l10n.reminderAdded),
+          content: Text(_isEditing ? l10n.reminderUpdated : l10n.reminderAdded),
         ),
       );
     } catch (e) {
@@ -157,10 +156,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
           ),
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(
-              l10n.delete,
-              style: TextStyle(color: c.error),
-            ),
+            child: Text(l10n.delete, style: TextStyle(color: c.error)),
           ),
         ],
       ),
@@ -172,9 +168,7 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
       await reminderStore.removeReminder(petId, reminder.id);
       if (!mounted) return;
       navigator.pop();
-      messenger.showSnackBar(
-        SnackBar(content: Text(l10n.reminderDeleted)),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l10n.reminderDeleted)));
     } catch (e) {
       debugPrint('[AddReminderSheet] Failed to delete reminder: $e');
       if (!mounted) return;
@@ -201,14 +195,19 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
         ),
         decoration: BoxDecoration(
           color: c.background,
-          borderRadius:
-              BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.pcCard)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadiiTokens.pcCard),
+          ),
         ),
         child: SafeArea(
           top: false,
           child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(AppSpacingTokens.pcXl,
-                AppSpacingTokens.pcLg, AppSpacingTokens.pcXl, AppSpacingTokens.pcXl),
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacingTokens.pcXl,
+              AppSpacingTokens.pcLg,
+              AppSpacingTokens.pcXl,
+              AppSpacingTokens.pcXl,
+            ),
             child: Form(
               key: _formKey,
               child: Column(
@@ -231,7 +230,10 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                           tooltip: l10n.deleteReminder,
                         ),
                       RoundIconButton(
-                        icon: Icon(Icons.keyboard_arrow_up, color: c.textPrimary),
+                        icon: Icon(
+                          Icons.keyboard_arrow_up,
+                          color: c.textPrimary,
+                        ),
                         variant: RoundIconButtonVariant.ghost,
                         size: 36,
                         iconSize: 24,
@@ -270,8 +272,9 @@ class _AddReminderSheetState extends State<AddReminderSheet> {
                         child: PrimaryButton(
                           label: l10n.cancel,
                           variant: PrimaryButtonVariant.outlined,
-                          onPressed:
-                              _isSaving ? null : () => Navigator.of(context).pop(),
+                          onPressed: _isSaving
+                              ? null
+                              : () => Navigator.of(context).pop(),
                         ),
                       ),
                       const SizedBox(width: AppSpacingTokens.pcMd),

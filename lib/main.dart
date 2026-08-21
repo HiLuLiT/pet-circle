@@ -136,8 +136,7 @@ void main() async {
     final l10n = lookupAppLocalizations(appLocale.value);
     final now = DateTime.now();
     for (final med in medicationStore.getMedicationsWithEndReminder()) {
-      final resolvedPetName =
-          petStore.getPetById(med.petId)?.name ?? med.name;
+      final resolvedPetName = petStore.getPetById(med.petId)?.name ?? med.name;
       if (!med.endDate!.isAfter(now)) {
         notificationStore.reconcileMedicationEndNotifications(
           [med],
@@ -208,8 +207,9 @@ void _seedMockStores() {
   });
 
   reminderStore.seed({
-    princessId:
-        MockData.princessReminders.map((r) => r.copyWith(petId: princessId)).toList(),
+    princessId: MockData.princessReminders
+        .map((r) => r.copyWith(petId: princessId))
+        .toList(),
   });
 
   medicationStore.seed({

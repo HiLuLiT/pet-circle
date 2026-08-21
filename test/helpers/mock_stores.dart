@@ -24,19 +24,16 @@ void seedAllStores() {
 
   // Measurement store — keyed by pet mock-id
   final princessId = petStore.ownerPets.first.id!;
-  measurementStore.seed({
-    princessId: MockData.princessMeasurements,
-  });
+  measurementStore.seed({princessId: MockData.princessMeasurements});
 
   // Note store — keyed by pet mock-id
-  noteStore.seed({
-    princessId: MockData.princessNotes,
-  });
+  noteStore.seed({princessId: MockData.princessNotes});
 
   // Reminder store — keyed by pet mock-id
   reminderStore.seed({
-    princessId:
-        MockData.princessReminders.map((r) => r.copyWith(petId: princessId)).toList(),
+    princessId: MockData.princessReminders
+        .map((r) => r.copyWith(petId: princessId))
+        .toList(),
   });
 
   // Medication store — empty by default (no mock medications defined)

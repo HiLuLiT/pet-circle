@@ -35,7 +35,9 @@ class NotificationService {
     String uid,
     AppNotification notification,
   ) async {
-    await _notificationsRef(uid).doc(notification.id).set(notification.toFirestore());
+    await _notificationsRef(
+      uid,
+    ).doc(notification.id).set(notification.toFirestore());
   }
 
   static Future<void> markRead(String uid, String notificationId) async {

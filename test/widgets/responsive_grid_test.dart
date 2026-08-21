@@ -23,29 +23,29 @@ void main() {
     }
 
     testWidgets('renders without error', (tester) async {
-      await tester.pumpWidget(testApp(
-        ResponsiveGrid(
-          maxCrossAxisCount: 3,
-          minItemWidth: 280,
-          children: const [Text('a'), Text('b')],
+      await tester.pumpWidget(
+        testApp(
+          ResponsiveGrid(
+            maxCrossAxisCount: 3,
+            minItemWidth: 280,
+            children: const [Text('a'), Text('b')],
+          ),
         ),
-      ));
+      );
       expect(find.byType(ResponsiveGrid), findsOneWidget);
       expect(find.byType(GridView), findsOneWidget);
     });
 
     testWidgets('renders all children', (tester) async {
-      await tester.pumpWidget(testApp(
-        ResponsiveGrid(
-          maxCrossAxisCount: 3,
-          minItemWidth: 280,
-          children: const [
-            Text('one'),
-            Text('two'),
-            Text('three'),
-          ],
+      await tester.pumpWidget(
+        testApp(
+          ResponsiveGrid(
+            maxCrossAxisCount: 3,
+            minItemWidth: 280,
+            children: const [Text('one'), Text('two'), Text('three')],
+          ),
         ),
-      ));
+      );
 
       expect(find.text('one'), findsOneWidget);
       expect(find.text('two'), findsOneWidget);
@@ -53,14 +53,16 @@ void main() {
     });
 
     testWidgets('uses one column on a narrow viewport', (tester) async {
-      await tester.pumpWidget(gridIn(
-        300,
-        grid: ResponsiveGrid(
-          maxCrossAxisCount: 3,
-          minItemWidth: 280,
-          children: const [Text('a'), Text('b'), Text('c')],
+      await tester.pumpWidget(
+        gridIn(
+          300,
+          grid: ResponsiveGrid(
+            maxCrossAxisCount: 3,
+            minItemWidth: 280,
+            children: const [Text('a'), Text('b'), Text('c')],
+          ),
         ),
-      ));
+      );
       await tester.pump();
 
       final grid = tester.widget<GridView>(find.byType(GridView));
@@ -70,16 +72,19 @@ void main() {
       expect(delegate.crossAxisCount, 1);
     });
 
-    testWidgets('clamps column count to maxCrossAxisCount on wide viewport',
-        (tester) async {
-      await tester.pumpWidget(gridIn(
-        2000,
-        grid: ResponsiveGrid(
-          maxCrossAxisCount: 3,
-          minItemWidth: 280,
-          children: const [Text('a'), Text('b'), Text('c')],
+    testWidgets('clamps column count to maxCrossAxisCount on wide viewport', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        gridIn(
+          2000,
+          grid: ResponsiveGrid(
+            maxCrossAxisCount: 3,
+            minItemWidth: 280,
+            children: const [Text('a'), Text('b'), Text('c')],
+          ),
         ),
-      ));
+      );
       await tester.pump();
 
       final grid = tester.widget<GridView>(find.byType(GridView));
@@ -90,15 +95,17 @@ void main() {
     });
 
     testWidgets('honours custom childAspectRatio', (tester) async {
-      await tester.pumpWidget(gridIn(
-        600,
-        grid: ResponsiveGrid(
-          maxCrossAxisCount: 3,
-          minItemWidth: 280,
-          childAspectRatio: 3.3,
-          children: const [Text('a'), Text('b')],
+      await tester.pumpWidget(
+        gridIn(
+          600,
+          grid: ResponsiveGrid(
+            maxCrossAxisCount: 3,
+            minItemWidth: 280,
+            childAspectRatio: 3.3,
+            children: const [Text('a'), Text('b')],
+          ),
         ),
-      ));
+      );
       await tester.pump();
 
       final grid = tester.widget<GridView>(find.byType(GridView));

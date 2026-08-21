@@ -82,14 +82,8 @@ void main() {
     test('copyWith can update each field independently', () {
       const original = UserSettings();
 
-      expect(
-        original.copyWith(elevatedThreshold: 15).elevatedThreshold,
-        15,
-      );
-      expect(
-        original.copyWith(criticalThreshold: 50).criticalThreshold,
-        50,
-      );
+      expect(original.copyWith(elevatedThreshold: 15).elevatedThreshold, 15);
+      expect(original.copyWith(criticalThreshold: 50).criticalThreshold, 50);
       expect(
         original.copyWith(pushNotifications: false).pushNotifications,
         isFalse,
@@ -98,10 +92,7 @@ void main() {
         original.copyWith(emergencyAlerts: false).emergencyAlerts,
         isFalse,
       );
-      expect(
-        original.copyWith(visionRREnabled: true).visionRREnabled,
-        isTrue,
-      );
+      expect(original.copyWith(visionRREnabled: true).visionRREnabled, isTrue);
       expect(
         original.copyWith(weeklySummaryEnabled: true).weeklySummaryEnabled,
         isTrue,
@@ -165,14 +156,16 @@ void main() {
       expect(settings.weeklySummaryEnabled, isTrue);
     });
 
-    test('fromMap prefers weeklySummaryEnabled over the legacy autoExport key',
-        () {
-      final settings = UserSettings.fromMap({
-        'weeklySummaryEnabled': false,
-        'autoExport': true,
-      });
-      expect(settings.weeklySummaryEnabled, isFalse);
-    });
+    test(
+      'fromMap prefers weeklySummaryEnabled over the legacy autoExport key',
+      () {
+        final settings = UserSettings.fromMap({
+          'weeklySummaryEnabled': false,
+          'autoExport': true,
+        });
+        expect(settings.weeklySummaryEnabled, isFalse);
+      },
+    );
   });
 
   group('UserSettings toMap', () {
@@ -326,24 +319,42 @@ void main() {
 
       final roundtripped = UserSettings.fromMap(original.toMap());
 
-      expect(roundtripped.measurementRemindersEnabled,
-          original.measurementRemindersEnabled);
-      expect(roundtripped.measurementReminderFrequency,
-          original.measurementReminderFrequency);
-      expect(roundtripped.measurementReminderDays,
-          original.measurementReminderDays);
-      expect(roundtripped.measurementReminderHour,
-          original.measurementReminderHour);
-      expect(roundtripped.measurementReminderMinute,
-          original.measurementReminderMinute);
-      expect(roundtripped.medicationMorningHour,
-          original.medicationMorningHour);
-      expect(roundtripped.medicationMorningMinute,
-          original.medicationMorningMinute);
-      expect(roundtripped.medicationEveningHour,
-          original.medicationEveningHour);
-      expect(roundtripped.medicationEveningMinute,
-          original.medicationEveningMinute);
+      expect(
+        roundtripped.measurementRemindersEnabled,
+        original.measurementRemindersEnabled,
+      );
+      expect(
+        roundtripped.measurementReminderFrequency,
+        original.measurementReminderFrequency,
+      );
+      expect(
+        roundtripped.measurementReminderDays,
+        original.measurementReminderDays,
+      );
+      expect(
+        roundtripped.measurementReminderHour,
+        original.measurementReminderHour,
+      );
+      expect(
+        roundtripped.measurementReminderMinute,
+        original.measurementReminderMinute,
+      );
+      expect(
+        roundtripped.medicationMorningHour,
+        original.medicationMorningHour,
+      );
+      expect(
+        roundtripped.medicationMorningMinute,
+        original.medicationMorningMinute,
+      );
+      expect(
+        roundtripped.medicationEveningHour,
+        original.medicationEveningHour,
+      );
+      expect(
+        roundtripped.medicationEveningMinute,
+        original.medicationEveningMinute,
+      );
     });
 
     test('copyWith updates notification preferences', () {
@@ -371,10 +382,7 @@ void main() {
 
   group('UserSettings edge cases', () {
     test('threshold can be zero', () {
-      const settings = UserSettings(
-        elevatedThreshold: 0,
-        criticalThreshold: 0,
-      );
+      const settings = UserSettings(elevatedThreshold: 0, criticalThreshold: 0);
 
       expect(settings.elevatedThreshold, 0);
       expect(settings.criticalThreshold, 0);

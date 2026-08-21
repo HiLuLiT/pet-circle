@@ -43,15 +43,20 @@ void main() {
         imageUrl: '',
         statusLabel: 'Normal',
         statusColorHex: 0xFF75ACFF,
-        latestMeasurement: Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
-        careCircle: circle ?? [
-          CareCircleMember(
-            uid: 'u1',
-            name: 'Owner',
-            role: CareCircleRole.owner,
-            avatarUrl: '',
-          ),
-        ],
+        latestMeasurement: Measurement(
+          bpm: 20,
+          recordedAt: DateTime(2025, 1, 1),
+        ),
+        careCircle:
+            circle ??
+            [
+              CareCircleMember(
+                uid: 'u1',
+                name: 'Owner',
+                role: CareCircleRole.owner,
+                avatarUrl: '',
+              ),
+            ],
         pendingInvites: invites ?? const [],
       );
     }
@@ -59,34 +64,49 @@ void main() {
     test('careCircle list is unmodifiable', () {
       final pet = _makePet();
       expect(
-        () => pet.careCircle.add(CareCircleMember(
-          uid: 'u2', name: 'New', role: CareCircleRole.member, avatarUrl: '',
-        )),
+        () => pet.careCircle.add(
+          CareCircleMember(
+            uid: 'u2',
+            name: 'New',
+            role: CareCircleRole.member,
+            avatarUrl: '',
+          ),
+        ),
         throwsUnsupportedError,
       );
     });
 
     test('pendingInvites list is unmodifiable', () {
-      final pet = _makePet(invites: [
-        PendingInvite(
-          token: 't1',
-          invitedEmail: 'x@y.com',
-          expiresAt: DateTime(2099, 1, 1),
-        ),
-      ]);
+      final pet = _makePet(
+        invites: [
+          PendingInvite(
+            token: 't1',
+            invitedEmail: 'x@y.com',
+            expiresAt: DateTime(2099, 1, 1),
+          ),
+        ],
+      );
       expect(() => pet.pendingInvites.removeAt(0), throwsUnsupportedError);
     });
 
     test('modifying the source list does not affect the model', () {
       final circle = [
         CareCircleMember(
-          uid: 'u1', name: 'Owner', role: CareCircleRole.owner, avatarUrl: '',
+          uid: 'u1',
+          name: 'Owner',
+          role: CareCircleRole.owner,
+          avatarUrl: '',
         ),
       ];
       final pet = _makePet(circle: circle);
-      circle.add(CareCircleMember(
-        uid: 'u2', name: 'Extra', role: CareCircleRole.member, avatarUrl: '',
-      ));
+      circle.add(
+        CareCircleMember(
+          uid: 'u2',
+          name: 'Extra',
+          role: CareCircleRole.member,
+          avatarUrl: '',
+        ),
+      );
       expect(pet.careCircle.length, 1);
     });
   });
@@ -99,7 +119,10 @@ void main() {
         imageUrl: '',
         statusLabel: 'Normal',
         statusColorHex: 0xFF75ACFF,
-        latestMeasurement: Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+        latestMeasurement: Measurement(
+          bpm: 20,
+          recordedAt: DateTime(2025, 1, 1),
+        ),
         careCircle: [],
       );
       final user = User(

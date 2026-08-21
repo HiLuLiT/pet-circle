@@ -11,36 +11,40 @@ void main() {
   group('LabeledTextField', () {
     // ── Smoke ───────────────────────────────────────────────────────────────
     testWidgets('renders without error', (tester) async {
-      await tester.pumpWidget(testApp(
-        const LabeledTextField(label: 'Name', hintText: 'Enter name'),
-      ));
+      await tester.pumpWidget(
+        testApp(const LabeledTextField(label: 'Name', hintText: 'Enter name')),
+      );
       expect(find.byType(LabeledTextField), findsOneWidget);
     });
 
     // ── Variant / state tests ──────────────────────────────────────────────
     testWidgets('displays label text', (tester) async {
-      await tester.pumpWidget(testApp(
-        const LabeledTextField(label: 'Email', hintText: 'you@example.com'),
-      ));
+      await tester.pumpWidget(
+        testApp(
+          const LabeledTextField(label: 'Email', hintText: 'you@example.com'),
+        ),
+      );
       expect(find.text('Email'), findsOneWidget);
     });
 
     testWidgets('displays hint text', (tester) async {
-      await tester.pumpWidget(testApp(
-        const LabeledTextField(label: 'Name', hintText: 'John Doe'),
-      ));
+      await tester.pumpWidget(
+        testApp(const LabeledTextField(label: 'Name', hintText: 'John Doe')),
+      );
       expect(find.text('John Doe'), findsOneWidget);
     });
 
     testWidgets('uses provided controller', (tester) async {
       final controller = TextEditingController(text: 'preset');
-      await tester.pumpWidget(testApp(
-        LabeledTextField(
-          label: 'Field',
-          hintText: 'hint',
-          controller: controller,
+      await tester.pumpWidget(
+        testApp(
+          LabeledTextField(
+            label: 'Field',
+            hintText: 'hint',
+            controller: controller,
+          ),
         ),
-      ));
+      );
       expect(find.text('preset'), findsOneWidget);
       controller.dispose();
     });
@@ -48,13 +52,15 @@ void main() {
     // ── Interaction test ────────────────────────────────────────────────────
     testWidgets('calls onChanged when text is entered', (tester) async {
       String? changedValue;
-      await tester.pumpWidget(testApp(
-        LabeledTextField(
-          label: 'Input',
-          hintText: 'type here',
-          onChanged: (v) => changedValue = v,
+      await tester.pumpWidget(
+        testApp(
+          LabeledTextField(
+            label: 'Input',
+            hintText: 'type here',
+            onChanged: (v) => changedValue = v,
+          ),
         ),
-      ));
+      );
 
       await tester.enterText(find.byType(TextField), 'hello');
       expect(changedValue, 'hello');
@@ -62,9 +68,9 @@ void main() {
 
     // ── Theme token tests (PC v3 / Claude-Design) ───────────────────────────
     testWidgets('label uses semantic labelMSemibold style', (tester) async {
-      await tester.pumpWidget(testApp(
-        const LabeledTextField(label: 'Label', hintText: 'hint'),
-      ));
+      await tester.pumpWidget(
+        testApp(const LabeledTextField(label: 'Label', hintText: 'hint')),
+      );
 
       final label = tester.widget<Text>(find.text('Label'));
       expect(
@@ -79,12 +85,16 @@ void main() {
 
     testWidgets('input fill color is semantic surface', (tester) async {
       late BuildContext capturedContext;
-      await tester.pumpWidget(testApp(
-        Builder(builder: (ctx) {
-          capturedContext = ctx;
-          return const LabeledTextField(label: 'F', hintText: 'h');
-        }),
-      ));
+      await tester.pumpWidget(
+        testApp(
+          Builder(
+            builder: (ctx) {
+              capturedContext = ctx;
+              return const LabeledTextField(label: 'F', hintText: 'h');
+            },
+          ),
+        ),
+      );
 
       final textField = tester.widget<TextField>(find.byType(TextField));
       expect(
@@ -95,12 +105,19 @@ void main() {
 
     testWidgets('hint text color is semantic textTertiary', (tester) async {
       late BuildContext capturedContext;
-      await tester.pumpWidget(testApp(
-        Builder(builder: (ctx) {
-          capturedContext = ctx;
-          return const LabeledTextField(label: 'F', hintText: 'placeholder');
-        }),
-      ));
+      await tester.pumpWidget(
+        testApp(
+          Builder(
+            builder: (ctx) {
+              capturedContext = ctx;
+              return const LabeledTextField(
+                label: 'F',
+                hintText: 'placeholder',
+              );
+            },
+          ),
+        ),
+      );
 
       final textField = tester.widget<TextField>(find.byType(TextField));
       expect(
@@ -110,9 +127,9 @@ void main() {
     });
 
     testWidgets('border radius is pcField (14)', (tester) async {
-      await tester.pumpWidget(testApp(
-        const LabeledTextField(label: 'F', hintText: 'h'),
-      ));
+      await tester.pumpWidget(
+        testApp(const LabeledTextField(label: 'F', hintText: 'h')),
+      );
 
       final textField = tester.widget<TextField>(find.byType(TextField));
       final border = textField.decoration?.enabledBorder as OutlineInputBorder;
@@ -122,11 +139,12 @@ void main() {
       );
     });
 
-    testWidgets('enabled border has no visible border (DS borderless field)',
-        (tester) async {
-      await tester.pumpWidget(testApp(
-        const LabeledTextField(label: 'F', hintText: 'h'),
-      ));
+    testWidgets('enabled border has no visible border (DS borderless field)', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        testApp(const LabeledTextField(label: 'F', hintText: 'h')),
+      );
 
       final textField = tester.widget<TextField>(find.byType(TextField));
       final border = textField.decoration?.enabledBorder as OutlineInputBorder;
@@ -135,12 +153,16 @@ void main() {
 
     testWidgets('focused border is 2px primary ring', (tester) async {
       late BuildContext capturedContext;
-      await tester.pumpWidget(testApp(
-        Builder(builder: (ctx) {
-          capturedContext = ctx;
-          return const LabeledTextField(label: 'F', hintText: 'h');
-        }),
-      ));
+      await tester.pumpWidget(
+        testApp(
+          Builder(
+            builder: (ctx) {
+              capturedContext = ctx;
+              return const LabeledTextField(label: 'F', hintText: 'h');
+            },
+          ),
+        ),
+      );
 
       final textField = tester.widget<TextField>(find.byType(TextField));
       final border = textField.decoration?.focusedBorder as OutlineInputBorder;
@@ -151,24 +173,24 @@ void main() {
       );
     });
 
-    testWidgets('input style uses pcBody (16px Instrument Sans)', (tester) async {
-      await tester.pumpWidget(testApp(
-        const LabeledTextField(label: 'F', hintText: 'h'),
-      ));
+    testWidgets('input style uses pcBody (16px Instrument Sans)', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        testApp(const LabeledTextField(label: 'F', hintText: 'h')),
+      );
 
       final textField = tester.widget<TextField>(find.byType(TextField));
       expect(textField.style?.fontSize, AppSemanticTextStyles.pcBody.fontSize);
     });
 
     testWidgets('spacing between label and field is sm (8)', (tester) async {
-      await tester.pumpWidget(testApp(
-        const LabeledTextField(label: 'L', hintText: 'h'),
-      ));
+      await tester.pumpWidget(
+        testApp(const LabeledTextField(label: 'L', hintText: 'h')),
+      );
 
       final sizedBoxes = tester.widgetList<SizedBox>(find.byType(SizedBox));
-      final spacer = sizedBoxes.where(
-        (sb) => sb.height == AppSpacingTokens.sm,
-      );
+      final spacer = sizedBoxes.where((sb) => sb.height == AppSpacingTokens.sm);
       expect(spacer.isNotEmpty, isTrue);
     });
   });

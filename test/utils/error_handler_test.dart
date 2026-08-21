@@ -58,19 +58,28 @@ void main() {
         } catch (e) {
           // Only Firebase initialisation errors are expected; anything else
           // indicates a real bug in the handler.
-          expect(e.toString(), contains('Firebase'),
-              reason: 'Unexpected exception from reportError: $e');
+          expect(
+            e.toString(),
+            contains('Firebase'),
+            reason: 'Unexpected exception from reportError: $e',
+          );
         }
       }
 
-      test('executes without unexpected exceptions for a simple error object', () {
-        callReportError(Exception('test error'));
-      });
+      test(
+        'executes without unexpected exceptions for a simple error object',
+        () {
+          callReportError(Exception('test error'));
+        },
+      );
 
-      test('executes without unexpected exceptions when stack trace is provided', () {
-        final stack = StackTrace.current;
-        callReportError(Exception('test with stack'), stack);
-      });
+      test(
+        'executes without unexpected exceptions when stack trace is provided',
+        () {
+          final stack = StackTrace.current;
+          callReportError(Exception('test with stack'), stack);
+        },
+      );
 
       test('executes without unexpected exceptions for a string error', () {
         callReportError('string error');
@@ -82,21 +91,26 @@ void main() {
     });
 
     group('showUserError()', () {
-      testWidgets('displays a SnackBar with the provided message',
-          (tester) async {
-        await tester.pumpWidget(testApp(Builder(
-          builder: (context) {
-            return ElevatedButton(
-              onPressed: () {
-                AppErrorHandler.instance.showUserError(
-                  context,
-                  'Something went wrong',
+      testWidgets('displays a SnackBar with the provided message', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          testApp(
+            Builder(
+              builder: (context) {
+                return ElevatedButton(
+                  onPressed: () {
+                    AppErrorHandler.instance.showUserError(
+                      context,
+                      'Something went wrong',
+                    );
+                  },
+                  child: const Text('trigger'),
                 );
               },
-              child: const Text('trigger'),
-            );
-          },
-        )));
+            ),
+          ),
+        );
 
         await tester.tap(find.text('trigger'));
         await tester.pump();
@@ -106,12 +120,16 @@ void main() {
 
       testWidgets('shows a floating SnackBar', (tester) async {
         late BuildContext capturedCtx;
-        await tester.pumpWidget(testApp(Builder(
-          builder: (context) {
-            capturedCtx = context;
-            return const SizedBox();
-          },
-        )));
+        await tester.pumpWidget(
+          testApp(
+            Builder(
+              builder: (context) {
+                capturedCtx = context;
+                return const SizedBox();
+              },
+            ),
+          ),
+        );
         await tester.pump();
 
         AppErrorHandler.instance.showUserError(capturedCtx, 'float test');
@@ -121,15 +139,20 @@ void main() {
         expect(snackBar.behavior, SnackBarBehavior.floating);
       });
 
-      testWidgets('can be called multiple times without throwing',
-          (tester) async {
+      testWidgets('can be called multiple times without throwing', (
+        tester,
+      ) async {
         late BuildContext capturedCtx;
-        await tester.pumpWidget(testApp(Builder(
-          builder: (context) {
-            capturedCtx = context;
-            return const SizedBox();
-          },
-        )));
+        await tester.pumpWidget(
+          testApp(
+            Builder(
+              builder: (context) {
+                capturedCtx = context;
+                return const SizedBox();
+              },
+            ),
+          ),
+        );
         await tester.pump();
 
         // First call — verify the snackbar appears.
@@ -139,7 +162,10 @@ void main() {
 
         // Second call while the first snackbar is still animating — should not throw.
         expect(
-          () => AppErrorHandler.instance.showUserError(capturedCtx, 'second error'),
+          () => AppErrorHandler.instance.showUserError(
+            capturedCtx,
+            'second error',
+          ),
           returnsNormally,
         );
       });
@@ -153,8 +179,9 @@ void main() {
 
       test('does not throw when no navigatorKey is set', () {
         expect(
-          () => AppErrorHandler.instance
-              .showUserErrorGlobal('global error without key'),
+          () => AppErrorHandler.instance.showUserErrorGlobal(
+            'global error without key',
+          ),
           returnsNormally,
         );
       });
@@ -165,8 +192,9 @@ void main() {
 
         // Key is set but has no mounted widget — currentContext is null.
         expect(
-          () => AppErrorHandler.instance
-              .showUserErrorGlobal('no context available'),
+          () => AppErrorHandler.instance.showUserErrorGlobal(
+            'no context available',
+          ),
           returnsNormally,
         );
       });

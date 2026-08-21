@@ -141,7 +141,9 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
             updated,
             title: l10n.medicationEndingTitle,
             body: l10n.medicationEndingBody(
-                petStore.activePet?.name ?? updated.name, updated.name),
+              petStore.activePet?.name ?? updated.name,
+              updated.name,
+            ),
           );
         } else {
           ReminderService.instance.cancelMedicationReminder(
@@ -167,7 +169,9 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
           newMed,
           title: l10n.medicationEndingTitle,
           body: l10n.medicationEndingBody(
-              petStore.activePet?.name ?? newMed.name, newMed.name),
+            petStore.activePet?.name ?? newMed.name,
+            newMed.name,
+          ),
         );
       }
     }

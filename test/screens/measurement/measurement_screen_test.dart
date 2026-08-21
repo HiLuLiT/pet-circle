@@ -25,7 +25,9 @@ void main() {
       expect(find.byType(MeasurementScreen), findsOneWidget);
     });
 
-    testWidgets('shows manual mode without the vision mode tab', (tester) async {
+    testWidgets('shows manual mode without the vision mode tab', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -39,8 +41,9 @@ void main() {
       expect(find.byIcon(Icons.videocam_outlined), findsNothing);
     });
 
-    testWidgets('shows timer duration selector with duration chips',
-        (tester) async {
+    testWidgets('shows timer duration selector with duration chips', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -56,8 +59,9 @@ void main() {
       expect(find.text('60s'), findsAtLeast(1));
     });
 
-    testWidgets('shows tap-to-begin state before the timer starts',
-        (tester) async {
+    testWidgets('shows tap-to-begin state before the timer starts', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -72,8 +76,9 @@ void main() {
       expect(find.byIcon(Icons.favorite), findsOneWidget);
     });
 
-    testWidgets('shows elapsed time next to the duration progress track',
-        (tester) async {
+    testWidgets('shows elapsed time next to the duration progress track', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -90,42 +95,43 @@ void main() {
     });
 
     testWidgets(
-        'Last reading card refreshes as soon as a new measurement is saved '
-        '(BUG-033 — was stuck on the value from first build)',
-        (tester) async {
-      tester.view.physicalSize = const Size(480, 1200);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+      'Last reading card refreshes as soon as a new measurement is saved '
+      '(BUG-033 — was stuck on the value from first build)',
+      (tester) async {
+        tester.view.physicalSize = const Size(480, 1200);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(testApp(const MeasurementScreen()));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(testApp(const MeasurementScreen()));
+        await tester.pumpAndSettle();
 
-      // Seeded mock data already has a latest reading of 22 BPM for the
-      // active pet (see MockData.princessMeasurements).
-      expect(find.text('22'), findsOneWidget);
-      expect(find.text('99'), findsNothing);
+        // Seeded mock data already has a latest reading of 22 BPM for the
+        // active pet (see MockData.princessMeasurements).
+        expect(find.text('22'), findsOneWidget);
+        expect(find.text('99'), findsNothing);
 
-      final petId = petStore.activePet!.id!;
-      // seed() (a pure local mutation + notifyListeners(), no Firestore
-      // write) is used here rather than addMeasurement() -- the latter
-      // optimistically inserts then rolls back once its Firestore write
-      // fails in this Firebase-less test environment, which would make
-      // this assertion flaky/order-dependent on exactly when that
-      // rejection resolves relative to pump(). seed() isolates the one
-      // thing this test needs to prove: the screen rebuilds off
-      // measurementStore.notifyListeners(), not just petStore/userStore.
-      measurementStore.seed({
-        petId: [
-          Measurement(bpm: 99, recordedAt: DateTime.now()),
-          ...measurementStore.getMeasurements(petId),
-        ],
-      });
-      await tester.pump();
+        final petId = petStore.activePet!.id!;
+        // seed() (a pure local mutation + notifyListeners(), no Firestore
+        // write) is used here rather than addMeasurement() -- the latter
+        // optimistically inserts then rolls back once its Firestore write
+        // fails in this Firebase-less test environment, which would make
+        // this assertion flaky/order-dependent on exactly when that
+        // rejection resolves relative to pump(). seed() isolates the one
+        // thing this test needs to prove: the screen rebuilds off
+        // measurementStore.notifyListeners(), not just petStore/userStore.
+        measurementStore.seed({
+          petId: [
+            Measurement(bpm: 99, recordedAt: DateTime.now()),
+            ...measurementStore.getMeasurements(petId),
+          ],
+        });
+        await tester.pump();
 
-      expect(find.text('99'), findsOneWidget);
-      expect(find.text('22'), findsNothing);
-    });
+        expect(find.text('99'), findsOneWidget);
+        expect(find.text('22'), findsNothing);
+      },
+    );
 
     testWidgets('stop button is absent before timing starts', (tester) async {
       tester.view.physicalSize = const Size(480, 1200);
@@ -150,10 +156,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap the circle (the GestureDetector wrapping the heart icon).
-      final circleGesture = find.ancestor(
-        of: find.byIcon(Icons.favorite),
-        matching: find.byType(GestureDetector),
-      ).first;
+      final circleGesture = find
+          .ancestor(
+            of: find.byIcon(Icons.favorite),
+            matching: find.byType(GestureDetector),
+          )
+          .first;
       await tester.tap(circleGesture);
       await tester.pump();
 
@@ -161,8 +169,9 @@ void main() {
       expect(find.byIcon(Icons.replay_rounded), findsNothing);
     });
 
-    testWidgets('stop button shows restart icon after being tapped',
-        (tester) async {
+    testWidgets('stop button shows restart icon after being tapped', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -172,10 +181,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap the circle (ancestor of the heart icon) to start timing.
-      final circleGesture = find.ancestor(
-        of: find.byIcon(Icons.favorite),
-        matching: find.byType(GestureDetector),
-      ).first;
+      final circleGesture = find
+          .ancestor(
+            of: find.byIcon(Icons.favorite),
+            matching: find.byType(GestureDetector),
+          )
+          .first;
       await tester.tap(circleGesture);
       await tester.pump();
 
@@ -189,8 +200,9 @@ void main() {
       expect(find.byIcon(Icons.replay_rounded), findsOneWidget);
     });
 
-    testWidgets('restart button resets to ready state without auto-starting',
-        (tester) async {
+    testWidgets('restart button resets to ready state without auto-starting', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -200,10 +212,12 @@ void main() {
       await tester.pumpAndSettle();
 
       // Tap the circle to start.
-      final circleGesture = find.ancestor(
-        of: find.byIcon(Icons.favorite),
-        matching: find.byType(GestureDetector),
-      ).first;
+      final circleGesture = find
+          .ancestor(
+            of: find.byIcon(Icons.favorite),
+            matching: find.byType(GestureDetector),
+          )
+          .first;
       await tester.tap(circleGesture);
       await tester.pump();
 

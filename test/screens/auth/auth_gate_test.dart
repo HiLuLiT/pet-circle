@@ -11,8 +11,9 @@ void main() {
   tearDown(resetAllStores);
 
   group('AuthGate widget', () {
-    testWidgets('renders a Scaffold with a CircularProgressIndicator',
-        (tester) async {
+    testWidgets('renders a Scaffold with a CircularProgressIndicator', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const AuthGate()));

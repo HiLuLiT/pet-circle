@@ -148,13 +148,15 @@ void main() {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.seed(User(
-        id: 'u-1',
-        name: 'Test',
-        email: 'test@example.com',
-        role: UserRole.owner,
-        avatarUrl: 'https://example.com/test.png',
-      ));
+      store.seed(
+        User(
+          id: 'u-1',
+          name: 'Test',
+          email: 'test@example.com',
+          role: UserRole.owner,
+          avatarUrl: 'https://example.com/test.png',
+        ),
+      );
 
       expect(callCount, 1);
     });

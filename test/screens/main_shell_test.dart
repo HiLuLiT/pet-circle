@@ -37,9 +37,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const MainShell()),
-      );
+      await tester.pumpWidget(testApp(const MainShell()));
       await tester.pump();
 
       expect(find.byType(MainShell), findsOneWidget);
@@ -52,9 +50,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const MainShell()),
-      );
+      await tester.pumpWidget(testApp(const MainShell()));
       await tester.pump();
 
       expect(find.byType(BottomNavBar), findsOneWidget);
@@ -67,9 +63,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const MainShell()),
-      );
+      await tester.pumpWidget(testApp(const MainShell()));
       await tester.pump();
 
       // Tab labels appear in the BottomNavBar. Some labels may also
@@ -93,9 +87,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const MainShell()),
-      );
+      await tester.pumpWidget(testApp(const MainShell()));
       await tester.pump();
 
       expect(find.byType(MainShell), findsOneWidget);
@@ -109,16 +101,15 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const MainShell(initialIndex: 2)),
-      );
+      await tester.pumpWidget(testApp(const MainShell(initialIndex: 2)));
       await tester.pump();
 
       expect(find.byType(BottomNavBar), findsOneWidget);
     });
 
-    testWidgets('shows the active pet name in the header on the Home tab',
-        (tester) async {
+    testWidgets('shows the active pet name in the header on the Home tab', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       tester.view.physicalSize = const Size(430, 932);
       tester.view.devicePixelRatio = 1.0;
@@ -152,7 +143,9 @@ void main() {
       expect(navBar.selectedIndex, 0);
     });
 
-    testWidgets('starts on correct index when initialIndex is set', (tester) async {
+    testWidgets('starts on correct index when initialIndex is set', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       tester.view.physicalSize = const Size(430, 932);
       tester.view.devicePixelRatio = 1.0;
@@ -182,7 +175,9 @@ void main() {
       expect(find.byType(BottomNavBar), findsNothing);
     });
 
-    testWidgets('NavigationRail has 4 destinations on wide layout', (tester) async {
+    testWidgets('NavigationRail has 4 destinations on wide layout', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       tester.view.physicalSize = const Size(1024, 1366);
       tester.view.devicePixelRatio = 1.0;
@@ -211,7 +206,9 @@ void main() {
       expect(find.byType(NavigationRail), findsNothing);
     });
 
-    testWidgets('IndexedStack renders correct number of children', (tester) async {
+    testWidgets('IndexedStack renders correct number of children', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       tester.view.physicalSize = const Size(430, 932);
       tester.view.devicePixelRatio = 1.0;

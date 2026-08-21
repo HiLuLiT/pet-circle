@@ -282,8 +282,9 @@ class PetService {
 
   /// Fetch all reminders for a pet, ordered upcoming-first (ascending date).
   static Future<List<Reminder>> fetchReminders(String petId) async {
-    final snapshot =
-        await _remindersRef(petId).orderBy('date', descending: false).get();
+    final snapshot = await _remindersRef(
+      petId,
+    ).orderBy('date', descending: false).get();
     return snapshot.docs.map((doc) => Reminder.fromFirestore(doc)).toList();
   }
 }

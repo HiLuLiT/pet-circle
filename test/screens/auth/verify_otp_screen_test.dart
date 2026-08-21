@@ -27,11 +27,8 @@ Widget _verifyOtpApp({
       ),
       GoRoute(
         path: '/verify-otp',
-        builder: (_, _) => VerifyOtpScreen(
-          email: email,
-          isSignup: isSignup,
-          name: name,
-        ),
+        builder: (_, _) =>
+            VerifyOtpScreen(email: email, isSignup: isSignup, name: name),
       ),
     ],
   );
@@ -55,9 +52,7 @@ void main() {
     testWidgets('renders without error', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        _verifyOtpApp(email: 'test@example.com'),
-      );
+      await tester.pumpWidget(_verifyOtpApp(email: 'test@example.com'));
       await tester.pumpAndSettle();
 
       expect(find.byType(VerifyOtpScreen), findsOneWidget);
@@ -66,9 +61,7 @@ void main() {
     testWidgets('shows "Check your email" heading', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        _verifyOtpApp(email: 'test@example.com'),
-      );
+      await tester.pumpWidget(_verifyOtpApp(email: 'test@example.com'));
       await tester.pumpAndSettle();
 
       // l10n enterVerificationCode => "Check your email"
@@ -78,9 +71,7 @@ void main() {
     testWidgets('shows the email address', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        _verifyOtpApp(email: 'user@domain.com'),
-      );
+      await tester.pumpWidget(_verifyOtpApp(email: 'user@domain.com'));
       await tester.pumpAndSettle();
 
       expect(find.textContaining('user@domain.com'), findsOneWidget);
@@ -89,9 +80,7 @@ void main() {
     testWidgets('shows 6 digit input fields', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        _verifyOtpApp(email: 'test@example.com'),
-      );
+      await tester.pumpWidget(_verifyOtpApp(email: 'test@example.com'));
       await tester.pumpAndSettle();
 
       // 6 TextFormField widgets for the OTP digits
@@ -101,9 +90,7 @@ void main() {
     testWidgets('shows "Verify" button', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        _verifyOtpApp(email: 'test@example.com'),
-      );
+      await tester.pumpWidget(_verifyOtpApp(email: 'test@example.com'));
       await tester.pumpAndSettle();
 
       // l10n verifyCode => "Verify"
@@ -113,9 +100,7 @@ void main() {
     testWidgets('shows "Resend code" text', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        _verifyOtpApp(email: 'test@example.com'),
-      );
+      await tester.pumpWidget(_verifyOtpApp(email: 'test@example.com'));
       await tester.pumpAndSettle();
 
       // Initially the cooldown is active, so it shows "Resend code in 60s"
@@ -126,9 +111,7 @@ void main() {
     testWidgets('shows "Use a different email" link', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        _verifyOtpApp(email: 'test@example.com'),
-      );
+      await tester.pumpWidget(_verifyOtpApp(email: 'test@example.com'));
       await tester.pumpAndSettle();
 
       // l10n useDifferentEmail => "Use a different email"

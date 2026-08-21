@@ -22,9 +22,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const SettingsContent()),
-      );
+      await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
       expect(find.byType(SettingsContent), findsOneWidget);
@@ -36,25 +34,22 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const SettingsContent()),
-      );
+      await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
       expect(find.text('Settings'), findsOneWidget);
       expect(find.text('Manage your preferences'), findsOneWidget);
     });
 
-    testWidgets('shows appearance section with dark mode toggle',
-        (tester) async {
+    testWidgets('shows appearance section with dark mode toggle', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(600, 1800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const SettingsContent()),
-      );
+      await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
       expect(find.text('Appearance'), findsOneWidget);
@@ -67,9 +62,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const SettingsContent()),
-      );
+      await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
       expect(find.text('Notifications'), findsOneWidget);
@@ -84,9 +77,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const SettingsContent()),
-      );
+      await tester.pumpWidget(testApp(const SettingsContent()));
       await tester.pumpAndSettle();
 
       // DS alignment: Sign Out is now a plain PrimaryButton pill (no
@@ -102,9 +93,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const SettingsDrawer()),
-      );
+      await tester.pumpWidget(testApp(const SettingsDrawer()));
       await tester.pumpAndSettle();
 
       expect(find.byType(SettingsDrawer), findsOneWidget);
@@ -125,7 +114,9 @@ void main() {
   });
 
   group('SettingsContent with onClose callback', () {
-    testWidgets('renders close button when onClose is provided', (tester) async {
+    testWidgets('renders close button when onClose is provided', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(600, 1800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -146,8 +137,9 @@ void main() {
       expect(closeCalled, isTrue);
     });
 
-    testWidgets('does NOT render close button when onClose is null',
-        (tester) async {
+    testWidgets('does NOT render close button when onClose is null', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(600, 1800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -275,58 +267,56 @@ void main() {
     });
 
     testWidgets(
-        'push notification toggle flips visually on the very next frame '
-        '(BUG-030 — was gated behind the awaited persist call)',
-        (tester) async {
-      tester.view.physicalSize = const Size(600, 1800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+      'push notification toggle flips visually on the very next frame '
+      '(BUG-030 — was gated behind the awaited persist call)',
+      (tester) async {
+        tester.view.physicalSize = const Size(600, 1800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(testApp(const SettingsContent()));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(testApp(const SettingsContent()));
+        await tester.pumpAndSettle();
 
-      final before = settingsStore.pushNotifications;
-      final toggleFinder = find
-          .ancestor(
-            of: find.text('In-app notification'),
-            matching: find.byType(SettingsToggleRow),
-          )
-          .first;
-      expect(
-        tester.widget<SettingsToggleRow>(toggleFinder).isOn,
-        before,
-      );
-      // Scope to the AppToggle inside THIS row -- the dark-mode row (which
-      // appears earlier in the tree) also renders an AppToggle, so an
-      // unscoped find.byType(AppToggle).first would tap the wrong switch.
-      final switchFinder =
-          find.descendant(of: toggleFinder, matching: find.byType(AppToggle));
+        final before = settingsStore.pushNotifications;
+        final toggleFinder = find
+            .ancestor(
+              of: find.text('In-app notification'),
+              matching: find.byType(SettingsToggleRow),
+            )
+            .first;
+        expect(tester.widget<SettingsToggleRow>(toggleFinder).isOn, before);
+        // Scope to the AppToggle inside THIS row -- the dark-mode row (which
+        // appears earlier in the tree) also renders an AppToggle, so an
+        // unscoped find.byType(AppToggle).first would tap the wrong switch.
+        final switchFinder = find.descendant(
+          of: toggleFinder,
+          matching: find.byType(AppToggle),
+        );
 
-      // Tap, then pump exactly one frame (not pumpAndSettle) so any
-      // awaited work inside togglePushNotifications() -- persisting to
-      // Firestore, notification-permission side effects -- has not had a
-      // chance to resolve yet. Before the fix, the toggle only rebuilt via
-      // a manual setState() placed *after* that awaited chain, so it would
-      // still show the old value here. runZonedGuarded intercepts the
-      // FirebaseException the eventual persist call throws in this
-      // Firebase-less test environment; the in-memory store mutation and
-      // notifyListeners() it fires happen synchronously before that await,
-      // which is exactly the part this regression test is verifying.
-      await runZonedGuarded(() async {
-        await tester.tap(switchFinder);
-        await tester.pump();
-      }, (error, stack) {});
+        // Tap, then pump exactly one frame (not pumpAndSettle) so any
+        // awaited work inside togglePushNotifications() -- persisting to
+        // Firestore, notification-permission side effects -- has not had a
+        // chance to resolve yet. Before the fix, the toggle only rebuilt via
+        // a manual setState() placed *after* that awaited chain, so it would
+        // still show the old value here. runZonedGuarded intercepts the
+        // FirebaseException the eventual persist call throws in this
+        // Firebase-less test environment; the in-memory store mutation and
+        // notifyListeners() it fires happen synchronously before that await,
+        // which is exactly the part this regression test is verifying.
+        await runZonedGuarded(() async {
+          await tester.tap(switchFinder);
+          await tester.pump();
+        }, (error, stack) {});
 
-      expect(settingsStore.pushNotifications, !before);
-      expect(
-        tester.widget<SettingsToggleRow>(toggleFinder).isOn,
-        !before,
-      );
-    });
+        expect(settingsStore.pushNotifications, !before);
+        expect(tester.widget<SettingsToggleRow>(toggleFinder).isOn, !before);
+      },
+    );
 
-    testWidgets('hides VisionRR coming soon badge (feature flag off)',
-        (tester) async {
+    testWidgets('hides VisionRR coming soon badge (feature flag off)', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(600, 1800);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -354,27 +344,30 @@ void main() {
     });
   });
 
-  group('kPushNotificationCategories and kEmergencyAlertCategories constants',
-      () {
-    test('kPushNotificationCategories contains expected values', () {
-      expect(
+  group(
+    'kPushNotificationCategories and kEmergencyAlertCategories constants',
+    () {
+      test('kPushNotificationCategories contains expected values', () {
+        expect(
           kPushNotificationCategories,
-          containsAll(['medicine_reminder', 'measurement_reminder']));
-    });
+          containsAll(['medicine_reminder', 'measurement_reminder']),
+        );
+      });
 
-    test('kEmergencyAlertCategories contains expected values', () {
-      expect(
+      test('kEmergencyAlertCategories contains expected values', () {
+        expect(
           kEmergencyAlertCategories,
-          containsAll(
-              ['bpm_threshold_exceeded', 'missed_medication_24h']));
-    });
+          containsAll(['bpm_threshold_exceeded', 'missed_medication_24h']),
+        );
+      });
 
-    test('kPushNotificationCategories has 2 entries', () {
-      expect(kPushNotificationCategories.length, equals(2));
-    });
+      test('kPushNotificationCategories has 2 entries', () {
+        expect(kPushNotificationCategories.length, equals(2));
+      });
 
-    test('kEmergencyAlertCategories has 2 entries', () {
-      expect(kEmergencyAlertCategories.length, equals(2));
-    });
-  });
+      test('kEmergencyAlertCategories has 2 entries', () {
+        expect(kEmergencyAlertCategories.length, equals(2));
+      });
+    },
+  );
 }

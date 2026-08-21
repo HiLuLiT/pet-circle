@@ -125,7 +125,9 @@ void main() {
       expect(find.text('Enalapril'), findsOneWidget);
     });
 
-    testWidgets('shows dosage and frequency for each medication', (tester) async {
+    testWidgets('shows dosage and frequency for each medication', (
+      tester,
+    ) async {
       setViewSize(tester);
       await tester.pumpWidget(testApp(const MedicationScreen()));
       await tester.pumpAndSettle();
@@ -134,7 +136,9 @@ void main() {
       expect(find.text('5mg • Once daily'), findsOneWidget);
     });
 
-    testWidgets('shows active status badge for active medication', (tester) async {
+    testWidgets('shows active status badge for active medication', (
+      tester,
+    ) async {
       setViewSize(tester);
       await tester.pumpWidget(testApp(const MedicationScreen()));
       await tester.pumpAndSettle();
@@ -159,7 +163,9 @@ void main() {
       expect(find.textContaining('1 active treatments'), findsOneWidget);
     });
 
-    testWidgets('does not show empty state when medications exist', (tester) async {
+    testWidgets('does not show empty state when medications exist', (
+      tester,
+    ) async {
       setViewSize(tester);
       await tester.pumpWidget(testApp(const MedicationScreen()));
       await tester.pumpAndSettle();
@@ -196,7 +202,9 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
     }
 
-    testWidgets('tapping export button opens dialog with csv preview', (tester) async {
+    testWidgets('tapping export button opens dialog with csv preview', (
+      tester,
+    ) async {
       setViewSize(tester);
       await tester.pumpWidget(testApp(const MedicationScreen()));
       await tester.pumpAndSettle();
@@ -242,7 +250,9 @@ void main() {
   // MedicationScreen — no scaffold variant
   // ---------------------------------------------------------------------------
   group('MedicationScreen — showScaffold=false', () {
-    testWidgets('renders without Scaffold when showScaffold is false', (tester) async {
+    testWidgets('renders without Scaffold when showScaffold is false', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(800, 1400);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);

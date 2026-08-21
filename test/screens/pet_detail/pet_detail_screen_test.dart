@@ -39,9 +39,7 @@ void main() {
       };
       addTearDown(() => FlutterError.onError = oldHandler);
 
-      await tester.pumpWidget(
-        testApp(PetDetailScreen(pet: testPet())),
-      );
+      await tester.pumpWidget(testApp(PetDetailScreen(pet: testPet())));
       await tester.pumpAndSettle();
 
       expect(find.byType(PetDetailScreen), findsOneWidget);
@@ -56,15 +54,14 @@ void main() {
       final oldHandler = FlutterError.onError;
       FlutterError.onError = (details) {
         final msg = details.exceptionAsString();
-        if (msg.contains('overflowed') || msg.contains('HTTP request failed')) return;
+        if (msg.contains('overflowed') || msg.contains('HTTP request failed'))
+          return;
         oldHandler?.call(details);
       };
       addTearDown(() => FlutterError.onError = oldHandler);
 
       final pet = testPet();
-      await tester.pumpWidget(
-        testApp(PetDetailScreen(pet: pet)),
-      );
+      await tester.pumpWidget(testApp(PetDetailScreen(pet: pet)));
       await tester.pumpAndSettle();
 
       expect(find.text(pet.name), findsOneWidget);
@@ -79,15 +76,14 @@ void main() {
       final oldHandler = FlutterError.onError;
       FlutterError.onError = (details) {
         final msg = details.exceptionAsString();
-        if (msg.contains('overflowed') || msg.contains('HTTP request failed')) return;
+        if (msg.contains('overflowed') || msg.contains('HTTP request failed'))
+          return;
         oldHandler?.call(details);
       };
       addTearDown(() => FlutterError.onError = oldHandler);
 
       final pet = testPet();
-      await tester.pumpWidget(
-        testApp(PetDetailScreen(pet: pet)),
-      );
+      await tester.pumpWidget(testApp(PetDetailScreen(pet: pet)));
       await tester.pumpAndSettle();
 
       expect(find.text(pet.breedAndAge), findsOneWidget);
@@ -102,15 +98,14 @@ void main() {
       final oldHandler = FlutterError.onError;
       FlutterError.onError = (details) {
         final msg = details.exceptionAsString();
-        if (msg.contains('overflowed') || msg.contains('HTTP request failed')) return;
+        if (msg.contains('overflowed') || msg.contains('HTTP request failed'))
+          return;
         oldHandler?.call(details);
       };
       addTearDown(() => FlutterError.onError = oldHandler);
 
       final pet = testPet();
-      await tester.pumpWidget(
-        testApp(PetDetailScreen(pet: pet)),
-      );
+      await tester.pumpWidget(testApp(PetDetailScreen(pet: pet)));
       await tester.pumpAndSettle();
 
       expect(find.byType(StatusBadge), findsOneWidget);
@@ -126,14 +121,13 @@ void main() {
       final oldHandler = FlutterError.onError;
       FlutterError.onError = (details) {
         final msg = details.exceptionAsString();
-        if (msg.contains('overflowed') || msg.contains('HTTP request failed')) return;
+        if (msg.contains('overflowed') || msg.contains('HTTP request failed'))
+          return;
         oldHandler?.call(details);
       };
       addTearDown(() => FlutterError.onError = oldHandler);
 
-      await tester.pumpWidget(
-        testApp(PetDetailScreen(pet: testPet())),
-      );
+      await tester.pumpWidget(testApp(PetDetailScreen(pet: testPet())));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
@@ -147,7 +141,8 @@ void main() {
     final oldHandler = FlutterError.onError;
     FlutterError.onError = (details) {
       final msg = details.exceptionAsString();
-      if (msg.contains('overflowed') || msg.contains('HTTP request failed')) return;
+      if (msg.contains('overflowed') || msg.contains('HTTP request failed'))
+        return;
       oldHandler?.call(details);
     };
     addTearDown(() => FlutterError.onError = oldHandler);
@@ -266,9 +261,7 @@ void main() {
       final pet = testPet();
       // Re-seed with a specific bpm; it appears in both the InfoTile and the bar chart
       measurementStore.seed({
-        pet.id!: [
-          Measurement(bpm: 28, recordedAt: DateTime.now()),
-        ],
+        pet.id!: [Measurement(bpm: 28, recordedAt: DateTime.now())],
       });
 
       await tester.pumpWidget(testApp(PetDetailScreen(pet: pet)));
@@ -279,7 +272,9 @@ void main() {
       expect(find.text('28'), findsWidgets);
     });
 
-    testWidgets('shows -- when no measurements and pet bpm == 0', (tester) async {
+    testWidgets('shows -- when no measurements and pet bpm == 0', (
+      tester,
+    ) async {
       setViewSize(tester);
       suppressErrors(tester);
 
@@ -311,7 +306,9 @@ void main() {
       expect(find.text('BPM'), findsOneWidget);
     });
 
-    testWidgets('shows View Graph button in measurement history', (tester) async {
+    testWidgets('shows View Graph button in measurement history', (
+      tester,
+    ) async {
       setViewSize(tester);
       suppressErrors(tester);
 
@@ -326,7 +323,9 @@ void main() {
   // PetDetailScreen — no notes state
   // ---------------------------------------------------------------------------
   group('PetDetailScreen — empty notes state', () {
-    testWidgets('shows no clinical notes message when notes empty', (tester) async {
+    testWidgets('shows no clinical notes message when notes empty', (
+      tester,
+    ) async {
       setViewSize(tester);
       suppressErrors(tester);
 
@@ -339,7 +338,9 @@ void main() {
       expect(find.text('No clinical notes yet'), findsOneWidget);
     });
 
-    testWidgets('shows existing note content when notes seeded', (tester) async {
+    testWidgets('shows existing note content when notes seeded', (
+      tester,
+    ) async {
       setViewSize(tester);
       suppressErrors(tester);
 
@@ -366,7 +367,9 @@ void main() {
       expect(find.byIcon(Icons.edit), findsOneWidget);
     });
 
-    testWidgets('edit sheet shows a delete icon button for owner', (tester) async {
+    testWidgets('edit sheet shows a delete icon button for owner', (
+      tester,
+    ) async {
       setViewSize(tester);
       suppressErrors(tester);
 
@@ -380,32 +383,35 @@ void main() {
     });
 
     testWidgets(
-        'tapping delete in the edit sheet closes it and opens the delete '
-        'confirmation dialog', (tester) async {
-      setViewSize(tester);
-      suppressErrors(tester);
+      'tapping delete in the edit sheet closes it and opens the delete '
+      'confirmation dialog',
+      (tester) async {
+        setViewSize(tester);
+        suppressErrors(tester);
 
-      final pet = testPet();
-      await tester.pumpWidget(testApp(PetDetailScreen(pet: pet)));
-      await tester.pumpAndSettle();
+        final pet = testPet();
+        await tester.pumpWidget(testApp(PetDetailScreen(pet: pet)));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.byIcon(Icons.edit));
-      await tester.pumpAndSettle();
-      expect(find.text('Edit Pet'), findsOneWidget);
+        await tester.tap(find.byIcon(Icons.edit));
+        await tester.pumpAndSettle();
+        expect(find.text('Edit Pet'), findsOneWidget);
 
-      // The delete button is the tappable Container wrapping the trash SVG,
-      // adjacent to the "Edit Pet" title.
-      await tester.tap(find.byType(SvgPicture).first);
-      await tester.pumpAndSettle();
+        // The delete button is the tappable Container wrapping the trash SVG,
+        // adjacent to the "Edit Pet" title.
+        await tester.tap(find.byType(SvgPicture).first);
+        await tester.pumpAndSettle();
 
-      // Edit sheet is gone; the confirmation dialog is showing instead.
-      expect(find.text('Edit Pet'), findsNothing);
-      expect(find.text('Delete Pet'), findsWidgets);
-      expect(find.textContaining(pet.name), findsWidgets);
-    });
+        // Edit sheet is gone; the confirmation dialog is showing instead.
+        expect(find.text('Edit Pet'), findsNothing);
+        expect(find.text('Delete Pet'), findsWidgets);
+        expect(find.textContaining(pet.name), findsWidgets);
+      },
+    );
 
-    testWidgets('cancelling the delete confirmation keeps the pet',
-        (tester) async {
+    testWidgets('cancelling the delete confirmation keeps the pet', (
+      tester,
+    ) async {
       setViewSize(tester);
       suppressErrors(tester);
 

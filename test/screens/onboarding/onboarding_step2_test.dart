@@ -15,33 +15,30 @@ void main() {
     testWidgets('renders without error', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep2(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
       expect(find.byType(OnboardingStep2), findsOneWidget);
     });
 
-    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)',
-        (tester) async {
+    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep2(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
       expect(find.text('Step 2 of 3'), findsNothing);
     });
 
-    testWidgets('shows diagnosis text field with placeholder hint', (tester) async {
+    testWidgets('shows diagnosis text field with placeholder hint', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep2(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
       // DS alignment: the diagnosis dropdown was replaced with a free-text
@@ -53,12 +50,12 @@ void main() {
       expect(find.byType(TextField), findsOneWidget);
     });
 
-    testWidgets('shows "Diagnosis" label with "(optional)" suffix', (tester) async {
+    testWidgets('shows "Diagnosis" label with "(optional)" suffix', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep2(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
       // DS alignment: "Diagnosis (Optional)" is now two separate Text
@@ -71,9 +68,7 @@ void main() {
     testWidgets('shows "Medical information" heading', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep2(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
       // l10n copy consolidation: heading casing changed to sentence case.
@@ -83,13 +78,11 @@ void main() {
     testWidgets('shows Back button when onBack is provided', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        OnboardingStep2(
-          onBack: () {},
-          onNext: () {},
-          nextLabel: 'Next',
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep2(onBack: () {}, onNext: () {}, nextLabel: 'Next'),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
@@ -98,13 +91,11 @@ void main() {
     testWidgets('shows Next button when onNext is provided', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        OnboardingStep2(
-          onBack: () {},
-          onNext: () {},
-          nextLabel: 'Next',
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep2(onBack: () {}, onNext: () {}, nextLabel: 'Next'),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Next'), findsOneWidget);
@@ -114,13 +105,15 @@ void main() {
       suppressOverflowErrors();
 
       var backCalled = false;
-      await tester.pumpWidget(testApp(
-        OnboardingStep2(
-          onBack: () => backCalled = true,
-          onNext: () {},
-          nextLabel: 'Next',
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep2(
+            onBack: () => backCalled = true,
+            onNext: () {},
+            nextLabel: 'Next',
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.arrow_back));
@@ -133,13 +126,15 @@ void main() {
       suppressOverflowErrors();
 
       var nextCalled = false;
-      await tester.pumpWidget(testApp(
-        OnboardingStep2(
-          onBack: () {},
-          onNext: () => nextCalled = true,
-          nextLabel: 'Next',
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep2(
+            onBack: () {},
+            onNext: () => nextCalled = true,
+            nextLabel: 'Next',
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Next'));
@@ -148,16 +143,17 @@ void main() {
       expect(nextCalled, isTrue);
     });
 
-    testWidgets('typing in the diagnosis field calls onDiagnosisChanged',
-        (tester) async {
+    testWidgets('typing in the diagnosis field calls onDiagnosisChanged', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       String? selectedDiagnosis;
-      await tester.pumpWidget(testApp(
-        OnboardingStep2(
-          onDiagnosisChanged: (d) => selectedDiagnosis = d,
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep2(onDiagnosisChanged: (d) => selectedDiagnosis = d),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // DS alignment: diagnosis is now free text, not a dropdown selection.
@@ -167,15 +163,14 @@ void main() {
       expect(selectedDiagnosis, 'Heart murmur');
     });
 
-    testWidgets('typing in the diagnosis field updates the displayed text',
-        (tester) async {
+    testWidgets('typing in the diagnosis field updates the displayed text', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        OnboardingStep2(
-          onDiagnosisChanged: (_) {},
-        ),
-      ));
+      await tester.pumpWidget(
+        testApp(OnboardingStep2(onDiagnosisChanged: (_) {})),
+      );
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextField), 'Heart murmur');
@@ -188,9 +183,7 @@ void main() {
     testWidgets('shows note section about diagnosis data', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep2(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
       // l10n copy consolidation: NoteCallout title is now "Note" (no colon).
@@ -200,9 +193,7 @@ void main() {
     testWidgets('shows OnboardingShell wrapper', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep2(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
       expect(find.byType(OnboardingShell), findsOneWidget);
@@ -211,9 +202,7 @@ void main() {
     testWidgets('shows setup title text', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep2(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
 
       expect(find.text('Setup pet profile'), findsOneWidget);
@@ -222,11 +211,9 @@ void main() {
     testWidgets('initialDiagnosis pre-fills the text field', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep2(
-          initialDiagnosis: 'Diagnosis 03',
-        ),
-      ));
+      await tester.pumpWidget(
+        testApp(const OnboardingStep2(initialDiagnosis: 'Diagnosis 03')),
+      );
       await tester.pumpAndSettle();
 
       // DS alignment: the diagnosis field is free text now, so the initial

@@ -31,14 +31,16 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        Form(
-          child: ValidatedFormField(
-            label: 'Medication Name *',
-            hint: 'e.g., Furosemide',
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: ValidatedFormField(
+              label: 'Medication Name *',
+              hint: 'e.g., Furosemide',
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(ValidatedFormField), findsOneWidget);
@@ -48,14 +50,16 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        Form(
-          child: ValidatedFormField(
-            label: 'Medication Name *',
-            hint: 'e.g., Furosemide',
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: ValidatedFormField(
+              label: 'Medication Name *',
+              hint: 'e.g., Furosemide',
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Medication Name *'), findsOneWidget);
@@ -65,14 +69,16 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        Form(
-          child: ValidatedFormField(
-            label: 'Medication Name *',
-            hint: 'e.g., Furosemide',
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: ValidatedFormField(
+              label: 'Medication Name *',
+              hint: 'e.g., Furosemide',
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('e.g., Furosemide'), findsOneWidget);
@@ -83,15 +89,17 @@ void main() {
       _setSheetSize(tester);
 
       final controller = TextEditingController();
-      await tester.pumpWidget(testApp(
-        Form(
-          child: ValidatedFormField(
-            label: 'Dosage *',
-            hint: 'e.g., 5mg',
-            controller: controller,
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: ValidatedFormField(
+              label: 'Dosage *',
+              hint: 'e.g., 5mg',
+              controller: controller,
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextFormField), '10mg');
@@ -100,22 +108,26 @@ void main() {
       expect(controller.text, '10mg');
     });
 
-    testWidgets('shows validation error when validator returns message', (tester) async {
+    testWidgets('shows validation error when validator returns message', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
       final formKey = GlobalKey<FormState>();
-      await tester.pumpWidget(testApp(
-        Form(
-          key: formKey,
-          child: ValidatedFormField(
-            label: 'Medication Name *',
-            hint: 'e.g., Furosemide',
-            validator: (value) =>
-                (value == null || value.isEmpty) ? 'Required' : null,
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            key: formKey,
+            child: ValidatedFormField(
+              label: 'Medication Name *',
+              hint: 'e.g., Furosemide',
+              validator: (value) =>
+                  (value == null || value.isEmpty) ? 'Required' : null,
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       formKey.currentState!.validate();
@@ -134,15 +146,17 @@ void main() {
       _setSheetSize(tester);
 
       final controller = TextEditingController();
-      await tester.pumpWidget(testApp(
-        Form(
-          child: DatePickerField(
-            label: 'Start Date *',
-            controller: controller,
-            onTap: () {},
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: DatePickerField(
+              label: 'Start Date *',
+              controller: controller,
+              onTap: () {},
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(DatePickerField), findsOneWidget);
@@ -153,15 +167,17 @@ void main() {
       _setSheetSize(tester);
 
       final controller = TextEditingController();
-      await tester.pumpWidget(testApp(
-        Form(
-          child: DatePickerField(
-            label: 'Start Date *',
-            controller: controller,
-            onTap: () {},
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: DatePickerField(
+              label: 'Start Date *',
+              controller: controller,
+              onTap: () {},
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Start Date *'), findsOneWidget);
@@ -172,15 +188,17 @@ void main() {
       _setSheetSize(tester);
 
       final controller = TextEditingController();
-      await tester.pumpWidget(testApp(
-        Form(
-          child: DatePickerField(
-            label: 'Start Date *',
-            controller: controller,
-            onTap: () {},
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: DatePickerField(
+              label: 'Start Date *',
+              controller: controller,
+              onTap: () {},
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.calendar_today), findsOneWidget);
@@ -192,15 +210,17 @@ void main() {
 
       var tapped = false;
       final controller = TextEditingController();
-      await tester.pumpWidget(testApp(
-        Form(
-          child: DatePickerField(
-            label: 'Start Date *',
-            controller: controller,
-            onTap: () => tapped = true,
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: DatePickerField(
+              label: 'Start Date *',
+              controller: controller,
+              onTap: () => tapped = true,
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(TextFormField));
@@ -214,21 +234,24 @@ void main() {
       _setSheetSize(tester);
 
       final controller = TextEditingController();
-      await tester.pumpWidget(testApp(
-        Form(
-          child: DatePickerField(
-            label: 'Start Date *',
-            controller: controller,
-            onTap: () {},
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: DatePickerField(
+              label: 'Start Date *',
+              controller: controller,
+              onTap: () {},
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // DatePickerField wraps a TextFormField with readOnly: true.
       // The underlying EditableText will have readOnly=true.
-      final editableText =
-          tester.widget<EditableText>(find.byType(EditableText));
+      final editableText = tester.widget<EditableText>(
+        find.byType(EditableText),
+      );
       expect(editableText.readOnly, isTrue);
     });
   });
@@ -241,13 +264,15 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        DropdownField(
-          label: 'Frequency *',
-          value: 'Once daily',
-          onChanged: (_) {},
+      await tester.pumpWidget(
+        testApp(
+          DropdownField(
+            label: 'Frequency *',
+            value: 'Once daily',
+            onChanged: (_) {},
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(DropdownField), findsOneWidget);
@@ -257,13 +282,15 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        DropdownField(
-          label: 'Frequency *',
-          value: 'Once daily',
-          onChanged: (_) {},
+      await tester.pumpWidget(
+        testApp(
+          DropdownField(
+            label: 'Frequency *',
+            value: 'Once daily',
+            onChanged: (_) {},
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Frequency *'), findsOneWidget);
@@ -273,13 +300,15 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        DropdownField(
-          label: 'Frequency *',
-          value: 'Once daily',
-          onChanged: (_) {},
+      await tester.pumpWidget(
+        testApp(
+          DropdownField(
+            label: 'Frequency *',
+            value: 'Once daily',
+            onChanged: (_) {},
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Once daily'), findsOneWidget);
@@ -289,13 +318,15 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        DropdownField(
-          label: 'Frequency *',
-          value: 'Once daily',
-          onChanged: (_) {},
+      await tester.pumpWidget(
+        testApp(
+          DropdownField(
+            label: 'Frequency *',
+            value: 'Once daily',
+            onChanged: (_) {},
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // Tap the trigger (the currently selected value) to open the
@@ -312,13 +343,15 @@ void main() {
       _setSheetSize(tester);
 
       String? selected;
-      await tester.pumpWidget(testApp(
-        DropdownField(
-          label: 'Frequency *',
-          value: 'Once daily',
-          onChanged: (v) => selected = v,
+      await tester.pumpWidget(
+        testApp(
+          DropdownField(
+            label: 'Frequency *',
+            value: 'Once daily',
+            onChanged: (v) => selected = v,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // Open the inline option list, then choose a new option.
@@ -341,13 +374,15 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        FrequencyChipSelector(
-          label: 'Frequency *',
-          value: 'Once daily',
-          onChanged: (_) {},
+      await tester.pumpWidget(
+        testApp(
+          FrequencyChipSelector(
+            label: 'Frequency *',
+            value: 'Once daily',
+            onChanged: (_) {},
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(FrequencyChipSelector), findsOneWidget);
@@ -357,13 +392,15 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        FrequencyChipSelector(
-          label: 'Frequency *',
-          value: 'Once daily',
-          onChanged: (_) {},
+      await tester.pumpWidget(
+        testApp(
+          FrequencyChipSelector(
+            label: 'Frequency *',
+            value: 'Once daily',
+            onChanged: (_) {},
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // Unlike DropdownField, every option is visible without opening
@@ -373,19 +410,22 @@ void main() {
       expect(find.text('As needed'), findsOneWidget);
     });
 
-    testWidgets('calls onChanged with the canonical value when tapped',
-        (tester) async {
+    testWidgets('calls onChanged with the canonical value when tapped', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
       String? selected;
-      await tester.pumpWidget(testApp(
-        FrequencyChipSelector(
-          label: 'Frequency *',
-          value: 'Once daily',
-          onChanged: (v) => selected = v,
+      await tester.pumpWidget(
+        testApp(
+          FrequencyChipSelector(
+            label: 'Frequency *',
+            value: 'Once daily',
+            onChanged: (v) => selected = v,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Twice daily'));
@@ -394,29 +434,39 @@ void main() {
       expect(selected, 'Twice daily');
     });
 
-    testWidgets('selected chip uses accentPeriwinkleTile background',
-        (tester) async {
+    testWidgets('selected chip uses accentPeriwinkleTile background', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setSheetSize(tester);
       late BuildContext capturedContext;
 
-      await tester.pumpWidget(testApp(
-        Builder(builder: (ctx) {
-          capturedContext = ctx;
-          return FrequencyChipSelector(
-            label: 'Frequency *',
-            value: 'Twice daily',
-            onChanged: (_) {},
-          );
-        }),
-      ));
+      await tester.pumpWidget(
+        testApp(
+          Builder(
+            builder: (ctx) {
+              capturedContext = ctx;
+              return FrequencyChipSelector(
+                label: 'Frequency *',
+                value: 'Twice daily',
+                onChanged: (_) {},
+              );
+            },
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
-      final tileColor = AppSemanticColors.of(capturedContext).accentPeriwinkleTile;
-      final containers = tester.widgetList<Container>(find.byType(Container)).where(
-        (c) => c.decoration is BoxDecoration &&
-            (c.decoration as BoxDecoration).color == tileColor,
-      );
+      final tileColor = AppSemanticColors.of(
+        capturedContext,
+      ).accentPeriwinkleTile;
+      final containers = tester
+          .widgetList<Container>(find.byType(Container))
+          .where(
+            (c) =>
+                c.decoration is BoxDecoration &&
+                (c.decoration as BoxDecoration).color == tileColor,
+          );
       expect(containers.isNotEmpty, isTrue);
     });
   });
@@ -429,14 +479,16 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        Form(
-          child: ValidatedTextArea(
-            label: 'Additional Notes',
-            hint: 'Enter any additional notes here',
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: ValidatedTextArea(
+              label: 'Additional Notes',
+              hint: 'Enter any additional notes here',
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(ValidatedTextArea), findsOneWidget);
@@ -446,14 +498,16 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        Form(
-          child: ValidatedTextArea(
-            label: 'Additional Notes',
-            hint: 'Enter any additional notes here',
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: ValidatedTextArea(
+              label: 'Additional Notes',
+              hint: 'Enter any additional notes here',
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Additional Notes'), findsOneWidget);
@@ -463,14 +517,16 @@ void main() {
       suppressOverflowErrors();
       _setSheetSize(tester);
 
-      await tester.pumpWidget(testApp(
-        Form(
-          child: ValidatedTextArea(
-            label: 'Additional Notes',
-            hint: 'Enter any additional notes here',
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: ValidatedTextArea(
+              label: 'Additional Notes',
+              hint: 'Enter any additional notes here',
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Enter any additional notes here'), findsOneWidget);
@@ -481,15 +537,17 @@ void main() {
       _setSheetSize(tester);
 
       final controller = TextEditingController();
-      await tester.pumpWidget(testApp(
-        Form(
-          child: ValidatedTextArea(
-            label: 'Notes',
-            hint: 'Notes...',
-            controller: controller,
+      await tester.pumpWidget(
+        testApp(
+          Form(
+            child: ValidatedTextArea(
+              label: 'Notes',
+              hint: 'Notes...',
+              controller: controller,
+            ),
           ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextFormField), 'Line 1\nLine 2');

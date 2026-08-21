@@ -125,16 +125,14 @@ class PetCard extends StatelessWidget {
                   children: [
                     Text(
                       name,
-                      style: (size == PetCardSize.hero
-                              ? AppSemanticTextStyles.pcDisplay
-                              : AppSemanticTextStyles.title3)
-                          .copyWith(color: c.textPrimary),
+                      style:
+                          (size == PetCardSize.hero
+                                  ? AppSemanticTextStyles.pcDisplay
+                                  : AppSemanticTextStyles.title3)
+                              .copyWith(color: c.textPrimary),
                     ),
                     const SizedBox(height: AppSpacingTokens.xs),
-                    Text(
-                      subtitle,
-                      style: AppSemanticTextStyles.pcLabelMuted,
-                    ),
+                    Text(subtitle, style: AppSemanticTextStyles.pcLabelMuted),
                   ],
                 ),
               ),

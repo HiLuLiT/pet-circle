@@ -62,24 +62,15 @@ void main() {
 
   group('AppRoutes.petDetail()', () {
     test('returns correct path for pet ID', () {
-      expect(
-        AppRoutes.petDetail('pet123'),
-        '/shell/pet/pet123',
-      );
+      expect(AppRoutes.petDetail('pet123'), '/shell/pet/pet123');
     });
 
     test('returns correct path for another pet ID', () {
-      expect(
-        AppRoutes.petDetail('abc-456'),
-        '/shell/pet/abc-456',
-      );
+      expect(AppRoutes.petDetail('abc-456'), '/shell/pet/abc-456');
     });
 
     test('returns correct path for short ID', () {
-      expect(
-        AppRoutes.petDetail('abc'),
-        '/shell/pet/abc',
-      );
+      expect(AppRoutes.petDetail('abc'), '/shell/pet/abc');
     });
   });
 

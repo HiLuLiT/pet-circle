@@ -275,8 +275,10 @@ class ActionRow extends StatelessWidget {
     required this.description,
     required this.onTap,
     this.iconTileColor,
-  }) : assert(iconAsset != null || iconWidget != null,
-            'Provide either iconAsset or iconWidget');
+  }) : assert(
+         iconAsset != null || iconWidget != null,
+         'Provide either iconAsset or iconWidget',
+       );
 
   /// SVG asset path. Mutually exclusive with [iconWidget] — if [iconWidget]
   /// is provided, [iconAsset] is ignored.
@@ -318,7 +320,8 @@ class ActionRow extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Center(
-                child: iconWidget ??
+                child:
+                    iconWidget ??
                     SvgPicture.asset(iconAsset!, width: 24, height: 24),
               ),
             ),

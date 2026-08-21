@@ -34,8 +34,9 @@ void main() {
       expect(find.textContaining('unread'), findsOneWidget);
     });
 
-    testWidgets('displays notification cards when notifications exist',
-        (tester) async {
+    testWidgets('displays notification cards when notifications exist', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -57,8 +58,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Test Notification'), findsOneWidget);
-      expect(
-          find.text('This is a test notification body'), findsOneWidget);
+      expect(find.text('This is a test notification body'), findsOneWidget);
     });
 
     testWidgets('shows empty state when no notifications', (tester) async {

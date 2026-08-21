@@ -14,8 +14,7 @@ void main() {
     });
 
     // ── Background color tests ──────────────────────────────────────────────
-    testWidgets('value: true uses accentPurpleTile background',
-        (tester) async {
+    testWidgets('value: true uses accentPurpleTile background', (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: true)));
 
       final container = tester.widget<AnimatedContainer>(
@@ -25,18 +24,20 @@ void main() {
       expect(decoration.color, AppSemanticColors.light.accentPurpleTile);
     });
 
-    testWidgets('value: false uses accentButterCream (#E8E4D8) off background',
-        (tester) async {
-      await tester.pumpWidget(testApp(const AppToggle(value: false)));
+    testWidgets(
+      'value: false uses accentButterCream (#E8E4D8) off background',
+      (tester) async {
+        await tester.pumpWidget(testApp(const AppToggle(value: false)));
 
-      final container = tester.widget<AnimatedContainer>(
-        find.byType(AnimatedContainer),
-      );
-      final decoration = container.decoration as BoxDecoration;
-      expect(decoration.color, AppSemanticColors.light.accentButterCream);
-      // Token resolves to the Candy/Butter/Cream primitive.
-      expect(decoration.color, const Color(0xFFE8E4D8));
-    });
+        final container = tester.widget<AnimatedContainer>(
+          find.byType(AnimatedContainer),
+        );
+        final decoration = container.decoration as BoxDecoration;
+        expect(decoration.color, AppSemanticColors.light.accentButterCream);
+        // Token resolves to the Candy/Butter/Cream primitive.
+        expect(decoration.color, const Color(0xFFE8E4D8));
+      },
+    );
 
     // ── Size & shape ────────────────────────────────────────────────────────
     testWidgets('has fixed pill size 46x28', (tester) async {
@@ -63,8 +64,9 @@ void main() {
     testWidgets('knob positioned left: 21 when value is true', (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: true)));
 
-      final positioned =
-          tester.widget<AnimatedPositioned>(find.byType(AnimatedPositioned));
+      final positioned = tester.widget<AnimatedPositioned>(
+        find.byType(AnimatedPositioned),
+      );
       expect(positioned.left, 21);
       expect(positioned.top, 3);
     });
@@ -72,8 +74,9 @@ void main() {
     testWidgets('knob positioned left: 3 when value is false', (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: false)));
 
-      final positioned =
-          tester.widget<AnimatedPositioned>(find.byType(AnimatedPositioned));
+      final positioned = tester.widget<AnimatedPositioned>(
+        find.byType(AnimatedPositioned),
+      );
       expect(positioned.left, 3);
       expect(positioned.top, 3);
     });
@@ -81,16 +84,18 @@ void main() {
     testWidgets('animation duration is 200ms', (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: false)));
 
-      final positioned =
-          tester.widget<AnimatedPositioned>(find.byType(AnimatedPositioned));
+      final positioned = tester.widget<AnimatedPositioned>(
+        find.byType(AnimatedPositioned),
+      );
       expect(positioned.duration, const Duration(milliseconds: 200));
     });
 
     testWidgets('knob is a white 22x22 circle', (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: true)));
 
-      final containers =
-          tester.widgetList<Container>(find.byType(Container)).toList();
+      final containers = tester
+          .widgetList<Container>(find.byType(Container))
+          .toList();
       final knob = containers.firstWhere((c) {
         final d = c.decoration;
         return d is BoxDecoration &&
@@ -103,26 +108,26 @@ void main() {
     });
 
     // ── Interaction tests ───────────────────────────────────────────────────
-    testWidgets('calls onChanged with !value when tapped (false -> true)',
-        (tester) async {
+    testWidgets('calls onChanged with !value when tapped (false -> true)', (
+      tester,
+    ) async {
       bool? received;
-      await tester.pumpWidget(testApp(AppToggle(
-        value: false,
-        onChanged: (v) => received = v,
-      )));
+      await tester.pumpWidget(
+        testApp(AppToggle(value: false, onChanged: (v) => received = v)),
+      );
 
       await tester.tap(find.byType(AppToggle));
       await tester.pump();
       expect(received, isTrue);
     });
 
-    testWidgets('calls onChanged with !value when tapped (true -> false)',
-        (tester) async {
+    testWidgets('calls onChanged with !value when tapped (true -> false)', (
+      tester,
+    ) async {
       bool? received;
-      await tester.pumpWidget(testApp(AppToggle(
-        value: true,
-        onChanged: (v) => received = v,
-      )));
+      await tester.pumpWidget(
+        testApp(AppToggle(value: true, onChanged: (v) => received = v)),
+      );
 
       await tester.tap(find.byType(AppToggle));
       await tester.pump();
@@ -131,11 +136,15 @@ void main() {
 
     testWidgets('does not fire onChanged when disabled', (tester) async {
       var called = false;
-      await tester.pumpWidget(testApp(AppToggle(
-        value: false,
-        disabled: true,
-        onChanged: (_) => called = true,
-      )));
+      await tester.pumpWidget(
+        testApp(
+          AppToggle(
+            value: false,
+            disabled: true,
+            onChanged: (_) => called = true,
+          ),
+        ),
+      );
 
       await tester.tap(find.byType(AppToggle), warnIfMissed: false);
       await tester.pump();
@@ -143,10 +152,9 @@ void main() {
     });
 
     testWidgets('wraps in Opacity(0.5) when disabled', (tester) async {
-      await tester.pumpWidget(testApp(const AppToggle(
-        value: true,
-        disabled: true,
-      )));
+      await tester.pumpWidget(
+        testApp(const AppToggle(value: true, disabled: true)),
+      );
 
       // The AppToggle places exactly one Opacity at the root when disabled.
       final opacity = tester.widget<Opacity>(

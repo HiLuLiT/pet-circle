@@ -40,13 +40,17 @@ class NotificationsDrawer extends StatelessWidget {
                 n.createdAt.month == now.month &&
                 n.createdAt.day == now.day;
           }).toList();
-          final unreadNotifications =
-              notifications.where((n) => !n.isRead).toList();
-          final readNotifications =
-              notifications.where((n) => n.isRead).toList();
+          final unreadNotifications = notifications
+              .where((n) => !n.isRead)
+              .toList();
+          final readNotifications = notifications
+              .where((n) => n.isRead)
+              .toList();
 
           return ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppRadiiTokens.lg),
+            ),
             child: Container(
               color: c.surface,
               child: SingleChildScrollView(
@@ -84,9 +88,7 @@ class NotificationsDrawer extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          l10n.unreadNotifications(
-                            unreadNotifications.length,
-                          ),
+                          l10n.unreadNotifications(unreadNotifications.length),
                           style: AppSemanticTextStyles.pcLabelMuted,
                         ),
                         if (unreadNotifications.isNotEmpty)
@@ -120,12 +122,14 @@ class NotificationsDrawer extends StatelessWidget {
                           ),
                         ),
                       ),
-                      ...unreadNotifications.map((notification) => Padding(
-                            padding: EdgeInsets.only(
-                              bottom: AppSpacingTokens.sm + 4,
-                            ),
-                            child: _NotificationRow(notification: notification),
-                          )),
+                      ...unreadNotifications.map(
+                        (notification) => Padding(
+                          padding: EdgeInsets.only(
+                            bottom: AppSpacingTokens.sm + 4,
+                          ),
+                          child: _NotificationRow(notification: notification),
+                        ),
+                      ),
                     ],
                     if (readNotifications.isNotEmpty) ...[
                       Padding(
@@ -141,12 +145,14 @@ class NotificationsDrawer extends StatelessWidget {
                           ),
                         ),
                       ),
-                      ...readNotifications.map((notification) => Padding(
-                            padding: EdgeInsets.only(
-                              bottom: AppSpacingTokens.sm + 4,
-                            ),
-                            child: _NotificationRow(notification: notification),
-                          )),
+                      ...readNotifications.map(
+                        (notification) => Padding(
+                          padding: EdgeInsets.only(
+                            bottom: AppSpacingTokens.sm + 4,
+                          ),
+                          child: _NotificationRow(notification: notification),
+                        ),
+                      ),
                     ],
                   ],
                 ),
@@ -179,37 +185,43 @@ class MessagesScreen extends StatelessWidget {
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(AppSpacingTokens.lg),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: AppSpacingTokens.md),
-                Text(
-                  l10n.notifications,
-                  style: AppSemanticTextStyles.title3.copyWith(
-                    color: c.textPrimary,
-                    letterSpacing: -0.96,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: responsiveMaxWidth(context),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: AppSpacingTokens.md),
+                      Text(
+                        l10n.notifications,
+                        style: AppSemanticTextStyles.title3.copyWith(
+                          color: c.textPrimary,
+                          letterSpacing: -0.96,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacingTokens.sm),
+                      Text(
+                        l10n.unreadNotifications(notificationStore.unreadCount),
+                        style: AppSemanticTextStyles.body.copyWith(
+                          color: c.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacingTokens.lg),
+                      ...notifications.map(
+                        (notification) => Padding(
+                          padding: EdgeInsets.only(
+                            bottom: AppSpacingTokens.sm + 4,
+                          ),
+                          child: _NotificationRow(notification: notification),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: AppSpacingTokens.sm),
-                Text(
-                  l10n.unreadNotifications(notificationStore.unreadCount),
-                  style: AppSemanticTextStyles.body.copyWith(
-                    color: c.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: AppSpacingTokens.lg),
-                ...notifications.map((notification) => Padding(
-                  padding: EdgeInsets.only(bottom: AppSpacingTokens.sm + 4),
-                  child: _NotificationRow(notification: notification),
-                )),
-              ],
-            ),
               ),
             ),
-          ),
           ),
         );
 
@@ -217,10 +229,7 @@ class MessagesScreen extends StatelessWidget {
           return Container(color: c.surface, child: content);
         }
 
-        return Scaffold(
-          backgroundColor: c.surface,
-          body: content,
-        );
+        return Scaffold(backgroundColor: c.surface, body: content);
       },
     );
   }

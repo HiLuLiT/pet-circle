@@ -34,10 +34,7 @@ void main() {
     });
 
     test('constructs a failure result with error', () {
-      const result = OtpVerifyResult(
-        success: false,
-        error: 'Invalid OTP code',
-      );
+      const result = OtpVerifyResult(success: false, error: 'Invalid OTP code');
       expect(result.success, isFalse);
       expect(result.error, 'Invalid OTP code');
       expect(result.token, isNull);

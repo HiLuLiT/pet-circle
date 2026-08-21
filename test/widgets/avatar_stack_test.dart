@@ -22,9 +22,7 @@ void main() {
   // errorBuilder fires. All other tests use empty URLs (no network).
   group('AvatarStack', () {
     testWidgets('renders nothing for an empty list', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AvatarStack(avatars: []),
-      ));
+      await tester.pumpWidget(testApp(const AvatarStack(avatars: [])));
 
       expect(find.byType(AvatarStack), findsOneWidget);
       // No images and no initials text should be rendered.
@@ -32,13 +30,17 @@ void main() {
     });
 
     testWidgets('renders one circle per member', (tester) async {
-      await tester.pumpWidget(testApp(
-        AvatarStack(avatars: [
-          _member('Alice Smith'),
-          _member('Bob Jones'),
-          _member('Cara Lee'),
-        ]),
-      ));
+      await tester.pumpWidget(
+        testApp(
+          AvatarStack(
+            avatars: [
+              _member('Alice Smith'),
+              _member('Bob Jones'),
+              _member('Cara Lee'),
+            ],
+          ),
+        ),
+      );
 
       // Empty URLs -> initials fallback for each member.
       expect(find.text('AS'), findsOneWidget);
@@ -46,34 +48,34 @@ void main() {
       expect(find.text('CL'), findsOneWidget);
     });
 
-    testWidgets('empty avatarUrl falls back to initials (no network image)',
-        (tester) async {
-      await tester.pumpWidget(testApp(
-        AvatarStack(avatars: [_member('Dana Park', avatarUrl: '')]),
-      ));
+    testWidgets('empty avatarUrl falls back to initials (no network image)', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        testApp(AvatarStack(avatars: [_member('Dana Park', avatarUrl: '')])),
+      );
 
       expect(find.text('DP'), findsOneWidget);
       expect(find.byType(Image), findsNothing);
     });
 
     testWidgets('single-word name uses first letter', (tester) async {
-      await tester.pumpWidget(testApp(
-        AvatarStack(avatars: [_member('Madonna')]),
-      ));
+      await tester.pumpWidget(
+        testApp(AvatarStack(avatars: [_member('Madonna')])),
+      );
 
       expect(find.text('M'), findsOneWidget);
     });
 
     testWidgets('blank name falls back to "?"', (tester) async {
-      await tester.pumpWidget(testApp(
-        AvatarStack(avatars: [_member('   ')]),
-      ));
+      await tester.pumpWidget(testApp(AvatarStack(avatars: [_member('   ')])));
 
       expect(find.text('?'), findsOneWidget);
     });
 
-    testWidgets('network image error falls back to initials placeholder',
-        (tester) async {
+    testWidgets('network image error falls back to initials placeholder', (
+      tester,
+    ) async {
       // Install a failing HTTP layer so the network load fails
       // deterministically (no reliance on real-network flakiness), making the
       // errorBuilder fire and render the neutral initials fallback.
@@ -83,11 +85,15 @@ void main() {
       HttpOverrides.global = FailingHttpOverrides();
 
       try {
-        await tester.pumpWidget(testApp(
-          AvatarStack(avatars: [
-            _member('Erin Cole', avatarUrl: 'https://example.com/a.jpg'),
-          ]),
-        ));
+        await tester.pumpWidget(
+          testApp(
+            AvatarStack(
+              avatars: [
+                _member('Erin Cole', avatarUrl: 'https://example.com/a.jpg'),
+              ],
+            ),
+          ),
+        );
         await tester.pumpAndSettle();
       } finally {
         HttpOverrides.global = null;
@@ -101,34 +107,38 @@ void main() {
     });
 
     testWidgets('left and right alignment both render', (tester) async {
-      await tester.pumpWidget(testApp(
-        Column(
-          children: [
-            AvatarStack(
-              avatars: [_member('Ann Bell')],
-              alignment: AvatarStackAlignment.left,
-            ),
-            AvatarStack(
-              avatars: [_member('Cy Dorn')],
-              alignment: AvatarStackAlignment.right,
-            ),
-          ],
+      await tester.pumpWidget(
+        testApp(
+          Column(
+            children: [
+              AvatarStack(
+                avatars: [_member('Ann Bell')],
+                alignment: AvatarStackAlignment.left,
+              ),
+              AvatarStack(
+                avatars: [_member('Cy Dorn')],
+                alignment: AvatarStackAlignment.right,
+              ),
+            ],
+          ),
         ),
-      ));
+      );
 
       expect(find.text('AB'), findsOneWidget);
       expect(find.text('CD'), findsOneWidget);
     });
 
     testWidgets('highlightFirst renders without error', (tester) async {
-      await tester.pumpWidget(testApp(
-        AvatarStack(
-          avatars: [_member('Fay Glen'), _member('Hal Iver')],
-          avatarSize: 32,
-          alignment: AvatarStackAlignment.left,
-          highlightFirst: true,
+      await tester.pumpWidget(
+        testApp(
+          AvatarStack(
+            avatars: [_member('Fay Glen'), _member('Hal Iver')],
+            avatarSize: 32,
+            alignment: AvatarStackAlignment.left,
+            highlightFirst: true,
+          ),
         ),
-      ));
+      );
 
       expect(find.byType(AvatarStack), findsOneWidget);
       expect(find.text('FG'), findsOneWidget);

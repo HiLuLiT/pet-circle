@@ -10,19 +10,14 @@ void main() {
   group('AppCard', () {
     // ── Smoke ───────────────────────────────────────────────────────────────
     testWidgets('renders without error', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppCard(child: Text('Hello')),
-      ));
+      await tester.pumpWidget(testApp(const AppCard(child: Text('Hello'))));
       expect(find.byType(AppCard), findsOneWidget);
       expect(find.text('Hello'), findsOneWidget);
     });
 
     // ── Variant: surface ────────────────────────────────────────────────────
-    testWidgets('surface variant uses semantic surface color',
-        (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppCard(child: Text('Surface')),
-      ));
+    testWidgets('surface variant uses semantic surface color', (tester) async {
+      await tester.pumpWidget(testApp(const AppCard(child: Text('Surface'))));
 
       final container = tester.widget<Container>(find.byType(Container).last);
       final decoration = container.decoration as BoxDecoration;
@@ -30,14 +25,12 @@ void main() {
     });
 
     // ── Variant: tile (default purple) ──────────────────────────────────────
-    testWidgets('tile variant defaults to accentPurpleTile',
-        (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppCard(
-          variant: AppCardVariant.tile,
-          child: Text('Tile'),
+    testWidgets('tile variant defaults to accentPurpleTile', (tester) async {
+      await tester.pumpWidget(
+        testApp(
+          const AppCard(variant: AppCardVariant.tile, child: Text('Tile')),
         ),
-      ));
+      );
 
       final container = tester.widget<Container>(find.byType(Container).last);
       final decoration = container.decoration as BoxDecoration;
@@ -45,16 +38,17 @@ void main() {
     });
 
     // ── Variant: tile with override color ───────────────────────────────────
-    testWidgets('tile variant respects tileColor override',
-        (tester) async {
+    testWidgets('tile variant respects tileColor override', (tester) async {
       const override = Color(0xFFFFAA00);
-      await tester.pumpWidget(testApp(
-        const AppCard(
-          variant: AppCardVariant.tile,
-          tileColor: override,
-          child: Text('Custom tile'),
+      await tester.pumpWidget(
+        testApp(
+          const AppCard(
+            variant: AppCardVariant.tile,
+            tileColor: override,
+            child: Text('Custom tile'),
+          ),
         ),
-      ));
+      );
 
       final container = tester.widget<Container>(find.byType(Container).last);
       final decoration = container.decoration as BoxDecoration;
@@ -63,12 +57,14 @@ void main() {
 
     // ── tileColor is ignored on surface variant ─────────────────────────────
     testWidgets('surface variant ignores tileColor', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppCard(
-          tileColor: Color(0xFFFFAA00),
-          child: Text('Surface ignores tileColor'),
+      await tester.pumpWidget(
+        testApp(
+          const AppCard(
+            tileColor: Color(0xFFFFAA00),
+            child: Text('Surface ignores tileColor'),
+          ),
         ),
-      ));
+      );
 
       final container = tester.widget<Container>(find.byType(Container).last);
       final decoration = container.decoration as BoxDecoration;
@@ -76,11 +72,10 @@ void main() {
     });
 
     // ── Radius ──────────────────────────────────────────────────────────────
-    testWidgets('uses AppRadiiTokens.pcCard (16) for border radius',
-        (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppCard(child: Text('Radius')),
-      ));
+    testWidgets('uses AppRadiiTokens.pcCard (16) for border radius', (
+      tester,
+    ) async {
+      await tester.pumpWidget(testApp(const AppCard(child: Text('Radius'))));
 
       final container = tester.widget<Container>(find.byType(Container).last);
       final decoration = container.decoration as BoxDecoration;
@@ -93,9 +88,7 @@ void main() {
 
     // ── No shadow (flat) ────────────────────────────────────────────────────
     testWidgets('has no shadow (flat surface)', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppCard(child: Text('Flat')),
-      ));
+      await tester.pumpWidget(testApp(const AppCard(child: Text('Flat'))));
 
       final container = tester.widget<Container>(find.byType(Container).last);
       final decoration = container.decoration as BoxDecoration;
@@ -104,21 +97,20 @@ void main() {
 
     // ── Padding defaults ────────────────────────────────────────────────────
     testWidgets('default padding is EdgeInsets.all(16)', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppCard(child: Text('Default padding')),
-      ));
+      await tester.pumpWidget(
+        testApp(const AppCard(child: Text('Default padding'))),
+      );
 
       final container = tester.widget<Container>(find.byType(Container).last);
       expect(container.padding, const EdgeInsets.all(16));
     });
 
     testWidgets('accepts custom padding', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppCard(
-          padding: EdgeInsets.all(24),
-          child: Text('Padded'),
+      await tester.pumpWidget(
+        testApp(
+          const AppCard(padding: EdgeInsets.all(24), child: Text('Padded')),
         ),
-      ));
+      );
 
       final container = tester.widget<Container>(find.byType(Container).last);
       expect(container.padding, const EdgeInsets.all(24));
@@ -126,9 +118,7 @@ void main() {
 
     // ── Child can be null ───────────────────────────────────────────────────
     testWidgets('renders without a child', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppCard(),
-      ));
+      await tester.pumpWidget(testApp(const AppCard()));
       expect(find.byType(AppCard), findsOneWidget);
     });
   });

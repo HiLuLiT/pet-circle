@@ -20,9 +20,7 @@ void main() {
   group('InviteButton', () {
     testWidgets('renders invite label', (tester) async {
       suppressOverflowErrors();
-      await tester.pumpWidget(testApp(
-        InviteButton(onTap: () {}),
-      ));
+      await tester.pumpWidget(testApp(InviteButton(onTap: () {})));
       await tester.pumpAndSettle();
 
       // DS alignment: InviteButton now renders the full-width secondary
@@ -33,9 +31,9 @@ void main() {
     testWidgets('calls onTap when tapped', (tester) async {
       suppressOverflowErrors();
       var tapped = false;
-      await tester.pumpWidget(testApp(
-        InviteButton(onTap: () => tapped = true),
-      ));
+      await tester.pumpWidget(
+        testApp(InviteButton(onTap: () => tapped = true)),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(GestureDetector).first);
@@ -54,14 +52,16 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(testApp(
-        CareCircleItem(
-          email: 'owner@example.com',
-          roleLabel: 'Admin',
-          roleColor: Colors.purple,
-          statusLabel: 'Active',
+      await tester.pumpWidget(
+        testApp(
+          CareCircleItem(
+            email: 'owner@example.com',
+            roleLabel: 'Admin',
+            roleColor: Colors.purple,
+            statusLabel: 'Active',
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('owner@example.com'), findsOneWidget);
@@ -77,15 +77,17 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       var removeCalled = false;
-      await tester.pumpWidget(testApp(
-        CareCircleItem(
-          email: 'member@example.com',
-          roleLabel: 'Member',
-          roleColor: Colors.blue,
-          statusLabel: 'Active',
-          onRemove: () => removeCalled = true,
+      await tester.pumpWidget(
+        testApp(
+          CareCircleItem(
+            email: 'member@example.com',
+            roleLabel: 'Member',
+            roleColor: Colors.blue,
+            statusLabel: 'Active',
+            onRemove: () => removeCalled = true,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // Tap the GestureDetector wrapping the trash icon (last one in tree)
@@ -100,15 +102,17 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(testApp(
-        const CareCircleItem(
-          email: 'viewer@example.com',
-          roleLabel: 'Viewer',
-          roleColor: Colors.grey,
-          statusLabel: 'Active',
-          onRemove: null,
+      await tester.pumpWidget(
+        testApp(
+          const CareCircleItem(
+            email: 'viewer@example.com',
+            roleLabel: 'Viewer',
+            roleColor: Colors.grey,
+            statusLabel: 'Active',
+            onRemove: null,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('viewer@example.com'), findsOneWidget);
@@ -126,9 +130,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(testApp(
-        ConfigureRow(onTap: () {}),
-      ));
+      await tester.pumpWidget(testApp(ConfigureRow(onTap: () {})));
       await tester.pumpAndSettle();
 
       // DS alignment: ConfigureRow is now a single tappable row (icon tile +
@@ -144,9 +146,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(testApp(
-        ConfigureRow(onTap: () {}),
-      ));
+      await tester.pumpWidget(testApp(ConfigureRow(onTap: () {})));
       await tester.pumpAndSettle();
 
       expect(find.text('Customize BPM ranges for alerts'), findsOneWidget);
@@ -160,9 +160,9 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       var tapped = false;
-      await tester.pumpWidget(testApp(
-        ConfigureRow(onTap: () => tapped = true),
-      ));
+      await tester.pumpWidget(
+        testApp(ConfigureRow(onTap: () => tapped = true)),
+      );
       await tester.pumpAndSettle();
 
       // The whole row (no separate "Configure" button anymore) is tappable.
