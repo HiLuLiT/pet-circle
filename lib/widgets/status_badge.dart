@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
-import 'package:pet_circle/theme/tokens/typography.dart';
 
 /// Visual status family for [StatusBadge].
 ///
@@ -55,17 +55,18 @@ class StatusBadge extends StatelessWidget {
     final dot = _dotFor(c, effectiveStatus);
     final text = _textFor(c, effectiveStatus);
 
-    final textStyle = TextStyle(
-      fontFamily: AppTypography.fontFamily,
-      fontSize: 13,
-      fontWeight: FontWeight.w700,
-      fontVariations: AppTypography.axesBold,
-      height: 1.0,
+    // Figma "Pills" (node I442:8893;442:8868) uses Label/S SemiBold —
+    // 13px / 18px line height, weight 600 — not a bold 13/13.
+    final textStyle = AppSemanticTextStyles.labelSSemibold.copyWith(
       color: text,
     );
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      // Figma: px-[16px] py-[8px].
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacingTokens.md,
+        vertical: AppSpacingTokens.sm,
+      ),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: BorderRadius.circular(AppRadiiTokens.pcPill),

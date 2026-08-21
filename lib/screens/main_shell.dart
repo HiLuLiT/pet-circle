@@ -169,7 +169,12 @@ class _MainShellState extends State<MainShell> {
           children: [
             // -- Persistent header --
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacingTokens.pcXl,
+                AppSpacingTokens.pcMd,
+                AppSpacingTokens.pcXl,
+                0,
+              ),
               child: AppHeader(
                 userName: user?.name ?? '',
                 userImageUrl: user?.avatarUrl ?? '',

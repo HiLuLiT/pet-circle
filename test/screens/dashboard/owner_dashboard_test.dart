@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/models/measurement.dart';
+import 'package:pet_circle/theme/app_assets.dart';
+import 'package:pet_circle/widgets/mascot.dart';
 import 'package:pet_circle/screens/dashboard/add_reminder_sheet.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
@@ -59,6 +61,22 @@ void main() {
       expect(find.text(pet!.name), findsWidgets);
     });
 
+    testWidgets('hero card renders the Figma dog artwork, not a mascot', (
+      tester,
+    ) async {
+      await pumpDashboard(tester);
+
+      // Figma 442:8893 uses a photo-real dog PNG in the 90x90 media frame.
+      final images = tester
+          .widgetList<Image>(find.byType(Image))
+          .map((i) => i.image)
+          .whereType<AssetImage>()
+          .map((a) => a.assetName)
+          .toList();
+      expect(images, contains(AppAssets.petCardDog));
+      expect(find.byType(Mascot), findsNothing);
+    });
+
     testWidgets('shows the Active status badge on the hero card', (
       tester,
     ) async {
@@ -73,7 +91,7 @@ void main() {
       final latest = measurementStore.latestForPet(pet.id ?? '');
       expect(latest, isNotNull);
       expect(find.text('${latest!.bpm} BPM'), findsOneWidget);
-      expect(find.text('Latest Reading'), findsOneWidget);
+      expect(find.text('Heart rate'), findsOneWidget);
     });
 
     testWidgets('hides latest reading card when there is no measurement', (
@@ -84,7 +102,7 @@ void main() {
 
       await pumpDashboard(tester);
 
-      expect(find.text('Latest Reading'), findsNothing);
+      expect(find.text('Heart rate'), findsNothing);
     });
 
     testWidgets('shows Care Circle card with avatar stack', (tester) async {
@@ -124,18 +142,24 @@ void main() {
       expect(find.byType(AddReminderSheet), findsOneWidget);
     });
 
-    testWidgets('reminder tile shows a close button instead of opening a sheet', (
+    testWidgets('reminder tile opens the sheet in edit mode when tapped', (
       tester,
     ) async {
       await pumpDashboard(tester);
 
-      // Tiles are no longer tappable — tapping the text does not open any sheet.
+      // Figma 469:1023 gives each tile a chevron affordance, not a × dismiss.
+      expect(find.byIcon(Icons.chevron_right), findsWidgets);
+      expect(find.byIcon(Icons.close), findsNothing);
+
       await tester.tap(find.text('Veterinary dentist'));
       await tester.pumpAndSettle();
-      expect(find.byType(AddReminderSheet), findsNothing);
 
-      // Each tile shows a × dismiss button.
-      expect(find.byIcon(Icons.close), findsWidgets);
+      // Edit mode pre-fills the tapped reminder; delete lives inside the sheet.
+      expect(find.byType(AddReminderSheet), findsOneWidget);
+      expect(
+        find.widgetWithText(TextFormField, 'Veterinary dentist'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('shows Measure and Trends action buttons', (tester) async {

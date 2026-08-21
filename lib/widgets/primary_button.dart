@@ -94,8 +94,10 @@ class PrimaryButton extends StatelessWidget {
   // SemiBold 14 / lineHeight 20 — the label style shared by the new
   // [link] and [miniPrimary] variants. Height collapsed to 1.0 to match the
   // tight Figma button layout (vertical centering handled by padding).
+  // Figma 442:8689 / 442:8683 / 474:2550 all use Label/M SemiBold 14/**20**.
+  // Collapsing height to 1.0 made these labels 20% shorter than the design.
   static TextStyle _miniLabelStyle(Color fg) =>
-      AppTypography.pcLabelSemibold.copyWith(color: fg, height: 1.0);
+      AppTypography.pcLabelSemibold.copyWith(color: fg);
 
   @override
   Widget build(BuildContext context) {

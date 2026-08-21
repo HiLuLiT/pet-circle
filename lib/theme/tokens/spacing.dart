@@ -7,19 +7,32 @@ import 'package:flutter/material.dart';
 class AppSpacingTokens {
   AppSpacingTokens._();
 
-  // ── PC v3 scale ──────────────────────────────────────────────────────────
-  static const double pcXs = 6;
-  static const double pcSm = 10;
-  static const double pcMd = 14;
-  static const double pcLg = 18;
+  // ── PC v3 scale — matches the spacing actually used in Figma ─────────────
+  //
+  // Measured across Figma nodes 442:6747, 407:3528, 442:8893, 442:8959 and
+  // 426:1182, the design uses 4 / 8 / 12 / 16 / 20 / 24 / 28 / 32. The former
+  // pc* values (6 / 10 / 14 / 18 / 24) matched only 24 — every other step
+  // corresponded to nothing in the design, so code that "preferred pc*" was
+  // being steered away from Figma. 12 in particular recurs (header group gap,
+  // action-button gap, reminders gaps) and was absent from both old scales.
+  static const double pcXs = 4;
+  static const double pcSm = 8;
+  static const double pcMd = 12;
+  static const double pcLg = 16;
   static const double pcXl = 24;
+  static const double pc2Xl = 32;
 
-  // ── Legacy v2 scale ──────────────────────────────────────────────────────
-  static const double xs = 4;
-  static const double sm = 8;
-  static const double md = 16;
-  static const double lg = 24;
-  static const double xl = 32;
+  /// One-off Figma steps that do not belong to the core rhythm: `pl-20` on the
+  /// outlined button (icon-slot allowance) and `pt-28` on the "Your pets" row.
+  static const double pc20 = 20;
+  static const double pc28 = 28;
+
+  // ── Legacy v2 names — aliases onto the Figma-aligned scale ───────────────
+  static const double xs = pcXs; // 4
+  static const double sm = pcSm; // 8
+  static const double md = pcLg; // 16
+  static const double lg = pcXl; // 24
+  static const double xl = pc2Xl; // 32
 }
 
 /// Border-radius tokens.

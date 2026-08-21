@@ -92,7 +92,10 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     fontVariations: axesBold,
     height: 36 / 28,
-    letterSpacing: -0.5,
+    // Figma reports Display/M letter spacing as -0.5 *percent*, which the
+    // rendered node resolves to -0.14px at 28px (28 * -0.005). Flutter's
+    // letterSpacing is in logical px, so -0.5 was ~3.5x too tight.
+    letterSpacing: -0.14,
   );
 
   // ── PC v3: Heading — Bold only ──────────────────────────────────────────
@@ -102,7 +105,8 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     fontVariations: axesBold,
     height: 32 / 24,
-    letterSpacing: -0.3,
+    // Figma -0.3% of 24px -> -0.072px (letterSpacing is a percent).
+    letterSpacing: -0.072,
   );
   static const TextStyle pcHeadingH2Bold = TextStyle(
     fontFamily: fontFamily,
@@ -110,7 +114,8 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     fontVariations: axesBold,
     height: 28 / 20,
-    letterSpacing: -0.2,
+    // Figma -0.2% of 20px -> -0.04px (letterSpacing is a percent).
+    letterSpacing: -0.04,
   );
   static const TextStyle pcHeadingXsBold = TextStyle(
     fontFamily: fontFamily,
@@ -242,7 +247,8 @@ class AppTypography {
     fontWeight: FontWeight.w500,
     fontVariations: axesMedium,
     height: 16 / 12,
-    letterSpacing: 0.1,
+    // Figma 0.1% of 12px -> 0.012px (letterSpacing is a percent).
+    letterSpacing: 0.012,
   );
   static const TextStyle pcCaptionRegular = TextStyle(
     fontFamily: fontFamily,
@@ -258,7 +264,8 @@ class AppTypography {
     fontWeight: FontWeight.w700,
     fontVariations: axesBold,
     height: 16 / 11,
-    letterSpacing: 0.5,
+    // Figma 0.5% of 11px -> 0.055px (letterSpacing is a percent).
+    letterSpacing: 0.055,
   );
   // Caption/XS — 10px, Bold (avatar initials, tiny tags).
   static const TextStyle pcCaptionXsBold = TextStyle(

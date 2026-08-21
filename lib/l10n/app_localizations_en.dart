@@ -779,6 +779,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get latestReading => 'Latest Reading';
 
   @override
+  String get heartRate => 'Heart rate';
+
+  @override
   String get lastMeasured => 'Last Measured';
 
   @override

@@ -264,6 +264,7 @@
   "status": "Status",
 
   "latestReading": "Latest Reading",
+  "heartRate": "Heart rate",
   "lastMeasured": "Last Measured",
   "viewGraph": "View Graph",
   "clinicalNotes": "Clinical Notes",

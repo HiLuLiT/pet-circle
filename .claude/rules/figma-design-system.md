@@ -37,6 +37,53 @@ These rules define how to translate Figma inputs into code for this project and 
 - Strive for 1:1 visual parity with the Figma design
 - Validate the final UI against the Figma screenshot for both look and behavior
 
+
+### Alignment Audit — diff every property, not the ones you notice
+
+When the task is "make X match Figma", do a **property-level diff**, not a spot-fix. Skimming the
+`get_design_context` output and fixing what stands out reliably misses most of the divergences.
+
+1. Build a property inventory for **every element in the node**, including nested components (a
+   pill/badge/chip inside a card is its own element with its own full property set). Capture:
+   fill, border radius, padding, gaps to siblings, and — for every text node — font family, size,
+   weight, line height, letter spacing, and color. For images: intrinsic aspect ratio and rendered box.
+2. **Resolve each candidate token to its literal value and compare against the Figma literal.**
+   NEVER accept a token because its *name* matches the role. Real cases found this way:
+   `pcStatusActiveBg` was named for the Active pill but held `#D7EECB` where the DS says `#C2E8C8`;
+   `pcLabelMuted` sounded right for a subtitle but rendered tertiary grey where Figma said ink.
+3. Treat a shared widget that hand-rolls a raw `TextStyle`/`BoxDecoration` instead of using
+   `AppSemanticTextStyles.*` / tokens as a **drift smell** — check it against the DS before reusing it.
+   `StatusBadge` built its own `TextStyle` at Bold 13/13 where the DS says SemiBold 13/18.
+4. Fix the shared component or token, then the screen — never let a screen invent a one-off that
+   contradicts the DS node.
+
+### IMPORTANT: Figma letter spacing is a PERCENT, not pixels
+
+`get_variable_defs` reports type-style letter spacing as a **percentage of the font size**, with no
+unit marker. `get_design_context` reports the same value **already resolved to px** as
+`tracking-[Npx]`. Flutter's `TextStyle.letterSpacing` is in logical pixels.
+
+- Convert: `px = fontSize * percent / 100`
+- e.g. `Display/M ... letterSpacing: -0.5` at 28px is **-0.14px**, not -0.5
+- Verified against rendered instances: 20px -> -0.04px, 28px -> -0.14px
+
+Prefer the resolved `tracking-[...px]` value from `get_design_context`. This bug silently affected
+`Display/M`, `Heading/H1`, `Heading/H2`, `Caption/Medium` and `Caption/Tag` before 2026-08-21.
+
+### Verifying design work
+
+- For **token fidelity** (colors, font metrics, padding, radius, gaps) assert the rendered values in a
+  `testWidgets` test — read `tester.widget<Text>(...).style` and the `BoxDecoration` off the
+  container. This is deterministic and becomes permanent regression protection; screenshots are not.
+  See `test/widgets/pet_card_test.dart` ("matches every Figma 442:8893 value") for the pattern —
+  write one such test per aligned node.
+- `test/theme/figma_ds_parity_test.dart` pins the whole token layer against DS node `402-1191`.
+  When the DS changes, update that table **first**, watch it fail, then change the tokens.
+- Use screenshots for layout, composition and overflow — not for whether a hex or a line height is right.
+- **`flutter run` does NOT pick up source edits.** Restart it before reviewing or concluding anything
+  from the running app, and check for orphaned servers on the `.claude/launch.json` port
+  (`lsof -nP -iTCP:8090 -sTCP:LISTEN`). Reviewing a stale build wastes a full round trip.
+
 ---
 
 ## Component Organization

@@ -131,7 +131,7 @@ class _AuthGateState extends State<AuthGate> {
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
     return Scaffold(
-      backgroundColor: c.surface,
+      backgroundColor: c.background,
       body: Center(child: CircularProgressIndicator(color: c.primary)),
     );
   }
