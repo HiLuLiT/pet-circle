@@ -25,13 +25,14 @@ import 'package:pet_circle/widgets/app_image.dart';
 /// agent's context without corruption, so prefer the higher-resolution copy
 /// already committed here. See BUG-031.
 ///
-/// Two deliberate departures from the design preview:
+/// One deliberate departure from the design preview:
 ///  * The preview's `scale(1.75)` and `translateY(8px)` only sized the artwork
 ///    to fill its 640x360 preview stage, so they are dropped — here the hero
 ///    renders at its natural [heroWidth] x [heroHeight].
-///  * The preview loops authored time over the 4.2s scene, which snaps the
-///    6.2s drift mid-cycle. This runs time continuously instead (see
-///    [_loopSeconds]), so the drift stays smooth forever.
+/// Playback follows the authored scene exactly: `OM_SCENES` declares a single
+/// 4.2s "Heartbeat" section and `OM_PLAYBACK` is `{"mode":"loop"}`, so this
+/// loops every [_loopSeconds] = 4.2s. See that constant for why the wrap is
+/// clean enough not to need the longer cycle this once used.
 class PoundingHeartHero extends StatefulWidget {
   const PoundingHeartHero({
     super.key,
@@ -70,14 +71,23 @@ class _PoundingHeartHeroState extends State<PoundingHeartHero>
   static const double _breathPeriod = 4.2;
   static const double _breathAmp = 0.004;
 
-  /// Lowest common multiple of the three periods above (1.4 = 7/5,
-  /// 6.2 = 31/5, 4.2 = 21/5, so lcm(7,31,21)/5 = 651/5). Looping the ticker
-  /// over exactly this span makes every oscillator seamless at the wrap.
-  static const double _loopSeconds = 130.2;
+  /// The authored loop length, from `OM_SCENES` in
+  /// `Pounding Heart standalone-src.dc.html`: one 4.2s "Heartbeat" section,
+  /// with `OM_PLAYBACK` set to loop.
+  ///
+  /// 4.2 is an exact multiple of both the 1.4s beat (3 beats — matching the
+  /// scene's own "pounds gently three times") and the 4.2s dog breath, so both
+  /// wrap seamlessly. Only the 6.2s drift is cut mid-cycle, and it contributes
+  /// at most `2.2 * 0.3` = 0.66px here, so that discontinuity is sub-pixel.
+  ///
+  /// An earlier version ran the 651/5-second LCM of all three periods to avoid
+  /// even that cut. It diverged from the design for no visible gain — prefer
+  /// the authored value.
+  static const double _loopSeconds = 4.2;
 
   late final AnimationController _controller = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 130200), // _loopSeconds
+    duration: const Duration(milliseconds: 4200), // _loopSeconds
   );
 
   /// Platform reduce-motion. Read here rather than in [build] so the ticker
