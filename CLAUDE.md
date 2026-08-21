@@ -181,6 +181,21 @@ the primary.
 - Text colors use `Ink/*` tokens — NOT hardcoded black
 - The app background is the single token `pcBg` (#F5F3EF), read via `c.background`; other surfaces use `Sky/*` or `primaryLightest` — NOT hardcoded white
 
+**Dark mode ("Warm Charcoal"):** dark is a per-role transform of light, not an inversion — all 51
+semantic fields resolve to a `pcDark*` primitive, and none may fall through to a light value. Its
+surface ladder (`pcDarkCanvas` → `pcDarkWell` → `pcDarkSurface` → `pcDarkElevated`) carries elevation
+because shadows barely register on a dark canvas. `textPrimary` has a contrast **ceiling** of 16.5:1
+as well as a 14:1 floor: pure white on near-black is what made the previous dark theme feel harsh.
+Never reuse a light pastel as a dark fill — use the `pcDark*Tile` washes for backgrounds and the
+bright `pcDark*` accents for foregrounds. `test/theme/dark_contrast_test.dart` enforces all of this;
+`.claude/rules/design-system-enforcement.md` has the full rules.
+
+**Shadows:** use `AppShadowTokens.smallOf(context)` (and `mediumOf`/`largeOf`) in widgets — the bare
+`small`/`medium`/`large` constants are the light values.
+
+**Theme mode:** `appThemeMode` (`ValueNotifier<ThemeMode>`) in `lib/config/app_config.dart`, persisted
+through `settingsStore.setThemeMode()` to `/users/{uid}.settings`. Defaults to `ThemeMode.system`.
+
 ### Typography System
 
 **Font:** Instrument Sans — a **variable** font. Both axes must be set: `wght` (400-700)

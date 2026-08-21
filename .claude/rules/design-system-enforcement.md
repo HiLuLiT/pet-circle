@@ -16,6 +16,29 @@ Single source of truth for design tokens and shared components. The PC v3 migrat
   - Feedback: `error`, `onError`, `success`, `warning`, `info`
   - Accents (each has a base + `*Tile` wash; purple also has `*Chip`/`*Ghost`): `accentPurple`/`accentPurpleTile`, `accentPeriwinkle`/`accentPeriwinkleTile`/`accentPeriwinkleChip`, `accentButter`/`accentButterTile`/`accentButterCream`, `accentBlush`/`accentBlushTile`, `accentMint`/`accentMintTile`
   - Status pills (bg/dot/text triplets — see `StatusBadgeStatus`): `statusNormal*`, `statusElevated*`, `statusAlert*`, `statusActive*`, `statusInvited*` (no dot for invited/active)
+  - Control surfaces: `disabledSurface`/`disabledOnSurface` (a disabled filled button — note `disabled` is a *content* colour, not a surface) and `knobFill` (a switch knob; NOT `surface`, which inverts)
+
+### Dark mode — "Warm Charcoal"
+
+Dark is a **per-role transform** of light, not an inversion, and it is a first-class palette: every
+one of the 51 semantic fields resolves to a `pcDark*` primitive. Rules when touching it:
+
+- NEVER reuse a light-mode pastel as a dark-mode *fill*. Each candy family has a dedicated dark tile
+  (`pcDark*Tile`, L\* 13-17) for backgrounds and a bright foreground (`pcDark*`) for icons/dots/text.
+  The light *tile* becomes the dark *foreground* — `accentPurple` is `pcPurpleTile` in dark.
+- NEVER add a field to `AppSemanticColors` without giving it a real dark value. 31 of 48 fields once
+  fell through to light, which is why every badge was a near-white chip on near-black.
+- Elevation is carried by the **surface ladder** (`pcDarkCanvas` → `Well` → `Surface` → `Elevated`),
+  not by shadow. Use `AppShadowTokens.smallOf(context)` / `mediumOf` / `largeOf` rather than the bare
+  `small`/`medium`/`large` lists, which are the light values.
+- Text has a **contrast ceiling**, not just a floor: `textPrimary` must stay in 14-16.5:1 on the
+  canvas. Pure white on near-black visually vibrates — that was the old theme's harshness, and
+  `test/theme/dark_contrast_test.dart` fails if it drifts back.
+- Hue is the invariant: surfaces stay in a 30-50deg warm band under 30% saturation, and a semantic
+  role's hue must not move more than ~6deg between light and dark.
+- Theme mode lives in `appThemeMode` (`ValueNotifier<ThemeMode>`, `lib/config/app_config.dart`),
+  persisted via `settingsStore.setThemeMode()`. Read it with a `ValueListenableBuilder`; never sample
+  `.value` in `build`.
 - For opacity use `.withValues(alpha: 0.5)` — NEVER the deprecated `.withOpacity()`.
 
 ### Typography
@@ -39,7 +62,7 @@ Single source of truth for design tokens and shared components. The PC v3 migrat
 - ALWAYS build `InputDecoration` via `appInputDecoration(context, hintText: ...)` (`lib/widgets/app_input_decoration.dart`) rather than hand-rolling a bordered decoration. Per the DS "Input" component, text fields are **borderless white** (`pcField` radius, no idle border) with a 2px `primary` focus ring — never re-add a hairline/divider border on idle. `hintText` is optional — omit it for call sites using a Material floating `labelText` instead (via `.copyWith(labelText: ...)`), since setting both to the same string renders it twice.
 
 ### Shadows
-- `AppShadowTokens.small/medium/large` — flat elevation levels. The old `AppShadows.neumorphicOuter/neumorphicInner` are **gone**; don't recreate neumorphic dual-shadows for new UI.
+- `AppShadowTokens.smallOf(context)` / `mediumOf` / `largeOf` — theme-aware resolvers; **prefer these in widgets**. The bare `small`/`medium`/`large` are the light values (4-8% black, invisible on a dark canvas); `darkSmall`/`darkMedium`/`darkLarge` are their dark counterparts. The old `AppShadows.neumorphicOuter/neumorphicInner` are **gone**; don't recreate neumorphic dual-shadows for new UI.
 
 ## Component Catalog (`lib/widgets/`) — search here before writing new UI
 
@@ -125,7 +148,7 @@ ALL user-facing text MUST use localized strings. No hardcoded text in widgets.
 ## Checklist for Every Code Change
 
 Before completing any edit to a `.dart` file:
-1. Colors from `AppSemanticColors.of(context)` — not `AppColorsTheme`, not hardcoded hex
+1. Colors from `AppSemanticColors.of(context)` — not `AppColorsTheme`, not hardcoded hex. A `Color(0x…)` literal outside `lib/theme/` is a bug: it renders unconditionally and so pins that pixel to light mode
 2. Spacing from `AppSpacingTokens` (pick one scale, `pc*` or legacy, and stay consistent within the widget)
 3. Border radii from `AppRadiiTokens` — no raw `BorderRadius.circular(N)`
 4. Text styles from `AppSemanticTextStyles` — not `AppTextStyles`, not a raw `TextStyle`
