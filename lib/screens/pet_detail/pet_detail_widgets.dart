@@ -48,7 +48,9 @@ class InfoTile extends StatelessWidget {
               children: [
                 Text(
                   value,
-                  style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
+                  style: AppSemanticTextStyles.headingLg.copyWith(
+                    color: c.textPrimary,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(label, style: AppSemanticTextStyles.caption),
@@ -88,12 +90,16 @@ class NoteCard extends StatelessWidget {
                   children: [
                     Text(
                       note.authorName,
-                      style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600),
+                      style: AppSemanticTextStyles.body.withWeight(
+                        FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(width: AppSpacingTokens.sm),
                     Text(
                       formatTimeAgo(note.createdAt, l10n),
-                      style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
+                      style: AppSemanticTextStyles.caption.copyWith(
+                        color: c.textPrimary,
+                      ),
                     ),
                   ],
                 ),
@@ -133,11 +139,13 @@ class MemberTile extends StatelessWidget {
               children: [
                 Text(
                   member.name,
-                  style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w500),
+                  style: AppSemanticTextStyles.body.withWeight(FontWeight.w500),
                 ),
                 Text(
                   roleLabel,
-                  style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
+                  style: AppSemanticTextStyles.caption.copyWith(
+                    color: c.textPrimary,
+                  ),
                 ),
               ],
             ),
@@ -169,17 +177,19 @@ class RoleBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = _color(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.sm + 2, vertical: AppSpacingTokens.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacingTokens.sm + 2,
+        vertical: AppSpacingTokens.xs,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
       ),
       child: Text(
         label,
-        style: AppSemanticTextStyles.caption.copyWith(
-          color: color,
-          fontWeight: FontWeight.w500,
-        ),
+        style: AppSemanticTextStyles.caption
+            .withWeight(FontWeight.w500)
+            .copyWith(color: color),
       ),
     );
   }

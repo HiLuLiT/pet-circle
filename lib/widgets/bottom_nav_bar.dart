@@ -103,8 +103,10 @@ class BottomNavBar extends StatelessWidget {
                                   tab.assetPath!,
                                   width: 24,
                                   height: 24,
-                                  colorFilter:
-                                      ColorFilter.mode(color, BlendMode.srcIn),
+                                  colorFilter: ColorFilter.mode(
+                                    color,
+                                    BlendMode.srcIn,
+                                  ),
                                 )
                               : Icon(
                                   isActive ? tab.activeIcon : tab.icon,
@@ -114,11 +116,9 @@ class BottomNavBar extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             labels[i],
-                            style: AppSemanticTextStyles.pcCaption.copyWith(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: color,
-                            ),
+                            style: AppSemanticTextStyles.pcCaption
+                                .withWeight(FontWeight.w600)
+                                .copyWith(fontSize: 11, color: color),
                           ),
                         ],
                       ),
@@ -136,9 +136,7 @@ class BottomNavBar extends StatelessWidget {
 
 @immutable
 class _TabDef {
-  const _TabDef.svg(this.assetPath)
-      : icon = null,
-        activeIcon = null;
+  const _TabDef.svg(this.assetPath) : icon = null, activeIcon = null;
 
   const _TabDef.icon(this.icon, this.activeIcon) : assetPath = null;
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/theme/tokens/shadows.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
@@ -86,13 +87,11 @@ void main() {
       });
 
       test('primaryLightest is correct', () {
-        expect(
-            AppPrimitives.primaryLightest, equals(const Color(0xFFE7E7FF)));
+        expect(AppPrimitives.primaryLightest, equals(const Color(0xFFE7E7FF)));
       });
 
       test('primaryLighter is correct', () {
-        expect(
-            AppPrimitives.primaryLighter, equals(const Color(0xFFC6C4FF)));
+        expect(AppPrimitives.primaryLighter, equals(const Color(0xFFC6C4FF)));
       });
 
       test('primaryLight is correct', () {
@@ -211,8 +210,11 @@ void main() {
         AppPrimitives.blueDarkest,
       ];
       for (final color in allColors) {
-        expect(color.alpha, equals(0xFF),
-            reason: 'Expected $color to be fully opaque');
+        expect(
+          color.alpha,
+          equals(0xFF),
+          reason: 'Expected $color to be fully opaque',
+        );
       }
     });
   });
@@ -277,18 +279,15 @@ void main() {
     });
 
     test('elevation increases: small < medium < large blurRadius', () {
-      final smallMax =
-          AppShadowTokens.small.map((s) => s.blurRadius).reduce(
-                (a, b) => a > b ? a : b,
-              );
-      final mediumMax =
-          AppShadowTokens.medium.map((s) => s.blurRadius).reduce(
-                (a, b) => a > b ? a : b,
-              );
-      final largeMax =
-          AppShadowTokens.large.map((s) => s.blurRadius).reduce(
-                (a, b) => a > b ? a : b,
-              );
+      final smallMax = AppShadowTokens.small
+          .map((s) => s.blurRadius)
+          .reduce((a, b) => a > b ? a : b);
+      final mediumMax = AppShadowTokens.medium
+          .map((s) => s.blurRadius)
+          .reduce((a, b) => a > b ? a : b);
+      final largeMax = AppShadowTokens.large
+          .map((s) => s.blurRadius)
+          .reduce((a, b) => a > b ? a : b);
       expect(smallMax, lessThanOrEqualTo(mediumMax));
       expect(mediumMax, lessThanOrEqualTo(largeMax));
     });
@@ -339,28 +338,38 @@ void main() {
 
     group('BorderRadius getters', () {
       test('borderRadiusSm returns BorderRadius.circular(4)', () {
-        expect(AppRadiiTokens.borderRadiusSm,
-            equals(BorderRadius.circular(AppRadiiTokens.sm)));
+        expect(
+          AppRadiiTokens.borderRadiusSm,
+          equals(BorderRadius.circular(AppRadiiTokens.sm)),
+        );
       });
 
       test('borderRadiusMd returns BorderRadius.circular(8)', () {
-        expect(AppRadiiTokens.borderRadiusMd,
-            equals(BorderRadius.circular(AppRadiiTokens.md)));
+        expect(
+          AppRadiiTokens.borderRadiusMd,
+          equals(BorderRadius.circular(AppRadiiTokens.md)),
+        );
       });
 
       test('borderRadiusLg returns BorderRadius.circular(16)', () {
-        expect(AppRadiiTokens.borderRadiusLg,
-            equals(BorderRadius.circular(AppRadiiTokens.lg)));
+        expect(
+          AppRadiiTokens.borderRadiusLg,
+          equals(BorderRadius.circular(AppRadiiTokens.lg)),
+        );
       });
 
       test('borderRadiusXl returns BorderRadius.circular(48)', () {
-        expect(AppRadiiTokens.borderRadiusXl,
-            equals(BorderRadius.circular(AppRadiiTokens.xl)));
+        expect(
+          AppRadiiTokens.borderRadiusXl,
+          equals(BorderRadius.circular(AppRadiiTokens.xl)),
+        );
       });
 
       test('borderRadiusFull returns BorderRadius.circular(1000)', () {
-        expect(AppRadiiTokens.borderRadiusFull,
-            equals(BorderRadius.circular(AppRadiiTokens.full)));
+        expect(
+          AppRadiiTokens.borderRadiusFull,
+          equals(BorderRadius.circular(AppRadiiTokens.full)),
+        );
       });
     });
   });
@@ -378,12 +387,14 @@ void main() {
       });
 
       test('title1NormalBold is bold', () {
-        expect(AppTypography.title1NormalBold.fontWeight, equals(FontWeight.w700));
+        expect(
+          AppTypography.title1NormalBold.fontWeight,
+          equals(FontWeight.w700),
+        );
       });
 
       test('title1NormalBold height is 56/48', () {
-        expect(AppTypography.title1NormalBold.height,
-            closeTo(56 / 48, 0.001));
+        expect(AppTypography.title1NormalBold.height, closeTo(56 / 48, 0.001));
       });
 
       test('title2NormalBold has fontSize 32', () {
@@ -402,12 +413,17 @@ void main() {
       });
 
       test('largeNoneMedium has w500', () {
-        expect(AppTypography.largeNoneMedium.fontWeight, equals(FontWeight.w500));
+        expect(
+          AppTypography.largeNoneMedium.fontWeight,
+          equals(FontWeight.w500),
+        );
       });
 
       test('largeNoneRegular has w400', () {
         expect(
-            AppTypography.largeNoneRegular.fontWeight, equals(FontWeight.w400));
+          AppTypography.largeNoneRegular.fontWeight,
+          equals(FontWeight.w400),
+        );
       });
 
       test('largeTightBold height is 20/18', () {
@@ -423,27 +439,31 @@ void main() {
       test('regularNoneBold has fontSize 16 and w700', () {
         expect(AppTypography.regularNoneBold.fontSize, equals(16));
         expect(
-            AppTypography.regularNoneBold.fontWeight, equals(FontWeight.w700));
+          AppTypography.regularNoneBold.fontWeight,
+          equals(FontWeight.w700),
+        );
       });
 
       test('regularNoneMedium has w500', () {
         expect(
-            AppTypography.regularNoneMedium.fontWeight, equals(FontWeight.w500));
+          AppTypography.regularNoneMedium.fontWeight,
+          equals(FontWeight.w500),
+        );
       });
 
       test('regularNoneRegular has w400', () {
-        expect(AppTypography.regularNoneRegular.fontWeight,
-            equals(FontWeight.w400));
+        expect(
+          AppTypography.regularNoneRegular.fontWeight,
+          equals(FontWeight.w400),
+        );
       });
 
       test('regularTightBold height is 20/16', () {
-        expect(
-            AppTypography.regularTightBold.height, closeTo(20 / 16, 0.001));
+        expect(AppTypography.regularTightBold.height, closeTo(20 / 16, 0.001));
       });
 
       test('regularNormalBold height is 24/16', () {
-        expect(
-            AppTypography.regularNormalBold.height, closeTo(24 / 16, 0.001));
+        expect(AppTypography.regularNormalBold.height, closeTo(24 / 16, 0.001));
       });
     });
 
@@ -455,7 +475,9 @@ void main() {
 
       test('smallNormalRegular height is 20/14', () {
         expect(
-            AppTypography.smallNormalRegular.height, closeTo(20 / 14, 0.001));
+          AppTypography.smallNormalRegular.height,
+          closeTo(20 / 14, 0.001),
+        );
       });
 
       test('smallTightMedium height is 16/14', () {
@@ -470,8 +492,7 @@ void main() {
       });
 
       test('tinyTightRegular height is 14/12', () {
-        expect(
-            AppTypography.tinyTightRegular.height, closeTo(14 / 12, 0.001));
+        expect(AppTypography.tinyTightRegular.height, closeTo(14 / 12, 0.001));
       });
 
       test('tinyNormalBold height is 16/12', () {
@@ -493,24 +514,139 @@ void main() {
         AppTypography.tinyNormalRegular,
       ];
       for (final style in styles) {
-        expect(style.fontFamily, equals(AppTypography.fontFamily),
-            reason: 'Expected $style to use Instrument Sans');
+        expect(
+          style.fontFamily,
+          equals(AppTypography.fontFamily),
+          reason: 'Expected $style to use Instrument Sans',
+        );
       }
     });
 
-    test('font sizes decrease: title1 > title2 > title3 > large > regular > small > tiny', () {
-      expect(AppTypography.title1NormalBold.fontSize,
-          greaterThan(AppTypography.title2NormalBold.fontSize!));
-      expect(AppTypography.title2NormalBold.fontSize,
-          greaterThan(AppTypography.title3NormalBold.fontSize!));
-      expect(AppTypography.title3NormalBold.fontSize,
-          greaterThan(AppTypography.largeNoneBold.fontSize!));
-      expect(AppTypography.largeNoneBold.fontSize,
-          greaterThan(AppTypography.regularNoneBold.fontSize!));
-      expect(AppTypography.regularNoneBold.fontSize,
-          greaterThan(AppTypography.smallNoneBold.fontSize!));
-      expect(AppTypography.smallNoneBold.fontSize,
-          greaterThan(AppTypography.tinyNoneBold.fontSize!));
+    test(
+      'font sizes decrease: title1 > title2 > title3 > large > regular > small > tiny',
+      () {
+        expect(
+          AppTypography.title1NormalBold.fontSize,
+          greaterThan(AppTypography.title2NormalBold.fontSize!),
+        );
+        expect(
+          AppTypography.title2NormalBold.fontSize,
+          greaterThan(AppTypography.title3NormalBold.fontSize!),
+        );
+        expect(
+          AppTypography.title3NormalBold.fontSize,
+          greaterThan(AppTypography.largeNoneBold.fontSize!),
+        );
+        expect(
+          AppTypography.largeNoneBold.fontSize,
+          greaterThan(AppTypography.regularNoneBold.fontSize!),
+        );
+        expect(
+          AppTypography.regularNoneBold.fontSize,
+          greaterThan(AppTypography.smallNoneBold.fontSize!),
+        );
+        expect(
+          AppTypography.smallNoneBold.fontSize,
+          greaterThan(AppTypography.tinyNoneBold.fontSize!),
+        );
+      },
+    );
+
+    // BUG-030: Instrument Sans is a variable font whose default instance is
+    // wght 400, and every per-weight file in pubspec.yaml is the same file.
+    // Flutter uses fontWeight only to pick a file, never to set an axis, so a
+    // style without a matching `wght` variation renders at Regular no matter
+    // what its fontWeight says.
+    group('variable-font wght axis', () {
+      /// Every public TextStyle token, via the same reflection-free list the
+      /// scale tests use: mirrors AppTypography's declared members.
+      final styles = <String, TextStyle>{
+        'pcDisplayXxlBold': AppTypography.pcDisplayXxlBold,
+        'pcDisplayXlBold': AppTypography.pcDisplayXlBold,
+        'pcDisplayLBold': AppTypography.pcDisplayLBold,
+        'pcDisplayMBold': AppTypography.pcDisplayMBold,
+        'pcHeadingH1Bold': AppTypography.pcHeadingH1Bold,
+        'pcHeadingH2Bold': AppTypography.pcHeadingH2Bold,
+        'pcHeadingXsBold': AppTypography.pcHeadingXsBold,
+        'pcLabelLBold': AppTypography.pcLabelLBold,
+        'pcLabelLSemibold': AppTypography.pcLabelLSemibold,
+        'pcLabelLRegular': AppTypography.pcLabelLRegular,
+        'pcLabelRegular': AppTypography.pcLabelRegular,
+        'pcLabelMedium': AppTypography.pcLabelMedium,
+        'pcLabelSemibold': AppTypography.pcLabelSemibold,
+        'pcLabelBold': AppTypography.pcLabelBold,
+        'pcLabelSBold': AppTypography.pcLabelSBold,
+        'pcLabelSSemibold': AppTypography.pcLabelSSemibold,
+        'pcLabelSRegular': AppTypography.pcLabelSRegular,
+        'pcBodyRegular': AppTypography.pcBodyRegular,
+        'pcBodyMedium': AppTypography.pcBodyMedium,
+        'pcBodySemibold': AppTypography.pcBodySemibold,
+        'pcBodyBold': AppTypography.pcBodyBold,
+        'pcCaptionBold': AppTypography.pcCaptionBold,
+        'pcCaptionMedium': AppTypography.pcCaptionMedium,
+        'pcCaptionRegular': AppTypography.pcCaptionRegular,
+        'pcCaptionTagBold': AppTypography.pcCaptionTagBold,
+        'pcCaptionXsBold': AppTypography.pcCaptionXsBold,
+        'title1NormalBold': AppTypography.title1NormalBold,
+        'title2NormalBold': AppTypography.title2NormalBold,
+        'title3NormalBold': AppTypography.title3NormalBold,
+        'largeNormalBold': AppTypography.largeNormalBold,
+        'largeNormalMedium': AppTypography.largeNormalMedium,
+        'largeNormalRegular': AppTypography.largeNormalRegular,
+        'regularNormalBold': AppTypography.regularNormalBold,
+        'regularNormalMedium': AppTypography.regularNormalMedium,
+        'regularNormalRegular': AppTypography.regularNormalRegular,
+        'smallNormalBold': AppTypography.smallNormalBold,
+        'smallNormalMedium': AppTypography.smallNormalMedium,
+        'smallNormalRegular': AppTypography.smallNormalRegular,
+        'tinyNormalBold': AppTypography.tinyNormalBold,
+        'tinyNormalMedium': AppTypography.tinyNormalMedium,
+        'tinyNormalRegular': AppTypography.tinyNormalRegular,
+      };
+
+      test('every style sets a wght axis matching its fontWeight', () {
+        for (final entry in styles.entries) {
+          final style = entry.value;
+          final variations = style.fontVariations;
+          expect(
+            variations,
+            isNotNull,
+            reason:
+                '${entry.key} has no fontVariations, so its '
+                'fontWeight is decorative and it renders at wght 400',
+          );
+          final wght = variations!.firstWhere((v) => v.axis == 'wght');
+          expect(
+            wght.value,
+            style.fontWeight!.value.toDouble(),
+            reason: '${entry.key}: wght axis disagrees with fontWeight',
+          );
+        }
+      });
+
+      test('every style pins wdth to 100, matching the Figma DS', () {
+        for (final entry in styles.entries) {
+          final wdth = entry.value.fontVariations!.firstWhere(
+            (v) => v.axis == 'wdth',
+          );
+          expect(wdth.value, 100.0, reason: entry.key);
+        }
+      });
+
+      test('axesFor clamps to the font\'s 400-700 wght range', () {
+        expect(AppTypography.axesFor(FontWeight.w100).first.value, 400.0);
+        expect(AppTypography.axesFor(FontWeight.w600).first.value, 600.0);
+        expect(AppTypography.axesFor(FontWeight.w900).first.value, 700.0);
+      });
+
+      test('withWeight moves fontWeight and the wght axis together', () {
+        final bolded = AppTypography.pcBodyRegular.withWeight(FontWeight.w700);
+        expect(bolded.fontWeight, FontWeight.w700);
+        expect(
+          bolded.fontVariations!.firstWhere((v) => v.axis == 'wght').value,
+          700.0,
+        );
+      });
     });
   });
 }

@@ -44,10 +44,9 @@ class SettingsRow extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: AppSemanticTextStyles.body.copyWith(
-                      color: c.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: AppSemanticTextStyles.body
+                        .withWeight(FontWeight.w600)
+                        .copyWith(color: c.textPrimary),
                   ),
                   if (description != null) ...[
                     const SizedBox(height: AppSpacingTokens.xs),

@@ -92,112 +92,123 @@ class _CircleContent extends StatelessWidget {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
           child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.people, size: 24, color: c.primary),
-              const SizedBox(width: AppSpacingTokens.sm),
+              Row(
+                children: [
+                  Icon(Icons.people, size: 24, color: c.primary),
+                  const SizedBox(width: AppSpacingTokens.sm),
+                  Expanded(
+                    child: Text(
+                      l10n.circleTitle(petName),
+                      style: AppSemanticTextStyles.title3,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacingTokens.sm,
+                      vertical: AppSpacingTokens.xs,
+                    ),
+                    decoration: BoxDecoration(
+                      color: c.primaryLightest,
+                      borderRadius: BorderRadius.circular(
+                        AppRadiiTokens.sm + 8,
+                      ),
+                    ),
+                    child: Text(
+                      '${members.length}',
+                      style: AppSemanticTextStyles.caption
+                          .withWeight(FontWeight.w600)
+                          .copyWith(color: c.primary),
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: AppSpacingTokens.lg),
+
+              // Member list — always show all members including the owner
               Expanded(
-                child: Text(
-                  l10n.circleTitle(petName),
-                  style: AppSemanticTextStyles.title3,
+                child: ListView(
+                  children: [
+                    ...members.map(
+                      (member) => Padding(
+                        padding: const EdgeInsets.only(
+                          bottom: AppSpacingTokens.sm,
+                        ),
+                        child: _MemberTile(
+                          member: member,
+                          isOwner: isOwner,
+                          onRemove:
+                              isOwner && member.role != CareCircleRole.owner
+                              ? () => _confirmRemove(context, member)
+                              : null,
+                        ),
+                      ),
+                    ),
+                    // Invite prompt when the owner is the only member
+                    if (members.length <= 1 && pendingInvites.isEmpty) ...[
+                      const SizedBox(height: AppSpacingTokens.lg),
+                      Center(
+                        child: Text(
+                          l10n.circleEmptyDescription(petName),
+                          style: AppSemanticTextStyles.body.copyWith(
+                            color: c.textSecondary,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                    if (pendingInvites.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacingTokens.lg),
+                      Text(
+                        l10n.pendingInvites,
+                        style: AppSemanticTextStyles.headingLg,
+                      ),
+                      const SizedBox(height: AppSpacingTokens.sm),
+                      ...pendingInvites.map(
+                        (invite) => Padding(
+                          padding: const EdgeInsets.only(
+                            bottom: AppSpacingTokens.sm,
+                          ),
+                          child: _PendingInviteTile(
+                            email: invite.invitedEmail,
+                            expiresAt: invite.expiresAt,
+                            onCancel: isOwner
+                                ? () => _cancelInvite(context, invite.token)
+                                : null,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacingTokens.sm,
-                  vertical: AppSpacingTokens.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: c.primaryLightest,
-                  borderRadius: BorderRadius.circular(AppRadiiTokens.sm + 8),
-                ),
-                child: Text(
-                  '${members.length}',
-                  style: AppSemanticTextStyles.caption.copyWith(
-                    color: c.primary,
-                    fontWeight: FontWeight.w600,
+
+              // Invite button (owner only)
+              if (isOwner)
+                SafeArea(
+                  top: false,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: AppSpacingTokens.md),
+                    child: PrimaryButton(
+                      label: l10n.inviteToCircle,
+                      icon: Icons.person_add_alt_1,
+                      onPressed: () => _showInviteSheet(context),
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
-
-          const SizedBox(height: AppSpacingTokens.lg),
-
-          // Member list — always show all members including the owner
-          Expanded(
-            child: ListView(
-              children: [
-                ...members.map((member) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacingTokens.sm),
-                  child: _MemberTile(
-                    member: member,
-                    isOwner: isOwner,
-                    onRemove: isOwner && member.role != CareCircleRole.owner
-                        ? () => _confirmRemove(context, member)
-                        : null,
-                  ),
-                )),
-                // Invite prompt when the owner is the only member
-                if (members.length <= 1 && pendingInvites.isEmpty) ...[
-                  const SizedBox(height: AppSpacingTokens.lg),
-                  Center(
-                    child: Text(
-                      l10n.circleEmptyDescription(petName),
-                      style: AppSemanticTextStyles.body.copyWith(
-                        color: c.textSecondary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                ],
-                if (pendingInvites.isNotEmpty) ...[
-                  const SizedBox(height: AppSpacingTokens.lg),
-                  Text(
-                    l10n.pendingInvites,
-                    style: AppSemanticTextStyles.headingLg,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.sm),
-                  ...pendingInvites.map((invite) => Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: AppSpacingTokens.sm,
-                    ),
-                    child: _PendingInviteTile(
-                      email: invite.invitedEmail,
-                      expiresAt: invite.expiresAt,
-                      onCancel: isOwner
-                          ? () => _cancelInvite(context, invite.token)
-                          : null,
-                    ),
-                  )),
-                ],
-              ],
-            ),
-          ),
-
-          // Invite button (owner only)
-          if (isOwner)
-            SafeArea(
-              top: false,
-              child: Padding(
-                padding: const EdgeInsets.only(top: AppSpacingTokens.md),
-                child: PrimaryButton(
-                  label: l10n.inviteToCircle,
-                  icon: Icons.person_add_alt_1,
-                  onPressed: () => _showInviteSheet(context),
-                ),
-              ),
-            ),
-        ],
-      ),
         ),
       ),
     );
   }
 
-  Future<void> _confirmRemove(BuildContext context, CareCircleMember member) async {
+  Future<void> _confirmRemove(
+    BuildContext context,
+    CareCircleMember member,
+  ) async {
     final l10n = AppLocalizations.of(context)!;
     final c = AppSemanticColors.of(context);
     final confirmed = await showDialog<bool>(
@@ -220,15 +231,21 @@ class _CircleContent extends StatelessWidget {
     );
     if (confirmed == true) {
       try {
-        debugPrint('[CircleScreen] Removing member: name="${member.name}", uid="${member.uid}", pet="$petName"');
-        await petStore.removeCareCircleMemberByUid(petName, member.uid, member.name);
+        debugPrint(
+          '[CircleScreen] Removing member: name="${member.name}", uid="${member.uid}", pet="$petName"',
+        );
+        await petStore.removeCareCircleMemberByUid(
+          petName,
+          member.uid,
+          member.name,
+        );
         debugPrint('[CircleScreen] Remove succeeded');
       } catch (e) {
         debugPrint('[CircleScreen] Remove failed: $e');
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.failedToRemoveMember)),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.failedToRemoveMember)));
       }
     }
   }
@@ -293,10 +310,14 @@ class _EmptyCircle extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacingTokens.sm),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.xl),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacingTokens.xl,
+              ),
               child: Text(
                 l10n.circleEmptyDescription(petName),
-                style: AppSemanticTextStyles.body.copyWith(color: c.textSecondary),
+                style: AppSemanticTextStyles.body.copyWith(
+                  color: c.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -350,11 +371,7 @@ class _MemberTile extends StatelessWidget {
       ),
       child: Row(
         children: [
-          UserAvatar(
-            name: member.name,
-            imageUrl: member.avatarUrl,
-            size: 40,
-          ),
+          UserAvatar(name: member.name, imageUrl: member.avatarUrl, size: 40),
           const SizedBox(width: AppSpacingTokens.md),
           Expanded(
             child: Column(
@@ -362,9 +379,7 @@ class _MemberTile extends StatelessWidget {
               children: [
                 Text(
                   member.name,
-                  style: AppSemanticTextStyles.body.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppSemanticTextStyles.body.withWeight(FontWeight.w600),
                 ),
                 Text(
                   roleLabel,
@@ -603,10 +618,7 @@ class _InviteSheetState extends State<_InviteSheet> {
             ),
           ),
           const SizedBox(height: AppSpacingTokens.lg),
-          Text(
-            l10n.inviteToCircle,
-            style: AppSemanticTextStyles.title3,
-          ),
+          Text(l10n.inviteToCircle, style: AppSemanticTextStyles.title3),
           const SizedBox(height: AppSpacingTokens.sm),
           Text(
             l10n.inviteDescription(widget.petName),
@@ -667,10 +679,7 @@ class _InviteSuccess extends StatelessWidget {
         children: [
           Icon(Icons.check_circle, color: c.primary, size: 40),
           const SizedBox(height: AppSpacingTokens.sm),
-          Text(
-            l10n.inviteSent,
-            style: AppSemanticTextStyles.headingLg,
-          ),
+          Text(l10n.inviteSent, style: AppSemanticTextStyles.headingLg),
           const SizedBox(height: AppSpacingTokens.xs),
           Text(
             l10n.inviteLinkCopied,

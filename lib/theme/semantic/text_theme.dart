@@ -38,10 +38,8 @@ class AppSemanticTextStyles {
 
   // ── Title — retired DS-less 19px scale; now maps onto Heading ───────────
   static const TextStyle pcTitle = headingXs;
-  static final TextStyle pcTitleSecondary =
-      AppTypography.pcLabelLSemibold.copyWith(
-    color: AppPrimitives.pcInkTertiary,
-  );
+  static final TextStyle pcTitleSecondary = AppTypography.pcLabelLSemibold
+      .copyWith(color: AppPrimitives.pcInkTertiary);
 
   // ── Body (16px / line-height 24) ────────────────────────────────────────
   static const TextStyle pcBody = AppTypography.pcBodyRegular;
@@ -72,17 +70,14 @@ class AppSemanticTextStyles {
 
   // ── Caption (12px / line-height 16) ─────────────────────────────────────
   static const TextStyle captionBold = AppTypography.pcCaptionBold;
-  static final TextStyle captionMedium =
-      AppTypography.pcCaptionMedium.copyWith(
+  static final TextStyle captionMedium = AppTypography.pcCaptionMedium.copyWith(
     color: AppPrimitives.pcInkTertiary,
   );
   static final TextStyle pcCaption = AppTypography.pcCaptionRegular.copyWith(
     color: AppPrimitives.pcInkTertiary,
   );
-  static final TextStyle pcCaptionMuted =
-      AppTypography.pcCaptionRegular.copyWith(
-    color: AppPrimitives.pcInkTertiary,
-  );
+  static final TextStyle pcCaptionMuted = AppTypography.pcCaptionRegular
+      .copyWith(color: AppPrimitives.pcInkTertiary);
 
   // ── Button (16px bold, matches DS Button component text) ───────────────
   static const TextStyle pcButton = AppTypography.pcHeadingXsBold;
@@ -118,4 +113,16 @@ class AppSemanticTextStyles {
 
   // ── Caption ──────────────────────────────────────────────────────────────
   static const TextStyle caption = AppTypography.pcCaptionRegular;
+}
+
+/// Keeps [TextStyle.fontWeight] and the Instrument Sans `wght` axis in sync.
+///
+/// Plain `copyWith(fontWeight: ...)` cannot change the rendered weight of a
+/// variable font — the `fontVariations` already on the style take precedence.
+/// Use this instead.
+extension AppTextStyleWeight on TextStyle {
+  TextStyle withWeight(FontWeight weight) => copyWith(
+    fontWeight: weight,
+    fontVariations: AppTypography.axesFor(weight),
+  );
 }

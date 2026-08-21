@@ -87,13 +87,27 @@ flutter:
     - assets/figma/
     - assets/fonts/
 
-  # Instrument Sans is bundled locally (all 4 weights + italics) so text
-  # renders correctly and consistently offline. AppTypography's TextStyles
-  # reference fontFamily: 'Instrument Sans' directly, resolved entirely from
-  # this registration — do not add a google_fonts runtime fetch for the same
-  # family name; a prior version of this app did, and having two font
-  # sources registered under one family name caused Flutter Web's font
-  # matching to intermittently resolve bold text to a lighter weight.
+  # Instrument Sans is bundled locally so text renders correctly offline —
+  # AppTypography's TextStyles reference fontFamily: 'Instrument Sans'
+  # directly, which only resolves via this registration. Without it, that
+  # name only exists if a runtime network fetch happens to succeed; if it's
+  # slow, blocked, or fails, every explicit 'Instrument Sans' TextStyle
+  # silently falls back to the platform default font, which renders visibly
+  # smaller/thinner at the same declared size.
+  #
+  # Do NOT add a google_fonts runtime fetch for this same family name. A
+  # prior version did, and having two font sources registered under one
+  # family made Flutter Web's font matching intermittently resolve bold text
+  # to a lighter weight.
+  #
+  # IMPORTANT: the eight entries below are only TWO distinct files — one
+  # upright variable font and one italic, each registered four times. They
+  # are variable fonts (axes wght 400-700, wdth 75-100), NOT a static
+  # instance per weight. The `weight:` keys only tell Flutter which file to
+  # pick — they do NOT set the wght axis, and the font's default instance is
+  # 400. So weight must be applied in code via `fontVariations`; see the axis
+  # tokens in lib/theme/tokens/typography.dart and BUG-030 in
+  # docs/bug-log.md. Do not rely on `fontWeight` alone.
   fonts:
     - family: Instrument Sans
       fonts:
