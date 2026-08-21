@@ -54,7 +54,7 @@ void main() {
   });
 
   // Regression: the fixed-height hero + text block used to overflow a short
-  // viewport by 16px (BUG-029). The layout must scroll instead of overflowing.
+  // viewport by 16px (BUG-043). The layout must scroll instead of overflowing.
   testWidgets('LandingScreen does not overflow a short viewport', (
     WidgetTester tester,
   ) async {
@@ -98,7 +98,7 @@ void main() {
       expect(heartTransform(), isNot(before));
     });
 
-    // Regression (BUG-033): the beat, drift and breath used to share one 4.2s
+    // Regression (BUG-047): the beat, drift and breath used to share one 4.2s
     // controller. At the authored tempo of 0.7 a beat lasts 2.0s, so 4.2s is
     // 2.1 beats and the restart landed 89% up the first thump — the heart
     // snapped ~7px back to rest once per loop. Each clock now wraps on its own

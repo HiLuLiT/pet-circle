@@ -106,7 +106,7 @@ flutter:
   # instance per weight. The `weight:` keys only tell Flutter which file to
   # pick — they do NOT set the wght axis, and the font's default instance is
   # 400. So weight must be applied in code via `fontVariations`; see the axis
-  # tokens in lib/theme/tokens/typography.dart and BUG-030 in
+  # tokens in lib/theme/tokens/typography.dart and BUG-044 in
   # docs/bug-log.md. Do not rely on `fontWeight` alone.
   fonts:
     - family: Instrument Sans

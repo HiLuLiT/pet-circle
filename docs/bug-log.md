@@ -934,9 +934,9 @@ Consequences:
   however it got that way, which is what a guard should do.
 
 
-## BUG-032: `welcome_illustration.png` is an SVG with a `.png` extension
+## BUG-046: `welcome_illustration.png` is an SVG with a `.png` extension
 
-- **Found during:** the new `test/assets/asset_integrity_test.dart` guard added after BUG-031 — it failed on its first run.
+- **Found during:** the new `test/assets/asset_integrity_test.dart` guard added after BUG-045 — it failed on its first run.
 - **Severity:** Low
 - **Status:** Fixed
 - **Symptom:** No user-visible symptom today, because nothing references the file. Any future
@@ -950,7 +950,7 @@ Consequences:
 - **Files changed:** `assets/figma/welcome_illustration.png` -> `assets/figma/welcome_illustration.svg`
 - **Follow-up:** The file is unreferenced in `lib/` and `test/`. Delete it, or wire it up.
 
-## BUG-033: Hero heartbeat snapped back to rest once per loop
+## BUG-047: Hero heartbeat snapped back to rest once per loop
 
 - **Found during:** manual review of the landing screen after the animation's `tempo` was retuned in the Claude Design source; reported as "the loop is cut in a jumpy place".
 - **Severity:** Medium

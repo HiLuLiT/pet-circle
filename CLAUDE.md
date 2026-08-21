@@ -188,7 +188,7 @@ the primary.
 `pubspec.yaml` only pick a *file* — they do not set `wght`, whose default instance is 400.
 Weight comes from `fontVariations` only (see `AppTypography.axesBold` / `axesFor()`), never from
 `fontWeight` alone. Using `.copyWith(fontWeight: ...)` on a semantic style silently drops back to
-400; use the `withWeight()` extension instead. This was BUG-030 — see `docs/bug-log.md`.
+400; use the `withWeight()` extension instead. This was BUG-044 — see `docs/bug-log.md`.
 
 **Scale (aligned to Figma DS node 402-1191):** Display (`pcDisplayXxl/Xl/L`, `pcDisplay`), Heading
 (`headingH1` 24/32, `headingH2` 20/28, `headingXs` 16/22), Label L 15px, Label M 14px, Label S 13px,

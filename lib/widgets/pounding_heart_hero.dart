@@ -23,7 +23,7 @@ import 'package:pet_circle/widgets/app_image.dart';
 /// Motion changes are a numbers diff and safe to port. Artwork changes are not:
 /// the design exports at 1x, and image bytes cannot round-trip through an
 /// agent's context without corruption, so prefer the higher-resolution copy
-/// already committed here. See BUG-031.
+/// already committed here. See BUG-045.
 ///
 /// Two deliberate departures from the design preview:
 ///  * The preview's `scale(1.75)` and `translateY(8px)` only sized the artwork
@@ -97,7 +97,7 @@ class _PoundingHeartHeroState extends State<PoundingHeartHero>
   /// 4.2s is exactly three 1.4s beats. That holds only at `tempo == 1`. At the
   /// authored tempo of 0.7 a beat lasts 2.0s, so 4.2s is 2.1 beats and the
   /// wrap landed at phase 0.0995 — 89% up the first thump, snapping the heart
-  /// from +7% swell and -4.4px of lift straight back to rest. See BUG-033.
+  /// from +7% swell and -4.4px of lift straight back to rest. See BUG-047.
   late final AnimationController _beat = AnimationController(
     vsync: this,
     duration: _beatCycle,

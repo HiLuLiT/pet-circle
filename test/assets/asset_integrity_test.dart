@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 /// Guards against committing an image that a browser will happily render but
 /// Flutter's decoder will not.
 ///
-/// This exists because of BUG-031: `welcome_heart.png` arrived from the design
+/// This exists because of BUG-045: `welcome_heart.png` arrived from the design
 /// project with a corrupt IDAT CRC32 and a bad trailing adler32. Chrome ignores
 /// PNG checksums by design, so the animation looked fine in the web preview —
 /// but Skia rejects them, and [AppImage] swallows decode failures to show its
@@ -21,15 +21,13 @@ void main() {
     final dir = Directory('assets/figma');
     expect(dir.existsSync(), isTrue, reason: 'assets/figma is missing');
 
-    final images = dir
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where((f) {
-          final p = f.path.toLowerCase();
-          return p.endsWith('.png') || p.endsWith('.jpg') ||
-              p.endsWith('.jpeg') || p.endsWith('.webp');
-        })
-        .toList();
+    final images = dir.listSync(recursive: true).whereType<File>().where((f) {
+      final p = f.path.toLowerCase();
+      return p.endsWith('.png') ||
+          p.endsWith('.jpg') ||
+          p.endsWith('.jpeg') ||
+          p.endsWith('.webp');
+    }).toList();
 
     expect(images, isNotEmpty, reason: 'no raster assets found to verify');
 
@@ -45,7 +43,7 @@ void main() {
         frame.image.dispose();
         codec.dispose();
       } on Object catch (e) {
-        // The BUG-031 signature is a zlib "incorrect data check" here.
+        // The BUG-045 signature is a zlib "incorrect data check" here.
         failures.add('${file.path}: $e');
       }
     }
