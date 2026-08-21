@@ -950,6 +950,36 @@ Consequences:
 - **Files changed:** `assets/figma/welcome_illustration.png` -> `assets/figma/welcome_illustration.svg`
 - **Follow-up:** The file is unreferenced in `lib/` and `test/`. Delete it, or wire it up.
 
+## BUG-033: Hero heartbeat snapped back to rest once per loop
+
+- **Found during:** manual review of the landing screen after the animation's `tempo` was retuned in the Claude Design source; reported as "the loop is cut in a jumpy place".
+- **Severity:** Medium
+- **Status:** Fixed
+- **Symptom:** Every 4.2s the heart jumped — mid-swell it snapped instantly back to its resting
+  size and position, then began a fresh beat. The motion itself was correct; only the seam was wrong.
+- **Root cause:** One `AnimationController` drove the beat, the drift and the dog's breath from a
+  single 4.2s clock. That was chosen because 4.2s is exactly three 1.4s beats — but `tempo` scales
+  the beat and nothing else, so at the authored `tempo = 0.7` a beat lasts `1.4 / 0.7` = 2.0s and
+  4.2s is **2.1** beats. The restart therefore landed at beat phase 0.0995 — 89% of the way up the
+  first thump — discarding a `+7%` scale and `-4.4px` lift in one frame. The 6.2s drift, which does
+  not divide 4.2s either, snapped a further 2.6px. Sampled at 16ms, the worst single-frame jump was
+  4.5px against 0.3px for ordinary motion.
+  The stale premise was asserted in a code comment that was written when `tempo` was 1 and never
+  rechecked when the tuned value landed.
+- **Fix:** Gave each rhythm its own repeating controller instead of a shared scene clock. The beat
+  controller's period is `1.4 / tempo`, so it always wraps at phase 1.0 where both thumps have
+  ended (they finish at 0.4) and the heart is at rest. The slow controller runs 130.2s — the LCM of
+  the 6.2s drift and 4.2s breath — so those complete 21 and 31 whole cycles. `tempo` changes
+  re-period the beat via `didUpdateWidget`. This required `TickerProviderStateMixin` in place of
+  `SingleTickerProviderStateMixin`; keeping the latter threw
+  "multiple tickers were created" and failed to build the widget at all.
+- **Files changed:** `lib/widgets/pounding_heart_hero.dart`, `test/widget_test.dart`
+- **Regression test:** `animated hero loops without a visible jump` sweeps 5s at 16ms steps and
+  asserts no single frame moves the heart more than 1.0px. Replaying the old formula at the same
+  sampling yields 4.5px, so the test discriminates.
+- **Note:** The design preview has the same seam — it restarts a shared 4.2s scene clock. Divergence
+  is deliberate: an infinite loop should be continuous, and only the app loops forever.
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

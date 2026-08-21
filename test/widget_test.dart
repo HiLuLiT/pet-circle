@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -91,9 +92,55 @@ void main() {
           .reduce((a, b) => a * b as Matrix4);
 
       final before = heartTransform();
-      // A quarter of the 1.4s beat lands mid-thump.
-      await tester.pump(const Duration(milliseconds: 350));
+      // The default tempo of 0.7 stretches the 1.4s beat to 2.0s of
+      // wall-clock, so 160ms lands mid-thump.
+      await tester.pump(const Duration(milliseconds: 160));
       expect(heartTransform(), isNot(before));
+    });
+
+    // Regression (BUG-033): the beat, drift and breath used to share one 4.2s
+    // controller. At the authored tempo of 0.7 a beat lasts 2.0s, so 4.2s is
+    // 2.1 beats and the restart landed 89% up the first thump — the heart
+    // snapped ~7px back to rest once per loop. Each clock now wraps on its own
+    // boundary, so no frame may jump further than ordinary motion does.
+    testWidgets('loops without a visible jump', (WidgetTester tester) async {
+      useViewport(tester, const Size(1080, 1920));
+
+      await tester.pumpWidget(_app());
+      await tester.pump();
+
+      // storage[13] is the accumulated y translation — the axis the snap was
+      // on (lift + drift both move the heart vertically).
+      double y() => tester
+          .widgetList<Transform>(
+            find.descendant(
+              of: find.byType(PoundingHeartHero),
+              matching: find.byType(Transform),
+            ),
+          )
+          .map((t) => t.transform)
+          .reduce((a, b) => a * b as Matrix4)
+          .storage[13];
+
+      // Sweep past where the old 4.2s restart fell, sampling finely enough
+      // that a one-frame discontinuity cannot hide between samples.
+      const step = Duration(milliseconds: 16);
+      var previous = y();
+      var worst = 0.0;
+      for (
+        var elapsed = Duration.zero;
+        elapsed < const Duration(seconds: 5);
+        elapsed += step
+      ) {
+        await tester.pump(step);
+        final current = y();
+        worst = math.max(worst, (current - previous).abs());
+        previous = current;
+      }
+
+      // A thump moves the heart ~0.3px per 16ms frame at its fastest; the old
+      // restart moved it ~7px in one frame.
+      expect(worst, lessThan(1.0));
     });
 
     testWidgets('holds a still frame when animations are disabled', (

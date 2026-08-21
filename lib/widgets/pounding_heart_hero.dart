@@ -25,14 +25,16 @@ import 'package:pet_circle/widgets/app_image.dart';
 /// agent's context without corruption, so prefer the higher-resolution copy
 /// already committed here. See BUG-031.
 ///
-/// One deliberate departure from the design preview:
+/// Two deliberate departures from the design preview:
 ///  * The preview's `scale(1.75)` and `translateY(8px)` only sized the artwork
 ///    to fill its 640x360 preview stage, so they are dropped — here the hero
 ///    renders at its natural [heroWidth] x [heroHeight].
-/// Playback follows the authored scene exactly: `OM_SCENES` declares a single
-/// 4.2s "Heartbeat" section and `OM_PLAYBACK` is `{"mode":"loop"}`, so this
-/// loops every [_loopSeconds] = 4.2s. See that constant for why the wrap is
-/// clean enough not to need the longer cycle this once used.
+///  * The preview restarts every 4.2s (`OM_SCENES` declares one 4.2s
+///    "Heartbeat" section, `OM_PLAYBACK` is `{"mode":"loop"}`). Restarting a
+///    shared clock cannot be seamless here, because the beat, the drift and
+///    the dog's breath have periods that share no useful common multiple once
+///    [tempo] scales the beat — so each is driven by its own repeating
+///    controller instead. See [_beatCycle] and [_slowLoopSeconds].
 class PoundingHeartHero extends StatefulWidget {
   const PoundingHeartHero({
     super.key,
@@ -62,7 +64,7 @@ class PoundingHeartHero extends StatefulWidget {
 }
 
 class _PoundingHeartHeroState extends State<PoundingHeartHero>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   // ── Timing, all from heart-scene.jsx ──────────────────────────────────────
 
   /// One heartbeat cycle.
@@ -76,23 +78,36 @@ class _PoundingHeartHeroState extends State<PoundingHeartHero>
   static const double _breathPeriod = 4.2;
   static const double _breathAmp = 0.004;
 
-  /// The authored loop length, from `OM_SCENES` in
-  /// `Pounding Heart standalone-src.dc.html`: one 4.2s "Heartbeat" section,
-  /// with `OM_PLAYBACK` set to loop.
-  ///
-  /// 4.2 is an exact multiple of both the 1.4s beat (3 beats — matching the
-  /// scene's own "pounds gently three times") and the 4.2s dog breath, so both
-  /// wrap seamlessly. Only the 6.2s drift is cut mid-cycle, and it contributes
-  /// at most `2.2 * 0.3` = 0.66px here, so that discontinuity is sub-pixel.
-  ///
-  /// An earlier version ran the 651/5-second LCM of all three periods to avoid
-  /// even that cut. It diverged from the design for no visible gain — prefer
-  /// the authored value.
-  static const double _loopSeconds = 4.2;
+  /// Loop length for the slow motion: the LCM of the drift and breath periods,
+  /// so both complete a whole number of cycles (21 and 31) and the wrap is
+  /// exact rather than merely small.
+  static const double _slowLoopSeconds = 130.2;
 
-  late final AnimationController _controller = AnimationController(
+  /// One heartbeat in wall-clock seconds. [PoundingHeartHero.tempo] scales the
+  /// beat and nothing else, so it belongs in this clock's period rather than
+  /// inside the phase maths — that way the controller wraps exactly on a beat
+  /// boundary at any tempo.
+  Duration get _beatCycle =>
+      Duration(microseconds: (_period / widget.tempo * 1e6).round());
+
+  /// Drives the heartbeat. Wraps at phase 1.0, where both thumps have long
+  /// since ended (they finish at 0.4), so the heart is at rest across the cut.
+  ///
+  /// This used to be one 4.2s controller for everything, on the reasoning that
+  /// 4.2s is exactly three 1.4s beats. That holds only at `tempo == 1`. At the
+  /// authored tempo of 0.7 a beat lasts 2.0s, so 4.2s is 2.1 beats and the
+  /// wrap landed at phase 0.0995 — 89% up the first thump, snapping the heart
+  /// from +7% swell and -4.4px of lift straight back to rest. See BUG-033.
+  late final AnimationController _beat = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 4200), // _loopSeconds
+    duration: _beatCycle,
+  );
+
+  /// Drives the drift and the dog's breath, which [PoundingHeartHero.tempo]
+  /// does not affect.
+  late final AnimationController _slow = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 130200), // _slowLoopSeconds
   );
 
   /// Platform reduce-motion. Read here rather than in [build] so the ticker
@@ -104,16 +119,29 @@ class _PoundingHeartHeroState extends State<PoundingHeartHero>
   void didChangeDependencies() {
     super.didChangeDependencies();
     _reduceMotion = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
-    if (_reduceMotion) {
-      _controller.stop();
-    } else if (!_controller.isAnimating) {
-      _controller.repeat();
+    for (final c in [_beat, _slow]) {
+      if (_reduceMotion) {
+        c.stop();
+      } else if (!c.isAnimating) {
+        c.repeat();
+      }
     }
   }
 
   @override
+  void didUpdateWidget(PoundingHeartHero old) {
+    super.didUpdateWidget(old);
+    if (widget.tempo == old.tempo) return;
+    // Re-period the beat in place: `repeat()` reads `duration` when it starts,
+    // so a running controller would otherwise keep the old tempo forever.
+    _beat.duration = _beatCycle;
+    if (!_reduceMotion) _beat.repeat();
+  }
+
+  @override
   void dispose() {
-    _controller.dispose();
+    _beat.dispose();
+    _slow.dispose();
     super.dispose();
   }
 
@@ -137,25 +165,29 @@ class _PoundingHeartHeroState extends State<PoundingHeartHero>
       // Under reduce-motion, hold the resting frame — which is exactly what
       // t = 0 produces.
       child: _reduceMotion
-          ? _frame(0)
+          ? _frame(beatPhase: 0, slowTime: 0)
           : AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) => _frame(_controller.value * _loopSeconds),
+              animation: Listenable.merge([_beat, _slow]),
+              builder: (context, _) => _frame(
+                beatPhase: _beat.value,
+                slowTime: _slow.value * _slowLoopSeconds,
+              ),
             ),
     );
   }
 
-  Widget _frame(double t) {
-    final p = ((t * widget.tempo) % _period) / _period;
-
+  /// [beatPhase] is 0..1 through one heartbeat; [slowTime] is seconds through
+  /// the slow loop. They advance on separate clocks — see [_beat] and [_slow].
+  Widget _frame({required double beatPhase, required double slowTime}) {
     // Lub-dub: a full thump, then a half-strength one just behind it.
-    final beat = _thump(p, 0, 0.16, 1) + _thump(p, 0.2, 0.2, 0.5);
+    final beat =
+        _thump(beatPhase, 0, 0.16, 1) + _thump(beatPhase, 0.2, 0.2, 0.5);
 
     final scale = 1 + widget.pulseStrength * beat;
     final lift = -5 * beat;
     final glow = 0.1 + 0.28 * beat;
-    final drift = _breathe(t, _driftPeriod, _driftAmp);
-    final dogBreath = 1 + _breathe(t, _breathPeriod, _breathAmp);
+    final drift = _breathe(slowTime, _driftPeriod, _driftAmp);
+    final dogBreath = 1 + _breathe(slowTime, _breathPeriod, _breathAmp);
 
     return Transform.translate(
       offset: Offset(0, drift * 0.3),
