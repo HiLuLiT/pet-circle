@@ -36,9 +36,17 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
-        title: Text(l10n.signOut, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
-        content: Text(l10n.signOutConfirmation, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadiiTokens.borderRadiusLg,
+        ),
+        title: Text(
+          l10n.signOut,
+          style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
+        ),
+        content: Text(
+          l10n.signOutConfirmation,
+          style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogCtx),
@@ -84,13 +92,20 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: c.background,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppRadiiTokens.lg),
+            ),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(l10n.editProfile, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+              Text(
+                l10n.editProfile,
+                style: AppSemanticTextStyles.headingLg.copyWith(
+                  color: c.textPrimary,
+                ),
+              ),
               const SizedBox(height: 16),
               TextField(
                 controller: nameCtrl,
@@ -119,10 +134,16 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   TextButton(
                     onPressed: () {
                       if (user != null) {
-                        userStore.setUser(user.copyWith(
-                          name: nameCtrl.text.isNotEmpty ? nameCtrl.text : user.name,
-                          avatarUrl: photoCtrl.text.isNotEmpty ? photoCtrl.text : user.avatarUrl,
-                        ));
+                        userStore.setUser(
+                          user.copyWith(
+                            name: nameCtrl.text.isNotEmpty
+                                ? nameCtrl.text
+                                : user.name,
+                            avatarUrl: photoCtrl.text.isNotEmpty
+                                ? photoCtrl.text
+                                : user.avatarUrl,
+                          ),
+                        );
                       }
                       Navigator.pop(ctx);
                       setState(() {});
@@ -130,8 +151,13 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                         SnackBar(content: Text(l10n.profileUpdated)),
                       );
                     },
-                    style: TextButton.styleFrom(backgroundColor: c.primaryLight),
-                    child: Text(l10n.save, style: TextStyle(color: c.textPrimary)),
+                    style: TextButton.styleFrom(
+                      backgroundColor: c.primaryLight,
+                    ),
+                    child: Text(
+                      l10n.save,
+                      style: TextStyle(color: c.textPrimary),
+                    ),
                   ),
                 ],
               ),
@@ -142,28 +168,46 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
     );
   }
 
-  void confirmRemoveMember(BuildContext context, String petName, String memberName) {
+  void confirmRemoveMember(
+    BuildContext context,
+    String petName,
+    String memberName,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final c = AppSemanticColors.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
-        title: Text(l10n.removeMember, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
-        content: Text(l10n.removeMemberConfirmation(memberName), style: AppSemanticTextStyles.body),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadiiTokens.borderRadiusLg,
+        ),
+        title: Text(
+          l10n.removeMember,
+          style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
+        ),
+        content: Text(
+          l10n.removeMemberConfirmation(memberName),
+          style: AppSemanticTextStyles.body,
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               petStore.removeCareCircleMemberWithFirestore(petName, memberName);
               setState(() {});
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.memberRemoved)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(l10n.memberRemoved)));
             },
             style: TextButton.styleFrom(backgroundColor: c.error),
-            child: Text(l10n.removeMember, style: TextStyle(color: c.background)),
+            child: Text(
+              l10n.removeMember,
+              style: TextStyle(color: c.background),
+            ),
           ),
         ],
       ),
@@ -184,18 +228,27 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheetState) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: c.background,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppRadiiTokens.lg),
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.invite, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+                Text(
+                  l10n.invite,
+                  style: AppSemanticTextStyles.headingLg.copyWith(
+                    color: c.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 16),
                 TextField(
                   controller: emailController,
@@ -218,7 +271,9 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                     label: l10n.role,
                     value: localizeRoleName(selectedRole, l10n),
                     isOpen: isRoleOpen,
-                    options: roles.map((r) => localizeRoleName(r, l10n)).toList(),
+                    options: roles
+                        .map((r) => localizeRoleName(r, l10n))
+                        .toList(),
                     onTap: () => setSheetState(() => isRoleOpen = !isRoleOpen),
                     onOptionSelected: (label) {
                       // Map the localized label back to its canonical role by
@@ -251,40 +306,63 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                       child: PrimaryButton(
                         label: l10n.sendInvite,
                         variant: PrimaryButtonVariant.filled,
-                        onPressed: isSending ? null : () async {
-                          final email = emailController.text.trim();
-                          if (email.isEmpty) return;
+                        onPressed: isSending
+                            ? null
+                            : () async {
+                                final email = emailController.text.trim();
+                                if (email.isEmpty) return;
 
-                          if (kEnableFirebase) {
-                            setSheetState(() => isSending = true);
-                            final activePet = petStore.activePet;
-                            if (activePet?.id == null) {
-                              Navigator.pop(ctx);
-                              return;
-                            }
-                            final navigator = Navigator.of(ctx);
-                            final token = await invitationStore.createInvitation(
-                              petId: activePet!.id!,
-                              petName: activePet.name,
-                              invitedEmail: email,
-                              invitedByUid: userStore.currentUserUid ?? '',
-                              invitedByName: userStore.currentUserDisplayName ?? '',
-                            );
-                            navigator.pop();
-                            final link = 'https://petcircle.app/invite?token=$token';
-                            await Clipboard.setData(ClipboardData(text: link));
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(l10n.invitationSentTo(email, selectedRole))),
-                              );
-                            }
-                          } else {
-                            Navigator.pop(ctx);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(l10n.invitationSentTo(email, selectedRole))),
-                            );
-                          }
-                        },
+                                if (kEnableFirebase) {
+                                  setSheetState(() => isSending = true);
+                                  final activePet = petStore.activePet;
+                                  if (activePet?.id == null) {
+                                    Navigator.pop(ctx);
+                                    return;
+                                  }
+                                  final navigator = Navigator.of(ctx);
+                                  final token = await invitationStore
+                                      .createInvitation(
+                                        petId: activePet!.id!,
+                                        petName: activePet.name,
+                                        invitedEmail: email,
+                                        invitedByUid:
+                                            userStore.currentUserUid ?? '',
+                                        invitedByName:
+                                            userStore.currentUserDisplayName ??
+                                            '',
+                                      );
+                                  navigator.pop();
+                                  final link =
+                                      'https://petcircle.app/invite?token=$token';
+                                  await Clipboard.setData(
+                                    ClipboardData(text: link),
+                                  );
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          l10n.invitationSentTo(
+                                            email,
+                                            selectedRole,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  Navigator.pop(ctx);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        l10n.invitationSentTo(
+                                          email,
+                                          selectedRole,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
                       ),
                     ),
                   ],
@@ -302,9 +380,9 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
     final c = AppSemanticColors.of(context);
     final pet = petStore.activePet;
     if (pet == null || pet.id == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.noPetsYet)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.noPetsYet)));
       return;
     }
     final petId = pet.id!;
@@ -312,7 +390,9 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadiiTokens.borderRadiusLg,
+        ),
         title: Text(l10n.exportAllData, style: AppSemanticTextStyles.headingLg),
         content: Text(
           l10n.exportAllDataConfirmation,
@@ -337,17 +417,23 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                 await exportCsv('${pet.name}_full_record_$timestamp.csv', csv);
                 if (!context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.dataExported), backgroundColor: c.primaryLight),
+                  SnackBar(
+                    content: Text(l10n.dataExported),
+                    backgroundColor: c.primaryLight,
+                  ),
                 );
               } catch (_) {
                 if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.exportFailedRetry)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(l10n.exportFailedRetry)));
               }
             },
             style: TextButton.styleFrom(backgroundColor: c.primaryLight),
-            child: Text(l10n.exportAllData, style: TextStyle(color: c.textPrimary)),
+            child: Text(
+              l10n.exportAllData,
+              style: TextStyle(color: c.textPrimary),
+            ),
           ),
         ],
       ),
@@ -370,12 +456,16 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheetState) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          ),
           child: Container(
             padding: const EdgeInsets.all(AppSpacingTokens.lg),
             decoration: BoxDecoration(
               color: c.background,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppRadiiTokens.lg),
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -385,8 +475,12 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   children: [
                     Icon(Icons.local_hospital, size: 20, color: c.primary),
                     const SizedBox(width: AppSpacingTokens.sm),
-                    Text(l10n.inviteYourVet,
-                        style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+                    Text(
+                      l10n.inviteYourVet,
+                      style: AppSemanticTextStyles.headingLg.copyWith(
+                        color: c.textPrimary,
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: AppSpacingTokens.sm),
@@ -409,27 +503,40 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                     PrimaryButton(
                       label: l10n.lookUpVet,
                       fullWidth: false,
-                      onPressed: state == 1 ? null : () async {
-                        final email = emailController.text.trim();
-                        if (email.isEmpty) return;
-                        setSheetState(() { state = 1; errorMessage = null; });
+                      onPressed: state == 1
+                          ? null
+                          : () async {
+                              final email = emailController.text.trim();
+                              if (email.isEmpty) return;
+                              setSheetState(() {
+                                state = 1;
+                                errorMessage = null;
+                              });
 
-                        if (!kEnableFirebase) {
-                          setSheetState(() { state = 4; foundVet = null; });
-                          return;
-                        }
+                              if (!kEnableFirebase) {
+                                setSheetState(() {
+                                  state = 4;
+                                  foundVet = null;
+                                });
+                                return;
+                              }
 
-                        final vet = await userStore.findVetByEmail(email);
-                        if (vet != null) {
-                          setSheetState(() { state = 2; foundVet = vet; });
-                          return;
-                        }
-                        final user = await userStore.findUserByEmail(email);
-                        setSheetState(() {
-                          foundVet = null;
-                          state = user != null ? 3 : 4;
-                        });
-                      },
+                              final vet = await userStore.findVetByEmail(email);
+                              if (vet != null) {
+                                setSheetState(() {
+                                  state = 2;
+                                  foundVet = vet;
+                                });
+                                return;
+                              }
+                              final user = await userStore.findUserByEmail(
+                                email,
+                              );
+                              setSheetState(() {
+                                foundVet = null;
+                                state = user != null ? 3 : 4;
+                              });
+                            },
                     ),
                   ],
                 ),
@@ -440,10 +547,16 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                 if (state == 1)
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacingTokens.sm),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacingTokens.sm,
+                      ),
                       child: SizedBox(
-                        width: 20, height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: c.primary),
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: c.primary,
+                        ),
                       ),
                     ),
                   ),
@@ -460,17 +573,29 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                         CircleAvatar(
                           radius: 18,
                           backgroundColor: c.primary.withValues(alpha: 0.2),
-                          child: Icon(Icons.verified, size: 18, color: c.primary),
+                          child: Icon(
+                            Icons.verified,
+                            size: 18,
+                            color: c.primary,
+                          ),
                         ),
                         const SizedBox(width: AppSpacingTokens.sm),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(l10n.vetFound,
-                                  style: AppSemanticTextStyles.caption.copyWith(color: c.primary)),
-                              Text(foundVet?.displayName ?? emailController.text,
-                                  style: AppSemanticTextStyles.body.copyWith(fontWeight: FontWeight.w600)),
+                              Text(
+                                l10n.vetFound,
+                                style: AppSemanticTextStyles.caption.copyWith(
+                                  color: c.primary,
+                                ),
+                              ),
+                              Text(
+                                foundVet?.displayName ?? emailController.text,
+                                style: AppSemanticTextStyles.body.withWeight(
+                                  FontWeight.w600,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -489,11 +614,19 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.warning_amber_rounded, size: 18, color: c.error),
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          size: 18,
+                          color: c.error,
+                        ),
                         const SizedBox(width: AppSpacingTokens.sm),
                         Expanded(
-                          child: Text(l10n.notAVetAccount,
-                              style: AppSemanticTextStyles.caption.copyWith(color: c.error)),
+                          child: Text(
+                            l10n.notAVetAccount,
+                            style: AppSemanticTextStyles.caption.copyWith(
+                              color: c.error,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -508,11 +641,19 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.info_outline, size: 16, color: c.textPrimary),
+                        Icon(
+                          Icons.info_outline,
+                          size: 16,
+                          color: c.textPrimary,
+                        ),
                         const SizedBox(width: AppSpacingTokens.sm),
                         Expanded(
-                          child: Text(l10n.vetNotFound,
-                              style: AppSemanticTextStyles.caption.copyWith(color: c.textPrimary)),
+                          child: Text(
+                            l10n.vetNotFound,
+                            style: AppSemanticTextStyles.caption.copyWith(
+                              color: c.textPrimary,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -530,8 +671,12 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                         Icon(Icons.error_outline, size: 18, color: c.error),
                         const SizedBox(width: AppSpacingTokens.sm),
                         Expanded(
-                          child: Text(errorMessage!,
-                              style: AppSemanticTextStyles.caption.copyWith(color: c.error)),
+                          child: Text(
+                            errorMessage!,
+                            style: AppSemanticTextStyles.caption.copyWith(
+                              color: c.error,
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -549,66 +694,87 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                     const SizedBox(width: AppSpacingTokens.sm),
                     if (state == 2 || state == 4)
                       TextButton(
-                        onPressed: state == 5 ? null : () async {
-                          final email = emailController.text.trim();
-                          if (email.isEmpty) return;
+                        onPressed: state == 5
+                            ? null
+                            : () async {
+                                final email = emailController.text.trim();
+                                if (email.isEmpty) return;
 
-                          if (kEnableFirebase) {
-                            setSheetState(() => state = 5);
-                            final activePet = petStore.activePet;
-                            if (activePet?.id == null) {
-                              Navigator.pop(ctx);
-                              return;
-                            }
-                          final navigator = Navigator.of(ctx);
+                                if (kEnableFirebase) {
+                                  setSheetState(() => state = 5);
+                                  final activePet = petStore.activePet;
+                                  if (activePet?.id == null) {
+                                    Navigator.pop(ctx);
+                                    return;
+                                  }
+                                  final navigator = Navigator.of(ctx);
 
-                            final validationError = await invitationStore.validateInvitation(
-                              petId: activePet!.id!,
-                              email: email,
-                              invitedByUid: userStore.currentUserUid ?? '',
-                            );
-                            if (validationError != null) {
-                              String msg;
-                              switch (validationError) {
-                                case 'alreadyInvited':
-                                  msg = l10n.vetAlreadyInvited;
-                                case 'dailyInviteLimitReached':
-                                  msg = l10n.dailyInviteLimitReached;
-                                default:
-                                  msg = validationError;
-                              }
-                              setSheetState(() { state = 6; errorMessage = msg; });
-                              return;
-                            }
+                                  final validationError = await invitationStore
+                                      .validateInvitation(
+                                        petId: activePet!.id!,
+                                        email: email,
+                                        invitedByUid:
+                                            userStore.currentUserUid ?? '',
+                                      );
+                                  if (validationError != null) {
+                                    String msg;
+                                    switch (validationError) {
+                                      case 'alreadyInvited':
+                                        msg = l10n.vetAlreadyInvited;
+                                      case 'dailyInviteLimitReached':
+                                        msg = l10n.dailyInviteLimitReached;
+                                      default:
+                                        msg = validationError;
+                                    }
+                                    setSheetState(() {
+                                      state = 6;
+                                      errorMessage = msg;
+                                    });
+                                    return;
+                                  }
 
-                            await invitationStore.createInvitation(
-                              petId: activePet.id!,
-                              petName: activePet.name,
-                              invitedEmail: email,
-                              invitedByUid: userStore.currentUserUid ?? '',
-                              invitedByName: userStore.currentUserDisplayName ?? '',
-                            );
-                            navigator.pop();
-                            if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(l10n.vetInviteSent(email))),
-                              );
-                            }
-                          } else {
-                            Navigator.pop(ctx);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text(l10n.vetInviteSent(email))),
-                            );
-                          }
-                        },
+                                  await invitationStore.createInvitation(
+                                    petId: activePet.id!,
+                                    petName: activePet.name,
+                                    invitedEmail: email,
+                                    invitedByUid:
+                                        userStore.currentUserUid ?? '',
+                                    invitedByName:
+                                        userStore.currentUserDisplayName ?? '',
+                                  );
+                                  navigator.pop();
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          l10n.vetInviteSent(email),
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  Navigator.pop(ctx);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(l10n.vetInviteSent(email)),
+                                    ),
+                                  );
+                                }
+                              },
                         style: TextButton.styleFrom(backgroundColor: c.primary),
                         child: state == 5
                             ? SizedBox(
-                                width: 16, height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2, color: c.background))
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: c.background,
+                                ),
+                              )
                             : Text(
                                 state == 2 ? l10n.addAsVet : l10n.sendVetInvite,
-                                style: TextStyle(color: c.background)),
+                                style: TextStyle(color: c.background),
+                              ),
                       ),
                   ],
                 ),
@@ -622,8 +788,12 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
 
   void showThresholdDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final normalController = TextEditingController(text: '${settingsStore.elevatedThreshold}');
-    final alertController = TextEditingController(text: '${settingsStore.criticalThreshold}');
+    final normalController = TextEditingController(
+      text: '${settingsStore.elevatedThreshold}',
+    );
+    final alertController = TextEditingController(
+      text: '${settingsStore.criticalThreshold}',
+    );
 
     showModalBottomSheet(
       context: context,
@@ -632,22 +802,41 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
       builder: (context) {
         final c = AppSemanticColors.of(context);
         return Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               color: c.background,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(AppRadiiTokens.lg),
+              ),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(l10n.configureAlertThresholds, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+                Text(
+                  l10n.configureAlertThresholds,
+                  style: AppSemanticTextStyles.headingLg.copyWith(
+                    color: c.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text(l10n.configureAlertThresholdsDesc, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
+                Text(
+                  l10n.configureAlertThresholdsDesc,
+                  style: AppSemanticTextStyles.body.copyWith(
+                    color: c.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 24),
-                Text(l10n.normalThresholdBpm, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary, fontWeight: FontWeight.w600)),
+                Text(
+                  l10n.normalThresholdBpm,
+                  style: AppSemanticTextStyles.body
+                      .withWeight(FontWeight.w600)
+                      .copyWith(color: c.textPrimary),
+                ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: normalController,
@@ -658,7 +847,12 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                Text(l10n.alertThresholdBpm, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary, fontWeight: FontWeight.w600)),
+                Text(
+                  l10n.alertThresholdBpm,
+                  style: AppSemanticTextStyles.body
+                      .withWeight(FontWeight.w600)
+                      .copyWith(color: c.textPrimary),
+                ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: alertController,
@@ -686,8 +880,10 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
                         onPressed: () {
                           final navigator = Navigator.of(context);
                           final messenger = ScaffoldMessenger.of(this.context);
-                          final elevated = int.tryParse(normalController.text) ?? 30;
-                          final critical = int.tryParse(alertController.text) ?? 40;
+                          final elevated =
+                              int.tryParse(normalController.text) ?? 30;
+                          final critical =
+                              int.tryParse(alertController.text) ?? 40;
                           settingsStore.updateThresholds(
                             elevated: elevated,
                             critical: critical,
@@ -717,15 +913,30 @@ mixin SettingsDialogsMixin on State<SettingsContent> {
         final c = AppSemanticColors.of(context);
         return AlertDialog(
           backgroundColor: c.background,
-          shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusLg),
-          title: Text(title, style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
+          shape: RoundedRectangleBorder(
+            borderRadius: AppRadiiTokens.borderRadiusLg,
+          ),
+          title: Text(
+            title,
+            style: AppSemanticTextStyles.headingLg.copyWith(
+              color: c.textPrimary,
+            ),
+          ),
           content: SingleChildScrollView(
-            child: Text(content, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
+            child: Text(
+              content,
+              style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text(l10n.close, style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
+              child: Text(
+                l10n.close,
+                style: AppSemanticTextStyles.body.copyWith(
+                  color: c.textPrimary,
+                ),
+              ),
             ),
           ],
         );

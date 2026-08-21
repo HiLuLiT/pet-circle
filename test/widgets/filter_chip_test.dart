@@ -9,17 +9,16 @@ void main() {
   group('AppFilterChip', () {
     // ── Smoke ───────────────────────────────────────────────────────────────
     testWidgets('renders the label text', (tester) async {
-      await tester.pumpWidget(
-        testApp(const AppFilterChip(label: 'All')),
-      );
+      await tester.pumpWidget(testApp(const AppFilterChip(label: 'All')));
 
       expect(find.text('All'), findsOneWidget);
       expect(find.byType(AppFilterChip), findsOneWidget);
     });
 
     // ── Variant tests ───────────────────────────────────────────────────────
-    testWidgets('selected: true uses periwinkle chip background',
-        (tester) async {
+    testWidgets('selected: true uses periwinkle chip background', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         testApp(const AppFilterChip(label: 'Active', selected: true)),
       );
@@ -34,11 +33,10 @@ void main() {
       expect(decoration.color, AppSemanticColors.light.accentPeriwinkleChip);
     });
 
-    testWidgets('selected: false uses recessed surface background',
-        (tester) async {
-      await tester.pumpWidget(
-        testApp(const AppFilterChip(label: 'Inactive')),
-      );
+    testWidgets('selected: false uses recessed surface background', (
+      tester,
+    ) async {
+      await tester.pumpWidget(testApp(const AppFilterChip(label: 'Inactive')));
 
       final container = tester.widget<Container>(
         find.descendant(
@@ -54,12 +52,7 @@ void main() {
     testWidgets('fires onTap when tapped', (tester) async {
       var tapped = 0;
       await tester.pumpWidget(
-        testApp(
-          AppFilterChip(
-            label: 'Tap me',
-            onTap: () => tapped += 1,
-          ),
-        ),
+        testApp(AppFilterChip(label: 'Tap me', onTap: () => tapped += 1)),
       );
 
       await tester.tap(find.byType(AppFilterChip));

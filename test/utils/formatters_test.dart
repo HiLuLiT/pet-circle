@@ -9,7 +9,10 @@ void main() {
     test('returns "Just now" for time within the last minute', () {
       final now = DateTime.now();
       expect(formatTimeAgo(now, l10n), 'Just now');
-      expect(formatTimeAgo(now.subtract(const Duration(seconds: 30)), l10n), 'Just now');
+      expect(
+        formatTimeAgo(now.subtract(const Duration(seconds: 30)), l10n),
+        'Just now',
+      );
     });
 
     test('returns minutes ago for time within the last hour', () {

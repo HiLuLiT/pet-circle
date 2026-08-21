@@ -109,7 +109,10 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                   onChanged: widget.onAgeChanged,
                   prefixIcon: SvgPicture.asset(
                     AppAssets.onboardingCalendarIcon,
-                    colorFilter: ColorFilter.mode(c.textTertiary, BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(
+                      c.textTertiary,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),
@@ -118,12 +121,17 @@ class _OnboardingStep1State extends State<OnboardingStep1>
                 child: LabeledTextField(
                   label: l10n.weightKg,
                   hintText: l10n.hintPetWeight,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
                   controller: _weightController,
                   onChanged: widget.onWeightChanged,
                   prefixIcon: SvgPicture.asset(
                     AppAssets.onboardingPulseIcon,
-                    colorFilter: ColorFilter.mode(c.textTertiary, BlendMode.srcIn),
+                    colorFilter: ColorFilter.mode(
+                      c.textTertiary,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),

@@ -863,6 +863,123 @@ Escaping alone turned out to be insufficient. The first pass at this fix escaped
 
 ---
 
+## BUG-043: Landing screen overflowed by 16px on short viewports
+
+- **Found during:** running the app in the browser (`flutter run` web, 656x442 viewport) and inspecting the console.
+- **Severity:** Medium (visual only — content clipped, app still usable)
+- **Status:** Fixed
+- **Symptom:** On startup the console logged `A RenderFlex overflowed by 16 pixels on the bottom.` from `landing_screen.dart:28`, followed by `[AppErrorHandler] FlutterError` and an `Uncaught (in promise)` assertion. In debug builds the bottom of the CTA area showed the yellow/black overflow stripes. Only reproduced on short/landscape viewports; a 375x812 phone viewport was fine.
+- **Root cause:** `LandingScreen`'s body was a plain `Column` inside `SafeArea` mixing fixed-height and flexible children: `Spacer(flex: 5)`, a fixed 280x280 hero circle, `Spacer(flex: 4)`, the text + CTA block, and a fixed 32px bottom gap. The `Spacer`s can collapse to zero under pressure, but the fixed children cannot shrink, so once `280 + textBlock + 32` exceeded the available height the flex overflowed. There was no scrollable fallback. `test/widget_test.dart` masked it with `suppressOverflowErrors()`, so no test ever failed.
+- **Fix:** Wrapped the body in the scroll-when-tight pattern — `LayoutBuilder` -> `SingleChildScrollView` -> `ConstrainedBox(minHeight: constraints.maxHeight)` -> `IntrinsicHeight` -> `Column`. `IntrinsicHeight` bounds the column height so `Spacer` stays legal inside the scroll view; `minHeight` keeps the spacers expanding when there is room, and the content scrolls when there is not. Removed `suppressOverflowErrors()` from the test and added a 393x442 regression test asserting no exception. (Landed alongside the Figma 402:1682 redesign, which also replaced the fixed 280x280 hero with the exported 194.69x173.15 illustration.)
+- **Files changed:**
+  - `lib/screens/landing_screen.dart`
+  - `test/widget_test.dart`
+
+## BUG-044: All Bold/SemiBold/Medium text rendered at Regular weight (variable-font `wght` axis never set)
+
+- **Found during:** comparing the landing screen against Figma node `594-2405` — the design title read distinctly bolder than the app's.
+- **Severity:** High (app-wide typography mismatch against the design system; every emphasised run of text was affected)
+- **Status:** Fixed
+- **Symptom:** Text rendered in the correct typeface at the correct size and line height, but visibly lighter than Figma everywhere weight was supposed to carry emphasis — titles, headings, button labels, badges, bold labels. Because size and family were right, it read as a vague "fonts don't match the design" rather than an obvious bug, and it had been present since the fonts were bundled.
+- **Root cause:** `assets/fonts/InstrumentSans-{Regular,Medium,SemiBold,Bold}.ttf` are four copies of the *same variable font* — byte-identical, md5 `73e3eb26e68e0c36091ac63b5f97efb7`, each carrying an `fvar` table with axes `wght` 400–700 (**default instance 400**) and `wdth` 75–100 (default 100). `pubspec.yaml` declares them as `weight: 500 / 600 / 700` static faces, so Flutter used `fontWeight` to select a font *file* and dutifully loaded the one named `-Bold.ttf` — but Flutter never sets a variation axis on its own, so the font rendered its default `wght 400` instance. Every `FontWeight.w500/w600/w700` in `AppTypography` was therefore decorative: it changed which identical file was picked and nothing else. The pre-existing comment in `pubspec.yaml` blamed a google_fonts network-fallback path, which is a different mechanism and was not what was happening — the bundled font loaded fine, just at the wrong weight.
+- **Fix:** Added explicit `fontVariations` to all 65 styles in `lib/theme/tokens/typography.dart` via four shared const axis lists (`axesRegular`/`axesMedium`/`axesSemibold`/`axesBold`), each pairing the matching `wght` with `wdth: 100` — the same `wdth` Figma specifies via `fontVariationSettings: "'wdth' 100"`. `fontWeight` is kept alongside so file selection and platform-font fallback still resolve correctly. Because `AppSemanticTextStyles` derives every style from `AppTypography` with `copyWith`, this corrected the whole app from one file. Second half of the fix: once a style carries `fontVariations`, a later `copyWith(fontWeight: ...)` is silently ignored (the axis wins), so the 20 call sites doing exactly that were migrated to a new `TextStyle.withWeight()` extension on `AppSemanticTextStyles`, which moves the weight and the axis together.
+- **Files changed:**
+  - `lib/theme/tokens/typography.dart` (axis tokens + all 65 styles)
+  - `lib/theme/semantic/text_theme.dart` (`withWeight` extension)
+  - `lib/widgets/status_badge.dart` (hand-built `TextStyle` on the bundled family)
+  - `lib/screens/main_shell.dart`, `lib/screens/circle/circle_screen.dart`, `lib/screens/dashboard/vet_dashboard.dart`, `lib/screens/medication/medication_screen.dart`, `lib/screens/pet_detail/pet_detail_sections.dart`, `lib/screens/pet_detail/pet_detail_widgets.dart`, `lib/screens/settings/settings_content.dart`, `lib/screens/settings/settings_dialogs.dart`
+  - `lib/widgets/app_header.dart`, `lib/widgets/bottom_nav_bar.dart`, `lib/widgets/segmented_control.dart`, `lib/widgets/settings_row.dart`
+- **Known remaining gap:** the raw `const TextStyle`s inside `buildAppTheme()` / `buildDarkTheme()` (`lib/theme/app_theme.dart`) declare no `fontFamily`, so they are Material fallback styles rather than Instrument Sans and were left untouched.
+
+## BUG-045: Animated hero's heart layer rendered as a broken-image icon (corrupt source PNG)
+
+- **Found during:** first browser run of the new animated welcome hero (`PoundingHeartHero`) after importing the Claude Design project "Heart animation for dog".
+- **Severity:** High (the hero's focal element was missing on the app's first screen)
+- **Status:** Fixed
+- **Symptom:** The dog layer painted correctly, but where the heart should have been the app drew Flutter's grey broken-image fallback icon (`AppImage`'s `fallbackIcon`). No Dart exception and no console error — `AppImage` swallows the decode failure by design, so the only signal was the visual. The same asset renders fine in Chrome and in the design preview, which is what made it look like a Flutter bug rather than a bad file.
+- **Root cause:** `assets/figma/welcome_heart.png` was corrupt **at the source**. Its `IDAT` chunk failed its CRC32, and the zlib stream's trailing adler32 was also wrong (`zlib: incorrect data check`). Re-fetching the asset from the design project via `DesignSync get_file` returned **byte-identical** content, proving the damage is in the design project's stored asset, not in the download. Browsers deliberately ignore PNG chunk CRCs and truncated checksums and render what they can, so Chrome (and therefore the design preview) showed the heart normally — Skia's decoder is strict and rejects the image outright. `welcome_dog.png`, fetched in the same batch, was clean, which ruled out the transport. Worth noting: this exact zlib error surfaced earlier in the session during an asset sanity check and was dismissed as noise, which cost a full build-and-verify cycle before it was taken seriously.
+- **Fix:** Repaired the file locally rather than waiting on a re-export. The pixel data itself was intact — only the checksums were wrong — so inflating the `IDAT` payload as a **raw deflate stream** (`zlib.decompressobj(-15)` over `idat[2:]`, which skips both the zlib header and the trailing adler32 the standard decompressor validates) recovered **7439 / 7439 bytes, 100%, no pixels lost**. The recovered scanlines were re-encoded as a fresh 43x43 RGBA PNG with valid chunk CRCs (3794 bytes, 62% transparent), which Skia accepts. Both hero layers now verify clean (`badCRC=none`, `zlib=ok`).
+- **Files changed:**
+  - `assets/figma/welcome_heart.png` (re-encoded)
+- **Follow-up (not a bug, but related):** the two layers are 1x only (`welcome_dog.png` 195x174, `welcome_heart.png` 43x43), whereas the hero they replaced (`welcome_hero.png`) was 488x434 (~2.5x). The hero is therefore softer on retina until 2x/3x re-exports are requested from the design project. The corrupt source asset should also be fixed there, since anything stricter than a browser will reject it.
+
+---
+
+
+### Correction (2026-08-21, later the same session)
+
+The root cause above is **wrong**, and the correction matters more than the original entry.
+
+Both versions of `heart.png` stored in the design project were re-extracted straight from this
+session's transcript (so the bytes never passed through a retyping step) and validated: every
+chunk CRC32 is correct and the zlib stream's adler32 is valid in **both**. The source asset was
+never damaged.
+
+What actually happened: the base64 returned by `DesignSync get_file` was transcribed by the agent
+into a file, and that transcription dropped/altered bytes. The resulting local file was corrupt,
+the `zlib: incorrect data check` was real — but it was self-inflicted in transit, and the
+"re-fetch returned byte-identical content" claim was a mis-comparison that appeared to exonerate
+the pipeline and indict the source. The same retyping failure recurred later in the session and
+failed loudly with `binascii.Error: Incorrect padding`, which is what exposed the original
+misdiagnosis.
+
+Consequences:
+- The "repair" re-encoded an asset that was already fine, and the re-encode was then kept in
+  preference to the design's newer artwork — shipping a visibly wrong heart (pale `#E5A1A3`,
+  49% opaque coverage, instead of the redrawn saturated `#D8696C` at 65%). Fixed separately.
+- **Rule:** never transcribe binary out of a tool result. Extract it programmatically from the
+  transcript, or have the tool write to disk. Compare **pixels, not byte counts or dimensions**,
+  before concluding two assets are the same image.
+- `test/assets/asset_integrity_test.dart` still earns its place: it catches a corrupt asset
+  however it got that way, which is what a guard should do.
+
+
+## BUG-046: `welcome_illustration.png` is an SVG with a `.png` extension
+
+- **Found during:** the new `test/assets/asset_integrity_test.dart` guard added after BUG-045 — it failed on its first run.
+- **Severity:** Low
+- **Status:** Fixed
+- **Symptom:** No user-visible symptom today, because nothing references the file. Any future
+  `Image.asset('assets/figma/welcome_illustration.png')` would have thrown
+  `Exception: Invalid image data`, or shown a silent fallback via `AppImage`.
+- **Root cause:** The file was committed in April with PNG naming but SVG content (`<svg
+  preserveAspectRatio=...`). `pubspec.yaml` registers `assets/figma/` as a whole *directory*, so
+  the 12 KB orphan is bundled into every build regardless of the misnaming.
+- **Fix:** `git mv` to `welcome_illustration.svg`. Left in place rather than deleted — it is
+  unreferenced dead weight, but removing a design asset is the owner's call.
+- **Files changed:** `assets/figma/welcome_illustration.png` -> `assets/figma/welcome_illustration.svg`
+- **Follow-up:** The file is unreferenced in `lib/` and `test/`. Delete it, or wire it up.
+
+## BUG-047: Hero heartbeat snapped back to rest once per loop
+
+- **Found during:** manual review of the landing screen after the animation's `tempo` was retuned in the Claude Design source; reported as "the loop is cut in a jumpy place".
+- **Severity:** Medium
+- **Status:** Fixed
+- **Symptom:** Every 4.2s the heart jumped — mid-swell it snapped instantly back to its resting
+  size and position, then began a fresh beat. The motion itself was correct; only the seam was wrong.
+- **Root cause:** One `AnimationController` drove the beat, the drift and the dog's breath from a
+  single 4.2s clock. That was chosen because 4.2s is exactly three 1.4s beats — but `tempo` scales
+  the beat and nothing else, so at the authored `tempo = 0.7` a beat lasts `1.4 / 0.7` = 2.0s and
+  4.2s is **2.1** beats. The restart therefore landed at beat phase 0.0995 — 89% of the way up the
+  first thump — discarding a `+7%` scale and `-4.4px` lift in one frame. The 6.2s drift, which does
+  not divide 4.2s either, snapped a further 2.6px. Sampled at 16ms, the worst single-frame jump was
+  4.5px against 0.3px for ordinary motion.
+  The stale premise was asserted in a code comment that was written when `tempo` was 1 and never
+  rechecked when the tuned value landed.
+- **Fix:** Gave each rhythm its own repeating controller instead of a shared scene clock. The beat
+  controller's period is `1.4 / tempo`, so it always wraps at phase 1.0 where both thumps have
+  ended (they finish at 0.4) and the heart is at rest. The slow controller runs 130.2s — the LCM of
+  the 6.2s drift and 4.2s breath — so those complete 21 and 31 whole cycles. `tempo` changes
+  re-period the beat via `didUpdateWidget`. This required `TickerProviderStateMixin` in place of
+  `SingleTickerProviderStateMixin`; keeping the latter threw
+  "multiple tickers were created" and failed to build the widget at all.
+- **Files changed:** `lib/widgets/pounding_heart_hero.dart`, `test/widget_test.dart`
+- **Regression test:** `animated hero loops without a visible jump` sweeps 5s at 16ms steps and
+  asserts no single frame moves the heart more than 1.0px. Replaying the old formula at the same
+  sampling yields 4.5px, so the test discriminates.
+- **Note:** The design preview has the same seam — it restarts a shared 4.2s scene clock. Divergence
+  is deliberate: an infinite loop should be continuous, and only the app loops forever.
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]
@@ -879,6 +996,7 @@ Escaping alone turned out to be insufficient. The first pass at this fix escaped
 
 **Files changed:**
 - `path/to/file.dart`
+
 
 ---
 -->

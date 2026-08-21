@@ -40,9 +40,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const VetDashboard(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const VetDashboard(showScaffold: false)));
       await tester.pump();
 
       expect(find.byType(VetDashboard), findsOneWidget);
@@ -55,9 +53,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const VetDashboard(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const VetDashboard(showScaffold: false)));
       await tester.pump();
 
       expect(find.text('Clinic Overview'), findsOneWidget);
@@ -70,9 +66,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const VetDashboard(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const VetDashboard(showScaffold: false)));
       await tester.pump();
 
       final petCount = petStore.allClinicPets.length;
@@ -90,9 +84,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const VetDashboard(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const VetDashboard(showScaffold: false)));
       await tester.pump();
 
       final pets = petStore.allClinicPets;
@@ -108,9 +100,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(
-        testApp(const VetDashboard(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const VetDashboard(showScaffold: false)));
       await tester.pump();
 
       expect(find.text('Normal Status'), findsWidgets);

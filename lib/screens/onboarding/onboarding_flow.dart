@@ -48,7 +48,8 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       final ownerMember = CareCircleMember(
         uid: userStore.currentUserUid,
         name: userStore.currentUserDisplayName ?? '',
-        avatarUrl: userStore.currentUserAvatarUrl ??
+        avatarUrl:
+            userStore.currentUserAvatarUrl ??
             'https://ui-avatars.com/api/?name=${Uri.encodeComponent(userStore.currentUserDisplayName ?? '')}&background=E8B4B8&color=5B2C3F',
         role: CareCircleRole.owner,
       );
@@ -60,7 +61,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         imageUrl: AppAssets.petPlaceholder,
         statusLabel: 'Normal',
         statusColorHex: AppPrimitives.pcPeriwinkle.toARGB32(),
-        latestMeasurement: Measurement(bpm: 0, recordedAt: DateTime.now(), recordedAtLabel: 'No measurements yet'),
+        latestMeasurement: Measurement(
+          bpm: 0,
+          recordedAt: DateTime.now(),
+          recordedAtLabel: 'No measurements yet',
+        ),
         careCircle: [ownerMember],
         diagnosis: _diagnosis.isNotEmpty ? _diagnosis : null,
         ownerId: kEnableFirebase ? userStore.currentUserUid : null,
@@ -83,9 +88,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       debugPrint('[OnboardingFlow] Failed to create pet: $e');
       final l10n = AppLocalizations.of(context)!;
       setState(() => _isSubmitting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.failedToCreatePet)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.failedToCreatePet)));
     }
   }
 
@@ -105,8 +110,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     // (i.e. "Add pet" from the dashboard). During mandatory new-user
     // onboarding the flow is the root, so there is nowhere to pop to.
     final router = GoRouter.maybeOf(context);
-    final onClose =
-        (router?.canPop() ?? false) ? () => context.pop() : null;
+    final onClose = (router?.canPop() ?? false) ? () => context.pop() : null;
     return PageView(
       controller: _controller,
       physics: const NeverScrollableScrollPhysics(),

@@ -58,10 +58,9 @@ class RoundIconButton extends StatelessWidget {
     final colors = AppSemanticColors.of(context);
 
     final isGhost = variant == RoundIconButtonVariant.ghost;
-    final resolvedBg = backgroundColor ??
-        (isGhost ? colors.surface : colors.onSurface);
-    final resolvedFg =
-        isGhost ? colors.textTertiary : colors.surface;
+    final resolvedBg =
+        backgroundColor ?? (isGhost ? colors.surface : colors.onSurface);
+    final resolvedFg = isGhost ? colors.textTertiary : colors.surface;
     final borderSide = isGhost
         ? BorderSide(color: colors.hairline, width: 1)
         : BorderSide.none;
@@ -83,11 +82,7 @@ class RoundIconButton extends StatelessWidget {
             child: Center(
               child: IconTheme.merge(
                 data: IconThemeData(color: resolvedFg, size: iconSize),
-                child: SizedBox(
-                  height: iconSize,
-                  width: iconSize,
-                  child: icon,
-                ),
+                child: SizedBox(height: iconSize, width: iconSize, child: icon),
               ),
             ),
           ),
@@ -96,10 +91,6 @@ class RoundIconButton extends StatelessWidget {
     );
 
     if (semanticLabel == null) return button;
-    return Semantics(
-      button: true,
-      label: semanticLabel,
-      child: button,
-    );
+    return Semantics(button: true, label: semanticLabel, child: button);
   }
 }

@@ -109,7 +109,9 @@ class NotificationStore extends ChangeNotifier {
         try {
           await NotificationService.addNotification(uid, notif);
         } catch (e) {
-          debugPrint('[NotificationStore] Failed to persist med-end notification: $e');
+          debugPrint(
+            '[NotificationStore] Failed to persist med-end notification: $e',
+          );
         }
       }
     }

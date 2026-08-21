@@ -21,13 +21,15 @@ void main() {
   group('SettingsCard', () {
     testWidgets('renders title and subtitle', (tester) async {
       suppressOverflowErrors();
-      await tester.pumpWidget(testApp(
-        const SettingsCard(
-          title: 'My Title',
-          subtitle: 'My Subtitle',
-          child: Text('content'),
+      await tester.pumpWidget(
+        testApp(
+          const SettingsCard(
+            title: 'My Title',
+            subtitle: 'My Subtitle',
+            child: Text('content'),
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('My Title'), findsOneWidget);
@@ -37,14 +39,16 @@ void main() {
 
     testWidgets('renders trailing widget when provided', (tester) async {
       suppressOverflowErrors();
-      await tester.pumpWidget(testApp(
-        const SettingsCard(
-          title: 'Title',
-          subtitle: 'Sub',
-          trailing: Icon(Icons.add, key: Key('trailing')),
-          child: SizedBox.shrink(),
+      await tester.pumpWidget(
+        testApp(
+          const SettingsCard(
+            title: 'Title',
+            subtitle: 'Sub',
+            trailing: Icon(Icons.add, key: Key('trailing')),
+            child: SizedBox.shrink(),
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byKey(const Key('trailing')), findsOneWidget);
@@ -52,13 +56,15 @@ void main() {
 
     testWidgets('does not render trailing widget when null', (tester) async {
       suppressOverflowErrors();
-      await tester.pumpWidget(testApp(
-        const SettingsCard(
-          title: 'Title',
-          subtitle: 'Sub',
-          child: SizedBox.shrink(),
+      await tester.pumpWidget(
+        testApp(
+          const SettingsCard(
+            title: 'Title',
+            subtitle: 'Sub',
+            child: SizedBox.shrink(),
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // No trailing — just verify the card still renders
@@ -72,12 +78,9 @@ void main() {
   group('SettingsToggleRow', () {
     testWidgets('renders label', (tester) async {
       suppressOverflowErrors();
-      await tester.pumpWidget(testApp(
-        const SettingsToggleRow(
-          label: 'Dark mode',
-          isOn: false,
-        ),
-      ));
+      await tester.pumpWidget(
+        testApp(const SettingsToggleRow(label: 'Dark mode', isOn: false)),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Dark mode'), findsOneWidget);
@@ -85,13 +88,15 @@ void main() {
 
     testWidgets('renders description when provided', (tester) async {
       suppressOverflowErrors();
-      await tester.pumpWidget(testApp(
-        const SettingsToggleRow(
-          label: 'Push notifications',
-          description: 'Enable push notifications',
-          isOn: true,
+      await tester.pumpWidget(
+        testApp(
+          const SettingsToggleRow(
+            label: 'Push notifications',
+            description: 'Enable push notifications',
+            isOn: true,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Enable push notifications'), findsOneWidget);
@@ -99,12 +104,9 @@ void main() {
 
     testWidgets('renders AppToggle', (tester) async {
       suppressOverflowErrors();
-      await tester.pumpWidget(testApp(
-        const SettingsToggleRow(
-          label: 'Toggle',
-          isOn: true,
-        ),
-      ));
+      await tester.pumpWidget(
+        testApp(const SettingsToggleRow(label: 'Toggle', isOn: true)),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(AppToggle), findsOneWidget);
@@ -113,13 +115,15 @@ void main() {
     testWidgets('calls onChanged when tapped', (tester) async {
       suppressOverflowErrors();
       var changed = false;
-      await tester.pumpWidget(testApp(
-        SettingsToggleRow(
-          label: 'Toggle',
-          isOn: false,
-          onChanged: () => changed = true,
+      await tester.pumpWidget(
+        testApp(
+          SettingsToggleRow(
+            label: 'Toggle',
+            isOn: false,
+            onChanged: () => changed = true,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(AppToggle));
@@ -139,7 +143,9 @@ void main() {
       expect(find.text('Language'), findsOneWidget);
     });
 
-    testWidgets('shows English as current language in en locale', (tester) async {
+    testWidgets('shows English as current language in en locale', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       await tester.pumpWidget(
         testApp(const LanguageRow(), locale: const Locale('en')),
@@ -168,14 +174,16 @@ void main() {
   group('ActionRow', () {
     testWidgets('renders title and description', (tester) async {
       suppressOverflowErrors();
-      await tester.pumpWidget(testApp(
-        ActionRow(
-          iconAsset: settingsDownAsset,
-          title: 'Export All Data',
-          description: 'Download complete records',
-          onTap: () {},
+      await tester.pumpWidget(
+        testApp(
+          ActionRow(
+            iconAsset: settingsDownAsset,
+            title: 'Export All Data',
+            description: 'Download complete records',
+            onTap: () {},
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Export All Data'), findsOneWidget);
@@ -185,14 +193,16 @@ void main() {
     testWidgets('calls onTap when tapped', (tester) async {
       suppressOverflowErrors();
       var tapped = false;
-      await tester.pumpWidget(testApp(
-        ActionRow(
-          iconAsset: settingsDownAsset,
-          title: 'Export',
-          description: 'Export data',
-          onTap: () => tapped = true,
+      await tester.pumpWidget(
+        testApp(
+          ActionRow(
+            iconAsset: settingsDownAsset,
+            title: 'Export',
+            description: 'Export data',
+            onTap: () => tapped = true,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byType(GestureDetector).first);
@@ -201,14 +211,16 @@ void main() {
 
     testWidgets('renders with null onTap without error', (tester) async {
       suppressOverflowErrors();
-      await tester.pumpWidget(testApp(
-        const ActionRow(
-          iconAsset: settingsShareAsset,
-          title: 'Share',
-          description: 'Share with vet',
-          onTap: null,
+      await tester.pumpWidget(
+        testApp(
+          const ActionRow(
+            iconAsset: settingsShareAsset,
+            title: 'Share',
+            description: 'Share with vet',
+            onTap: null,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Share'), findsOneWidget);
@@ -221,9 +233,9 @@ void main() {
   group('SimpleRow', () {
     testWidgets('renders label', (tester) async {
       suppressOverflowErrors();
-      await tester.pumpWidget(testApp(
-        SimpleRow(label: 'Terms of Service', onTap: () {}),
-      ));
+      await tester.pumpWidget(
+        testApp(SimpleRow(label: 'Terms of Service', onTap: () {})),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Terms of Service'), findsOneWidget);
@@ -232,9 +244,9 @@ void main() {
     testWidgets('calls onTap when tapped', (tester) async {
       suppressOverflowErrors();
       var tapped = false;
-      await tester.pumpWidget(testApp(
-        SimpleRow(label: 'Privacy Policy', onTap: () => tapped = true),
-      ));
+      await tester.pumpWidget(
+        testApp(SimpleRow(label: 'Privacy Policy', onTap: () => tapped = true)),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Privacy Policy'));

@@ -46,10 +46,7 @@ class LabeledTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppSemanticTextStyles.labelMSemibold,
-        ),
+        Text(label, style: AppSemanticTextStyles.labelMSemibold),
         const SizedBox(height: AppSpacingTokens.sm),
         ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 54),
@@ -57,17 +54,16 @@ class LabeledTextField extends StatelessWidget {
             controller: controller,
             onChanged: onChanged,
             keyboardType: keyboardType,
-            style: AppSemanticTextStyles.pcBody.copyWith(
-              color: c.textPrimary,
-            ),
-            decoration: appInputDecoration(
-              context,
-              hintText: hintText,
-              prefixIcon: prefixIcon,
-            ).copyWith(
-              isDense: false,
-              constraints: const BoxConstraints(minHeight: 54),
-            ),
+            style: AppSemanticTextStyles.pcBody.copyWith(color: c.textPrimary),
+            decoration:
+                appInputDecoration(
+                  context,
+                  hintText: hintText,
+                  prefixIcon: prefixIcon,
+                ).copyWith(
+                  isDense: false,
+                  constraints: const BoxConstraints(minHeight: 54),
+                ),
           ),
         ),
       ],

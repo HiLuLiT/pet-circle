@@ -51,7 +51,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     if (!kEnableFirebase) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}');
+      context.go(
+        '${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}',
+      );
       return;
     }
 
@@ -65,7 +67,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     setState(() => _isLoading = false);
 
     if (result.success) {
-      context.go('${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}');
+      context.go(
+        '${AppRoutes.verifyOtp}?email=${Uri.encodeComponent(email)}&signup=true&name=${Uri.encodeComponent(name)}',
+      );
     } else {
       final l10n = AppLocalizations.of(context)!;
       setState(() => _error = result.error ?? l10n.failedToSendCode);
@@ -84,9 +88,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     if (result.success) {
       context.go(AppRoutes.authGate);
     } else if (result.error != null && result.error != 'Sign in cancelled') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.error!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.error!)));
     }
   }
 
@@ -95,7 +99,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
     if (kIsWeb) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context)!.appleSignInNotAvailableOnWeb)),
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!.appleSignInNotAvailableOnWeb,
+          ),
+        ),
       );
       return;
     }
@@ -110,9 +118,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
     if (result.success) {
       context.go(AppRoutes.authGate);
     } else if (result.error != null && result.error != 'Sign in cancelled') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result.error!)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.error!)));
     }
   }
 
@@ -140,7 +148,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       color: c.primaryGhost,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.person_outline, size: 36, color: c.primary),
+                    child: Icon(
+                      Icons.person_outline,
+                      size: 36,
+                      color: c.primary,
+                    ),
                   ),
                   const SizedBox(height: AppSpacingTokens.sm + 4),
                   Text(
@@ -209,7 +221,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                             if (value == null || value.trim().isEmpty) {
                               return l10n.pleaseEnterEmail;
                             }
-                            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value.trim())) {
+                            if (!RegExp(
+                              r'^[^@]+@[^@]+\.[^@]+$',
+                            ).hasMatch(value.trim())) {
                               return l10n.enterValidEmail;
                             }
                             return null;
@@ -223,7 +237,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     const SizedBox(height: AppSpacingTokens.sm),
                     Text(
                       _error!,
-                      style: AppSemanticTextStyles.caption.copyWith(color: c.error),
+                      style: AppSemanticTextStyles.caption.copyWith(
+                        color: c.error,
+                      ),
                     ),
                   ],
                   const SizedBox(height: AppSpacingTokens.md),
@@ -264,7 +280,11 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   ),
                   const SizedBox(height: AppSpacingTokens.md + 4),
                   SocialButton(
-                    icon: Image.asset(AppAssets.googleLogo, width: 20, height: 20),
+                    icon: Image.asset(
+                      AppAssets.googleLogo,
+                      width: 20,
+                      height: 20,
+                    ),
                     label: l10n.continueWithGoogle,
                     onTap: _isLoading ? null : _handleGoogleSignIn,
                   ),
@@ -276,7 +296,9 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                   ),
                   const SizedBox(height: AppSpacingTokens.lg),
                   TextButton(
-                    onPressed: _isLoading ? null : () => context.push(AppRoutes.login),
+                    onPressed: _isLoading
+                        ? null
+                        : () => context.push(AppRoutes.login),
                     child: Text.rich(
                       TextSpan(
                         text: '${l10n.alreadyHaveAccount} ',

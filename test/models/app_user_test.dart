@@ -43,7 +43,10 @@ void main() {
       expect(copy.photoUrl, original.photoUrl);
       expect(copy.createdAt, original.createdAt);
       expect(copy.petIds, original.petIds);
-      expect(copy.settings.elevatedThreshold, original.settings.elevatedThreshold);
+      expect(
+        copy.settings.elevatedThreshold,
+        original.settings.elevatedThreshold,
+      );
     });
 
     test('original is unchanged after copyWith', () {
@@ -53,10 +56,7 @@ void main() {
         role: AppUserRole.owner,
       );
 
-      original.copyWith(
-        email: 'new@example.com',
-        role: AppUserRole.vet,
-      );
+      original.copyWith(email: 'new@example.com', role: AppUserRole.vet);
 
       expect(original.email, 'test@example.com');
       expect(original.role, AppUserRole.owner);
@@ -206,32 +206,38 @@ void main() {
       expect(user.hasCompletedOnboarding, isTrue);
     });
 
-    test('fromFirestore defaults hasCompletedOnboarding to true when field missing (existing user migration)', () {
-      // Mock DocumentSnapshot without hasCompletedOnboarding — existing user
-      final mockDoc = _MockDocumentSnapshot({
-        'uid': 'u-1',
-        'email': 'test@example.com',
-        'role': 'owner',
-      });
+    test(
+      'fromFirestore defaults hasCompletedOnboarding to true when field missing (existing user migration)',
+      () {
+        // Mock DocumentSnapshot without hasCompletedOnboarding — existing user
+        final mockDoc = _MockDocumentSnapshot({
+          'uid': 'u-1',
+          'email': 'test@example.com',
+          'role': 'owner',
+        });
 
-      final user = AppUser.fromFirestore(mockDoc);
+        final user = AppUser.fromFirestore(mockDoc);
 
-      // Existing users without the field are treated as already onboarded
-      expect(user.hasCompletedOnboarding, isTrue);
-    });
+        // Existing users without the field are treated as already onboarded
+        expect(user.hasCompletedOnboarding, isTrue);
+      },
+    );
 
-    test('fromFirestore reads hasCompletedOnboarding as false when explicitly set', () {
-      final mockDoc = _MockDocumentSnapshot({
-        'uid': 'u-1',
-        'email': 'test@example.com',
-        'role': 'owner',
-        'hasCompletedOnboarding': false,
-      });
+    test(
+      'fromFirestore reads hasCompletedOnboarding as false when explicitly set',
+      () {
+        final mockDoc = _MockDocumentSnapshot({
+          'uid': 'u-1',
+          'email': 'test@example.com',
+          'role': 'owner',
+          'hasCompletedOnboarding': false,
+        });
 
-      final user = AppUser.fromFirestore(mockDoc);
+        final user = AppUser.fromFirestore(mockDoc);
 
-      expect(user.hasCompletedOnboarding, isFalse);
-    });
+        expect(user.hasCompletedOnboarding, isFalse);
+      },
+    );
   });
 }
 

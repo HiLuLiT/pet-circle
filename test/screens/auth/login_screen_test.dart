@@ -152,10 +152,7 @@ void main() {
       await tester.pumpWidget(testApp(const LoginScreen()));
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('Enter your details to log in.'),
-        findsOneWidget,
-      );
+      expect(find.text('Enter your details to log in.'), findsOneWidget);
     });
 
     testWidgets('Google button is tappable (not disabled)', (tester) async {

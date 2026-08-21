@@ -88,11 +88,7 @@ void main() {
     test('original is unchanged after copyWith', () {
       final original = _makeNotification();
 
-      original.copyWith(
-        title: 'Changed',
-        isRead: true,
-        petName: 'Buddy',
-      );
+      original.copyWith(title: 'Changed', isRead: true, petName: 'Buddy');
 
       expect(original.title, 'New Measurement');
       expect(original.isRead, isFalse);
@@ -352,15 +348,15 @@ void main() {
 
   group('AppNotification localization keys', () {
     AppNotification keyed() => AppNotification(
-          id: 'n-key',
-          title: 'Measurement Complete',
-          body: 'Measurement saved: 12 BPM',
-          titleKey: 'measurementComplete',
-          bodyKey: 'measurementSavedBpm',
-          args: const ['12'],
-          type: NotificationType.measurement,
-          createdAt: DateTime(2025, 1, 1),
-        );
+      id: 'n-key',
+      title: 'Measurement Complete',
+      body: 'Measurement saved: 12 BPM',
+      titleKey: 'measurementComplete',
+      bodyKey: 'measurementSavedBpm',
+      args: const ['12'],
+      type: NotificationType.measurement,
+      createdAt: DateTime(2025, 1, 1),
+    );
 
     test('args default to empty list and keys to null', () {
       final n = _makeNotification();
@@ -433,10 +429,14 @@ void main() {
 
     test('copyWith updates keys and args independently', () {
       final original = _makeNotification();
-      expect(original.copyWith(titleKey: 'medicationAdded').titleKey,
-          'medicationAdded');
-      expect(original.copyWith(bodyKey: 'vetInviteSent').bodyKey,
-          'vetInviteSent');
+      expect(
+        original.copyWith(titleKey: 'medicationAdded').titleKey,
+        'medicationAdded',
+      );
+      expect(
+        original.copyWith(bodyKey: 'vetInviteSent').bodyKey,
+        'vetInviteSent',
+      );
       expect(original.copyWith(args: const ['a', 'b']).args, ['a', 'b']);
     });
 

@@ -53,9 +53,9 @@ class OtpService {
       final result = await _functions
           .httpsCallable('verifyOTP')
           .call<Map<String, dynamic>>({
-        'email': email.toLowerCase().trim(),
-        'code': code,
-      });
+            'email': email.toLowerCase().trim(),
+            'code': code,
+          });
 
       final data = result.data;
       return OtpVerifyResult(

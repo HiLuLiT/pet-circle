@@ -14,10 +14,7 @@ Pet _makePet() {
     imageUrl: 'https://example.com/pet.png',
     statusLabel: 'Normal',
     statusColorHex: 0xFF75ACFF,
-    latestMeasurement: Measurement(
-      bpm: 22,
-      recordedAt: DateTime(2025, 1, 1),
-    ),
+    latestMeasurement: Measurement(bpm: 22, recordedAt: DateTime(2025, 1, 1)),
     careCircle: [
       CareCircleMember(
         name: 'Hila',
@@ -82,10 +79,7 @@ void main() {
         original.copyWith(breedAndAge: 'Poodle - 2 years').breedAndAge,
         'Poodle - 2 years',
       );
-      expect(
-        original.copyWith(imageUrl: 'new.png').imageUrl,
-        'new.png',
-      );
+      expect(original.copyWith(imageUrl: 'new.png').imageUrl, 'new.png');
       expect(
         original.copyWith(statusLabel: 'Elevated').statusLabel,
         'Elevated',
@@ -94,10 +88,7 @@ void main() {
         original.copyWith(statusColorHex: 0xFF000000).statusColorHex,
         0xFF000000,
       );
-      expect(
-        original.copyWith(ownerId: 'new-owner').ownerId,
-        'new-owner',
-      );
+      expect(original.copyWith(ownerId: 'new-owner').ownerId, 'new-owner');
     });
 
     test('copyWith can replace careCircle', () {
@@ -126,7 +117,10 @@ void main() {
         imageUrl: '',
         statusLabel: 'Normal',
         statusColorHex: 0xFFFFFFFF,
-        latestMeasurement: Measurement(bpm: 0, recordedAt: DateTime(2025, 1, 1)),
+        latestMeasurement: Measurement(
+          bpm: 0,
+          recordedAt: DateTime(2025, 1, 1),
+        ),
         careCircle: [],
       );
 
@@ -142,7 +136,10 @@ void main() {
         imageUrl: '',
         statusLabel: 'Normal',
         statusColorHex: 0xFF75ACFF,
-        latestMeasurement: Measurement(bpm: 18, recordedAt: DateTime(2025, 1, 1)),
+        latestMeasurement: Measurement(
+          bpm: 18,
+          recordedAt: DateTime(2025, 1, 1),
+        ),
         careCircle: [],
       );
 
@@ -169,7 +166,10 @@ void main() {
         imageUrl: '',
         statusLabel: 'Normal',
         statusColorHex: 0xFF75ACFF,
-        latestMeasurement: Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+        latestMeasurement: Measurement(
+          bpm: 20,
+          recordedAt: DateTime(2025, 1, 1),
+        ),
         careCircle: [],
         pendingInvites: invites,
       );
@@ -329,11 +329,7 @@ void main() {
             'avatarUrl': 'https://example.com/bob.png',
             'role': 'member',
           },
-          'uid-legacy': {
-            'name': 'Charlie',
-            'avatarUrl': '',
-            'role': 'admin',
-          },
+          'uid-legacy': {'name': 'Charlie', 'avatarUrl': '', 'role': 'admin'},
         },
         'latestMeasurement': {
           'bpm': 20,
@@ -455,13 +451,10 @@ void main() {
 
   group('PendingInvite.fromFirestore', () {
     test('parses valid data with Timestamp', () {
-      final invite = PendingInvite.fromFirestore(
-        'tok-fs-1',
-        {
-          'invitedEmail': 'Test@Example.COM',
-          'expiresAt': Timestamp.fromDate(DateTime(2025, 8, 1)),
-        },
-      );
+      final invite = PendingInvite.fromFirestore('tok-fs-1', {
+        'invitedEmail': 'Test@Example.COM',
+        'expiresAt': Timestamp.fromDate(DateTime(2025, 8, 1)),
+      });
 
       expect(invite.token, 'tok-fs-1');
       expect(invite.invitedEmail, 'test@example.com');
@@ -469,22 +462,18 @@ void main() {
     });
 
     test('missing email defaults to empty string', () {
-      final invite = PendingInvite.fromFirestore(
-        'tok-fs-2',
-        {
-          'expiresAt': Timestamp.fromDate(DateTime(2025, 8, 1)),
-        },
-      );
+      final invite = PendingInvite.fromFirestore('tok-fs-2', {
+        'expiresAt': Timestamp.fromDate(DateTime(2025, 8, 1)),
+      });
 
       expect(invite.invitedEmail, '');
     });
 
     test('null expiresAt defaults to now', () {
       final before = DateTime.now();
-      final invite = PendingInvite.fromFirestore(
-        'tok-fs-3',
-        {'invitedEmail': 'test@example.com'},
-      );
+      final invite = PendingInvite.fromFirestore('tok-fs-3', {
+        'invitedEmail': 'test@example.com',
+      });
       final after = DateTime.now();
 
       expect(
@@ -506,7 +495,10 @@ void main() {
         imageUrl: '',
         statusLabel: 'Normal',
         statusColorHex: 0xFF75ACFF,
-        latestMeasurement: Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+        latestMeasurement: Measurement(
+          bpm: 20,
+          recordedAt: DateTime(2025, 1, 1),
+        ),
         careCircle: [
           CareCircleMember(
             uid: 'firebase-uid-123',
@@ -531,7 +523,10 @@ void main() {
         imageUrl: '',
         statusLabel: 'Normal',
         statusColorHex: 0xFF75ACFF,
-        latestMeasurement: Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+        latestMeasurement: Measurement(
+          bpm: 20,
+          recordedAt: DateTime(2025, 1, 1),
+        ),
         careCircle: [
           CareCircleMember(
             uid: 'valid-uid',
@@ -562,10 +557,22 @@ void main() {
         imageUrl: '',
         statusLabel: 'Normal',
         statusColorHex: 0xFF75ACFF,
-        latestMeasurement: Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+        latestMeasurement: Measurement(
+          bpm: 20,
+          recordedAt: DateTime(2025, 1, 1),
+        ),
         careCircle: [
-          CareCircleMember(uid: 'uid-1', name: 'Owner', avatarUrl: '', role: CareCircleRole.owner),
-          CareCircleMember(name: 'no-uid', avatarUrl: '', role: CareCircleRole.member),
+          CareCircleMember(
+            uid: 'uid-1',
+            name: 'Owner',
+            avatarUrl: '',
+            role: CareCircleRole.owner,
+          ),
+          CareCircleMember(
+            name: 'no-uid',
+            avatarUrl: '',
+            role: CareCircleRole.member,
+          ),
         ],
       );
 
@@ -578,22 +585,40 @@ void main() {
 
   group('CareCircleMember.firestoreKey', () {
     test('returns uid when set', () {
-      final member = CareCircleMember(uid: 'fb-uid', name: 'Hila', avatarUrl: '', role: CareCircleRole.owner);
+      final member = CareCircleMember(
+        uid: 'fb-uid',
+        name: 'Hila',
+        avatarUrl: '',
+        role: CareCircleRole.owner,
+      );
       expect(member.firestoreKey, 'fb-uid');
     });
 
     test('returns null when uid is null', () {
-      final member = CareCircleMember(name: 'tara@x.com', avatarUrl: '', role: CareCircleRole.member);
+      final member = CareCircleMember(
+        name: 'tara@x.com',
+        avatarUrl: '',
+        role: CareCircleRole.member,
+      );
       expect(member.firestoreKey, isNull);
     });
 
     test('hasFirestoreKey is true when uid is set', () {
-      final member = CareCircleMember(uid: 'uid', name: 'T', avatarUrl: '', role: CareCircleRole.member);
+      final member = CareCircleMember(
+        uid: 'uid',
+        name: 'T',
+        avatarUrl: '',
+        role: CareCircleRole.member,
+      );
       expect(member.hasFirestoreKey, isTrue);
     });
 
     test('hasFirestoreKey is false when uid is null', () {
-      final member = CareCircleMember(name: 'T', avatarUrl: '', role: CareCircleRole.member);
+      final member = CareCircleMember(
+        name: 'T',
+        avatarUrl: '',
+        role: CareCircleRole.member,
+      );
       expect(member.hasFirestoreKey, isFalse);
     });
   });

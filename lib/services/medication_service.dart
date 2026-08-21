@@ -2,8 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pet_circle/models/medication.dart';
 
 class MedicationService {
-  static final _usersCollection =
-      FirebaseFirestore.instance.collection('users');
+  static final _usersCollection = FirebaseFirestore.instance.collection(
+    'users',
+  );
 
   /// Medications are private per user: users/{uid}/medications.
   static CollectionReference _ref(String uid) =>
@@ -27,8 +28,9 @@ class MedicationService {
 
   /// Fetch all of the current user's medications (one-time read).
   static Future<List<Medication>> fetchForUser(String uid) async {
-    final snapshot =
-        await _ref(uid).orderBy('startDate', descending: true).get();
+    final snapshot = await _ref(
+      uid,
+    ).orderBy('startDate', descending: true).get();
     return snapshot.docs.map((doc) => Medication.fromFirestore(doc)).toList();
   }
 }

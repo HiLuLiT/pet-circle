@@ -79,11 +79,9 @@ class AppSegmentedControl extends StatelessWidget {
       fontSize: _fontSize,
       color: colors.onSurface,
     );
-    final inactiveStyle = AppSemanticTextStyles.pcLabel.copyWith(
-      fontSize: _fontSize,
-      fontWeight: FontWeight.w600,
-      color: colors.textTertiary,
-    );
+    final inactiveStyle = AppSemanticTextStyles.pcLabel
+        .withWeight(FontWeight.w600)
+        .copyWith(fontSize: _fontSize, color: colors.textTertiary);
     return Expanded(
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,

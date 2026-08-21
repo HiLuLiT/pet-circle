@@ -15,7 +15,9 @@ class Measurement {
   final String? recordedAtLabel;
   final String? recordedBy;
 
-  @Deprecated('Use formatTimeAgo(measurement.recordedAt) from utils/formatters.dart')
+  @Deprecated(
+    'Use formatTimeAgo(measurement.recordedAt) from utils/formatters.dart',
+  )
   String get timeAgo {
     if (recordedAtLabel != null) return recordedAtLabel!;
     final now = DateTime.now();

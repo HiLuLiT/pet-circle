@@ -116,18 +116,20 @@ void main() {
       expect(store.weeklySummaryEnabled, isTrue);
     });
 
-    test('setWeeklySummaryEnabled invokes onWeeklySummaryChanged with the new value',
-        () async {
-      final calls = <bool>[];
-      store.onWeeklySummaryChanged = (enabled) async {
-        calls.add(enabled);
-      };
+    test(
+      'setWeeklySummaryEnabled invokes onWeeklySummaryChanged with the new value',
+      () async {
+        final calls = <bool>[];
+        store.onWeeklySummaryChanged = (enabled) async {
+          calls.add(enabled);
+        };
 
-      await store.setWeeklySummaryEnabled(true);
-      await store.setWeeklySummaryEnabled(false);
+        await store.setWeeklySummaryEnabled(true);
+        await store.setWeeklySummaryEnabled(false);
 
-      expect(calls, [true, false]);
-    });
+        expect(calls, [true, false]);
+      },
+    );
 
     test('toggleWeeklySummaryEnabled invokes onWeeklySummaryChanged', () async {
       final calls = <bool>[];

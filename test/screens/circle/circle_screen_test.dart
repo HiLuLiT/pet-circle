@@ -27,9 +27,7 @@ void main() {
     testWidgets('renders with showScaffold=false', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       expect(find.byType(CircleScreen), findsOneWidget);
@@ -41,9 +39,7 @@ void main() {
     testWidgets('renders with showScaffold=true', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: true)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: true)));
       await tester.pumpAndSettle();
 
       expect(find.byType(CircleScreen), findsOneWidget);
@@ -59,9 +55,7 @@ void main() {
       suppressOverflowErrors();
       petStore.seed(ownerPets: [], clinicPets: []);
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.people_outline), findsOneWidget);
@@ -71,9 +65,7 @@ void main() {
       suppressOverflowErrors();
       petStore.seed(ownerPets: [], clinicPets: []);
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       expect(find.text('No pets yet'), findsOneWidget);
@@ -86,9 +78,7 @@ void main() {
     testWidgets('shows pet name in circle title', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // l10n circleTitle('Princess') => "Princess's Circle"
@@ -98,22 +88,19 @@ void main() {
     testWidgets('shows member count badge', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Princess has 3 care circle members (Hila, Dr. Smith, Sarah)
       expect(find.text('3'), findsOneWidget);
     });
 
-    testWidgets('displays owner member with "Owner" role label',
-        (tester) async {
+    testWidgets('displays owner member with "Owner" role label', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Hila is the owner — her name and "Owner" label should appear.
@@ -123,13 +110,12 @@ void main() {
       expect(find.text('Owner'), findsAtLeastNWidgets(2));
     });
 
-    testWidgets('displays regular members with "Member" role label',
-        (tester) async {
+    testWidgets('displays regular members with "Member" role label', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       expect(find.text('Dr. Smith'), findsOneWidget);
@@ -141,9 +127,7 @@ void main() {
     testWidgets('shows "Invite to Circle" button for owner', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // The owner sees the bottom "Invite to Circle" button.
@@ -182,15 +166,15 @@ void main() {
     testWidgets('shows invite description below owner tile', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // l10n circleEmptyDescription('Buddy') =>
       // "Invite family or caregivers to help monitor Buddy."
       expect(
-        find.textContaining('Invite family or caregivers to help monitor Buddy'),
+        find.textContaining(
+          'Invite family or caregivers to help monitor Buddy',
+        ),
         findsOneWidget,
       );
     });
@@ -198,9 +182,7 @@ void main() {
     testWidgets('shows invite button for owner', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // The owner always sees the bottom "Invite to Circle" button
@@ -216,9 +198,7 @@ void main() {
     testWidgets('each member tile shows member name', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       expect(find.text('Hila'), findsAtLeastNWidgets(1));
@@ -229,9 +209,7 @@ void main() {
     testWidgets('each member tile shows role label', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Owner role label appears in the tile text and the badge.
@@ -240,13 +218,12 @@ void main() {
       expect(find.text('Member'), findsNWidgets(2));
     });
 
-    testWidgets('non-owner members show remove button when viewer is owner',
-        (tester) async {
+    testWidgets('non-owner members show remove button when viewer is owner', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Two non-owner members should have close/remove icons.
@@ -258,13 +235,12 @@ void main() {
   // ── Group 6: Invite sheet ──────────────────────────────────────────────
 
   group('CircleScreen invite sheet', () {
-    testWidgets('tapping "Invite to Circle" opens the bottom sheet',
-        (tester) async {
+    testWidgets('tapping "Invite to Circle" opens the bottom sheet', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Invite to Circle'));
@@ -277,9 +253,7 @@ void main() {
     testWidgets('bottom sheet contains email input field', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Invite to Circle'));
@@ -292,9 +266,7 @@ void main() {
     testWidgets('bottom sheet contains "Send Invite" button', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Invite to Circle'));
@@ -304,36 +276,31 @@ void main() {
       expect(find.byIcon(Icons.send), findsOneWidget);
     });
 
-    testWidgets('bottom sheet shows invite description with pet name',
-        (tester) async {
+    testWidgets('bottom sheet shows invite description with pet name', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Invite to Circle'));
       await tester.pumpAndSettle();
 
       // l10n inviteDescription('Princess') contains the pet name.
-      expect(
-        find.textContaining("Princess's care circle"),
-        findsOneWidget,
-      );
+      expect(find.textContaining("Princess's care circle"), findsOneWidget);
     });
   });
 
   // ── Group 7: Invite sheet interactions ────────────────────────────────
 
   group('CircleScreen invite sheet interactions', () {
-    testWidgets('entering text in email field shows typed text',
-        (tester) async {
+    testWidgets('entering text in email field shows typed text', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Open the invite sheet
@@ -347,13 +314,12 @@ void main() {
       expect(find.text('friend@example.com'), findsOneWidget);
     });
 
-    testWidgets('tapping "Send Invite" with empty email does nothing',
-        (tester) async {
+    testWidgets('tapping "Send Invite" with empty email does nothing', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Open the invite sheet
@@ -372,9 +338,7 @@ void main() {
     testWidgets('email field has correct hint text', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Invite to Circle'));
@@ -387,9 +351,7 @@ void main() {
     testWidgets('can replace text in email field', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Invite to Circle'));
@@ -410,9 +372,7 @@ void main() {
     testWidgets('sheet can be dismissed by dragging down', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Open the invite sheet
@@ -470,13 +430,12 @@ void main() {
       petStore.seed(ownerPets: [petWithInvites], clinicPets: []);
     });
 
-    testWidgets('shows "Pending Invites" heading when invites exist',
-        (tester) async {
+    testWidgets('shows "Pending Invites" heading when invites exist', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       expect(find.text('Pending Invites'), findsOneWidget);
@@ -485,9 +444,7 @@ void main() {
     testWidgets('shows pending invite email addresses', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       expect(find.text('friend@example.com'), findsOneWidget);
@@ -497,60 +454,47 @@ void main() {
     testWidgets('pending invite tiles show mail icon', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Each pending invite tile has a mail_outline icon
       expect(find.byIcon(Icons.mail_outline), findsNWidgets(2));
     });
 
-    testWidgets('pending invites show cancel button for owner',
-        (tester) async {
+    testWidgets('pending invites show cancel button for owner', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Each pending invite tile uses a TextButton with l10n.cancelInvite
       // which is "Cancel". There are 2 pending invites so 2 cancel buttons.
       // Find TextButtons whose child text is "Cancel" (from pending tiles).
-      expect(
-        find.widgetWithText(TextButton, 'Cancel'),
-        findsNWidgets(2),
-      );
+      expect(find.widgetWithText(TextButton, 'Cancel'), findsNWidgets(2));
     });
 
-    testWidgets('does not show invite-empty description when invites exist',
-        (tester) async {
+    testWidgets('does not show invite-empty description when invites exist', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // The empty description should not appear when there are pending invites
-      expect(
-        find.textContaining('Invite family or caregivers'),
-        findsNothing,
-      );
+      expect(find.textContaining('Invite family or caregivers'), findsNothing);
     });
   });
 
   // ── Group 9: Invite sheet mock-mode send ──────────────────────────────
 
   group('CircleScreen invite sheet send flow', () {
-    testWidgets('invite sheet shows description text with pet name',
-        (tester) async {
+    testWidgets('invite sheet shows description text with pet name', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Open invite sheet
@@ -558,18 +502,13 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify the description mentions the pet name
-      expect(
-        find.textContaining("Princess's care circle"),
-        findsOneWidget,
-      );
+      expect(find.textContaining("Princess's care circle"), findsOneWidget);
     });
 
     testWidgets('email field is autofocused', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Invite to Circle'));
@@ -583,9 +522,7 @@ void main() {
     testWidgets('send button has send icon', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Invite to Circle'));
@@ -598,13 +535,12 @@ void main() {
   // ── Group 10: Remove member dialog ────────────────────────────────────
 
   group('CircleScreen remove member dialog', () {
-    testWidgets('tapping close on member opens confirmation dialog',
-        (tester) async {
+    testWidgets('tapping close on member opens confirmation dialog', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Tap the first close icon (non-owner member remove button)
@@ -615,13 +551,12 @@ void main() {
       expect(find.text('Remove Member'), findsOneWidget);
     });
 
-    testWidgets('cancel in dialog dismisses without removing member',
-        (tester) async {
+    testWidgets('cancel in dialog dismisses without removing member', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(
-        testApp(const CircleScreen(showScaffold: false)),
-      );
+      await tester.pumpWidget(testApp(const CircleScreen(showScaffold: false)));
       await tester.pumpAndSettle();
 
       // Tap the close icon for a member

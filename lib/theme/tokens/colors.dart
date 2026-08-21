@@ -54,6 +54,11 @@ class AppPrimitives {
 
   // Candy/Tomato/Accent per Figma DS node 402-1191.
   static const Color pcTomato = Color(0xFFF0634F);
+  // Glow behind the animated welcome heart. Taken verbatim from the Claude
+  // Design project "Heart animation for dog" (heart-scene.jsx), which pulses
+  // `rgba(240,104,120,a)` — a coral pink matching the heart artwork itself,
+  // distinct from both pcBlush and pcTomato.
+  static const Color pcHeartGlow = Color(0xFFF06878);
 
   // ── PC v3: Status — Normal (periwinkle) ──────────────────────────────────
   static const Color pcStatusNormalBg = Color(0xFFECEAF7);

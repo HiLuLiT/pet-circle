@@ -36,7 +36,9 @@ void main() {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.seed({'pet-1': [_makeNote()]});
+      store.seed({
+        'pet-1': [_makeNote()],
+      });
       expect(callCount, 1);
     });
   });
@@ -67,13 +69,12 @@ void main() {
 
   group('NoteStore unmodifiable', () {
     test('getNotes returns unmodifiable list', () {
-      store.seed({'pet-1': [_makeNote()]});
+      store.seed({
+        'pet-1': [_makeNote()],
+      });
 
       final list = store.getNotes('pet-1');
-      expect(
-        () => list.add(_makeNote(id: 'extra')),
-        throwsUnsupportedError,
-      );
+      expect(() => list.add(_makeNote(id: 'extra')), throwsUnsupportedError);
     });
   });
 
@@ -115,9 +116,7 @@ void main() {
   group('NoteStore multiple pets', () {
     test('notes are isolated per pet', () {
       store.seed({
-        'pet-1': [
-          _makeNote(id: 'note-1', content: 'Note for pet 1'),
-        ],
+        'pet-1': [_makeNote(id: 'note-1', content: 'Note for pet 1')],
         'pet-2': [
           _makeNote(id: 'note-2', content: 'Note for pet 2'),
           _makeNote(id: 'note-3', content: 'Another for pet 2'),
@@ -136,7 +135,9 @@ void main() {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.seed({'pet-1': [_makeNote()]});
+      store.seed({
+        'pet-1': [_makeNote()],
+      });
       expect(callCount, 1);
     });
 
@@ -144,7 +145,9 @@ void main() {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.seed({'pet-1': [_makeNote()]});
+      store.seed({
+        'pet-1': [_makeNote()],
+      });
       store.seed({'pet-1': []});
       store.seed({});
 
@@ -154,7 +157,9 @@ void main() {
 
   group('NoteStore getNotes returns defensive copy', () {
     test('modifying returned list does not affect store', () {
-      store.seed({'pet-1': [_makeNote()]});
+      store.seed({
+        'pet-1': [_makeNote()],
+      });
 
       // getNotes returns unmodifiable, so we can't add to it
       // but we verify the store still has the original data
@@ -167,21 +172,26 @@ void main() {
   // are verified via seed() simulation to avoid the uninitialized Firebase error.
 
   group('NoteStore addNote (via seed simulation)', () {
-    test('newest note at front: seeding newest-first reflects correct order', () {
-      store.seed({
-        'pet-1': [
-          _makeNote(id: 'note-2', content: 'Newest'),
-          _makeNote(id: 'note-1', content: 'Existing'),
-        ],
-      });
+    test(
+      'newest note at front: seeding newest-first reflects correct order',
+      () {
+        store.seed({
+          'pet-1': [
+            _makeNote(id: 'note-2', content: 'Newest'),
+            _makeNote(id: 'note-1', content: 'Existing'),
+          ],
+        });
 
-      final notes = store.getNotes('pet-1');
-      expect(notes.first.id, 'note-2');
-      expect(notes.length, 2);
-    });
+        final notes = store.getNotes('pet-1');
+        expect(notes.first.id, 'note-2');
+        expect(notes.length, 2);
+      },
+    );
 
     test('adding a note to a new pet creates an isolated entry', () {
-      store.seed({'pet-new': [_makeNote(id: 'note-1')]});
+      store.seed({
+        'pet-new': [_makeNote(id: 'note-1')],
+      });
 
       expect(store.getNotes('pet-new').length, 1);
       expect(store.getNotes('other-pet'), isEmpty);
@@ -191,13 +201,17 @@ void main() {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.seed({'pet-1': [_makeNote()]});
+      store.seed({
+        'pet-1': [_makeNote()],
+      });
 
       expect(callCount, 1);
     });
 
     test('countForPet reflects added notes', () {
-      store.seed({'pet-1': [_makeNote(id: 'note-1')]});
+      store.seed({
+        'pet-1': [_makeNote(id: 'note-1')],
+      });
       expect(store.countForPet('pet-1'), 1);
 
       store.seed({

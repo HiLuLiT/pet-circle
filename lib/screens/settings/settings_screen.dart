@@ -23,7 +23,9 @@ class SettingsDrawer extends StatelessWidget {
       maxChildSize: 1.0,
       builder: (context, scrollController) {
         return ClipRRect(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadiiTokens.lg),
+          ),
           child: SettingsContent(
             scrollController: scrollController,
             onClose: () => Navigator.of(context).pop(),
@@ -43,9 +45,7 @@ class SettingsScreen extends StatelessWidget {
     final c = AppSemanticColors.of(context);
     return Scaffold(
       backgroundColor: c.background,
-      body: const SafeArea(
-        child: SettingsContent(),
-      ),
+      body: const SafeArea(child: SettingsContent()),
       bottomNavigationBar: BottomNavBar(
         selectedIndex: 0,
         onTap: (index) {

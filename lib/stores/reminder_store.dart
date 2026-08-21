@@ -55,7 +55,10 @@ class ReminderStore extends ChangeNotifier {
   }
 
   Future<void> updateReminder(
-      String petId, String reminderId, Reminder updated) async {
+    String petId,
+    String reminderId,
+    Reminder updated,
+  ) async {
     final list = _reminders[petId];
     if (list == null) return;
     final idx = list.indexWhere((r) => r.id == reminderId);
@@ -68,7 +71,10 @@ class ReminderStore extends ChangeNotifier {
     if (kEnableFirebase) {
       try {
         await PetService.updateReminder(
-            petId, reminderId, updated.toFirestore());
+          petId,
+          reminderId,
+          updated.toFirestore(),
+        );
       } catch (e) {
         list[idx] = previous;
         notifyListeners();
@@ -117,11 +123,13 @@ class ReminderStore extends ChangeNotifier {
     for (final id in petIds) {
       if (_pendingWritePetIds.contains(id)) continue;
       futures.add(
-        PetService.fetchReminders(id).then((list) {
-          _reminders[id] = list;
-        }).catchError((Object e) {
-          debugPrint('[ReminderStore] Failed to fetch for pet $id: $e');
-        }),
+        PetService.fetchReminders(id)
+            .then((list) {
+              _reminders[id] = list;
+            })
+            .catchError((Object e) {
+              debugPrint('[ReminderStore] Failed to fetch for pet $id: $e');
+            }),
       );
     }
     await Future.wait(futures);

@@ -104,8 +104,9 @@ void main() {
       expect(find.byType(TextButton), findsAtLeast(2));
     });
 
-    testWidgets('tapping sign out button in dialog triggers sign out flow',
-        (tester) async {
+    testWidgets('tapping sign out button in dialog triggers sign out flow', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       // Use GoRouter app so context.go('/') doesn't crash
@@ -183,7 +184,9 @@ void main() {
       expect(find.text('Profile updated'), findsOneWidget);
     }, skip: true);
 
-    testWidgets('pre-fills name and photo URL from current user', (tester) async {
+    testWidgets('pre-fills name and photo URL from current user', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -203,8 +206,9 @@ void main() {
       }
     }, skip: true);
 
-    testWidgets('entering a new name and saving updates user store',
-        (tester) async {
+    testWidgets('entering a new name and saving updates user store', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -243,7 +247,8 @@ void main() {
       expect(find.byType(AlertDialog), findsOneWidget);
       expect(
         find.text(
-            'This will export all pet data, measurements, and clinical notes as a CSV file.'),
+          'This will export all pet data, measurements, and clinical notes as a CSV file.',
+        ),
         findsOneWidget,
       );
     });
@@ -285,7 +290,9 @@ void main() {
       expect(find.byType(AlertDialog), findsNothing);
     });
 
-    testWidgets('export dialog shows title and two action buttons', (tester) async {
+    testWidgets('export dialog shows title and two action buttons', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -334,7 +341,9 @@ void main() {
       expect(find.text('Configure Alert Thresholds'), findsNothing);
     });
 
-    testWidgets('threshold sheet shows pre-populated BPM input fields', (tester) async {
+    testWidgets('threshold sheet shows pre-populated BPM input fields', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -396,7 +405,9 @@ void main() {
       expect(find.text('Terms of Service'), findsWidgets);
     });
 
-    testWidgets('close button dismisses terms of service dialog', (tester) async {
+    testWidgets('close button dismisses terms of service dialog', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -452,7 +463,9 @@ void main() {
       expect(find.text('Help & Support'), findsWidgets);
     });
 
-    testWidgets('close button dismisses help and support dialog', (tester) async {
+    testWidgets('close button dismisses help and support dialog', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -523,7 +536,9 @@ void main() {
       expect(find.text('Enter email address'), findsNothing);
     });
 
-    testWidgets('invite with empty email does not dismiss sheet', (tester) async {
+    testWidgets('invite with empty email does not dismiss sheet', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -561,8 +576,9 @@ void main() {
       expect(find.text('Member'), findsAtLeast(1));
     });
 
-    testWidgets('invite with valid email shows Send Invite button as enabled',
-        (tester) async {
+    testWidgets('invite with valid email shows Send Invite button as enabled', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -601,11 +617,16 @@ void main() {
       // Scope to the AppDropdown subtree — 'Member' also appears as a care-circle
       // member role label behind the modal sheet.
       final dropdown = find.byType(AppDropdown);
-      await tester.tap(find.descendant(of: dropdown, matching: find.text('Member')));
+      await tester.tap(
+        find.descendant(of: dropdown, matching: find.text('Member')),
+      );
       await tester.pumpAndSettle();
 
       // The 'Admin' option now appears in the inline option list.
-      final adminOption = find.descendant(of: dropdown, matching: find.text('Admin'));
+      final adminOption = find.descendant(
+        of: dropdown,
+        matching: find.text('Admin'),
+      );
       expect(adminOption, findsWidgets);
       await tester.tap(adminOption.last);
       await tester.pumpAndSettle();
@@ -636,8 +657,9 @@ void main() {
       return find.text('Invite Your Veterinarian').evaluate().isNotEmpty;
     }
 
-    testWidgets('opens share with vet bottom sheet when user can manage pet',
-        (tester) async {
+    testWidgets('opens share with vet bottom sheet when user can manage pet', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -681,35 +703,38 @@ void main() {
     }, skip: true);
 
     testWidgets(
-        'looking up vet with non-Firebase mode shows not-found state and action button',
-        (tester) async {
-      suppressOverflowErrors();
-      _setTallView(tester);
-      await tester.pumpWidget(testApp(const SettingsContent()));
-      await tester.pumpAndSettle();
+      'looking up vet with non-Firebase mode shows not-found state and action button',
+      (tester) async {
+        suppressOverflowErrors();
+        _setTallView(tester);
+        await tester.pumpWidget(testApp(const SettingsContent()));
+        await tester.pumpAndSettle();
 
-      final opened = await _openShareWithVetSheet(tester);
-      if (!opened) return;
+        final opened = await _openShareWithVetSheet(tester);
+        if (!opened) return;
 
-      // Enter email and tap Look Up (l10n.lookUpVet = "Look Up")
-      await tester.enterText(find.byType(TextField).first, 'vet@example.com');
-      await tester.pumpAndSettle();
+        // Enter email and tap Look Up (l10n.lookUpVet = "Look Up")
+        await tester.enterText(find.byType(TextField).first, 'vet@example.com');
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Look Up'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Look Up'));
+        await tester.pumpAndSettle();
 
-      // In mock mode (kEnableFirebase=false), state=4 (not found) is set immediately.
-      // The "Send Vet Invite" button should appear.
-      final sendInviteBtn = find.text('Send Vet Invite');
-      final addAsVetBtn = find.text('Add as Vet');
-      final hasAction = sendInviteBtn.evaluate().isNotEmpty ||
-          addAsVetBtn.evaluate().isNotEmpty;
-      expect(hasAction, isTrue);
-    }, skip: true);
+        // In mock mode (kEnableFirebase=false), state=4 (not found) is set immediately.
+        // The "Send Vet Invite" button should appear.
+        final sendInviteBtn = find.text('Send Vet Invite');
+        final addAsVetBtn = find.text('Add as Vet');
+        final hasAction =
+            sendInviteBtn.evaluate().isNotEmpty ||
+            addAsVetBtn.evaluate().isNotEmpty;
+        expect(hasAction, isTrue);
+      },
+      skip: true,
+    );
 
-    testWidgets(
-        'send vet invite button is visible after not-found lookup',
-        (tester) async {
+    testWidgets('send vet invite button is visible after not-found lookup', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -735,8 +760,9 @@ void main() {
       // when kEnableFirebase=true; we skip the tap to avoid async exceptions.
     }, skip: true);
 
-    testWidgets('share with vet sheet shows hospital icon and description',
-        (tester) async {
+    testWidgets('share with vet sheet shows hospital icon and description', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -775,7 +801,9 @@ void main() {
     /// Finds the trash-icon GestureDetector for a given member name and taps it.
     /// Returns true if the dialog opened.
     Future<bool> _tapTrashForMember(
-        WidgetTester tester, String memberName) async {
+      WidgetTester tester,
+      String memberName,
+    ) async {
       // Find the member's name Text widget
       final memberText = find.text(memberName);
       if (memberText.evaluate().isEmpty) return false;
@@ -788,8 +816,10 @@ void main() {
       // a Container with a specific size.
       final trashContainers = find.byWidgetPredicate((widget) {
         if (widget is Container) {
-          final w = widget.constraints?.maxWidth ?? widget.constraints?.minWidth;
-          final h = widget.constraints?.maxHeight ?? widget.constraints?.minHeight;
+          final w =
+              widget.constraints?.maxWidth ?? widget.constraints?.minWidth;
+          final h =
+              widget.constraints?.maxHeight ?? widget.constraints?.minHeight;
           // The trash container has explicit width/height=36
           return (widget.child != null) &&
               ((widget.decoration is BoxDecoration));
@@ -813,9 +843,10 @@ void main() {
       // the outermost Row (mainAxisAlignment: spaceBetween).
       final rowFinder = find.ancestor(
         of: memberText,
-        matching: find.byWidgetPredicate((w) =>
-            w is Row &&
-            w.mainAxisAlignment == MainAxisAlignment.spaceBetween),
+        matching: find.byWidgetPredicate(
+          (w) =>
+              w is Row && w.mainAxisAlignment == MainAxisAlignment.spaceBetween,
+        ),
       );
       if (rowFinder.evaluate().isEmpty) return false;
 
@@ -831,8 +862,9 @@ void main() {
       return find.byType(AlertDialog).evaluate().isNotEmpty;
     }
 
-    testWidgets('shows remove member confirmation dialog on trash icon tap',
-        (tester) async {
+    testWidgets('shows remove member confirmation dialog on trash icon tap', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -847,7 +879,9 @@ void main() {
       expect(find.text('Remove Member'), findsAtLeast(1));
     });
 
-    testWidgets('cancel on remove member dialog keeps the member', (tester) async {
+    testWidgets('cancel on remove member dialog keeps the member', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -862,8 +896,9 @@ void main() {
       expect(find.byType(AlertDialog), findsNothing);
     });
 
-    testWidgets('remove member dialog shows member name in confirmation text',
-        (tester) async {
+    testWidgets('remove member dialog shows member name in confirmation text', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -878,8 +913,9 @@ void main() {
       expect(find.text('Remove Member'), findsAtLeast(1));
     });
 
-    testWidgets('confirming remove member shows member removed snackbar',
-        (tester) async {
+    testWidgets('confirming remove member shows member removed snackbar', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));

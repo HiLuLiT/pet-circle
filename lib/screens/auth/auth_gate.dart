@@ -39,7 +39,8 @@ class _AuthGateState extends State<AuthGate> {
       uid: appUser.uid,
       email: appUser.email,
       displayName: appUser.displayName ?? appUser.email,
-      avatarUrl: appUser.photoUrl ??
+      avatarUrl:
+          appUser.photoUrl ??
           'https://ui-avatars.com/api/?name=${Uri.encodeComponent(appUser.displayName ?? appUser.email)}&background=E8B4B8&color=5B2C3F',
     );
 
@@ -131,9 +132,7 @@ class _AuthGateState extends State<AuthGate> {
     final c = AppSemanticColors.of(context);
     return Scaffold(
       backgroundColor: c.surface,
-      body: Center(
-        child: CircularProgressIndicator(color: c.primary),
-      ),
+      body: Center(child: CircularProgressIndicator(color: c.primary)),
     );
   }
 }

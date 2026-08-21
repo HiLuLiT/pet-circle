@@ -60,8 +60,9 @@ void main() {
       expect(find.byType(RoleSelectionScreen), findsOneWidget);
     });
 
-    testWidgets('shows "Choose your role" when no user name is available',
-        (tester) async {
+    testWidgets('shows "Choose your role" when no user name is available', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(_roleSelectionApp());
@@ -70,10 +71,7 @@ void main() {
       // authProvider.firebaseUser is null in test, userStore.currentUser.name
       // may be set — the screen falls back to l10n.chooseYourRole only if
       // name is null or empty. Accept either the greeting or the fallback.
-      expect(
-        find.byType(RoleSelectionScreen),
-        findsOneWidget,
-      );
+      expect(find.byType(RoleSelectionScreen), findsOneWidget);
     });
 
     testWidgets('shows "I\'m a veterinarian" button', (tester) async {
@@ -151,8 +149,9 @@ void main() {
       expect(widget.onTap, isNotNull);
     });
 
-    testWidgets('tapping vet button navigates away (kEnableFirebase=false)',
-        (tester) async {
+    testWidgets('tapping vet button navigates away (kEnableFirebase=false)', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(_roleSelectionApp());
@@ -166,17 +165,19 @@ void main() {
       expect(find.byType(RoleSelectionScreen), findsNothing);
     });
 
-    testWidgets('tapping pet owner button navigates away (kEnableFirebase=false)',
-        (tester) async {
-      suppressOverflowErrors();
+    testWidgets(
+      'tapping pet owner button navigates away (kEnableFirebase=false)',
+      (tester) async {
+        suppressOverflowErrors();
 
-      await tester.pumpWidget(_roleSelectionApp());
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_roleSelectionApp());
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text("I'm a pet owner"));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text("I'm a pet owner"));
+        await tester.pumpAndSettle();
 
-      expect(find.byType(RoleSelectionScreen), findsNothing);
-    });
+        expect(find.byType(RoleSelectionScreen), findsNothing);
+      },
+    );
   });
 }

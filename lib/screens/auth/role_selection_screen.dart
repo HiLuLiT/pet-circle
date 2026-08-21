@@ -45,8 +45,8 @@ class RoleSelectionScreen extends StatelessWidget {
 
     // Try Firebase displayName first (for Google/Apple social auth users),
     // then userStore name, fallback to generic greeting
-    final name = authProvider.firebaseUser?.displayName ??
-        userStore.currentUser?.name;
+    final name =
+        authProvider.firebaseUser?.displayName ?? userStore.currentUser?.name;
     final greeting = (name != null && name.isNotEmpty)
         ? l10n.hiUser(name)
         : l10n.chooseYourRole;
@@ -71,7 +71,11 @@ class RoleSelectionScreen extends StatelessWidget {
                       color: c.primaryGhost,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.person_outline, size: 36, color: c.primary),
+                    child: Icon(
+                      Icons.person_outline,
+                      size: 36,
+                      color: c.primary,
+                    ),
                   ),
                   const SizedBox(height: AppSpacingTokens.pcLg),
                   Text(
@@ -187,7 +191,11 @@ class _RoleCard extends StatelessWidget {
                   color: c.background,
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.arrow_forward, size: 20, color: c.textPrimary),
+                child: Icon(
+                  Icons.arrow_forward,
+                  size: 20,
+                  color: c.textPrimary,
+                ),
               ),
             ],
           ),

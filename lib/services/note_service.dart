@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pet_circle/models/clinical_note.dart';
 
 class NoteService {
-  static final _petsCollection =
-      FirebaseFirestore.instance.collection('pets');
+  static final _petsCollection = FirebaseFirestore.instance.collection('pets');
 
   static CollectionReference _ref(String petId) =>
       _petsCollection.doc(petId).collection('notes');
@@ -14,9 +13,9 @@ class NoteService {
 
   /// Fetch all clinical notes for a pet (one-time read).
   static Future<List<ClinicalNote>> fetch(String petId) async {
-    final snapshot = await _ref(petId)
-        .orderBy('createdAt', descending: true)
-        .get();
+    final snapshot = await _ref(
+      petId,
+    ).orderBy('createdAt', descending: true).get();
     return snapshot.docs.map((doc) => ClinicalNote.fromFirestore(doc)).toList();
   }
 
@@ -25,7 +24,10 @@ class NoteService {
     return _ref(petId)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => ClinicalNote.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ClinicalNote.fromFirestore(doc))
+              .toList(),
+        );
   }
 }

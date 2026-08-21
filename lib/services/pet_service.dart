@@ -47,8 +47,10 @@ class PetService {
     return _petsCollection
         .where('memberUids', arrayContains: uid)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Pet.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Pet.fromFirestore(doc)).toList(),
+        );
   }
 
   /// Stream all pets owned by a specific user.
@@ -56,8 +58,10 @@ class PetService {
     return _petsCollection
         .where('ownerId', isEqualTo: uid)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Pet.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) =>
+              snapshot.docs.map((doc) => Pet.fromFirestore(doc)).toList(),
+        );
   }
 
   /// Add a member to a pet's care circle.
@@ -76,10 +80,10 @@ class PetService {
       if (!snapshot.exists) return;
 
       final data = snapshot.data() as Map<String, dynamic>;
-      final careCircle =
-          Map<String, dynamic>.from(data['careCircle'] as Map? ?? {});
-      final memberUids =
-          List<String>.from(data['memberUids'] as List? ?? []);
+      final careCircle = Map<String, dynamic>.from(
+        data['careCircle'] as Map? ?? {},
+      );
+      final memberUids = List<String>.from(data['memberUids'] as List? ?? []);
 
       careCircle[memberKey] = member.toFirestore();
       if (!memberUids.contains(memberKey)) {
@@ -109,10 +113,10 @@ class PetService {
       if (!snapshot.exists) return;
 
       final data = snapshot.data() as Map<String, dynamic>;
-      final careCircle =
-          Map<String, dynamic>.from(data['careCircle'] as Map? ?? {});
-      final memberUids =
-          List<String>.from(data['memberUids'] as List? ?? []);
+      final careCircle = Map<String, dynamic>.from(
+        data['careCircle'] as Map? ?? {},
+      );
+      final memberUids = List<String>.from(data['memberUids'] as List? ?? []);
 
       careCircle.remove(memberKey);
       memberUids.remove(memberKey);
@@ -135,23 +139,25 @@ class PetService {
   }
 
   static Stream<List<Measurement>> streamMeasurements(String petId) {
-    return _measurementsRef(petId)
-        .orderBy('recordedAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
-          final measurements = <Measurement>[];
-          for (final doc in snapshot.docs) {
-            try {
-              measurements.add(Measurement.fromFirestore(doc));
-            } catch (e) {
-              debugPrint('Skipping malformed measurement ${doc.id}: $e');
-            }
-          }
-          return measurements;
-        });
+    return _measurementsRef(
+      petId,
+    ).orderBy('recordedAt', descending: true).snapshots().map((snapshot) {
+      final measurements = <Measurement>[];
+      for (final doc in snapshot.docs) {
+        try {
+          measurements.add(Measurement.fromFirestore(doc));
+        } catch (e) {
+          debugPrint('Skipping malformed measurement ${doc.id}: $e');
+        }
+      }
+      return measurements;
+    });
   }
 
-  static Future<void> deleteMeasurement(String petId, String measurementId) async {
+  static Future<void> deleteMeasurement(
+    String petId,
+    String measurementId,
+  ) async {
     await _measurementsRef(petId).doc(measurementId).delete();
     await _syncLatestMeasurement(petId);
   }
@@ -171,10 +177,9 @@ class PetService {
 
   /// Re-query the subcollection to find the true latest (used by delete).
   static Future<void> _syncLatestMeasurement(String petId) async {
-    final latestSnapshot = await _measurementsRef(petId)
-        .orderBy('recordedAt', descending: true)
-        .limit(1)
-        .get();
+    final latestSnapshot = await _measurementsRef(
+      petId,
+    ).orderBy('recordedAt', descending: true).limit(1).get();
 
     if (latestSnapshot.docs.isEmpty) {
       await _petsCollection.doc(petId).update({
@@ -183,8 +188,9 @@ class PetService {
       return;
     }
 
-    final latestMeasurement =
-        Measurement.fromFirestore(latestSnapshot.docs.first);
+    final latestMeasurement = Measurement.fromFirestore(
+      latestSnapshot.docs.first,
+    );
     await _petsCollection.doc(petId).update({
       'latestMeasurement': {
         'bpm': latestMeasurement.bpm,
@@ -206,8 +212,11 @@ class PetService {
     return _notesRef(petId)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => ClinicalNote.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => ClinicalNote.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   // --- Medications subcollection ---
@@ -227,7 +236,10 @@ class PetService {
     await _medicationsRef(petId).doc(medicationId).update(data);
   }
 
-  static Future<void> deleteMedication(String petId, String medicationId) async {
+  static Future<void> deleteMedication(
+    String petId,
+    String medicationId,
+  ) async {
     await _medicationsRef(petId).doc(medicationId).delete();
   }
 
@@ -235,8 +247,11 @@ class PetService {
     return _medicationsRef(petId)
         .orderBy('startDate', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Medication.fromFirestore(doc)).toList());
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => Medication.fromFirestore(doc))
+              .toList(),
+        );
   }
 
   // --- Reminders subcollection ---
@@ -267,8 +282,9 @@ class PetService {
 
   /// Fetch all reminders for a pet, ordered upcoming-first (ascending date).
   static Future<List<Reminder>> fetchReminders(String petId) async {
-    final snapshot =
-        await _remindersRef(petId).orderBy('date', descending: false).get();
+    final snapshot = await _remindersRef(
+      petId,
+    ).orderBy('date', descending: false).get();
     return snapshot.docs.map((doc) => Reminder.fromFirestore(doc)).toList();
   }
 }

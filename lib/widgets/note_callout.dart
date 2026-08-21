@@ -79,18 +79,12 @@ class NoteCallout extends StatelessWidget {
               ),
               const SizedBox(width: AppSpacingTokens.sm),
               Expanded(
-                child: Text(
-                  title,
-                  style: AppSemanticTextStyles.pcLabelBold,
-                ),
+                child: Text(title, style: AppSemanticTextStyles.pcLabelBold),
               ),
             ],
           ),
           const SizedBox(height: AppSpacingTokens.xs),
-          Text(
-            body,
-            style: AppSemanticTextStyles.pcLabelMuted,
-          ),
+          Text(body, style: AppSemanticTextStyles.pcLabelMuted),
         ],
       ),
     );

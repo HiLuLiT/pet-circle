@@ -8,6 +8,15 @@ class AppAssets {
   static const welcomeCat = 'assets/figma/welcome_cat.svg';
   static const welcomeDog = 'assets/figma/welcome_dog.svg';
   static const welcomeCombined = 'assets/figma/welcome_combined.svg';
+
+  /// Welcome/landing hero illustration (Figma DS node 402:1682, layer "Object").
+  static const welcomeHero = 'assets/figma/welcome_hero.png';
+
+  /// Welcome hero split into animated layers, from the Claude Design project
+  /// "Heart animation for dog" (dog.png / heart.png). [welcomeHero] is the
+  /// same artwork pre-composited, kept as the reduced-motion still.
+  static const welcomeDogLayer = 'assets/figma/welcome_dog.png';
+  static const welcomeHeartLayer = 'assets/figma/welcome_heart.png';
   static const googleLogo = 'assets/figma/google_logo.png';
   static const appLogo = 'assets/figma/app_logo.svg';
   static const petPlaceholder = 'assets/figma/pet_placeholder.png';
@@ -18,10 +27,12 @@ class AppAssets {
   static const petRocky = petPlaceholder;
 
   // Care circle avatars
-  static const avatar1 = 'https://ui-avatars.com/api/?name=Owner&size=128&rounded=true';
+  static const avatar1 =
+      'https://ui-avatars.com/api/?name=Owner&size=128&rounded=true';
   static const avatar2 =
       'https://ui-avatars.com/api/?name=Caregiver&size=128&rounded=true';
-  static const avatar3 = 'https://ui-avatars.com/api/?name=Vet&size=128&rounded=true';
+  static const avatar3 =
+      'https://ui-avatars.com/api/?name=Vet&size=128&rounded=true';
   static const avatar4 =
       'https://ui-avatars.com/api/?name=Viewer&size=128&rounded=true';
 

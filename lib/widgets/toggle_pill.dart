@@ -30,10 +30,7 @@ class TogglePill extends StatelessWidget {
         child: Container(
           width: 31,
           height: 31,
-          decoration: BoxDecoration(
-            color: c.surface,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: c.surface, shape: BoxShape.circle),
         ),
       ),
     );

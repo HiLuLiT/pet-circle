@@ -25,12 +25,20 @@ void main() {
       // Verify that needsOnboarding comes after unauthenticated and before authenticated
       final beforeOnboarding = ['loading', 'unauthenticated'];
       final afterOnboarding = ['authenticated'];
-      final allCases = [...beforeOnboarding, 'needsOnboarding', ...afterOnboarding];
+      final allCases = [
+        ...beforeOnboarding,
+        'needsOnboarding',
+        ...afterOnboarding,
+      ];
 
-      expect(allCases.indexOf('needsOnboarding'),
-             greaterThan(allCases.indexOf('unauthenticated')));
-      expect(allCases.indexOf('needsOnboarding'),
-             lessThan(allCases.indexOf('authenticated')));
+      expect(
+        allCases.indexOf('needsOnboarding'),
+        greaterThan(allCases.indexOf('unauthenticated')),
+      );
+      expect(
+        allCases.indexOf('needsOnboarding'),
+        lessThan(allCases.indexOf('authenticated')),
+      );
     });
 
     test('has exactly four cases', () {

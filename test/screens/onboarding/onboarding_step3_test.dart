@@ -16,22 +16,19 @@ void main() {
     testWidgets('renders without error', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);
       expect(find.byType(OnboardingStep3), findsOneWidget);
     });
 
-    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)',
-        (tester) async {
+    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       expect(find.text('Step 3 of 3'), findsNothing);
@@ -40,9 +37,7 @@ void main() {
     testWidgets('shows target respiratory rate heading', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       expect(find.text('Set Target Respiratory Rate'), findsOneWidget);
@@ -51,9 +46,7 @@ void main() {
     testWidgets('shows rate description text', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       expect(
@@ -62,12 +55,12 @@ void main() {
       );
     });
 
-    testWidgets('shows 30 BPM option with a "Most popular" badge', (tester) async {
+    testWidgets('shows 30 BPM option with a "Most popular" badge', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       // DS alignment: the "(Standard)" suffix moved out of the title into a
@@ -79,9 +72,7 @@ void main() {
     testWidgets('shows 35 BPM option', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       expect(find.text('35 BPM'), findsOneWidget);
@@ -90,9 +81,7 @@ void main() {
     testWidgets('shows Custom Rate option', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       expect(find.text('Custom Rate'), findsOneWidget);
@@ -101,9 +90,7 @@ void main() {
     testWidgets('30 BPM is selected by default', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       // Exactly one RadioCard is selected, and it is the 30 BPM option.
@@ -121,9 +108,7 @@ void main() {
     testWidgets('shows OnboardingShell wrapper', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       expect(find.byType(OnboardingShell), findsOneWidget);
@@ -132,24 +117,21 @@ void main() {
     testWidgets('shows setup title text', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       expect(find.text('Setup pet profile'), findsOneWidget);
     });
 
-    testWidgets('calls onTargetRateChanged when 35 BPM tapped',
-        (tester) async {
+    testWidgets('calls onTargetRateChanged when 35 BPM tapped', (tester) async {
       suppressOverflowErrors();
 
       int? selectedRate;
-      await tester.pumpWidget(testApp(
-        OnboardingStep3(
-          onTargetRateChanged: (rate) => selectedRate = rate,
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep3(onTargetRateChanged: (rate) => selectedRate = rate),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.ensureVisible(find.text('35 BPM'));
@@ -160,17 +142,20 @@ void main() {
       expect(selectedRate, 35);
     });
 
-    testWidgets('calls onTargetRateChanged with 30 when 30 BPM tapped',
-        (tester) async {
+    testWidgets('calls onTargetRateChanged with 30 when 30 BPM tapped', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       int? selectedRate;
-      await tester.pumpWidget(testApp(
-        OnboardingStep3(
-          initialTargetRate: 35,
-          onTargetRateChanged: (rate) => selectedRate = rate,
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep3(
+            initialTargetRate: 35,
+            onTargetRateChanged: (rate) => selectedRate = rate,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('30 BPM'));
@@ -182,9 +167,7 @@ void main() {
     testWidgets('tapping Custom Rate shows text input field', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       // No TextField initially (only rate option cards)
@@ -200,16 +183,15 @@ void main() {
       expect(find.byType(TextField), findsOneWidget);
     });
 
-    testWidgets('custom rate input calls onTargetRateChanged',
-        (tester) async {
+    testWidgets('custom rate input calls onTargetRateChanged', (tester) async {
       suppressOverflowErrors();
 
       int? selectedRate;
-      await tester.pumpWidget(testApp(
-        OnboardingStep3(
-          onTargetRateChanged: (rate) => selectedRate = rate,
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep3(onTargetRateChanged: (rate) => selectedRate = rate),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // Scroll to Custom Rate and tap it to show input
@@ -228,29 +210,26 @@ void main() {
     testWidgets('shows Back button when onBack is provided', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        OnboardingStep3(
-          onBack: () {},
-          onNext: () {},
-          nextLabel: 'Done',
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep3(onBack: () {}, onNext: () {}, nextLabel: 'Done'),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
     });
 
-    testWidgets('shows Done button when onNext is provided with nextLabel',
-        (tester) async {
+    testWidgets('shows Done button when onNext is provided with nextLabel', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        OnboardingStep3(
-          onBack: () {},
-          onNext: () {},
-          nextLabel: 'Done',
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep3(onBack: () {}, onNext: () {}, nextLabel: 'Done'),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // The nextLabel 'Done' is displayed on the button
@@ -261,13 +240,15 @@ void main() {
       suppressOverflowErrors();
 
       var backCalled = false;
-      await tester.pumpWidget(testApp(
-        OnboardingStep3(
-          onBack: () => backCalled = true,
-          onNext: () {},
-          nextLabel: 'Done',
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep3(
+            onBack: () => backCalled = true,
+            onNext: () {},
+            nextLabel: 'Done',
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.arrow_back));
@@ -280,13 +261,15 @@ void main() {
       suppressOverflowErrors();
 
       var nextCalled = false;
-      await tester.pumpWidget(testApp(
-        OnboardingStep3(
-          onBack: () {},
-          onNext: () => nextCalled = true,
-          nextLabel: 'Done',
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep3(
+            onBack: () {},
+            onNext: () => nextCalled = true,
+            nextLabel: 'Done',
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Done'));
@@ -295,13 +278,14 @@ void main() {
       expect(nextCalled, isTrue);
     });
 
-    testWidgets('initialTargetRate of 35 pre-selects that option',
-        (tester) async {
+    testWidgets('initialTargetRate of 35 pre-selects that option', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(initialTargetRate: 35),
-      ));
+      await tester.pumpWidget(
+        testApp(const OnboardingStep3(initialTargetRate: 35)),
+      );
       await tester.pumpAndSettle();
 
       // Exactly one RadioCard is selected, and it is the 35 BPM option now.
@@ -316,9 +300,7 @@ void main() {
     testWidgets('shows standard rate description', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       expect(find.text('Recommended for most dogs'), findsOneWidget);
@@ -327,9 +309,7 @@ void main() {
     testWidgets('shows elevated rate description', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep3(),
-      ));
+      await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
 
       expect(find.text('For pets with mild conditions'), findsOneWidget);

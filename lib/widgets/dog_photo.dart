@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 
 class DogPhoto extends StatefulWidget {
-  const DogPhoto({
-    super.key,
-    required this.endpoint,
-    this.fit = BoxFit.cover,
-  });
+  const DogPhoto({super.key, required this.endpoint, this.fit = BoxFit.cover});
 
   final String endpoint;
   final BoxFit fit;

@@ -47,7 +47,9 @@ void main() {
       expect(find.byType(OnboardingFlow), findsOneWidget);
     });
 
-    testWidgets('shows step 1 first with OnboardingStep1 widget', (tester) async {
+    testWidgets('shows step 1 first with OnboardingStep1 widget', (
+      tester,
+    ) async {
       await tester.pumpWidget(testApp(const OnboardingFlow()));
       await tester.pumpAndSettle();
 
@@ -56,14 +58,15 @@ void main() {
     });
 
     testWidgets(
-        'does not show a "Step X of Y" label on step 1 (dropped per DS spec)',
-        (tester) async {
-      await tester.pumpWidget(testApp(const OnboardingFlow()));
-      await tester.pumpAndSettle();
+      'does not show a "Step X of Y" label on step 1 (dropped per DS spec)',
+      (tester) async {
+        await tester.pumpWidget(testApp(const OnboardingFlow()));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Step 1 of 3'), findsNothing);
-      expect(find.text('Step 1 of 4'), findsNothing);
-    });
+        expect(find.text('Step 1 of 3'), findsNothing);
+        expect(find.text('Step 1 of 4'), findsNothing);
+      },
+    );
 
     testWidgets('PageView has exactly 3 children (not 4)', (tester) async {
       await tester.pumpWidget(testApp(const OnboardingFlow()));
@@ -94,7 +97,9 @@ void main() {
       expect(find.text('Age (years)'), findsOneWidget);
     });
 
-    testWidgets('step 1 shows weight field (photo URL field removed)', (tester) async {
+    testWidgets('step 1 shows weight field (photo URL field removed)', (
+      tester,
+    ) async {
       await tester.pumpWidget(testApp(const OnboardingFlow()));
       await tester.pumpAndSettle();
 
@@ -142,10 +147,11 @@ void main() {
 
     testWidgets('calls onNext when Next tapped', (tester) async {
       var called = false;
-      await tester.pumpWidget(testApp(OnboardingStep1(
-        onNext: () => called = true,
-        nextLabel: 'Next',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep1(onNext: () => called = true, nextLabel: 'Next'),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Next'));
@@ -156,10 +162,14 @@ void main() {
 
     testWidgets('calls onNameChanged when name is typed', (tester) async {
       String? captured;
-      await tester.pumpWidget(testApp(OnboardingStep1(
-        onNameChanged: (v) => captured = v,
-        nextLabel: 'Next',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep1(
+            onNameChanged: (v) => captured = v,
+            nextLabel: 'Next',
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Find the pet name text field by its label position (first TextField).
@@ -176,10 +186,9 @@ void main() {
     });
 
     testWidgets('pre-fills initialName', (tester) async {
-      await tester.pumpWidget(testApp(const OnboardingStep1(
-        initialName: 'Rex',
-        nextLabel: 'Next',
-      )));
+      await tester.pumpWidget(
+        testApp(const OnboardingStep1(initialName: 'Rex', nextLabel: 'Next')),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Rex'), findsOneWidget);
@@ -205,8 +214,9 @@ void main() {
       expect(find.byType(OnboardingStep2), findsOneWidget);
     });
 
-    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)',
-        (tester) async {
+    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)', (
+      tester,
+    ) async {
       setStep2Size(tester);
       await tester.pumpWidget(testApp(const OnboardingStep2()));
       await tester.pumpAndSettle();
@@ -238,10 +248,11 @@ void main() {
     testWidgets('calls onBack when back button tapped', (tester) async {
       setStep2Size(tester);
       var called = false;
-      await tester.pumpWidget(testApp(OnboardingStep2(
-        onBack: () => called = true,
-        nextLabel: 'Next',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep2(onBack: () => called = true, nextLabel: 'Next'),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.arrow_back));
@@ -270,8 +281,9 @@ void main() {
       expect(find.byType(OnboardingStep3), findsOneWidget);
     });
 
-    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)',
-        (tester) async {
+    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)', (
+      tester,
+    ) async {
       setStep3Size(tester);
       await tester.pumpWidget(testApp(const OnboardingStep3()));
       await tester.pumpAndSettle();
@@ -315,7 +327,9 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
-      await tester.pumpWidget(testApp(const OnboardingStep3(initialTargetRate: 30)));
+      await tester.pumpWidget(
+        testApp(const OnboardingStep3(initialTargetRate: 30)),
+      );
       await tester.pumpAndSettle();
 
       // The '30' option is selected by default; check widget renders.
@@ -329,10 +343,11 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       var called = false;
-      await tester.pumpWidget(testApp(OnboardingStep3(
-        onBack: () => called = true,
-        nextLabel: 'Complete',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep3(onBack: () => called = true, nextLabel: 'Complete'),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.arrow_back));
@@ -341,7 +356,9 @@ void main() {
       expect(called, isTrue);
     });
 
-    testWidgets('shows custom input when custom rate option tapped', (tester) async {
+    testWidgets('shows custom input when custom rate option tapped', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(480, 1200);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -419,43 +436,45 @@ void main() {
     });
 
     testWidgets(
-        'step 2 does not show a "Step X of Y" label after navigation (dropped per DS spec)',
-        (tester) async {
-      await tester.pumpWidget(testApp(const OnboardingFlow()));
-      await tester.pumpAndSettle();
+      'step 2 does not show a "Step X of Y" label after navigation (dropped per DS spec)',
+      (tester) async {
+        await tester.pumpWidget(testApp(const OnboardingFlow()));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Step 2 of 3'), findsNothing);
-    });
+        expect(find.text('Step 2 of 3'), findsNothing);
+      },
+    );
 
     testWidgets(
-        'step 3 does not show a "Step X of Y" label after navigation (dropped per DS spec)',
-        (tester) async {
-      tester.view.physicalSize = const Size(800, 1400);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
-      addTearDown(tester.view.resetDevicePixelRatio);
+      'step 3 does not show a "Step X of Y" label after navigation (dropped per DS spec)',
+      (tester) async {
+        tester.view.physicalSize = const Size(800, 1400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
+        addTearDown(tester.view.resetDevicePixelRatio);
 
-      final oldHandler = FlutterError.onError;
-      FlutterError.onError = (details) {
-        if (details.exceptionAsString().contains('overflowed')) return;
-        oldHandler?.call(details);
-      };
-      addTearDown(() => FlutterError.onError = oldHandler);
+        final oldHandler = FlutterError.onError;
+        FlutterError.onError = (details) {
+          if (details.exceptionAsString().contains('overflowed')) return;
+          oldHandler?.call(details);
+        };
+        addTearDown(() => FlutterError.onError = oldHandler);
 
-      await tester.pumpWidget(testApp(const OnboardingFlow()));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(testApp(const OnboardingFlow()));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Step 3 of 3'), findsNothing);
-    });
+        expect(find.text('Step 3 of 3'), findsNothing);
+      },
+    );
 
     testWidgets('step 3 shows Complete button label', (tester) async {
       tester.view.physicalSize = const Size(800, 1400);
@@ -487,29 +506,34 @@ void main() {
   // OnboardingFlow — state persistence across steps
   // ---------------------------------------------------------------------------
   group('OnboardingFlow — state persistence', () {
-    testWidgets('pet name entered on step 1 is retained when going back from step 2', (tester) async {
-      await tester.pumpWidget(testApp(const OnboardingFlow()));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'pet name entered on step 1 is retained when going back from step 2',
+      (tester) async {
+        await tester.pumpWidget(testApp(const OnboardingFlow()));
+        await tester.pumpAndSettle();
 
-      // Enter name on step 1
-      final nameField = find.widgetWithText(TextField, "Pet's Name");
-      await tester.enterText(
-        nameField.evaluate().isNotEmpty ? nameField : find.byType(TextField).first,
-        'Buddy',
-      );
-      await tester.pump();
+        // Enter name on step 1
+        final nameField = find.widgetWithText(TextField, "Pet's Name");
+        await tester.enterText(
+          nameField.evaluate().isNotEmpty
+              ? nameField
+              : find.byType(TextField).first,
+          'Buddy',
+        );
+        await tester.pump();
 
-      // Navigate to step 2
-      await tester.tap(find.text('Next'));
-      await tester.pumpAndSettle();
+        // Navigate to step 2
+        await tester.tap(find.text('Next'));
+        await tester.pumpAndSettle();
 
-      // Navigate back
-      await tester.tap(find.byIcon(Icons.arrow_back));
-      await tester.pumpAndSettle();
+        // Navigate back
+        await tester.tap(find.byIcon(Icons.arrow_back));
+        await tester.pumpAndSettle();
 
-      // Name should still be filled
-      expect(find.text('Buddy'), findsOneWidget);
-    });
+        // Name should still be filled
+        expect(find.text('Buddy'), findsOneWidget);
+      },
+    );
 
     testWidgets('_goTo with out-of-range index has no effect', (tester) async {
       // The _goTo method guards index < 0 or index > 2.
@@ -526,12 +550,18 @@ void main() {
   // OnboardingStep1 — additional input callbacks
   // ---------------------------------------------------------------------------
   group('OnboardingStep1 — breed and age callbacks', () {
-    testWidgets('calls onBreedChanged when breed field changes', (tester) async {
+    testWidgets('calls onBreedChanged when breed field changes', (
+      tester,
+    ) async {
       String? capturedBreed;
-      await tester.pumpWidget(testApp(OnboardingStep1(
-        onBreedChanged: (v) => capturedBreed = v,
-        nextLabel: 'Next',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep1(
+            onBreedChanged: (v) => capturedBreed = v,
+            nextLabel: 'Next',
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Breed field is a custom BreedSearchField backed by a TextField
@@ -548,10 +578,14 @@ void main() {
 
     testWidgets('calls onAgeChanged when age field changes', (tester) async {
       String? capturedAge;
-      await tester.pumpWidget(testApp(OnboardingStep1(
-        onAgeChanged: (v) => capturedAge = v,
-        nextLabel: 'Next',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep1(
+            onAgeChanged: (v) => capturedAge = v,
+            nextLabel: 'Next',
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       final ageField = find.widgetWithText(TextField, 'Age (years)');
@@ -565,11 +599,15 @@ void main() {
     });
 
     testWidgets('pre-fills initialBreed and initialAge', (tester) async {
-      await tester.pumpWidget(testApp(const OnboardingStep1(
-        initialBreed: 'Golden Retriever',
-        initialAge: '5',
-        nextLabel: 'Next',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          const OnboardingStep1(
+            initialBreed: 'Golden Retriever',
+            initialAge: '5',
+            nextLabel: 'Next',
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('5'), findsOneWidget);
@@ -587,13 +625,19 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
     }
 
-    testWidgets('calls onDiagnosisChanged when diagnosis field changes', (tester) async {
+    testWidgets('calls onDiagnosisChanged when diagnosis field changes', (
+      tester,
+    ) async {
       setStep2Size(tester);
       String? captured;
-      await tester.pumpWidget(testApp(OnboardingStep2(
-        onDiagnosisChanged: (v) => captured = v,
-        nextLabel: 'Next',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep2(
+            onDiagnosisChanged: (v) => captured = v,
+            nextLabel: 'Next',
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // DS alignment: diagnosis is now a plain free-text TextField (no
@@ -606,10 +650,14 @@ void main() {
 
     testWidgets('pre-fills initialDiagnosis', (tester) async {
       setStep2Size(tester);
-      await tester.pumpWidget(testApp(const OnboardingStep2(
-        initialDiagnosis: 'MVD Stage B1',
-        nextLabel: 'Next',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          const OnboardingStep2(
+            initialDiagnosis: 'MVD Stage B1',
+            nextLabel: 'Next',
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('MVD Stage B1'), findsOneWidget);
@@ -618,10 +666,11 @@ void main() {
     testWidgets('calls onNext when Next tapped on step 2', (tester) async {
       setStep2Size(tester);
       var called = false;
-      await tester.pumpWidget(testApp(OnboardingStep2(
-        onNext: () => called = true,
-        nextLabel: 'Next',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep2(onNext: () => called = true, nextLabel: 'Next'),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Next'));
@@ -642,14 +691,20 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
     }
 
-    testWidgets('calls onTargetRateChanged when 35 BPM option tapped', (tester) async {
+    testWidgets('calls onTargetRateChanged when 35 BPM option tapped', (
+      tester,
+    ) async {
       setStep3Size(tester);
       int? capturedRate;
-      await tester.pumpWidget(testApp(OnboardingStep3(
-        onTargetRateChanged: (v) => capturedRate = v,
-        nextLabel: 'Complete',
-        initialTargetRate: 30,
-      )));
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep3(
+            onTargetRateChanged: (v) => capturedRate = v,
+            nextLabel: 'Complete',
+            initialTargetRate: 30,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('35 BPM'));
@@ -658,24 +713,31 @@ void main() {
       expect(capturedRate, 35);
     });
 
-    testWidgets('isNextLoading=true shows loading state on Complete button', (tester) async {
+    testWidgets('isNextLoading=true shows loading state on Complete button', (
+      tester,
+    ) async {
       setStep3Size(tester);
-      await tester.pumpWidget(testApp(const OnboardingStep3(
-        nextLabel: 'Complete',
-        isNextLoading: true,
-      )));
-      await tester.pump(); // single pump — avoid pumpAndSettle with infinite animations
+      await tester.pumpWidget(
+        testApp(
+          const OnboardingStep3(nextLabel: 'Complete', isNextLoading: true),
+        ),
+      );
+      await tester
+          .pump(); // single pump — avoid pumpAndSettle with infinite animations
 
       // When loading, a CircularProgressIndicator should appear instead of the label.
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
     });
 
-    testWidgets('initialTargetRate=35 pre-selects 35 BPM option', (tester) async {
+    testWidgets('initialTargetRate=35 pre-selects 35 BPM option', (
+      tester,
+    ) async {
       setStep3Size(tester);
-      await tester.pumpWidget(testApp(const OnboardingStep3(
-        initialTargetRate: 35,
-        nextLabel: 'Complete',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          const OnboardingStep3(initialTargetRate: 35, nextLabel: 'Complete'),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(OnboardingStep3), findsOneWidget);

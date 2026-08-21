@@ -94,8 +94,9 @@ void main() {
       expect(find.text('Continue with Apple'), findsOneWidget);
     });
 
-    testWidgets('shows "Already have an account?" with "Sign In" link',
-        (tester) async {
+    testWidgets('shows "Already have an account?" with "Sign In" link', (
+      tester,
+    ) async {
       await _pumpWelcome(tester);
 
       // Text.rich concatenates spans: "Already have an account? " + "Sign In"
@@ -140,15 +141,9 @@ void main() {
       await _pumpWelcome(tester);
 
       // Fill in a valid name so we get past name validation
-      await tester.enterText(
-        find.byType(TextFormField).first,
-        'Test User',
-      );
+      await tester.enterText(find.byType(TextFormField).first, 'Test User');
       // Enter invalid email
-      await tester.enterText(
-        find.byType(TextFormField).last,
-        'not-an-email',
-      );
+      await tester.enterText(find.byType(TextFormField).last, 'not-an-email');
 
       await tester.tap(find.text('Get started'));
       await tester.pumpAndSettle();
@@ -163,15 +158,13 @@ void main() {
       expect(scaffold.backgroundColor, isNotNull);
     });
 
-    testWidgets('form validation: valid name + valid email passes validation',
-        (tester) async {
+    testWidgets('form validation: valid name + valid email passes validation', (
+      tester,
+    ) async {
       await _pumpWelcome(tester);
 
       // Fill in a valid name
-      await tester.enterText(
-        find.byType(TextFormField).first,
-        'Test User',
-      );
+      await tester.enterText(find.byType(TextFormField).first, 'Test User');
       // Fill in a valid email
       await tester.enterText(
         find.byType(TextFormField).last,
@@ -194,10 +187,7 @@ void main() {
       await _pumpWelcome(tester);
 
       // Fill in a valid name but leave email empty
-      await tester.enterText(
-        find.byType(TextFormField).first,
-        'Test User',
-      );
+      await tester.enterText(find.byType(TextFormField).first, 'Test User');
 
       await tester.tap(find.text('Get started'));
       await tester.pumpAndSettle();

@@ -48,13 +48,15 @@ void main() {
       expect(find.text('Manage your preferences'), findsOneWidget);
     });
 
-    testWidgets('shows close button when onClose callback provided', (tester) async {
+    testWidgets('shows close button when onClose callback provided', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       var closed = false;
-      await tester.pumpWidget(testApp(
-        SettingsContent(onClose: () => closed = true),
-      ));
+      await tester.pumpWidget(
+        testApp(SettingsContent(onClose: () => closed = true)),
+      );
       await tester.pumpAndSettle();
 
       // DS alignment: the close affordance is now a collapse chevron
@@ -65,7 +67,9 @@ void main() {
       expect(closed, isTrue);
     });
 
-    testWidgets('does not show close button when onClose is null', (tester) async {
+    testWidgets('does not show close button when onClose is null', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setTallView(tester);
       await tester.pumpWidget(testApp(const SettingsContent()));
@@ -204,9 +208,9 @@ void main() {
       final controller = ScrollController();
       addTearDown(controller.dispose);
 
-      await tester.pumpWidget(testApp(
-        SettingsContent(scrollController: controller),
-      ));
+      await tester.pumpWidget(
+        testApp(SettingsContent(scrollController: controller)),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(SettingsContent), findsOneWidget);

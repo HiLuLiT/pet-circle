@@ -64,10 +64,7 @@ void main() {
       });
 
       test('bodyMedium is regular weight (w400)', () {
-        expect(
-          theme.textTheme.bodyMedium?.fontWeight,
-          equals(FontWeight.w400),
-        );
+        expect(theme.textTheme.bodyMedium?.fontWeight, equals(FontWeight.w400));
       });
 
       test('labelSmall has fontSize 12', () {
@@ -88,21 +85,16 @@ void main() {
       });
 
       test('border is OutlineInputBorder', () {
-        expect(
-          theme.inputDecorationTheme.border,
-          isA<OutlineInputBorder>(),
-        );
+        expect(theme.inputDecorationTheme.border, isA<OutlineInputBorder>());
       });
 
       test('border has borderRadius of 14 (PC v3 field radius)', () {
-        final border =
-            theme.inputDecorationTheme.border as OutlineInputBorder;
+        final border = theme.inputDecorationTheme.border as OutlineInputBorder;
         expect(border.borderRadius, equals(BorderRadius.circular(14)));
       });
 
       test('border side is none', () {
-        final border =
-            theme.inputDecorationTheme.border as OutlineInputBorder;
+        final border = theme.inputDecorationTheme.border as OutlineInputBorder;
         expect(border.borderSide, equals(BorderSide.none));
       });
     });
@@ -172,8 +164,7 @@ void main() {
       });
 
       test('border is OutlineInputBorder with radius 14 (PC v3)', () {
-        final border =
-            theme.inputDecorationTheme.border as OutlineInputBorder;
+        final border = theme.inputDecorationTheme.border as OutlineInputBorder;
         expect(border.borderRadius, equals(BorderRadius.circular(14)));
       });
     });

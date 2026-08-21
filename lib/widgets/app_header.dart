@@ -52,8 +52,9 @@ class AppHeader extends StatelessWidget {
                 Flexible(
                   child: Text(
                     petName!,
-                    style: AppSemanticTextStyles.headingH2
-                        .copyWith(color: c.textPrimary),
+                    style: AppSemanticTextStyles.headingH2.copyWith(
+                      color: c.textPrimary,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

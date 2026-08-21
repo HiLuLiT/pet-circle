@@ -26,8 +26,8 @@ class InvitationStore extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _pendingInvitations =
-          await invitationRepository.getPendingInvitationsForEmail(email);
+      _pendingInvitations = await invitationRepository
+          .getPendingInvitationsForEmail(email);
     } catch (e) {
       _lastError = e.toString();
     } finally {

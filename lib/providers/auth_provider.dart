@@ -11,12 +11,7 @@ import 'package:pet_circle/stores/settings_store.dart';
 import 'package:pet_circle/stores/user_store.dart';
 import 'package:pet_circle/main.dart' show pushService;
 
-enum AuthRouteState {
-  loading,
-  unauthenticated,
-  needsOnboarding,
-  authenticated,
-}
+enum AuthRouteState { loading, unauthenticated, needsOnboarding, authenticated }
 
 final authProvider = AuthProvider();
 
@@ -49,7 +44,9 @@ class AuthProvider extends ChangeNotifier {
 
   void init() {
     if (_authSubscription != null) return;
-    _authSubscription = AuthService.authStateChanges.listen(_onAuthStateChanged);
+    _authSubscription = AuthService.authStateChanges.listen(
+      _onAuthStateChanged,
+    );
   }
 
   Future<void> _onAuthStateChanged(User? user) async {
@@ -83,8 +80,8 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       try {
         final displayName = user.displayName ?? '';
-        final photoUrl = user.photoURL ??
-            _uiAvatarsFallback(displayName, user.email ?? '');
+        final photoUrl =
+            user.photoURL ?? _uiAvatarsFallback(displayName, user.email ?? '');
         await userRepository.createUser(
           uid: user.uid,
           email: user.email ?? '',

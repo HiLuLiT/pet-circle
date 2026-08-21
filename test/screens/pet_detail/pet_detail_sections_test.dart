@@ -27,18 +27,18 @@ void _setPhoneSize(WidgetTester tester) {
 Pet _testPet() => petStore.ownerPets.first;
 
 Pet _testPetNoMeasurement() => Pet(
-      name: 'Buddy',
-      breedAndAge: 'Poodle • 3 years old',
-      imageUrl: AppAssets.petPlaceholder,
-      statusLabel: 'Normal',
-      statusColorHex: AppPrimitives.blueBase.toARGB32(),
-      latestMeasurement: Measurement(
-        bpm: 0,
-        recordedAt: DateTime.now(),
-        recordedAtLabel: 'No measurements yet',
-      ),
-      careCircle: const [],
-    );
+  name: 'Buddy',
+  breedAndAge: 'Poodle • 3 years old',
+  imageUrl: AppAssets.petPlaceholder,
+  statusLabel: 'Normal',
+  statusColorHex: AppPrimitives.blueBase.toARGB32(),
+  latestMeasurement: Measurement(
+    bpm: 0,
+    recordedAt: DateTime.now(),
+    recordedAtLabel: 'No measurements yet',
+  ),
+  careCircle: const [],
+);
 
 void main() {
   setUpAll(() => HttpOverrides.global = MockHttpOverrides());
@@ -162,7 +162,9 @@ void main() {
       expect(chartBox, isNotEmpty);
     });
 
-    testWidgets('renders gracefully when pet has no measurements', (tester) async {
+    testWidgets('renders gracefully when pet has no measurements', (
+      tester,
+    ) async {
       suppressOverflowErrors();
       _setPhoneSize(tester);
 
@@ -237,13 +239,15 @@ void main() {
       // Use a pet without seeded notes.
       final pet = _testPetNoMeasurement();
       final controller = TextEditingController();
-      await tester.pumpWidget(testApp(
-        PetClinicalNotes(
-          pet: pet,
-          noteController: controller,
-          onAddNote: () {},
+      await tester.pumpWidget(
+        testApp(
+          PetClinicalNotes(
+            pet: pet,
+            noteController: controller,
+            onAddNote: () {},
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('No clinical notes yet'), findsOneWidget);
@@ -318,12 +322,12 @@ void main() {
   // ---------------------------------------------------------------------------
   group('NoteCard', () {
     ClinicalNote _testNote() => ClinicalNote(
-          id: 'test-note-1',
-          authorName: 'Dr. Test',
-          authorAvatarUrl: 'https://example.com/avatar.png',
-          content: 'Patient doing well.',
-          createdAt: DateTime.now().subtract(const Duration(hours: 3)),
-        );
+      id: 'test-note-1',
+      authorName: 'Dr. Test',
+      authorAvatarUrl: 'https://example.com/avatar.png',
+      content: 'Patient doing well.',
+      createdAt: DateTime.now().subtract(const Duration(hours: 3)),
+    );
 
     testWidgets('renders without error', (tester) async {
       suppressOverflowErrors();
@@ -418,7 +422,9 @@ void main() {
       suppressOverflowErrors();
       _setPhoneSize(tester);
 
-      await tester.pumpWidget(testApp(const MemberTile(member: _regularMember)));
+      await tester.pumpWidget(
+        testApp(const MemberTile(member: _regularMember)),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(RoleBadge), findsOneWidget);
@@ -435,12 +441,16 @@ void main() {
       suppressOverflowErrors();
       _setPhoneSize(tester);
 
-      await tester.pumpWidget(testApp(InfoTile(
-        icon: Icons.favorite,
-        iconColor: Colors.red,
-        value: '22',
-        label: 'BPM',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          InfoTile(
+            icon: Icons.favorite,
+            iconColor: Colors.red,
+            value: '22',
+            label: 'BPM',
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(InfoTile), findsOneWidget);
@@ -450,12 +460,16 @@ void main() {
       suppressOverflowErrors();
       _setPhoneSize(tester);
 
-      await tester.pumpWidget(testApp(InfoTile(
-        icon: Icons.favorite,
-        iconColor: Colors.red,
-        value: '22',
-        label: 'BPM',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          InfoTile(
+            icon: Icons.favorite,
+            iconColor: Colors.red,
+            value: '22',
+            label: 'BPM',
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('22'), findsOneWidget);
@@ -465,12 +479,16 @@ void main() {
       suppressOverflowErrors();
       _setPhoneSize(tester);
 
-      await tester.pumpWidget(testApp(InfoTile(
-        icon: Icons.favorite,
-        iconColor: Colors.red,
-        value: '22',
-        label: 'BPM',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          InfoTile(
+            icon: Icons.favorite,
+            iconColor: Colors.red,
+            value: '22',
+            label: 'BPM',
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('BPM'), findsOneWidget);
@@ -480,12 +498,16 @@ void main() {
       suppressOverflowErrors();
       _setPhoneSize(tester);
 
-      await tester.pumpWidget(testApp(InfoTile(
-        icon: Icons.favorite,
-        iconColor: Colors.red,
-        value: '22',
-        label: 'BPM',
-      )));
+      await tester.pumpWidget(
+        testApp(
+          InfoTile(
+            icon: Icons.favorite,
+            iconColor: Colors.red,
+            value: '22',
+            label: 'BPM',
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.favorite), findsOneWidget);

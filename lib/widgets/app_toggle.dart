@@ -41,8 +41,9 @@ class AppToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final semanticColors = AppSemanticColors.of(context);
-    final Color background =
-        value ? semanticColors.accentPurpleTile : semanticColors.accentButterCream;
+    final Color background = value
+        ? semanticColors.accentPurpleTile
+        : semanticColors.accentButterCream;
 
     final Widget pill = AnimatedContainer(
       duration: _duration,

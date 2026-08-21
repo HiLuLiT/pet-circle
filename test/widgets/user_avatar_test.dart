@@ -10,36 +10,29 @@ void main() {
   group('UserAvatar', () {
     // ── Smoke ───────────────────────────────────────────────────────────────
     testWidgets('renders without error', (tester) async {
-      await tester.pumpWidget(testApp(
-        const UserAvatar(name: 'Test User'),
-      ));
+      await tester.pumpWidget(testApp(const UserAvatar(name: 'Test User')));
       expect(find.byType(UserAvatar), findsOneWidget);
     });
 
     // ── Variant / state tests ──────────────────────────────────────────────
     testWidgets('shows initials for single name', (tester) async {
-      await tester.pumpWidget(testApp(
-        const UserAvatar(name: 'Alice'),
-      ));
+      await tester.pumpWidget(testApp(const UserAvatar(name: 'Alice')));
       expect(find.text('A'), findsOneWidget);
     });
 
     testWidgets('shows two-letter initials for full name', (tester) async {
-      await tester.pumpWidget(testApp(
-        const UserAvatar(name: 'John Doe'),
-      ));
+      await tester.pumpWidget(testApp(const UserAvatar(name: 'John Doe')));
       expect(find.text('JD'), findsOneWidget);
     });
 
     testWidgets('shows ? for empty name', (tester) async {
-      await tester.pumpWidget(testApp(
-        const UserAvatar(name: ''),
-      ));
+      await tester.pumpWidget(testApp(const UserAvatar(name: '')));
       expect(find.text('?'), findsOneWidget);
     });
 
-    testWidgets('attempts network image when imageUrl starts with http',
-        (tester) async {
+    testWidgets('attempts network image when imageUrl starts with http', (
+      tester,
+    ) async {
       // Network images fail in tests (no real HTTP), so the errorBuilder
       // falls back to initials. Verify that Image.network is in the tree
       // (proving the URL path was taken) even though the fallback shows.
@@ -47,12 +40,14 @@ void main() {
       final oldHandler = FlutterError.onError;
       FlutterError.onError = (details) => errors.add(details);
 
-      await tester.pumpWidget(testApp(
-        const UserAvatar(
-          name: 'Jane Doe',
-          imageUrl: 'https://example.com/photo.jpg',
+      await tester.pumpWidget(
+        testApp(
+          const UserAvatar(
+            name: 'Jane Doe',
+            imageUrl: 'https://example.com/photo.jpg',
+          ),
         ),
-      ));
+      );
       await tester.pump();
 
       FlutterError.onError = oldHandler;
@@ -62,19 +57,22 @@ void main() {
       expect(find.text('JD'), findsOneWidget);
     });
 
-    testWidgets('falls back to initials when imageUrl is empty', (tester) async {
-      await tester.pumpWidget(testApp(
-        const UserAvatar(name: 'Bob Smith', imageUrl: ''),
-      ));
+    testWidgets('falls back to initials when imageUrl is empty', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        testApp(const UserAvatar(name: 'Bob Smith', imageUrl: '')),
+      );
       expect(find.text('BS'), findsOneWidget);
     });
 
     testWidgets('respects custom size', (tester) async {
-      await tester.pumpWidget(testApp(
-        const UserAvatar(name: 'Test', size: 64),
-      ));
+      await tester.pumpWidget(
+        testApp(const UserAvatar(name: 'Test', size: 64)),
+      );
 
-      final container = tester.widgetList<Container>(find.byType(Container))
+      final container = tester
+          .widgetList<Container>(find.byType(Container))
           .where((c) => c.constraints?.maxWidth == 64);
       expect(container.isNotEmpty, isTrue);
     });
@@ -82,9 +80,9 @@ void main() {
     // ── Interaction test ────────────────────────────────────────────────────
     testWidgets('calls onTap when tapped', (tester) async {
       var tapped = false;
-      await tester.pumpWidget(testApp(
-        UserAvatar(name: 'Tap Me', onTap: () => tapped = true),
-      ));
+      await tester.pumpWidget(
+        testApp(UserAvatar(name: 'Tap Me', onTap: () => tapped = true)),
+      );
 
       await tester.tap(find.byType(UserAvatar));
       expect(tapped, isTrue);
@@ -92,44 +90,40 @@ void main() {
 
     // ── Theme token tests ───────────────────────────────────────────────────
     testWidgets('fallback bg is primaryLight', (tester) async {
-      await tester.pumpWidget(testApp(
-        const UserAvatar(name: 'AB'),
-      ));
+      await tester.pumpWidget(testApp(const UserAvatar(name: 'AB')));
 
-      final container = tester.widgetList<Container>(find.byType(Container))
+      final container = tester
+          .widgetList<Container>(find.byType(Container))
           .where((c) {
-        final decoration = c.decoration;
-        if (decoration is BoxDecoration) {
-          return decoration.color == AppSemanticColors.light.primaryLight;
-        }
-        return false;
-      });
+            final decoration = c.decoration;
+            if (decoration is BoxDecoration) {
+              return decoration.color == AppSemanticColors.light.primaryLight;
+            }
+            return false;
+          });
       expect(container.isNotEmpty, isTrue);
     });
 
     testWidgets('border color is surface', (tester) async {
-      await tester.pumpWidget(testApp(
-        const UserAvatar(name: 'AB'),
-      ));
+      await tester.pumpWidget(testApp(const UserAvatar(name: 'AB')));
 
-      final container = tester.widgetList<Container>(find.byType(Container))
+      final container = tester
+          .widgetList<Container>(find.byType(Container))
           .where((c) {
-        final decoration = c.decoration;
-        if (decoration is BoxDecoration) {
-          final border = decoration.border;
-          if (border is Border) {
-            return border.top.color == AppSemanticColors.light.surface;
-          }
-        }
-        return false;
-      });
+            final decoration = c.decoration;
+            if (decoration is BoxDecoration) {
+              final border = decoration.border;
+              if (border is Border) {
+                return border.top.color == AppSemanticColors.light.surface;
+              }
+            }
+            return false;
+          });
       expect(container.isNotEmpty, isTrue);
     });
 
     testWidgets('initials text color is textPrimary', (tester) async {
-      await tester.pumpWidget(testApp(
-        const UserAvatar(name: 'Charlie Davis'),
-      ));
+      await tester.pumpWidget(testApp(const UserAvatar(name: 'Charlie Davis')));
 
       final text = tester.widget<Text>(find.text('CD'));
       expect(text.style?.color, AppSemanticColors.light.textPrimary);

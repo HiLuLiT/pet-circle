@@ -49,8 +49,10 @@ class PrimaryButton extends StatelessWidget {
     this.variant = PrimaryButtonVariant.filled,
     this.fullWidth,
     this.isLoading = false,
-  }) : assert(label != null || child != null || isLoading,
-            'Either label, child, or isLoading must be provided');
+  }) : assert(
+         label != null || child != null || isLoading,
+         'Either label, child, or isLoading must be provided',
+       );
 
   final String? label;
   final VoidCallback? onPressed;
@@ -146,7 +148,8 @@ class PrimaryButton extends StatelessWidget {
 
     // Icon gap matches DS: 16px for Primary/Secondary, 12px for Tertiary.
     final double iconGap = isOutlined
-        ? AppSpacingTokens.sm + 4 // 12px
+        ? AppSpacingTokens.sm +
+              4 // 12px
         : AppSpacingTokens.md; // 16px
 
     // ── Inner content ───────────────────────────────────────────────────────
@@ -160,31 +163,31 @@ class PrimaryButton extends StatelessWidget {
             ),
           )
         : child ??
-        Row(
-          mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, color: effectiveFg, size: 24),
-              SizedBox(width: iconGap),
-            ],
-            Flexible(
-              child: Text(
-                label!,
-                style: style,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            if (trailingIcon != null) ...[
-              SizedBox(width: iconGap),
-              IconTheme.merge(
-                data: IconThemeData(color: effectiveFg, size: 24),
-                child: trailingIcon!,
-              ),
-            ],
-          ],
-        );
+              Row(
+                mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (icon != null) ...[
+                    Icon(icon, color: effectiveFg, size: 24),
+                    SizedBox(width: iconGap),
+                  ],
+                  Flexible(
+                    child: Text(
+                      label!,
+                      style: style,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (trailingIcon != null) ...[
+                    SizedBox(width: iconGap),
+                    IconTheme.merge(
+                      data: IconThemeData(color: effectiveFg, size: 24),
+                      child: trailingIcon!,
+                    ),
+                  ],
+                ],
+              );
 
     // ── Style: pill, ~54h (32x16 padding), optional 1px ink border ──────────
     final BorderSide borderSide = isOutlined
@@ -231,7 +234,8 @@ class PrimaryButton extends StatelessWidget {
     final TextStyle baseStyle = _miniLabelStyle(fg);
     final style = textStyle?.copyWith(color: fg) ?? baseStyle;
 
-    final Widget buttonChild = child ??
+    final Widget buttonChild =
+        child ??
         Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -271,11 +275,7 @@ class PrimaryButton extends StatelessWidget {
       shape: const RoundedRectangleBorder(),
     );
 
-    return TextButton(
-      style: bStyle,
-      onPressed: onPressed,
-      child: buttonChild,
-    );
+    return TextButton(style: bStyle, onPressed: onPressed, child: buttonChild);
   }
 
   // ── miniPrimary variant (Figma 474:2550) ─────────────────────────────────
@@ -293,7 +293,8 @@ class PrimaryButton extends StatelessWidget {
     final TextStyle baseStyle = _miniLabelStyle(effectiveFg);
     final style = textStyle?.copyWith(color: effectiveFg) ?? baseStyle;
 
-    final Widget buttonChild = child ??
+    final Widget buttonChild =
+        child ??
         Row(
           mainAxisSize: isFullWidth ? MainAxisSize.max : MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,

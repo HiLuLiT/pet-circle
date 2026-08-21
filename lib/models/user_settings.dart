@@ -66,15 +66,13 @@ class UserSettings {
       visionRREnabled: data['visionRREnabled'] ?? false,
       weeklySummaryEnabled:
           data['weeklySummaryEnabled'] ?? data['autoExport'] ?? false,
-      measurementRemindersEnabled:
-          data['measurementRemindersEnabled'] ?? true,
-      measurementReminderFrequency:
-          data['measurementReminderFrequency'] ?? 3,
+      measurementRemindersEnabled: data['measurementRemindersEnabled'] ?? true,
+      measurementReminderFrequency: data['measurementReminderFrequency'] ?? 3,
       measurementReminderDays:
           (data['measurementReminderDays'] as List<dynamic>?)
-                  ?.map((e) => e as int)
-                  .toList() ??
-              const [1, 3, 5],
+              ?.map((e) => e as int)
+              .toList() ??
+          const [1, 3, 5],
       measurementReminderHour: data['measurementReminderHour'] ?? 20,
       measurementReminderMinute: data['measurementReminderMinute'] ?? 0,
       medicationMorningHour: data['medicationMorningHour'] ?? 9,

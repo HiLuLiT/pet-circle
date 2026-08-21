@@ -27,9 +27,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      testApp(const OwnerDashboard(showScaffold: false)),
-    );
+    await tester.pumpWidget(testApp(const OwnerDashboard(showScaffold: false)));
     await tester.pump();
   }
 
@@ -61,8 +59,9 @@ void main() {
       expect(find.text(pet!.name), findsWidgets);
     });
 
-    testWidgets('shows the Active status badge on the hero card',
-        (tester) async {
+    testWidgets('shows the Active status badge on the hero card', (
+      tester,
+    ) async {
       await pumpDashboard(tester);
       expect(find.text('Active'), findsOneWidget);
     });
@@ -77,8 +76,9 @@ void main() {
       expect(find.text('Latest Reading'), findsOneWidget);
     });
 
-    testWidgets('hides latest reading card when there is no measurement',
-        (tester) async {
+    testWidgets('hides latest reading card when there is no measurement', (
+      tester,
+    ) async {
       final pet = petStore.activePet!;
       measurementStore.seed({pet.id ?? '': const <Measurement>[]});
 
@@ -92,8 +92,9 @@ void main() {
       expect(find.text('Care Circle'), findsOneWidget);
     });
 
-    testWidgets('shows Reminders card with seeded reminder titles',
-        (tester) async {
+    testWidgets('shows Reminders card with seeded reminder titles', (
+      tester,
+    ) async {
       await pumpDashboard(tester);
 
       expect(find.text('Reminders'), findsOneWidget);
@@ -101,8 +102,9 @@ void main() {
       expect(find.text('Vaccination booster'), findsOneWidget);
     });
 
-    testWidgets('shows empty reminders state when pet has none',
-        (tester) async {
+    testWidgets('shows empty reminders state when pet has none', (
+      tester,
+    ) async {
       final pet = petStore.activePet!;
       reminderStore.seed({pet.id ?? '': const []});
 
@@ -111,8 +113,9 @@ void main() {
       expect(find.text('No reminders yet'), findsOneWidget);
     });
 
-    testWidgets('tapping the reminders + icon opens the add-reminder sheet',
-        (tester) async {
+    testWidgets('tapping the reminders + icon opens the add-reminder sheet', (
+      tester,
+    ) async {
       await pumpDashboard(tester);
 
       await tester.tap(find.byIcon(Icons.add_circle_outline).last);
@@ -121,8 +124,9 @@ void main() {
       expect(find.byType(AddReminderSheet), findsOneWidget);
     });
 
-    testWidgets('reminder tile shows a close button instead of opening a sheet',
-        (tester) async {
+    testWidgets('reminder tile shows a close button instead of opening a sheet', (
+      tester,
+    ) async {
       await pumpDashboard(tester);
 
       // Tiles are no longer tappable — tapping the text does not open any sheet.

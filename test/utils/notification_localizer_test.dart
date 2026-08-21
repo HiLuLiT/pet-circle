@@ -48,33 +48,47 @@ void main() {
       };
       for (final entry in cases.entries) {
         final n = _notif(titleKey: entry.key);
-        expect(localizeNotification(n, en).title, entry.value,
-            reason: entry.key);
+        expect(
+          localizeNotification(n, en).title,
+          entry.value,
+          reason: entry.key,
+        );
       }
     });
 
     test('resolves templated inviteAcceptedTitle with two args (en)', () {
       final n = _notif(
-          titleKey: 'inviteAcceptedTitle', args: const ['a@b.com', 'Rex']);
-      expect(localizeNotification(n, en).title,
-          en.inviteAcceptedTitle('a@b.com', 'Rex'));
+        titleKey: 'inviteAcceptedTitle',
+        args: const ['a@b.com', 'Rex'],
+      );
+      expect(
+        localizeNotification(n, en).title,
+        en.inviteAcceptedTitle('a@b.com', 'Rex'),
+      );
     });
 
     test('resolves templated inviteAcceptedTitle in Hebrew (he)', () {
       final n = _notif(
-          titleKey: 'inviteAcceptedTitle', args: const ['a@b.com', 'Rex']);
-      expect(localizeNotification(n, he).title,
-          he.inviteAcceptedTitle('a@b.com', 'Rex'));
+        titleKey: 'inviteAcceptedTitle',
+        args: const ['a@b.com', 'Rex'],
+      );
+      expect(
+        localizeNotification(n, he).title,
+        he.inviteAcceptedTitle('a@b.com', 'Rex'),
+      );
     });
 
-    test('falls back to stored title when inviteAcceptedTitle args are insufficient',
-        () {
-      final n = _notif(
+    test(
+      'falls back to stored title when inviteAcceptedTitle args are insufficient',
+      () {
+        final n = _notif(
           title: 'frozen title',
           titleKey: 'inviteAcceptedTitle',
-          args: const ['a@b.com']);
-      expect(localizeNotification(n, en).title, 'frozen title');
-    });
+          args: const ['a@b.com'],
+        );
+        expect(localizeNotification(n, en).title, 'frozen title');
+      },
+    );
 
     test('falls back to stored title when titleKey is null', () {
       final n = _notif(title: 'frozen title');
@@ -90,9 +104,13 @@ void main() {
   group('localizeNotification — body resolution', () {
     test('resolves templated body with string args (medicationEndingBody)', () {
       final n = _notif(
-          bodyKey: 'medicationEndingBody', args: const ['Rex', 'test med']);
-      expect(localizeNotification(n, en).body,
-          en.medicationEndingBody('Rex', 'test med'));
+        bodyKey: 'medicationEndingBody',
+        args: const ['Rex', 'test med'],
+      );
+      expect(
+        localizeNotification(n, en).body,
+        en.medicationEndingBody('Rex', 'test med'),
+      );
     });
 
     test('resolves measurementSavedBpm with int arg', () {
@@ -102,16 +120,24 @@ void main() {
 
     test('resolves invitationSentTo with two args (en)', () {
       final n = _notif(
-          bodyKey: 'invitationSentTo', args: const ['a@b.com', 'Member']);
-      expect(localizeNotification(n, en).body,
-          en.invitationSentTo('a@b.com', en.roleMember));
+        bodyKey: 'invitationSentTo',
+        args: const ['a@b.com', 'Member'],
+      );
+      expect(
+        localizeNotification(n, en).body,
+        en.invitationSentTo('a@b.com', en.roleMember),
+      );
     });
 
     test('resolves invitationSentTo role in Hebrew (he)', () {
       final n = _notif(
-          bodyKey: 'invitationSentTo', args: const ['a@b.com', 'Member']);
-      expect(localizeNotification(n, he).body,
-          he.invitationSentTo('a@b.com', he.roleMember));
+        bodyKey: 'invitationSentTo',
+        args: const ['a@b.com', 'Member'],
+      );
+      expect(
+        localizeNotification(n, he).body,
+        he.invitationSentTo('a@b.com', he.roleMember),
+      );
     });
 
     test('resolves vetInviteSent with one arg', () {
@@ -131,9 +157,13 @@ void main() {
 
     test('localizes body in Hebrew', () {
       final n = _notif(
-          bodyKey: 'medicationEndingBody', args: const ['Rex', 'test med']);
-      expect(localizeNotification(n, he).body,
-          he.medicationEndingBody('Rex', 'test med'));
+        bodyKey: 'medicationEndingBody',
+        args: const ['Rex', 'test med'],
+      );
+      expect(
+        localizeNotification(n, he).body,
+        he.medicationEndingBody('Rex', 'test med'),
+      );
     });
 
     test('falls back to stored body when bodyKey is null', () {
@@ -148,7 +178,10 @@ void main() {
 
     test('falls back to stored body when bpm arg is not numeric', () {
       final n = _notif(
-          body: 'frozen body', bodyKey: 'measurementSavedBpm', args: const ['x']);
+        body: 'frozen body',
+        bodyKey: 'measurementSavedBpm',
+        args: const ['x'],
+      );
       expect(localizeNotification(n, en).body, 'frozen body');
     });
   });

@@ -16,9 +16,7 @@ void main() {
           Measurement(bpm: 22, recordedAt: DateTime(2025, 1, 1)),
           Measurement(bpm: 24, recordedAt: DateTime(2025, 1, 2)),
         ],
-        'pet-2': [
-          Measurement(bpm: 18, recordedAt: DateTime(2025, 1, 1)),
-        ],
+        'pet-2': [Measurement(bpm: 18, recordedAt: DateTime(2025, 1, 1))],
       };
 
       store.seed(measurements);
@@ -103,9 +101,7 @@ void main() {
           Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
           Measurement(bpm: 22, recordedAt: DateTime(2025, 1, 2)),
         ],
-        'pet-2': [
-          Measurement(bpm: 18, recordedAt: DateTime(2025, 1, 1)),
-        ],
+        'pet-2': [Measurement(bpm: 18, recordedAt: DateTime(2025, 1, 1))],
       });
 
       expect(store.totalCount, 3);
@@ -113,9 +109,7 @@ void main() {
 
     test('countForPet returns correct count', () {
       store.seed({
-        'pet-1': [
-          Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
-        ],
+        'pet-1': [Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1))],
       });
 
       expect(store.countForPet('pet-1'), 1);
@@ -160,10 +154,7 @@ void main() {
       });
 
       final map = store.all;
-      expect(
-        () => map['pet-2'] = [],
-        throwsUnsupportedError,
-      );
+      expect(() => map['pet-2'] = [], throwsUnsupportedError);
     });
   });
 
@@ -243,7 +234,9 @@ void main() {
       // Because kEnableFirebase is true and PetService will be called,
       // we cannot await addMeasurement without mocking.
       // But we can verify the optimistic insert via seed simulation.
-      store.seed({'pet-new': [m]});
+      store.seed({
+        'pet-new': [m],
+      });
 
       expect(store.getMeasurements('pet-new').length, 1);
       expect(store.getMeasurements('pet-new').first.bpm, 22);
@@ -255,11 +248,15 @@ void main() {
       final m1 = Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1));
       final m2 = Measurement(bpm: 22, recordedAt: DateTime(2025, 1, 2));
 
-      store.seed({'pet-1': [m2, m1]});
+      store.seed({
+        'pet-1': [m2, m1],
+      });
       expect(store.countForPet('pet-1'), 2);
 
       // Simulate removal by re-seeding without the measurement
-      store.seed({'pet-1': [m2]});
+      store.seed({
+        'pet-1': [m2],
+      });
       expect(store.countForPet('pet-1'), 1);
       expect(store.getMeasurements('pet-1').first.bpm, 22);
     });
@@ -282,27 +279,35 @@ void main() {
   // early-return code paths (no Firebase call) are tested directly.
 
   group('MeasurementStore addMeasurement (via seed simulation)', () {
-    test('newest-first ordering: higher-bpm measurement appears first when seeded that way', () {
-      store.seed({
-        'pet-1': [
-          Measurement(bpm: 30, recordedAt: DateTime(2025, 6, 1)),
-          Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
-        ],
-      });
+    test(
+      'newest-first ordering: higher-bpm measurement appears first when seeded that way',
+      () {
+        store.seed({
+          'pet-1': [
+            Measurement(bpm: 30, recordedAt: DateTime(2025, 6, 1)),
+            Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+          ],
+        });
 
-      final list = store.getMeasurements('pet-1');
-      expect(list.first.bpm, 30);
-      expect(list.length, 2);
-    });
+        final list = store.getMeasurements('pet-1');
+        expect(list.first.bpm, 30);
+        expect(list.length, 2);
+      },
+    );
 
-    test('measurement for a previously unknown pet creates an isolated list', () {
-      store.seed({
-        'brand-new-pet': [Measurement(bpm: 22, recordedAt: DateTime(2025, 3, 15))],
-      });
+    test(
+      'measurement for a previously unknown pet creates an isolated list',
+      () {
+        store.seed({
+          'brand-new-pet': [
+            Measurement(bpm: 22, recordedAt: DateTime(2025, 3, 15)),
+          ],
+        });
 
-      expect(store.getMeasurements('brand-new-pet').length, 1);
-      expect(store.getMeasurements('other-pet'), isEmpty);
-    });
+        expect(store.getMeasurements('brand-new-pet').length, 1);
+        expect(store.getMeasurements('other-pet'), isEmpty);
+      },
+    );
 
     test('seed notifies listeners — simulates addMeasurement notification', () {
       int callCount = 0;
@@ -316,7 +321,9 @@ void main() {
     });
 
     test('totalCount increases when a measurement is added', () {
-      store.seed({'pet-1': [Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1))]});
+      store.seed({
+        'pet-1': [Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1))],
+      });
       expect(store.totalCount, 1);
 
       store.seed({
@@ -331,41 +338,58 @@ void main() {
   });
 
   group('MeasurementStore removeMeasurement', () {
-    test('removeMeasurement result verified via seed — removed measurement absent', () {
-      store.seed({'pet-1': [Measurement(bpm: 30, recordedAt: DateTime(2025, 2, 1))]});
+    test(
+      'removeMeasurement result verified via seed — removed measurement absent',
+      () {
+        store.seed({
+          'pet-1': [Measurement(bpm: 30, recordedAt: DateTime(2025, 2, 1))],
+        });
 
-      expect(store.getMeasurements('pet-1').length, 1);
-      expect(store.getMeasurements('pet-1').first.bpm, 30);
-    });
+        expect(store.getMeasurements('pet-1').length, 1);
+        expect(store.getMeasurements('pet-1').first.bpm, 30);
+      },
+    );
 
-    test('removeMeasurement does nothing when bpm does not match (idx == -1)', () {
-      final m = Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1));
-      store.seed({'pet-1': [m]});
+    test(
+      'removeMeasurement does nothing when bpm does not match (idx == -1)',
+      () {
+        final m = Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1));
+        store.seed({
+          'pet-1': [m],
+        });
 
-      // No Firebase call — idx == -1 means method returns early.
-      store.removeMeasurement(
-        'pet-1',
-        Measurement(bpm: 99, recordedAt: DateTime(2025, 1, 1)),
-      );
+        // No Firebase call — idx == -1 means method returns early.
+        store.removeMeasurement(
+          'pet-1',
+          Measurement(bpm: 99, recordedAt: DateTime(2025, 1, 1)),
+        );
 
-      expect(store.getMeasurements('pet-1').length, 1);
-    });
+        expect(store.getMeasurements('pet-1').length, 1);
+      },
+    );
 
-    test('removeMeasurement does nothing when recordedAt does not match (idx == -1)', () {
-      final m = Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1));
-      store.seed({'pet-1': [m]});
+    test(
+      'removeMeasurement does nothing when recordedAt does not match (idx == -1)',
+      () {
+        final m = Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1));
+        store.seed({
+          'pet-1': [m],
+        });
 
-      store.removeMeasurement(
-        'pet-1',
-        Measurement(bpm: 20, recordedAt: DateTime(2025, 6, 1)),
-      );
+        store.removeMeasurement(
+          'pet-1',
+          Measurement(bpm: 20, recordedAt: DateTime(2025, 6, 1)),
+        );
 
-      expect(store.getMeasurements('pet-1').length, 1);
-    });
+        expect(store.getMeasurements('pet-1').length, 1);
+      },
+    );
 
     test('removeMeasurement does nothing for unknown pet (list == null)', () {
       final m = Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1));
-      store.seed({'pet-1': [m]});
+      store.seed({
+        'pet-1': [m],
+      });
 
       store.removeMeasurement(
         'nonexistent-pet',
@@ -375,14 +399,17 @@ void main() {
       expect(store.getMeasurements('pet-1').length, 1);
     });
 
-    test('removeMeasurement preserves other measurements via seed simulation', () {
-      store.seed({
-        'pet-1': [Measurement(bpm: 30, recordedAt: DateTime(2025, 2, 1))],
-      });
+    test(
+      'removeMeasurement preserves other measurements via seed simulation',
+      () {
+        store.seed({
+          'pet-1': [Measurement(bpm: 30, recordedAt: DateTime(2025, 2, 1))],
+        });
 
-      expect(store.getMeasurements('pet-1').length, 1);
-      expect(store.getMeasurements('pet-1').first.bpm, 30);
-    });
+        expect(store.getMeasurements('pet-1').length, 1);
+        expect(store.getMeasurements('pet-1').first.bpm, 30);
+      },
+    );
   });
 
   group('MeasurementStore clearData', () {
@@ -429,16 +456,19 @@ void main() {
   });
 
   group('MeasurementStore latestForPet edge cases', () {
-    test('latestForPet returns the first element (assumed newest-first order)', () {
-      store.seed({
-        'pet-1': [
-          Measurement(bpm: 35, recordedAt: DateTime(2025, 3, 1)),
-          Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
-          Measurement(bpm: 22, recordedAt: DateTime(2025, 2, 1)),
-        ],
-      });
-      expect(store.latestForPet('pet-1')?.bpm, 35);
-    });
+    test(
+      'latestForPet returns the first element (assumed newest-first order)',
+      () {
+        store.seed({
+          'pet-1': [
+            Measurement(bpm: 35, recordedAt: DateTime(2025, 3, 1)),
+            Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+            Measurement(bpm: 22, recordedAt: DateTime(2025, 2, 1)),
+          ],
+        });
+        expect(store.latestForPet('pet-1')?.bpm, 35);
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------
@@ -450,7 +480,9 @@ void main() {
     test('removes exact match by bpm + recordedAt when id is null', () {
       final target = Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1));
       final other = Measurement(bpm: 25, recordedAt: DateTime(2025, 2, 1));
-      store.seed({'pet-1': [other, target]});
+      store.seed({
+        'pet-1': [other, target],
+      });
 
       // id is null → Firebase branch is skipped; purely local removal.
       store.removeMeasurement('pet-1', target);
@@ -463,7 +495,9 @@ void main() {
     test('removeMeasurement notifies listeners when item is removed', () {
       int callCount = 0;
       final target = Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1));
-      store.seed({'pet-1': [target]});
+      store.seed({
+        'pet-1': [target],
+      });
       store.addListener(() => callCount++);
 
       store.removeMeasurement('pet-1', target);
@@ -473,7 +507,9 @@ void main() {
 
     test('removeMeasurement leaves list empty after removing sole item', () {
       final target = Measurement(bpm: 18, recordedAt: DateTime(2025, 6, 1));
-      store.seed({'pet-1': [target]});
+      store.seed({
+        'pet-1': [target],
+      });
 
       store.removeMeasurement('pet-1', target);
 
@@ -483,7 +519,9 @@ void main() {
     test('totalCount decreases after removeMeasurement', () {
       final m1 = Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1));
       final m2 = Measurement(bpm: 22, recordedAt: DateTime(2025, 2, 1));
-      store.seed({'pet-1': [m1, m2]});
+      store.seed({
+        'pet-1': [m1, m2],
+      });
       expect(store.totalCount, 2);
 
       store.removeMeasurement('pet-1', m1);
@@ -493,7 +531,9 @@ void main() {
 
     test('countForPet decreases after removeMeasurement', () {
       final m = Measurement(bpm: 30, recordedAt: DateTime(2025, 3, 1));
-      store.seed({'pet-1': [m]});
+      store.seed({
+        'pet-1': [m],
+      });
       expect(store.countForPet('pet-1'), 1);
 
       store.removeMeasurement('pet-1', m);
@@ -503,7 +543,9 @@ void main() {
 
     test('does not remove when bpm matches but recordedAt differs', () {
       final seeded = Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1));
-      store.seed({'pet-1': [seeded]});
+      store.seed({
+        'pet-1': [seeded],
+      });
 
       store.removeMeasurement(
         'pet-1',
@@ -520,18 +562,21 @@ void main() {
   //  are verified via seed() simulation, matching the project's test pattern.)
   // ---------------------------------------------------------------------------
   group('MeasurementStore addMeasurement — seed simulation extended', () {
-    test('newest-first: higher-bpm measurement is first when seeded that way', () {
-      store.seed({
-        'pet-1': [
-          Measurement(bpm: 30, recordedAt: DateTime(2025, 6, 1)),
-          Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
-        ],
-      });
+    test(
+      'newest-first: higher-bpm measurement is first when seeded that way',
+      () {
+        store.seed({
+          'pet-1': [
+            Measurement(bpm: 30, recordedAt: DateTime(2025, 6, 1)),
+            Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
+          ],
+        });
 
-      final list = store.getMeasurements('pet-1');
-      expect(list.first.bpm, 30);
-      expect(list.length, 2);
-    });
+        final list = store.getMeasurements('pet-1');
+        expect(list.first.bpm, 30);
+        expect(list.length, 2);
+      },
+    );
 
     test('adding to a new pet creates an isolated list', () {
       store.seed({
@@ -581,13 +626,17 @@ void main() {
   group('MeasurementStore latestForPet — single element', () {
     test('latestForPet returns the sole measurement', () {
       final m = Measurement(bpm: 24, recordedAt: DateTime(2025, 5, 1));
-      store.seed({'pet-1': [m]});
+      store.seed({
+        'pet-1': [m],
+      });
 
       expect(store.latestForPet('pet-1')?.bpm, 24);
     });
 
     test('latestForPet returns null for unknown petId', () {
-      store.seed({'pet-1': [Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1))]});
+      store.seed({
+        'pet-1': [Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1))],
+      });
 
       expect(store.latestForPet('unknown-pet'), isNull);
     });
@@ -613,9 +662,7 @@ void main() {
           Measurement(bpm: 20, recordedAt: DateTime(2025, 1, 1)),
           Measurement(bpm: 21, recordedAt: DateTime(2025, 1, 2)),
         ],
-        'pet-b': [
-          Measurement(bpm: 18, recordedAt: DateTime(2025, 1, 1)),
-        ],
+        'pet-b': [Measurement(bpm: 18, recordedAt: DateTime(2025, 1, 1))],
       });
 
       expect(store.countForPet('pet-a'), 2);

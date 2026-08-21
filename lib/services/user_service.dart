@@ -86,7 +86,9 @@ class UserService {
 
   /// Mark onboarding as complete for a user.
   static Future<void> updateOnboardingStatus(String uid, bool completed) async {
-    await _usersCollection.doc(uid).update({'hasCompletedOnboarding': completed});
+    await _usersCollection.doc(uid).update({
+      'hasCompletedOnboarding': completed,
+    });
   }
 
   /// Look up a registered vet by email. Returns null if no user with that

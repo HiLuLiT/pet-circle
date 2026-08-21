@@ -40,8 +40,9 @@ void main() {
       expect(find.text('Setup pet profile'), findsOneWidget);
     });
 
-    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)',
-        (tester) async {
+    testWidgets('does not show a "Step X of Y" label (dropped per DS spec)', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const OnboardingStep4()));
@@ -50,8 +51,9 @@ void main() {
       expect(find.text('Step 4 of 4'), findsNothing);
     });
 
-    testWidgets('shows "Invite Your Veterinarian" section heading',
-        (tester) async {
+    testWidgets('shows "Invite Your Veterinarian" section heading', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const OnboardingStep4()));
@@ -72,8 +74,9 @@ void main() {
       );
     });
 
-    testWidgets('shows "Invite Your Care Circle" section heading',
-        (tester) async {
+    testWidgets('shows "Invite Your Care Circle" section heading', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const OnboardingStep4()));
@@ -90,7 +93,8 @@ void main() {
 
       expect(
         find.text(
-            'Invite family members, pet sitters, and veterinarians to collaborate.'),
+          'Invite family members, pet sitters, and veterinarians to collaborate.',
+        ),
         findsOneWidget,
       );
     });
@@ -113,13 +117,12 @@ void main() {
       expect(find.text('Add to pet circle'), findsOneWidget);
     });
 
-    testWidgets('shows "Complete" button when onComplete is provided',
-        (tester) async {
+    testWidgets('shows "Complete" button when onComplete is provided', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        OnboardingStep4(onComplete: () {}),
-      ));
+      await tester.pumpWidget(testApp(OnboardingStep4(onComplete: () {})));
       await tester.pumpAndSettle();
 
       expect(find.text('Complete'), findsOneWidget);
@@ -156,9 +159,9 @@ void main() {
     testWidgets('shows Back button when onBack is provided', (tester) async {
       suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        OnboardingStep4(onBack: () {}, onComplete: () {}),
-      ));
+      await tester.pumpWidget(
+        testApp(OnboardingStep4(onBack: () {}, onComplete: () {})),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.arrow_back), findsOneWidget);
@@ -168,12 +171,11 @@ void main() {
       suppressOverflowErrors();
 
       var backCalled = false;
-      await tester.pumpWidget(testApp(
-        OnboardingStep4(
-          onBack: () => backCalled = true,
-          onComplete: () {},
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep4(onBack: () => backCalled = true, onComplete: () {}),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byIcon(Icons.arrow_back));
@@ -182,17 +184,20 @@ void main() {
       expect(backCalled, isTrue);
     });
 
-    testWidgets('calls onComplete when Complete button is tapped',
-        (tester) async {
+    testWidgets('calls onComplete when Complete button is tapped', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       var completeCalled = false;
-      await tester.pumpWidget(testApp(
-        OnboardingStep4(
-          onBack: () {},
-          onComplete: () => completeCalled = true,
+      await tester.pumpWidget(
+        testApp(
+          OnboardingStep4(
+            onBack: () {},
+            onComplete: () => completeCalled = true,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Complete'));
@@ -220,8 +225,9 @@ void main() {
       expect(find.text('Viewer'), findsOneWidget);
     });
 
-    testWidgets('selecting a role from the dropdown updates the display',
-        (tester) async {
+    testWidgets('selecting a role from the dropdown updates the display', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const OnboardingStep4()));
@@ -248,87 +254,92 @@ void main() {
     });
 
     testWidgets(
-        'entering empty email and tapping "Add to pet circle" shows error snackbar',
-        (tester) async {
-      suppressOverflowErrors();
+      'entering empty email and tapping "Add to pet circle" shows error snackbar',
+      (tester) async {
+        suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(const OnboardingStep4()));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(testApp(const OnboardingStep4()));
+        await tester.pumpAndSettle();
 
-      // Scroll to the button before tapping
-      await tester.ensureVisible(find.text('Add to pet circle'));
-      await tester.pumpAndSettle();
+        // Scroll to the button before tapping
+        await tester.ensureVisible(find.text('Add to pet circle'));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Add to pet circle'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Add to pet circle'));
+        await tester.pumpAndSettle();
 
-      expect(find.text('Please enter an email address'), findsOneWidget);
-    });
-
-    testWidgets(
-        'entering a valid email and tapping "Add to pet circle" calls onInviteAdded',
-        (tester) async {
-      suppressOverflowErrors();
-
-      String? capturedEmail;
-      String? capturedRole;
-      await tester.pumpWidget(testApp(
-        OnboardingStep4(
-          onInviteAdded: (email, role) {
-            capturedEmail = email;
-            capturedRole = role;
-          },
-        ),
-      ));
-      await tester.pumpAndSettle();
-
-      // Scroll to the care circle email field (last TextField in the scrollable)
-      final emailFields = find.byType(TextField);
-      await tester.ensureVisible(emailFields.last);
-      await tester.pumpAndSettle();
-
-      await tester.enterText(emailFields.last, 'friend@example.com');
-      await tester.pumpAndSettle();
-
-      // Scroll to and tap the Add to care circle button
-      await tester.ensureVisible(find.text('Add to pet circle'));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Add to pet circle'));
-      await tester.pumpAndSettle();
-
-      expect(capturedEmail, 'friend@example.com');
-      expect(capturedRole, 'Member');
-    });
+        expect(find.text('Please enter an email address'), findsOneWidget);
+      },
+    );
 
     testWidgets(
-        'entering email and adding to care circle shows invite in list',
-        (tester) async {
-      suppressOverflowErrors();
+      'entering a valid email and tapping "Add to pet circle" calls onInviteAdded',
+      (tester) async {
+        suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(const OnboardingStep4()));
-      await tester.pumpAndSettle();
+        String? capturedEmail;
+        String? capturedRole;
+        await tester.pumpWidget(
+          testApp(
+            OnboardingStep4(
+              onInviteAdded: (email, role) {
+                capturedEmail = email;
+                capturedRole = role;
+              },
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      final emailFields = find.byType(TextField);
-      await tester.ensureVisible(emailFields.last);
-      await tester.pumpAndSettle();
+        // Scroll to the care circle email field (last TextField in the scrollable)
+        final emailFields = find.byType(TextField);
+        await tester.ensureVisible(emailFields.last);
+        await tester.pumpAndSettle();
 
-      await tester.enterText(emailFields.last, 'team@example.com');
-      await tester.pumpAndSettle();
+        await tester.enterText(emailFields.last, 'friend@example.com');
+        await tester.pumpAndSettle();
 
-      await tester.ensureVisible(find.text('Add to pet circle'));
-      await tester.pumpAndSettle();
+        // Scroll to and tap the Add to care circle button
+        await tester.ensureVisible(find.text('Add to pet circle'));
+        await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Add to pet circle'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Add to pet circle'));
+        await tester.pumpAndSettle();
 
-      // The invited email should now appear in the invite list
-      expect(find.text('team@example.com'), findsAtLeastNWidgets(1));
-    });
+        expect(capturedEmail, 'friend@example.com');
+        expect(capturedRole, 'Member');
+      },
+    );
 
     testWidgets(
-        'vet lookup in mock mode shows "no account found" message',
-        (tester) async {
+      'entering email and adding to care circle shows invite in list',
+      (tester) async {
+        suppressOverflowErrors();
+
+        await tester.pumpWidget(testApp(const OnboardingStep4()));
+        await tester.pumpAndSettle();
+
+        final emailFields = find.byType(TextField);
+        await tester.ensureVisible(emailFields.last);
+        await tester.pumpAndSettle();
+
+        await tester.enterText(emailFields.last, 'team@example.com');
+        await tester.pumpAndSettle();
+
+        await tester.ensureVisible(find.text('Add to pet circle'));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('Add to pet circle'));
+        await tester.pumpAndSettle();
+
+        // The invited email should now appear in the invite list
+        expect(find.text('team@example.com'), findsAtLeastNWidgets(1));
+      },
+    );
+
+    testWidgets('vet lookup in mock mode shows "no account found" message', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const OnboardingStep4()));
@@ -346,8 +357,9 @@ void main() {
       expect(find.text('Send Vet Invite'), findsOneWidget);
     });
 
-    testWidgets('shows local_hospital icon in vet section heading',
-        (tester) async {
+    testWidgets('shows local_hospital icon in vet section heading', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const OnboardingStep4()));
@@ -356,8 +368,9 @@ void main() {
       expect(find.byIcon(Icons.local_hospital), findsOneWidget);
     });
 
-    testWidgets('shows person_add_alt_1 icon in Add to care circle button',
-        (tester) async {
+    testWidgets('shows person_add_alt_1 icon in Add to care circle button', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const OnboardingStep4()));
@@ -366,18 +379,20 @@ void main() {
       expect(find.byIcon(Icons.person_add_alt_1), findsOneWidget);
     });
 
-    testWidgets('isSubmitting=true shows loading indicator on Complete button',
-        (tester) async {
-      suppressOverflowErrors();
+    testWidgets(
+      'isSubmitting=true shows loading indicator on Complete button',
+      (tester) async {
+        suppressOverflowErrors();
 
-      await tester.pumpWidget(testApp(
-        const OnboardingStep4(isSubmitting: true),
-      ));
-      // Use pump with a duration instead of pumpAndSettle to avoid
-      // timing out on the continuously-animating CircularProgressIndicator.
-      await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpWidget(
+          testApp(const OnboardingStep4(isSubmitting: true)),
+        );
+        // Use pump with a duration instead of pumpAndSettle to avoid
+        // timing out on the continuously-animating CircularProgressIndicator.
+        await tester.pump(const Duration(milliseconds: 100));
 
-      expect(find.byType(CircularProgressIndicator), findsAtLeastNWidgets(1));
-    });
+        expect(find.byType(CircularProgressIndicator), findsAtLeastNWidgets(1));
+      },
+    );
   });
 }

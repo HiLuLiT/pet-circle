@@ -48,8 +48,9 @@ void main() {
       expect(find.byIcon(Icons.menu_book), findsOneWidget);
     });
 
-    testWidgets('renders Scaffold when showScaffold=true (default)',
-        (tester) async {
+    testWidgets('renders Scaffold when showScaffold=true (default)', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const DiaryScreen()));

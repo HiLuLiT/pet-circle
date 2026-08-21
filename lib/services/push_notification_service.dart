@@ -46,9 +46,7 @@ class PushNotificationService implements AbstractPushNotificationService {
   Future<void> init() async {
     if (_initialized) return;
 
-    FirebaseMessaging.onBackgroundMessage(
-      _firebaseMessagingBackgroundHandler,
-    );
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     // iOS: show alerts/badges/sound while app is in the foreground.
     await _messaging.setForegroundNotificationPresentationOptions(
@@ -182,7 +180,9 @@ class PushNotificationService implements AbstractPushNotificationService {
   @override
   void setupForegroundHandler() {
     _foregroundSub?.cancel();
-    _foregroundSub = FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+    _foregroundSub = FirebaseMessaging.onMessage.listen(
+      _handleForegroundMessage,
+    );
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
@@ -300,8 +300,9 @@ class PushNotificationService implements AbstractPushNotificationService {
   /// payloads from triggering arbitrary navigation.
   void _safeNavigate(void Function(String route) navigate, String route) {
     if (route.isEmpty) return;
-    final isAllowed =
-        _allowedRoutePrefixes.any((prefix) => route.startsWith(prefix));
+    final isAllowed = _allowedRoutePrefixes.any(
+      (prefix) => route.startsWith(prefix),
+    );
     if (!isAllowed) {
       developer.log(
         'Blocked navigation to disallowed route: $route',

@@ -25,7 +25,14 @@ import 'package:fl_chart/fl_chart.dart';
 /// The selected value is stored as one of these stable enum members rather
 /// than a localized display string, so switching the app locale never leaves
 /// the [DropdownButton] with a value that no longer matches any item.
-enum TrendsPeriod { last24Hours, last3Days, last7Days, last30Days, last90Days, customRange }
+enum TrendsPeriod {
+  last24Hours,
+  last3Days,
+  last7Days,
+  last30Days,
+  last90Days,
+  customRange,
+}
 
 class TrendsScreen extends StatefulWidget {
   const TrendsScreen({super.key, this.showScaffold = true});
@@ -130,13 +137,17 @@ class _TrendsScreenState extends State<TrendsScreen>
     final petId = petStore.activePet?.id ?? '';
     final petName = petStore.activePet?.name ?? l10n.petName;
     final measurements = measurementStore.getMeasurements(petId);
-    final csvLines = measurements.map((m) => '${m.recordedAt.toIso8601String()},${m.bpm}').join('\n');
+    final csvLines = measurements
+        .map((m) => '${m.recordedAt.toIso8601String()},${m.bpm}')
+        .join('\n');
     final csvData = 'Date,BPM\n$csvLines';
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusCard),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadiiTokens.borderRadiusCard,
+        ),
         title: Text(l10n.exportLabel, style: AppSemanticTextStyles.headingH2),
         content: SingleChildScrollView(
           child: Column(
@@ -151,7 +162,13 @@ class _TrendsScreenState extends State<TrendsScreen>
                   color: c.background,
                   borderRadius: AppRadiiTokens.borderRadiusField,
                 ),
-                child: Text(csvData, style: AppSemanticTextStyles.pcCaption.copyWith(fontFamily: 'monospace', fontSize: 10)),
+                child: Text(
+                  csvData,
+                  style: AppSemanticTextStyles.pcCaption.copyWith(
+                    fontFamily: 'monospace',
+                    fontSize: 10,
+                  ),
+                ),
               ),
             ],
           ),
@@ -159,7 +176,12 @@ class _TrendsScreenState extends State<TrendsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.close, style: AppSemanticTextStyles.pcBody.copyWith(color: c.textPrimary)),
+            child: Text(
+              l10n.close,
+              style: AppSemanticTextStyles.pcBody.copyWith(
+                color: c.textPrimary,
+              ),
+            ),
           ),
           TextButton(
             onPressed: () async {
@@ -174,16 +196,23 @@ class _TrendsScreenState extends State<TrendsScreen>
                 );
               } catch (_) {
                 if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(l10n.exportFailedRetry)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(l10n.exportFailedRetry)));
               }
             },
             style: TextButton.styleFrom(
               backgroundColor: c.primaryLight,
-              shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusField),
+              shape: RoundedRectangleBorder(
+                borderRadius: AppRadiiTokens.borderRadiusField,
+              ),
             ),
-            child: Text(l10n.downloadCsv, style: AppSemanticTextStyles.pcBody.copyWith(color: c.textPrimary)),
+            child: Text(
+              l10n.downloadCsv,
+              style: AppSemanticTextStyles.pcBody.copyWith(
+                color: c.textPrimary,
+              ),
+            ),
           ),
         ],
       ),
@@ -197,21 +226,35 @@ class _TrendsScreenState extends State<TrendsScreen>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: AppRadiiTokens.borderRadiusCard),
-        title: Text(l10n.deleteMeasurement, style: AppSemanticTextStyles.headingH2.copyWith(color: c.textPrimary)),
-        content: Text(l10n.deleteMeasurementConfirmation(m.bpm, dateStr), style: AppSemanticTextStyles.pcBody),
+        shape: RoundedRectangleBorder(
+          borderRadius: AppRadiiTokens.borderRadiusCard,
+        ),
+        title: Text(
+          l10n.deleteMeasurement,
+          style: AppSemanticTextStyles.headingH2.copyWith(color: c.textPrimary),
+        ),
+        content: Text(
+          l10n.deleteMeasurementConfirmation(m.bpm, dateStr),
+          style: AppSemanticTextStyles.pcBody,
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
           TextButton(
             onPressed: () {
               measurementStore.removeMeasurement(petId, m);
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.measurementDeleted)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(l10n.measurementDeleted)));
             },
             style: TextButton.styleFrom(backgroundColor: c.error),
-            child: Text(l10n.deleteMeasurement, style: TextStyle(color: c.surface)),
+            child: Text(
+              l10n.deleteMeasurement,
+              style: TextStyle(color: c.surface),
+            ),
           ),
         ],
       ),
@@ -237,135 +280,175 @@ class _TrendsScreenState extends State<TrendsScreen>
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Padding(
-              padding: const EdgeInsets.all(AppSpacingTokens.pcXl),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
-                  child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-              Text(l10n.healthTrends, style: AppSemanticTextStyles.headingH2),
-              const SizedBox(height: AppSpacingTokens.pcXs),
-              Text(
-                filtered.length < allMeasurements.length
-                    ? l10n.recordingsInPeriod(petName, filtered.length, allMeasurements.length)
-                    : l10n.recordingsTotal(petName, allMeasurements.length),
-                style: AppSemanticTextStyles.pcLabelMuted,
-              ),
-              const SizedBox(height: AppSpacingTokens.pcMd),
-              Row(
-                // Top-aligned, not centered: AppDropdown renders its open
-                // option list inline below the trigger, growing this Row's
-                // height when opened. Centering would re-center the fixed-
-                // height Export button within that taller row, making it
-                // visibly shift down each time the list opens (BUG-031).
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 165,
-                    child: AppDropdown(
-                      label: '',
-                      value: _periodLabel(_selectedPeriod, l10n),
-                      onTap: _togglePeriodOpen,
-                      isOpen: _isPeriodOpen,
-                      chevronController: _chevronController,
-                      options: TrendsPeriod.values
-                          .map((period) => _periodLabel(period, l10n))
-                          .toList(),
-                      onOptionSelected: (label) => _selectPeriodLabel(label, l10n),
-                      overlayMode: true,
+                padding: const EdgeInsets.all(AppSpacingTokens.pcXl),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: responsiveMaxWidth(context),
                     ),
-                  ),
-                  const SizedBox(width: AppSpacingTokens.sm),
-                  // Matches the dropdown trigger's height exactly (16 padding
-                  // + 24 line-height + 16 padding = 56, see AppDropdown's
-                  // _Trigger). miniPrimary is normally a compact ~44h button
-                  // (minimumSize: Size.zero), so without this it renders
-                  // visibly shorter than the dropdown beside it.
-                  SizedBox(
-                    height: 56,
-                    child: PrimaryButton(
-                      label: l10n.exportLabel,
-                      variant: PrimaryButtonVariant.miniPrimary,
-                      backgroundColor: c.textPrimary,
-                      foregroundColor: c.surface,
-                      onPressed: () => _showExportDialog(context),
-                      trailingIcon: Icon(Icons.file_download_outlined, color: c.surface),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: AppSpacingTokens.pcMd),
-              _SrrCard(filtered: filtered),
-              const SizedBox(height: AppSpacingTokens.pcMd),
-              _MetricRow(filtered: filtered),
-              if (filtered.isNotEmpty) ...[
-                const SizedBox(height: AppSpacingTokens.pcMd),
-                Text(l10n.measurementHistory, style: AppSemanticTextStyles.headingH2),
-                const SizedBox(height: AppSpacingTokens.pcSm),
-                ...filtered.map((m) {
-                  final dateStr = '${m.recordedAt.month}/${m.recordedAt.day} · ${m.recordedAt.hour.toString().padLeft(2, '0')}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
-                  final status = settingsStore.classifyStatus(m.bpm);
-                  final badgeStatus = status == 'Normal'
-                      ? StatusBadgeStatus.normal
-                      : status == 'Elevated'
-                          ? StatusBadgeStatus.elevated
-                          : StatusBadgeStatus.alert;
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacingTokens.pcSm),
-                    child: Dismissible(
-                      key: ValueKey('${m.recordedAt.millisecondsSinceEpoch}-${m.bpm}'),
-                      direction: access.canDeleteMeasurements
-                          ? DismissDirection.endToStart
-                          : DismissDirection.none,
-                      background: Container(
-                        alignment: Alignment.centerRight,
-                        padding: EdgeInsets.only(right: AppSpacingTokens.pcMd),
-                        decoration: BoxDecoration(
-                          color: c.error,
-                          borderRadius: AppRadiiTokens.borderRadiusCard,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.healthTrends,
+                          style: AppSemanticTextStyles.headingH2,
                         ),
-                        child: Icon(Icons.delete, color: c.surface),
-                      ),
-                      confirmDismiss: (_) async {
-                        if (!access.canDeleteMeasurements) return false;
-                        _confirmDelete(context, petId, m);
-                        return false;
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(AppSpacingTokens.pcMd),
-                        decoration: BoxDecoration(
-                          color: c.surface,
-                          borderRadius: AppRadiiTokens.borderRadiusCard,
+                        const SizedBox(height: AppSpacingTokens.pcXs),
+                        Text(
+                          filtered.length < allMeasurements.length
+                              ? l10n.recordingsInPeriod(
+                                  petName,
+                                  filtered.length,
+                                  allMeasurements.length,
+                                )
+                              : l10n.recordingsTotal(
+                                  petName,
+                                  allMeasurements.length,
+                                ),
+                          style: AppSemanticTextStyles.pcLabelMuted,
                         ),
-                        child: Row(
+                        const SizedBox(height: AppSpacingTokens.pcMd),
+                        Row(
+                          // Top-aligned, not centered: AppDropdown renders its open
+                          // option list inline below the trigger, growing this Row's
+                          // height when opened. Centering would re-center the fixed-
+                          // height Export button within that taller row, making it
+                          // visibly shift down each time the list opens (BUG-031).
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('${m.bpm} ${l10n.bpm}', style: AppSemanticTextStyles.labelLSemibold),
-                                  Text(dateStr, style: AppSemanticTextStyles.pcLabelMuted),
-                                ],
+                            SizedBox(
+                              width: 165,
+                              child: AppDropdown(
+                                label: '',
+                                value: _periodLabel(_selectedPeriod, l10n),
+                                onTap: _togglePeriodOpen,
+                                isOpen: _isPeriodOpen,
+                                chevronController: _chevronController,
+                                options: TrendsPeriod.values
+                                    .map((period) => _periodLabel(period, l10n))
+                                    .toList(),
+                                onOptionSelected: (label) =>
+                                    _selectPeriodLabel(label, l10n),
+                                overlayMode: true,
                               ),
                             ),
-                            StatusBadge(
-                              label: localizeStatus(status, l10n),
-                              status: badgeStatus,
+                            const SizedBox(width: AppSpacingTokens.sm),
+                            // Matches the dropdown trigger's height exactly (16 padding
+                            // + 24 line-height + 16 padding = 56, see AppDropdown's
+                            // _Trigger). miniPrimary is normally a compact ~44h button
+                            // (minimumSize: Size.zero), so without this it renders
+                            // visibly shorter than the dropdown beside it.
+                            SizedBox(
+                              height: 56,
+                              child: PrimaryButton(
+                                label: l10n.exportLabel,
+                                variant: PrimaryButtonVariant.miniPrimary,
+                                backgroundColor: c.textPrimary,
+                                foregroundColor: c.surface,
+                                onPressed: () => _showExportDialog(context),
+                                trailingIcon: Icon(
+                                  Icons.file_download_outlined,
+                                  color: c.surface,
+                                ),
+                              ),
                             ),
                           ],
                         ),
-                      ),
+                        const SizedBox(height: AppSpacingTokens.pcMd),
+                        _SrrCard(filtered: filtered),
+                        const SizedBox(height: AppSpacingTokens.pcMd),
+                        _MetricRow(filtered: filtered),
+                        if (filtered.isNotEmpty) ...[
+                          const SizedBox(height: AppSpacingTokens.pcMd),
+                          Text(
+                            l10n.measurementHistory,
+                            style: AppSemanticTextStyles.headingH2,
+                          ),
+                          const SizedBox(height: AppSpacingTokens.pcSm),
+                          ...filtered.map((m) {
+                            final dateStr =
+                                '${m.recordedAt.month}/${m.recordedAt.day} · ${m.recordedAt.hour.toString().padLeft(2, '0')}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
+                            final status = settingsStore.classifyStatus(m.bpm);
+                            final badgeStatus = status == 'Normal'
+                                ? StatusBadgeStatus.normal
+                                : status == 'Elevated'
+                                ? StatusBadgeStatus.elevated
+                                : StatusBadgeStatus.alert;
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpacingTokens.pcSm,
+                              ),
+                              child: Dismissible(
+                                key: ValueKey(
+                                  '${m.recordedAt.millisecondsSinceEpoch}-${m.bpm}',
+                                ),
+                                direction: access.canDeleteMeasurements
+                                    ? DismissDirection.endToStart
+                                    : DismissDirection.none,
+                                background: Container(
+                                  alignment: Alignment.centerRight,
+                                  padding: EdgeInsets.only(
+                                    right: AppSpacingTokens.pcMd,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: c.error,
+                                    borderRadius:
+                                        AppRadiiTokens.borderRadiusCard,
+                                  ),
+                                  child: Icon(Icons.delete, color: c.surface),
+                                ),
+                                confirmDismiss: (_) async {
+                                  if (!access.canDeleteMeasurements)
+                                    return false;
+                                  _confirmDelete(context, petId, m);
+                                  return false;
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(
+                                    AppSpacingTokens.pcMd,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: c.surface,
+                                    borderRadius:
+                                        AppRadiiTokens.borderRadiusCard,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${m.bpm} ${l10n.bpm}',
+                                              style: AppSemanticTextStyles
+                                                  .labelLSemibold,
+                                            ),
+                                            Text(
+                                              dateStr,
+                                              style: AppSemanticTextStyles
+                                                  .pcLabelMuted,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      StatusBadge(
+                                        label: localizeStatus(status, l10n),
+                                        status: badgeStatus,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }),
+                        ],
+                      ],
                     ),
-                  );
-                }),
-              ],
-                ],
+                  ),
+                ),
               ),
             ),
-              ),
-            ),
-          ),
           ),
         );
 
@@ -411,7 +494,12 @@ class _SrrCard extends StatelessWidget {
             children: [
               Text(avgLabel, style: AppSemanticTextStyles.pcDisplayXl),
               const SizedBox(width: AppSpacingTokens.pcXs),
-              Text(l10n.avgBpm, style: AppSemanticTextStyles.labelLRegular.copyWith(color: c.textSecondary)),
+              Text(
+                l10n.avgBpm,
+                style: AppSemanticTextStyles.labelLRegular.copyWith(
+                  color: c.textSecondary,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: AppSpacingTokens.pcSm),
@@ -447,7 +535,11 @@ class _SrrCard extends StatelessWidget {
 /// Pill legend badge for the SRR chart — tile bg + accent dot/text, matching
 /// the Figma "Badge" component instances in node 402:2096.
 class _LegendBadge extends StatelessWidget {
-  const _LegendBadge({required this.bg, required this.dot, required this.label});
+  const _LegendBadge({
+    required this.bg,
+    required this.dot,
+    required this.label,
+  });
 
   final Color bg;
   final Color dot;
@@ -456,7 +548,12 @@ class _LegendBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: AppSpacingTokens.pcSm, right: AppSpacingTokens.pcMd, top: AppSpacingTokens.pcXs, bottom: AppSpacingTokens.pcXs),
+      padding: const EdgeInsets.only(
+        left: AppSpacingTokens.pcSm,
+        right: AppSpacingTokens.pcMd,
+        top: AppSpacingTokens.pcXs,
+        bottom: AppSpacingTokens.pcXs,
+      ),
       decoration: BoxDecoration(
         color: bg,
         borderRadius: AppRadiiTokens.borderRadiusPill,
@@ -464,9 +561,16 @@ class _LegendBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(width: 9, height: 9, decoration: BoxDecoration(color: dot, shape: BoxShape.circle)),
+          Container(
+            width: 9,
+            height: 9,
+            decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
+          ),
           const SizedBox(width: AppSpacingTokens.pcXs),
-          Text(label, style: AppSemanticTextStyles.labelSSemibold.copyWith(color: dot)),
+          Text(
+            label,
+            style: AppSemanticTextStyles.labelSSemibold.copyWith(color: dot),
+          ),
         ],
       ),
     );
@@ -489,11 +593,19 @@ class _MetricRow extends StatelessWidget {
     final rangeLabel = bpms.isEmpty
         ? '--'
         : '${bpms.reduce((a, b) => a < b ? a : b)}-${bpms.reduce((a, b) => a > b ? a : b)}';
-    final normal = filtered.where((m) => m.bpm < settingsStore.elevatedThreshold).length;
-    final elevated = filtered
-        .where((m) => m.bpm >= settingsStore.elevatedThreshold && m.bpm < settingsStore.criticalThreshold)
+    final normal = filtered
+        .where((m) => m.bpm < settingsStore.elevatedThreshold)
         .length;
-    final alert = filtered.where((m) => m.bpm >= settingsStore.criticalThreshold).length;
+    final elevated = filtered
+        .where(
+          (m) =>
+              m.bpm >= settingsStore.elevatedThreshold &&
+              m.bpm < settingsStore.criticalThreshold,
+        )
+        .length;
+    final alert = filtered
+        .where((m) => m.bpm >= settingsStore.criticalThreshold)
+        .length;
 
     return Row(
       children: [
@@ -506,7 +618,12 @@ class _MetricRow extends StatelessWidget {
               children: [
                 Text(rangeLabel, style: AppSemanticTextStyles.headingH2),
                 const SizedBox(width: AppSpacingTokens.pcXs),
-                Text(l10n.bpm.toLowerCase(), style: AppSemanticTextStyles.labelSRegular.copyWith(color: c.textTertiary)),
+                Text(
+                  l10n.bpm.toLowerCase(),
+                  style: AppSemanticTextStyles.labelSRegular.copyWith(
+                    color: c.textTertiary,
+                  ),
+                ),
               ],
             ),
           ),
@@ -518,11 +635,26 @@ class _MetricRow extends StatelessWidget {
             child: Text.rich(
               TextSpan(
                 children: [
-                  TextSpan(text: '$normal', style: AppSemanticTextStyles.headingH2.copyWith(color: c.accentPeriwinkle)),
+                  TextSpan(
+                    text: '$normal',
+                    style: AppSemanticTextStyles.headingH2.copyWith(
+                      color: c.accentPeriwinkle,
+                    ),
+                  ),
                   TextSpan(text: ' ', style: AppSemanticTextStyles.headingH2),
-                  TextSpan(text: '$elevated', style: AppSemanticTextStyles.headingH2.copyWith(color: c.accentButter)),
+                  TextSpan(
+                    text: '$elevated',
+                    style: AppSemanticTextStyles.headingH2.copyWith(
+                      color: c.accentButter,
+                    ),
+                  ),
                   TextSpan(text: ' ', style: AppSemanticTextStyles.headingH2),
-                  TextSpan(text: '$alert', style: AppSemanticTextStyles.headingH2.copyWith(color: c.accentBlush)),
+                  TextSpan(
+                    text: '$alert',
+                    style: AppSemanticTextStyles.headingH2.copyWith(
+                      color: c.accentBlush,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -580,7 +712,10 @@ class _SrrChart extends StatelessWidget {
           children: [
             Icon(Icons.show_chart, size: 40, color: c.textTertiary),
             const SizedBox(height: AppSpacingTokens.pcSm),
-            Text(l10n.noMeasurementsYet, style: AppSemanticTextStyles.labelLSemibold),
+            Text(
+              l10n.noMeasurementsYet,
+              style: AppSemanticTextStyles.labelLSemibold,
+            ),
             const SizedBox(height: AppSpacingTokens.pcXs),
             Text(
               l10n.noMeasurementsDescription,
@@ -598,12 +733,12 @@ class _SrrChart extends StatelessWidget {
         .toList();
 
     final dateFormat = DateFormat('MMM d');
-    final labels = ordered
-        .map((m) => dateFormat.format(m.recordedAt))
-        .toList();
+    final labels = ordered.map((m) => dateFormat.format(m.recordedAt)).toList();
     final labelStep = (labels.length / 6).ceil().clamp(1, labels.length);
 
-    final maxBpm = spots.isEmpty ? 50.0 : spots.map((s) => s.y).reduce((a, b) => a > b ? a : b);
+    final maxBpm = spots.isEmpty
+        ? 50.0
+        : spots.map((s) => s.y).reduce((a, b) => a > b ? a : b);
     final maxY = max(50.0, maxBpm + 10.0);
 
     final labelColor = c.textTertiary;
@@ -635,11 +770,8 @@ class _SrrChart extends StatelessWidget {
             drawVerticalLine: true,
             drawHorizontalLine: false,
             verticalInterval: labelStep.toDouble(),
-            getDrawingVerticalLine: (_) => FlLine(
-              color: gridColor,
-              strokeWidth: 1,
-              dashArray: [4, 4],
-            ),
+            getDrawingVerticalLine: (_) =>
+                FlLine(color: gridColor, strokeWidth: 1, dashArray: [4, 4]),
           ),
           borderData: FlBorderData(show: false),
           titlesData: FlTitlesData(
@@ -685,8 +817,12 @@ class _SrrChart extends StatelessWidget {
                 },
               ),
             ),
-            topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-            rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
+            rightTitles: const AxisTitles(
+              sideTitles: SideTitles(showTitles: false),
+            ),
           ),
           extraLinesData: ExtraLinesData(
             horizontalLines: [
@@ -698,7 +834,8 @@ class _SrrChart extends StatelessWidget {
                 label: HorizontalLineLabel(
                   show: true,
                   alignment: Alignment.topRight,
-                  labelResolver: (_) => l10n.legendNormal(settingsStore.elevatedThreshold),
+                  labelResolver: (_) =>
+                      l10n.legendNormal(settingsStore.elevatedThreshold),
                   style: AppSemanticTextStyles.caption.copyWith(
                     color: labelColor,
                   ),
@@ -712,7 +849,8 @@ class _SrrChart extends StatelessWidget {
                 label: HorizontalLineLabel(
                   show: true,
                   alignment: Alignment.topRight,
-                  labelResolver: (_) => l10n.legendAlert(settingsStore.criticalThreshold),
+                  labelResolver: (_) =>
+                      l10n.legendAlert(settingsStore.criticalThreshold),
                   style: AppSemanticTextStyles.caption.copyWith(
                     color: labelColor,
                   ),
@@ -728,12 +866,13 @@ class _SrrChart extends StatelessWidget {
               barWidth: 2,
               dotData: FlDotData(
                 show: true,
-                getDotPainter: (spot, percent, bar, index) => FlDotCirclePainter(
-                  radius: 5,
-                  color: chartColor,
-                  strokeWidth: 2,
-                  strokeColor: c.surface,
-                ),
+                getDotPainter: (spot, percent, bar, index) =>
+                    FlDotCirclePainter(
+                      radius: 5,
+                      color: chartColor,
+                      strokeWidth: 2,
+                      strokeColor: c.surface,
+                    ),
               ),
               belowBarData: BarAreaData(
                 show: true,

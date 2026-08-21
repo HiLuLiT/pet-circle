@@ -25,11 +25,8 @@ class AppImage extends StatelessWidget {
       width: width,
       height: height,
       fit: fit,
-      errorBuilder: (_, _, _) => _Fallback(
-        width: width,
-        height: height,
-        icon: fallbackIcon,
-      ),
+      errorBuilder: (_, _, _) =>
+          _Fallback(width: width, height: height, icon: fallbackIcon),
     );
   }
 }

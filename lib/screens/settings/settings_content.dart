@@ -21,19 +21,21 @@ import 'package:pet_circle/widgets/segmented_control.dart';
 /// Push notification categories
 /// - Medicine reminders: upcoming doses, missed doses
 /// - Measurement reminders: scheduled SRR measurements
-const kPushNotificationCategories = ['medicine_reminder', 'measurement_reminder'];
+const kPushNotificationCategories = [
+  'medicine_reminder',
+  'measurement_reminder',
+];
 
 /// Emergency alert categories
 /// - BPM exceeds alert threshold
 /// - Missed medication for 24h+
-const kEmergencyAlertCategories = ['bpm_threshold_exceeded', 'missed_medication_24h'];
+const kEmergencyAlertCategories = [
+  'bpm_threshold_exceeded',
+  'missed_medication_24h',
+];
 
 class SettingsContent extends StatefulWidget {
-  const SettingsContent({
-    super.key,
-    this.scrollController,
-    this.onClose,
-  });
+  const SettingsContent({super.key, this.scrollController, this.onClose});
 
   final ScrollController? scrollController;
   final VoidCallback? onClose;
@@ -69,278 +71,310 @@ class _SettingsContentState extends State<SettingsContent>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-            // Top bar with title and optional close chevron
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.settings,
-                        style: AppSemanticTextStyles.pcDisplay.copyWith(
-                          color: c.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        l10n.managePreferences,
-                        style: AppSemanticTextStyles.labelSRegular.copyWith(
-                          color: c.textTertiary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (widget.onClose != null)
-                  RoundIconButton(
-                    icon: const Icon(Icons.keyboard_arrow_up),
-                    variant: RoundIconButtonVariant.ghost,
-                    size: 36,
-                    iconSize: 24,
-                    onTap: widget.onClose,
-                    semanticLabel: l10n.close,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 24),
-              SettingsCard(
-                title: l10n.appearance,
-                subtitle: l10n.customizeLookAndFeel,
-                child: Column(
+                // Top bar with title and optional close chevron
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    SettingsToggleRow(
-                      iconAsset: settingsMoonAsset,
-                      iconTileColor: c.accentPeriwinkleTile,
-                      label: l10n.darkMode,
-                      description: l10n.switchToADarkerTheme,
-                      isOn: appDarkMode.value,
-                      onChanged: () {
-                        appDarkMode.value = !appDarkMode.value;
-                        setState(() {}); // rebuild to reflect toggle state
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    const LanguageRow(),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Builder(builder: (context) {
-                return SettingsCard(
-                  title: l10n.careCircle,
-                  subtitle: l10n.manageCaregivers,
-                  child: Builder(builder: (context) {
-                    if (activePet == null) {
-                      return Text(l10n.noPetsYet, style: AppSemanticTextStyles.body);
-                    }
-                    final members = activePet.careCircle;
-                    if (members.isEmpty) {
-                      return Text(l10n.noCareCircleMembers, style: AppSemanticTextStyles.body);
-                    }
-                    return Column(
-                      children: [
-                        ...members.map((member) {
-                          final isOwner = member.role == CareCircleRole.owner;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: CareCircleItem(
-                              email: member.name,
-                              roleLabel: localizeRole(member.role, l10n),
-                              roleColor: isOwner ? c.surface : c.accentBlushTile,
-                              statusLabel: l10n.active,
-                              onRemove: canManageActivePet
-                                  ? () => confirmRemoveMember(context, activePet.name, member.name)
-                                  : null,
-                            ),
-                          );
-                        }),
-                        if (canManageActivePet)
-                          InviteButton(onTap: () => showInviteDialog(context)),
-                      ],
-                    );
-                  }),
-                );
-              }),
-              const SizedBox(height: 16),
-              SettingsCard(
-                title: l10n.notifications,
-                subtitle: l10n.manageAlerts,
-                child: Column(
-                  children: [
-                    SettingsToggleRow(
-                      label: l10n.pushNotifications,
-                      description: l10n.pushNotificationsDesc,
-                      isOn: settingsStore.pushNotifications,
-                      onChanged: settingsStore.togglePushNotifications,
-                    ),
-                    const SizedBox(height: 12),
-                    SettingsToggleRow(
-                      label: l10n.emergencyAlerts,
-                      description: l10n.emergencyAlertsDesc,
-                      isOn: settingsStore.emergencyAlerts,
-                      onChanged: settingsStore.toggleEmergencyAlerts,
-                    ),
-                    const SizedBox(height: 12),
-                    SettingsToggleRow(
-                      label: l10n.measurementReminders,
-                      description: l10n.measurementRemindersDesc,
-                      isOn: settingsStore.measurementRemindersEnabled,
-                      onChanged: settingsStore.toggleMeasurementReminders,
-                    ),
-                    if (settingsStore.measurementRemindersEnabled) ...[
-                      const SizedBox(height: 12),
-                      _MeasurementReminderFrequencyRow(
-                        currentFrequency:
-                            settingsStore.measurementReminderFrequency,
-                      ),
-                      const SizedBox(height: 8),
-                      _MeasurementReminderTimeRow(
-                        hour: settingsStore.measurementReminderHour,
-                        minute: settingsStore.measurementReminderMinute,
-                      ),
-                    ],
-                    const SizedBox(height: 16),
-                    Divider(color: c.divider, height: 1),
-                    const SizedBox(height: 12),
-                    Text(
-                      l10n.medicationReminderTimes,
-                      style: AppSemanticTextStyles.label.copyWith(
-                        color: c.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    _MedicationTimeRow(
-                      label: l10n.morningReminder,
-                      hour: settingsStore.medicationMorningHour,
-                      minute: settingsStore.medicationMorningMinute,
-                      onChanged: (h, m) async {
-                        await settingsStore.setMedicationMorningTime(h, m);
-                        if (!mounted) return;
-                        setState(() {});
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    _MedicationTimeRow(
-                      label: l10n.eveningReminder,
-                      hour: settingsStore.medicationEveningHour,
-                      minute: settingsStore.medicationEveningMinute,
-                      onChanged: (h, m) async {
-                        await settingsStore.setMedicationEveningTime(h, m);
-                        if (!mounted) return;
-                        setState(() {});
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              SettingsCard(
-                title: l10n.measurementSettings,
-                subtitle: l10n.configureModes,
-                child: Column(
-                  children: [
-                    // VisionRR camera mode is not shipped yet; hidden behind
-                    // kEnableVisionRR (lib/config/app_config.dart).
-                    if (kEnableVisionRR) ...[
-                      Stack(
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          SettingsToggleRow(
-                            label: l10n.visionRRCameraMode,
-                            description: l10n.visionRRDesc,
-                            isOn: settingsStore.visionRREnabled,
-                            onChanged: settingsStore.toggleVisionRR,
+                          Text(
+                            l10n.settings,
+                            style: AppSemanticTextStyles.pcDisplay.copyWith(
+                              color: c.textPrimary,
+                            ),
                           ),
-                          Positioned(
-                            top: 8,
-                            right: 80,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: c.error,
-                                borderRadius: AppRadiiTokens.borderRadiusMd,
-                              ),
-                              child: Text(
-                                l10n.comingSoon,
-                                style: AppSemanticTextStyles.caption.copyWith(
-                                  color: c.background,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
+                          const SizedBox(height: 4),
+                          Text(
+                            l10n.managePreferences,
+                            style: AppSemanticTextStyles.labelSRegular.copyWith(
+                              color: c.textTertiary,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                    ],
-                    ConfigureRow(onTap: () => showThresholdDialog(context)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              SettingsCard(
-                title: l10n.dataAndPrivacy,
-                subtitle: l10n.exportAndManage,
-                child: Column(
-                  children: [
-                    SettingsToggleRow(
-                      label: l10n.weeklySummary,
-                      description: l10n.weeklySummaryDesc,
-                      isOn: settingsStore.weeklySummaryEnabled,
-                      onChanged: settingsStore.toggleWeeklySummaryEnabled,
                     ),
-                    const SizedBox(height: 12),
-                    ActionRow(
-                      iconWidget: Icon(
-                        Icons.download_outlined,
-                        size: 22,
-                        color: c.accentPeriwinkle,
+                    if (widget.onClose != null)
+                      RoundIconButton(
+                        icon: const Icon(Icons.keyboard_arrow_up),
+                        variant: RoundIconButtonVariant.ghost,
+                        size: 36,
+                        iconSize: 24,
+                        onTap: widget.onClose,
+                        semanticLabel: l10n.close,
                       ),
-                      title: l10n.exportAllData,
-                      description: l10n.exportAllDataDesc,
-                      onTap: () => showExportDataDialog(context),
-                    ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 16),
-              SettingsCard(
-                title: l10n.about,
-                subtitle: l10n.appInfoAndSupport,
-                child: Column(
-                  children: [
-                    SimpleRow(
-                      label: l10n.termsOfService,
-                      onTap: () => showInfoDialog(
-                          context, l10n.termsOfService, l10n.termsOfServiceContent),
-                    ),
-                    const SizedBox(height: 12),
-                    SimpleRow(
-                      label: l10n.privacyPolicy,
-                      onTap: () => showInfoDialog(
-                          context, l10n.privacyPolicy, l10n.privacyPolicyContent),
-                    ),
-                    const SizedBox(height: 12),
-                    SimpleRow(
-                      label: l10n.helpAndSupport,
-                      onTap: () => showInfoDialog(
-                          context, l10n.helpAndSupport, l10n.helpAndSupportContent),
-                    ),
-                  ],
+                const SizedBox(height: 24),
+                SettingsCard(
+                  title: l10n.appearance,
+                  subtitle: l10n.customizeLookAndFeel,
+                  child: Column(
+                    children: [
+                      SettingsToggleRow(
+                        iconAsset: settingsMoonAsset,
+                        iconTileColor: c.accentPeriwinkleTile,
+                        label: l10n.darkMode,
+                        description: l10n.switchToADarkerTheme,
+                        isOn: appDarkMode.value,
+                        onChanged: () {
+                          appDarkMode.value = !appDarkMode.value;
+                          setState(() {}); // rebuild to reflect toggle state
+                        },
+                      ),
+                      const SizedBox(height: 12),
+                      const LanguageRow(),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              PrimaryButton(
-                label: l10n.signOut,
-                backgroundColor: AppPrimitives.pcTomato,
-                foregroundColor: c.surface,
-                onPressed: () => showSignOutDialog(context),
-              ),
-              const SizedBox(height: 24),
-            ],
-          ),
+                const SizedBox(height: 16),
+                Builder(
+                  builder: (context) {
+                    return SettingsCard(
+                      title: l10n.careCircle,
+                      subtitle: l10n.manageCaregivers,
+                      child: Builder(
+                        builder: (context) {
+                          if (activePet == null) {
+                            return Text(
+                              l10n.noPetsYet,
+                              style: AppSemanticTextStyles.body,
+                            );
+                          }
+                          final members = activePet.careCircle;
+                          if (members.isEmpty) {
+                            return Text(
+                              l10n.noCareCircleMembers,
+                              style: AppSemanticTextStyles.body,
+                            );
+                          }
+                          return Column(
+                            children: [
+                              ...members.map((member) {
+                                final isOwner =
+                                    member.role == CareCircleRole.owner;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: CareCircleItem(
+                                    email: member.name,
+                                    roleLabel: localizeRole(member.role, l10n),
+                                    roleColor: isOwner
+                                        ? c.surface
+                                        : c.accentBlushTile,
+                                    statusLabel: l10n.active,
+                                    onRemove: canManageActivePet
+                                        ? () => confirmRemoveMember(
+                                            context,
+                                            activePet.name,
+                                            member.name,
+                                          )
+                                        : null,
+                                  ),
+                                );
+                              }),
+                              if (canManageActivePet)
+                                InviteButton(
+                                  onTap: () => showInviteDialog(context),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                SettingsCard(
+                  title: l10n.notifications,
+                  subtitle: l10n.manageAlerts,
+                  child: Column(
+                    children: [
+                      SettingsToggleRow(
+                        label: l10n.pushNotifications,
+                        description: l10n.pushNotificationsDesc,
+                        isOn: settingsStore.pushNotifications,
+                        onChanged: settingsStore.togglePushNotifications,
+                      ),
+                      const SizedBox(height: 12),
+                      SettingsToggleRow(
+                        label: l10n.emergencyAlerts,
+                        description: l10n.emergencyAlertsDesc,
+                        isOn: settingsStore.emergencyAlerts,
+                        onChanged: settingsStore.toggleEmergencyAlerts,
+                      ),
+                      const SizedBox(height: 12),
+                      SettingsToggleRow(
+                        label: l10n.measurementReminders,
+                        description: l10n.measurementRemindersDesc,
+                        isOn: settingsStore.measurementRemindersEnabled,
+                        onChanged: settingsStore.toggleMeasurementReminders,
+                      ),
+                      if (settingsStore.measurementRemindersEnabled) ...[
+                        const SizedBox(height: 12),
+                        _MeasurementReminderFrequencyRow(
+                          currentFrequency:
+                              settingsStore.measurementReminderFrequency,
+                        ),
+                        const SizedBox(height: 8),
+                        _MeasurementReminderTimeRow(
+                          hour: settingsStore.measurementReminderHour,
+                          minute: settingsStore.measurementReminderMinute,
+                        ),
+                      ],
+                      const SizedBox(height: 16),
+                      Divider(color: c.divider, height: 1),
+                      const SizedBox(height: 12),
+                      Text(
+                        l10n.medicationReminderTimes,
+                        style: AppSemanticTextStyles.label.copyWith(
+                          color: c.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      _MedicationTimeRow(
+                        label: l10n.morningReminder,
+                        hour: settingsStore.medicationMorningHour,
+                        minute: settingsStore.medicationMorningMinute,
+                        onChanged: (h, m) async {
+                          await settingsStore.setMedicationMorningTime(h, m);
+                          if (!mounted) return;
+                          setState(() {});
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      _MedicationTimeRow(
+                        label: l10n.eveningReminder,
+                        hour: settingsStore.medicationEveningHour,
+                        minute: settingsStore.medicationEveningMinute,
+                        onChanged: (h, m) async {
+                          await settingsStore.setMedicationEveningTime(h, m);
+                          if (!mounted) return;
+                          setState(() {});
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SettingsCard(
+                  title: l10n.measurementSettings,
+                  subtitle: l10n.configureModes,
+                  child: Column(
+                    children: [
+                      // VisionRR camera mode is not shipped yet; hidden behind
+                      // kEnableVisionRR (lib/config/app_config.dart).
+                      if (kEnableVisionRR) ...[
+                        Stack(
+                          children: [
+                            SettingsToggleRow(
+                              label: l10n.visionRRCameraMode,
+                              description: l10n.visionRRDesc,
+                              isOn: settingsStore.visionRREnabled,
+                              onChanged: settingsStore.toggleVisionRR,
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 80,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: c.error,
+                                  borderRadius: AppRadiiTokens.borderRadiusMd,
+                                ),
+                                child: Text(
+                                  l10n.comingSoon,
+                                  style: AppSemanticTextStyles.caption
+                                      .withWeight(FontWeight.w600)
+                                      .copyWith(
+                                        color: c.background,
+                                        fontSize: 10,
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      ConfigureRow(onTap: () => showThresholdDialog(context)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SettingsCard(
+                  title: l10n.dataAndPrivacy,
+                  subtitle: l10n.exportAndManage,
+                  child: Column(
+                    children: [
+                      SettingsToggleRow(
+                        label: l10n.weeklySummary,
+                        description: l10n.weeklySummaryDesc,
+                        isOn: settingsStore.weeklySummaryEnabled,
+                        onChanged: settingsStore.toggleWeeklySummaryEnabled,
+                      ),
+                      const SizedBox(height: 12),
+                      ActionRow(
+                        iconWidget: Icon(
+                          Icons.download_outlined,
+                          size: 22,
+                          color: c.accentPeriwinkle,
+                        ),
+                        title: l10n.exportAllData,
+                        description: l10n.exportAllDataDesc,
+                        onTap: () => showExportDataDialog(context),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                SettingsCard(
+                  title: l10n.about,
+                  subtitle: l10n.appInfoAndSupport,
+                  child: Column(
+                    children: [
+                      SimpleRow(
+                        label: l10n.termsOfService,
+                        onTap: () => showInfoDialog(
+                          context,
+                          l10n.termsOfService,
+                          l10n.termsOfServiceContent,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SimpleRow(
+                        label: l10n.privacyPolicy,
+                        onTap: () => showInfoDialog(
+                          context,
+                          l10n.privacyPolicy,
+                          l10n.privacyPolicyContent,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SimpleRow(
+                        label: l10n.helpAndSupport,
+                        onTap: () => showInfoDialog(
+                          context,
+                          l10n.helpAndSupport,
+                          l10n.helpAndSupportContent,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                PrimaryButton(
+                  label: l10n.signOut,
+                  backgroundColor: AppPrimitives.pcTomato,
+                  foregroundColor: c.surface,
+                  onPressed: () => showSignOutDialog(context),
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
           );
         },
       ),
@@ -385,8 +419,9 @@ class _MeasurementReminderFrequencyRow extends StatelessWidget {
           onChanged: (label) async {
             final idx = _options.indexWhere((v) => labels[v] == label);
             if (idx >= 0) {
-              await settingsStore
-                  .setMeasurementReminderFrequency(_options[idx]);
+              await settingsStore.setMeasurementReminderFrequency(
+                _options[idx],
+              );
             }
           },
         ),
@@ -417,7 +452,9 @@ class _MedicationTimeRow extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
+            style: AppSemanticTextStyles.bodySm.copyWith(
+              color: c.textSecondary,
+            ),
           ),
         ),
         TextButton(
@@ -439,10 +476,7 @@ class _MedicationTimeRow extends StatelessWidget {
 }
 
 class _MeasurementReminderTimeRow extends StatelessWidget {
-  const _MeasurementReminderTimeRow({
-    required this.hour,
-    required this.minute,
-  });
+  const _MeasurementReminderTimeRow({required this.hour, required this.minute});
 
   final int hour;
   final int minute;
@@ -457,7 +491,9 @@ class _MeasurementReminderTimeRow extends StatelessWidget {
         Expanded(
           child: Text(
             l10n.measurementReminderTime,
-            style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
+            style: AppSemanticTextStyles.bodySm.copyWith(
+              color: c.textSecondary,
+            ),
           ),
         ),
         TextButton(

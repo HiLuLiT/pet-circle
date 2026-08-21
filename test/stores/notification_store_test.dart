@@ -93,9 +93,7 @@ void main() {
     });
 
     test('marking already-read notification does not change count', () async {
-      store.seed([
-        _makeNotification(id: 'n-1', isRead: true),
-      ]);
+      store.seed([_makeNotification(id: 'n-1', isRead: true)]);
 
       await store.markRead('n-1');
       expect(store.unreadCount, 0);
@@ -162,9 +160,7 @@ void main() {
     test('addNotification increases unread count', () async {
       store.seed([]);
 
-      await store.addNotification(
-        _makeNotification(id: 'n-1', isRead: false),
-      );
+      await store.addNotification(_makeNotification(id: 'n-1', isRead: false));
 
       expect(store.unreadCount, 1);
     });
@@ -314,10 +310,7 @@ void main() {
 
   group('NotificationStore seed replaces previous data', () {
     test('re-seeding replaces all notifications', () {
-      store.seed([
-        _makeNotification(id: 'n-1'),
-        _makeNotification(id: 'n-2'),
-      ]);
+      store.seed([_makeNotification(id: 'n-1'), _makeNotification(id: 'n-2')]);
       expect(store.all.length, 2);
 
       store.seed([_makeNotification(id: 'n-3')]);
@@ -328,15 +321,15 @@ void main() {
 
   group('NotificationStore reconcileMedicationEndNotifications', () {
     Medication endedMed(String id) => Medication(
-          id: id,
-          petId: 'p1',
-          name: 'Furosemide',
-          dosage: '12.5mg',
-          frequency: 'Twice daily',
-          startDate: DateTime(2026, 1, 1),
-          endDate: DateTime(2026, 6, 1),
-          remindersEnabled: true,
-        );
+      id: id,
+      petId: 'p1',
+      name: 'Furosemide',
+      dosage: '12.5mg',
+      frequency: 'Twice daily',
+      startDate: DateTime(2026, 1, 1),
+      endDate: DateTime(2026, 6, 1),
+      remindersEnabled: true,
+    );
 
     test('adds one entry per ended med and is idempotent', () {
       store.seed([]);
@@ -350,10 +343,7 @@ void main() {
         title: 'Medication ending today',
         body: "Furosemide's medication course ends today",
       );
-      expect(
-        store.all.where((n) => n.id.startsWith('med-end-m1-')).length,
-        1,
-      );
+      expect(store.all.where((n) => n.id.startsWith('med-end-m1-')).length, 1);
     });
 
     test('creates a medication-type notification with the med name', () {

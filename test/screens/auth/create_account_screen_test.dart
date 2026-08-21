@@ -105,8 +105,9 @@ void main() {
       expect(find.text('OR'), findsOneWidget);
     });
 
-    testWidgets('empty fields show validation errors on submit',
-        (tester) async {
+    testWidgets('empty fields show validation errors on submit', (
+      tester,
+    ) async {
       suppressOverflowErrors();
 
       await tester.pumpWidget(testApp(const CreateAccountScreen()));
@@ -127,14 +128,8 @@ void main() {
       await tester.pumpAndSettle();
 
       // Fill the name field so only the email validator fails.
-      await tester.enterText(
-        find.byType(TextFormField).first,
-        'Jane Doe',
-      );
-      await tester.enterText(
-        find.byType(TextFormField).last,
-        'not-an-email',
-      );
+      await tester.enterText(find.byType(TextFormField).first, 'Jane Doe');
+      await tester.enterText(find.byType(TextFormField).last, 'not-an-email');
 
       await tester.tap(find.byType(PrimaryButton));
       await tester.pumpAndSettle();

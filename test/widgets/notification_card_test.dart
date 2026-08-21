@@ -10,15 +10,17 @@ void main() {
   group('NotificationCard', () {
     // ── Smoke ───────────────────────────────────────────────────────────────
     testWidgets('renders title, body, and time', (tester) async {
-      await tester.pumpWidget(testApp(
-        const NotificationCard(
-          icon: Icon(Icons.notifications),
-          iconTileColor: Color(0xFFC3AEF0),
-          title: 'New measurement',
-          body: 'Buddy logged a reading of 22 BrPM',
-          time: '2m ago',
+      await tester.pumpWidget(
+        testApp(
+          const NotificationCard(
+            icon: Icon(Icons.notifications),
+            iconTileColor: Color(0xFFC3AEF0),
+            title: 'New measurement',
+            body: 'Buddy logged a reading of 22 BrPM',
+            time: '2m ago',
+          ),
         ),
-      ));
+      );
 
       expect(find.byType(NotificationCard), findsOneWidget);
       expect(find.text('New measurement'), findsOneWidget);
@@ -28,16 +30,18 @@ void main() {
 
     // ── Unread variant ──────────────────────────────────────────────────────
     testWidgets('unread variant shows purple dot', (tester) async {
-      await tester.pumpWidget(testApp(
-        const NotificationCard(
-          icon: Icon(Icons.circle),
-          iconTileColor: Color(0xFFC3AEF0),
-          title: 'Unread title',
-          body: 'Unread body',
-          time: 'now',
-          unread: true,
+      await tester.pumpWidget(
+        testApp(
+          const NotificationCard(
+            icon: Icon(Icons.circle),
+            iconTileColor: Color(0xFFC3AEF0),
+            title: 'Unread title',
+            body: 'Unread body',
+            time: 'now',
+            unread: true,
+          ),
         ),
-      ));
+      );
 
       expect(
         find.byKey(const ValueKey('notification_card.unread_dot')),
@@ -46,16 +50,18 @@ void main() {
     });
 
     testWidgets('unread variant uses surface background', (tester) async {
-      await tester.pumpWidget(testApp(
-        const NotificationCard(
-          icon: Icon(Icons.circle),
-          iconTileColor: Color(0xFFC3AEF0),
-          title: 'Unread title',
-          body: 'Unread body',
-          time: 'now',
-          unread: true,
+      await tester.pumpWidget(
+        testApp(
+          const NotificationCard(
+            icon: Icon(Icons.circle),
+            iconTileColor: Color(0xFFC3AEF0),
+            title: 'Unread title',
+            body: 'Unread body',
+            time: 'now',
+            unread: true,
+          ),
         ),
-      ));
+      );
 
       final card = tester.widget<Container>(
         find
@@ -75,15 +81,17 @@ void main() {
 
     // ── Read variant ────────────────────────────────────────────────────────
     testWidgets('read variant does not show purple dot', (tester) async {
-      await tester.pumpWidget(testApp(
-        const NotificationCard(
-          icon: Icon(Icons.circle),
-          iconTileColor: Color(0xFFC3AEF0),
-          title: 'Read title',
-          body: 'Read body',
-          time: '1d ago',
+      await tester.pumpWidget(
+        testApp(
+          const NotificationCard(
+            icon: Icon(Icons.circle),
+            iconTileColor: Color(0xFFC3AEF0),
+            title: 'Read title',
+            body: 'Read body',
+            time: '1d ago',
+          ),
         ),
-      ));
+      );
 
       expect(
         find.byKey(const ValueKey('notification_card.unread_dot')),
@@ -92,15 +100,17 @@ void main() {
     });
 
     testWidgets('read variant uses warm recessed background', (tester) async {
-      await tester.pumpWidget(testApp(
-        const NotificationCard(
-          icon: Icon(Icons.circle),
-          iconTileColor: Color(0xFFC3AEF0),
-          title: 'Read title',
-          body: 'Read body',
-          time: '1d ago',
+      await tester.pumpWidget(
+        testApp(
+          const NotificationCard(
+            icon: Icon(Icons.circle),
+            iconTileColor: Color(0xFFC3AEF0),
+            title: 'Read title',
+            body: 'Read body',
+            time: '1d ago',
+          ),
         ),
-      ));
+      );
 
       final card = tester.widget<Container>(
         find
@@ -116,31 +126,35 @@ void main() {
 
     testWidgets('read variant uses muted title color', (tester) async {
       const tileColor = Color(0xFFC3AEF0);
-      await tester.pumpWidget(testApp(
-        const NotificationCard(
-          icon: Icon(Icons.circle),
-          iconTileColor: tileColor,
-          title: 'Read title',
-          body: 'Read body',
-          time: '1d ago',
+      await tester.pumpWidget(
+        testApp(
+          const NotificationCard(
+            icon: Icon(Icons.circle),
+            iconTileColor: tileColor,
+            title: 'Read title',
+            body: 'Read body',
+            time: '1d ago',
+          ),
         ),
-      ));
+      );
 
       final titleWidget = tester.widget<Text>(find.text('Read title'));
       expect(titleWidget.style?.color, const Color(0xFF6E6E6E));
     });
 
     testWidgets('unread variant uses ink title color', (tester) async {
-      await tester.pumpWidget(testApp(
-        const NotificationCard(
-          icon: Icon(Icons.circle),
-          iconTileColor: Color(0xFFC3AEF0),
-          title: 'Unread title',
-          body: 'Unread body',
-          time: 'now',
-          unread: true,
+      await tester.pumpWidget(
+        testApp(
+          const NotificationCard(
+            icon: Icon(Icons.circle),
+            iconTileColor: Color(0xFFC3AEF0),
+            title: 'Unread title',
+            body: 'Unread body',
+            time: 'now',
+            unread: true,
+          ),
         ),
-      ));
+      );
 
       final titleWidget = tester.widget<Text>(find.text('Unread title'));
       expect(titleWidget.style?.color, AppSemanticColors.light.onSurface);
@@ -149,16 +163,18 @@ void main() {
     // ── Interaction ─────────────────────────────────────────────────────────
     testWidgets('onTap callback fires when tapped', (tester) async {
       var taps = 0;
-      await tester.pumpWidget(testApp(
-        NotificationCard(
-          icon: const Icon(Icons.circle),
-          iconTileColor: const Color(0xFFC3AEF0),
-          title: 'Tap me',
-          body: 'body',
-          time: 'now',
-          onTap: () => taps++,
+      await tester.pumpWidget(
+        testApp(
+          NotificationCard(
+            icon: const Icon(Icons.circle),
+            iconTileColor: const Color(0xFFC3AEF0),
+            title: 'Tap me',
+            body: 'body',
+            time: 'now',
+            onTap: () => taps++,
+          ),
         ),
-      ));
+      );
 
       await tester.tap(find.byType(NotificationCard));
       await tester.pump();
@@ -166,15 +182,17 @@ void main() {
     });
 
     testWidgets('without onTap, no InkWell is rendered', (tester) async {
-      await tester.pumpWidget(testApp(
-        const NotificationCard(
-          icon: Icon(Icons.circle),
-          iconTileColor: Color(0xFFC3AEF0),
-          title: 'No tap',
-          body: 'body',
-          time: 'now',
+      await tester.pumpWidget(
+        testApp(
+          const NotificationCard(
+            icon: Icon(Icons.circle),
+            iconTileColor: Color(0xFFC3AEF0),
+            title: 'No tap',
+            body: 'body',
+            time: 'now',
+          ),
         ),
-      ));
+      );
 
       expect(find.byType(InkWell), findsNothing);
     });

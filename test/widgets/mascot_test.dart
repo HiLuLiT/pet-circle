@@ -10,9 +10,9 @@ void main() {
     // ── Smoke: every breed renders without error ───────────────────────────
     for (final breed in MascotBreed.values) {
       testWidgets('renders ${breed.name} without error', (tester) async {
-        await tester.pumpWidget(testApp(
-          Mascot(breed: breed, color: const Color(0xFF6B4EFF)),
-        ));
+        await tester.pumpWidget(
+          testApp(Mascot(breed: breed, color: const Color(0xFF6B4EFF))),
+        );
         expect(find.byType(Mascot), findsOneWidget);
         expect(find.byType(SvgPicture), findsOneWidget);
       });
@@ -20,22 +20,26 @@ void main() {
 
     // ── Size param is applied to the rendered widget ───────────────────────
     testWidgets('respects size param (default = 56)', (tester) async {
-      await tester.pumpWidget(testApp(
-        const Mascot(breed: MascotBreed.floppy, color: Color(0xFF6B4EFF)),
-      ));
+      await tester.pumpWidget(
+        testApp(
+          const Mascot(breed: MascotBreed.floppy, color: Color(0xFF6B4EFF)),
+        ),
+      );
       final SvgPicture picture = tester.widget(find.byType(SvgPicture));
       expect(picture.width, 56);
       expect(picture.height, 56);
     });
 
     testWidgets('respects custom size param', (tester) async {
-      await tester.pumpWidget(testApp(
-        const Mascot(
-          breed: MascotBreed.perky,
-          color: Color(0xFF6B4EFF),
-          size: 128,
+      await tester.pumpWidget(
+        testApp(
+          const Mascot(
+            breed: MascotBreed.perky,
+            color: Color(0xFF6B4EFF),
+            size: 128,
+          ),
         ),
-      ));
+      );
       final SvgPicture picture = tester.widget(find.byType(SvgPicture));
       expect(picture.width, 128);
       expect(picture.height, 128);

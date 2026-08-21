@@ -21,10 +21,14 @@ void confirmDeletePet(BuildContext context, Pet pet) {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadiiTokens.md),
       ),
-      title: Text(l10n.deletePet,
-          style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary)),
-      content: Text(l10n.deletePetConfirmation(pet.name),
-          style: AppSemanticTextStyles.body),
+      title: Text(
+        l10n.deletePet,
+        style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
+      ),
+      content: Text(
+        l10n.deletePetConfirmation(pet.name),
+        style: AppSemanticTextStyles.body,
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx),
@@ -34,9 +38,9 @@ void confirmDeletePet(BuildContext context, Pet pet) {
           onPressed: () {
             Navigator.pop(ctx);
             petStore.removePetWithFirestore(pet.name);
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(l10n.petDeleted)),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text(l10n.petDeleted)));
           },
           style: TextButton.styleFrom(backgroundColor: c.error),
           child: Text(l10n.deletePet, style: TextStyle(color: c.background)),

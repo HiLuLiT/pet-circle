@@ -52,19 +52,22 @@ void main() {
     });
   });
 
-  group('InviteScreen initial render (null appUser — redirects immediately)',
-      () {
-    // When authProvider.appUser is null, _processInvitation calls
-    // context.go(AppRoutes.authGate). Since GoRouter is not available in the
-    // test harness this throws a GoRouter assertion in the async task.
-    // We only verify what can be observed from the synchronous first-frame
-    // build, before the async _processInvitation work fires.
-    testWidgets('has the correct token exposed on the widget instance',
-        (tester) async {
-      const screen = InviteScreen(token: 'check-token');
-      expect(screen.token, 'check-token');
-    });
-  });
+  group(
+    'InviteScreen initial render (null appUser — redirects immediately)',
+    () {
+      // When authProvider.appUser is null, _processInvitation calls
+      // context.go(AppRoutes.authGate). Since GoRouter is not available in the
+      // test harness this throws a GoRouter assertion in the async task.
+      // We only verify what can be observed from the synchronous first-frame
+      // build, before the async _processInvitation work fires.
+      testWidgets('has the correct token exposed on the widget instance', (
+        tester,
+      ) async {
+        const screen = InviteScreen(token: 'check-token');
+        expect(screen.token, 'check-token');
+      });
+    },
+  );
 
   group('InviteScreen error-code mapping (string logic)', () {
     // The _errorText logic maps error codes to localised strings.
@@ -96,10 +99,9 @@ void main() {
 
     test('null error code maps to invitationNotFound default', () {
       const String? nullCode = null;
-      final fallback =
-          (nullCode != null && knownErrorCodes.contains(nullCode))
-              ? nullCode
-              : 'invitationNotFound';
+      final fallback = (nullCode != null && knownErrorCodes.contains(nullCode))
+          ? nullCode
+          : 'invitationNotFound';
       expect(fallback, equals('invitationNotFound'));
     });
   });
@@ -107,8 +109,7 @@ void main() {
   group('InviteScreen avatar URL fallback logic', () {
     test('fallback URL encodes display name correctly', () {
       const displayName = 'Jane Doe';
-      final encoded =
-          Uri.encodeComponent(displayName);
+      final encoded = Uri.encodeComponent(displayName);
       final url =
           'https://ui-avatars.com/api/?name=$encoded&background=E8B4B8&color=5B2C3F';
       expect(url, contains('Jane%20Doe'));

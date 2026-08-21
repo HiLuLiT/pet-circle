@@ -54,10 +54,7 @@ void main() {
     });
 
     test('copyWith can update each field independently', () {
-      final original = Measurement(
-        bpm: 22,
-        recordedAt: DateTime(2025, 1, 1),
-      );
+      final original = Measurement(bpm: 22, recordedAt: DateTime(2025, 1, 1));
 
       expect(original.copyWith(id: 'new-id').id, 'new-id');
       expect(original.copyWith(bpm: 50).bpm, 50);
@@ -65,10 +62,7 @@ void main() {
         original.copyWith(recordedAt: DateTime(2026, 1, 1)).recordedAt,
         DateTime(2026, 1, 1),
       );
-      expect(
-        original.copyWith(recordedAtLabel: 'now').recordedAtLabel,
-        'now',
-      );
+      expect(original.copyWith(recordedAtLabel: 'now').recordedAtLabel, 'now');
       expect(original.copyWith(recordedBy: 'doc').recordedBy, 'doc');
     });
   });
@@ -94,10 +88,7 @@ void main() {
     });
 
     test('timeAgo returns Just now for very recent', () {
-      final justNow = Measurement(
-        bpm: 22,
-        recordedAt: DateTime.now(),
-      );
+      final justNow = Measurement(bpm: 22, recordedAt: DateTime.now());
 
       expect(justNow.timeAgo, 'Just now');
     });
@@ -230,10 +221,7 @@ void main() {
 
     test('fromFirestore handles int recordedAt (millisecondsSinceEpoch)', () {
       final epoch = DateTime(2025, 6, 1).millisecondsSinceEpoch;
-      final doc = FakeDocumentSnapshot('m-4', {
-        'bpm': 20,
-        'recordedAt': epoch,
-      });
+      final doc = FakeDocumentSnapshot('m-4', {'bpm': 20, 'recordedAt': epoch});
 
       final m = Measurement.fromFirestore(doc);
 

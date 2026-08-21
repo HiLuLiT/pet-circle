@@ -166,26 +166,39 @@ lib/theme/
 
 ### Color System
 
-**Font:** Instrument Sans (variable font, `fontVariationSettings: "'wdth' 100"`)
+**Palette categories (PC v3):** Ink (grays), Sky (backgrounds), Primary/purple, plus the candy
+accents — periwinkle, butter, blush, mint — and the red/green/yellow/blue feedback families.
 
-**Palette categories:** Ink (grays), Sky (backgrounds), Primary (purple #6B4EFF), Red, Green, Yellow, Blue.
-Each has 5 scales: Lightest, Lighter, Light, Base, Dark/Darkest.
+The live primary is **`pcPurple` #7E5CE0**, which is what semantic `primary` resolves to. The
+legacy `AppPrimitives.primaryBase` (#6B4EFF) is v2 residue: it survives only inside
+`status_badge.dart`'s backward-compat colour matcher and paints nothing. Do not treat it as
+the primary.
 
 **IMPORTANT rules:**
 - NEVER hardcode hex colors in widgets or screens — always use semantic tokens
 - Access colors via `AppSemanticColors.of(context).primary` (ThemeExtension pattern)
-- Primary actions use `Primary/Base` (#6B4EFF) — NOT the old chocolate color
+- Primary actions use `AppSemanticColors.of(context).primary` (= `pcPurple` #7E5CE0) — NOT `primaryBase`, NOT the old chocolate color
 - Text colors use `Ink/*` tokens — NOT hardcoded black
-- Background colors use `Sky/*` or `Primary/Lightest` — NOT hardcoded white
+- The app background is the single token `pcBg` (#F5F3EF), read via `c.background`; other surfaces use `Sky/*` or `primaryLightest` — NOT hardcoded white
 
 ### Typography System
 
-**Font family:** Instrument Sans (replaces Inter)
-**5 size categories:** Title 1 (48px), Title 2 (32px), Title 3 (24px), Large (18px), Regular (16px), Small (14px), Tiny (12px)
-**3 line-height variants per size:** None (= size), Tight, Normal
-**3 weights:** Bold (700), Medium (500), Regular (400)
+**Font:** Instrument Sans — a **variable** font. Both axes must be set: `wght` (400-700)
+*and* `wdth` (100). The eight bundled `.ttf` files are byte-identical, so the `weight:` keys in
+`pubspec.yaml` only pick a *file* — they do not set `wght`, whose default instance is 400.
+Weight comes from `fontVariations` only (see `AppTypography.axesBold` / `axesFor()`), never from
+`fontWeight` alone. Using `.copyWith(fontWeight: ...)` on a semantic style silently drops back to
+400; use the `withWeight()` extension instead. This was BUG-044 — see `docs/bug-log.md`.
 
-Access via `AppSemanticTextStyles.title1`, `AppSemanticTextStyles.largeBold`, etc.
+**Scale (aligned to Figma DS node 402-1191):** Display (`pcDisplayXxl/Xl/L`, `pcDisplay`), Heading
+(`headingH1` 24/32, `headingH2` 20/28, `headingXs` 16/22), Label L 15px, Label M 14px, Label S 13px,
+Body 16/24, Caption 12/16, plus `pcButton` (16/22 Bold).
+**Weights:** Regular 400, Medium 500, SemiBold 600, Bold 700 — applied via `fontVariations`.
+
+Access via `AppSemanticTextStyles.pcDisplayL`, `.headingH1`, `.pcBody`, `.captionMedium`, etc.
+The v2 names (`title1`/`title2`/`title3`, `body`, `label`, `caption`, ...) still resolve — each is
+an alias retargeted onto the nearest DS style — but prefer the DS-named styles in new code.
+Full catalog: `.claude/rules/design-system-enforcement.md`.
 
 ### Shadow System
 
@@ -199,7 +212,7 @@ Access via `AppSemanticTextStyles.title1`, `AppSemanticTextStyles.largeBold`, et
 - Buttons: pill-shaped (`borderRadius: 48`), filled (Primary/Base bg) or outlined (Primary/Base border)
 - Cards: `borderRadius: 16`, `Primary/Lightest` bg or white, Shadow/Small
 - Icon buttons: circular (`borderRadius: 1000`), `Sky/Light` bg
-- Tab bar: **5 tabs** (Home, Trends, Diary, Measure, Medicine), active = Primary/Base
+- Tab bar: Home, Trends, Circle, Measure, Medication — the Circle tab (index 2) is gated behind `kEnableCircleTab`, so it renders **4 tabs** while that flag is false. Active tint = `c.onSurface`
 - Inputs: `borderRadius: 16`, Sky/Lighter fill
 - Avatars: circular, 32px (small) or 64px (large)
 

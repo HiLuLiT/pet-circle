@@ -120,10 +120,7 @@ void main() {
         'new@example.com',
       );
       expect(original.copyWith(role: UserRole.vet).role, UserRole.vet);
-      expect(
-        original.copyWith(avatarUrl: 'new.png').avatarUrl,
-        'new.png',
-      );
+      expect(original.copyWith(avatarUrl: 'new.png').avatarUrl, 'new.png');
     });
 
     test('copyWith can replace pets list', () {

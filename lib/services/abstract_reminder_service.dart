@@ -3,6 +3,7 @@ import 'package:pet_circle/models/medication.dart';
 abstract class AbstractReminderService {
   Future<void> init();
   Future<bool> requestPermission();
+
   /// Schedule a one-shot reminder on the morning of [med]'s end date.
   Future<void> scheduleMedicationReminder(
     Medication med, {

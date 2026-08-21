@@ -29,7 +29,10 @@ void main() {
   group('MedicationStore seed', () {
     test('seed() populates medications', () {
       store.seed({
-        'pet-1': [_makeMedication(), _makeMedication(id: 'med-2', name: 'Aspirin')],
+        'pet-1': [
+          _makeMedication(),
+          _makeMedication(id: 'med-2', name: 'Aspirin'),
+        ],
         'pet-2': [_makeMedication(id: 'med-3', name: 'Enalapril')],
       });
 
@@ -42,7 +45,9 @@ void main() {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.seed({'pet-1': [_makeMedication()]});
+      store.seed({
+        'pet-1': [_makeMedication()],
+      });
       expect(callCount, 1);
     });
   });
@@ -77,17 +82,22 @@ void main() {
   });
 
   group('MedicationStore immutability', () {
-    test('updating a medication preserves immutability (new object via copyWith)', () {
-      final original = _makeMedication();
-      final updated = original.copyWith(dosage: '20mg');
+    test(
+      'updating a medication preserves immutability (new object via copyWith)',
+      () {
+        final original = _makeMedication();
+        final updated = original.copyWith(dosage: '20mg');
 
-      expect(original.dosage, '10mg');
-      expect(updated.dosage, '20mg');
-      expect(identical(original, updated), isFalse);
-    });
+        expect(original.dosage, '10mg');
+        expect(updated.dosage, '20mg');
+        expect(identical(original, updated), isFalse);
+      },
+    );
 
     test('getMedications returns unmodifiable list', () {
-      store.seed({'pet-1': [_makeMedication()]});
+      store.seed({
+        'pet-1': [_makeMedication()],
+      });
 
       final list = store.getMedications('pet-1');
       expect(
@@ -125,14 +135,18 @@ void main() {
 
   group('MedicationStore addMedication (via seed simulation)', () {
     test('adding one medication to an empty list produces length 1', () {
-      store.seed({'pet-1': [_makeMedication()]});
+      store.seed({
+        'pet-1': [_makeMedication()],
+      });
 
       expect(store.getMedications('pet-1').length, 1);
       expect(store.getMedications('pet-1').first.name, 'Furosemide');
     });
 
     test('adding to a new pet id produces an isolated list', () {
-      store.seed({'pet-new': [_makeMedication(id: 'med-1')]});
+      store.seed({
+        'pet-new': [_makeMedication(id: 'med-1')],
+      });
 
       expect(store.getMedications('pet-new').length, 1);
       expect(store.getMedications('other-pet'), isEmpty);
@@ -142,7 +156,9 @@ void main() {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.seed({'pet-1': [_makeMedication()]});
+      store.seed({
+        'pet-1': [_makeMedication()],
+      });
 
       expect(callCount, 1);
     });
@@ -167,33 +183,47 @@ void main() {
     });
 
     test('removing one of two medications leaves the other intact', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-2', name: 'Remaining')]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-2', name: 'Remaining')],
+      });
 
       expect(store.getMedications('pet-1').length, 1);
       expect(store.getMedications('pet-1').first.name, 'Remaining');
     });
 
-    test('medication remains when a different medication id is removed (seed simulation)', () {
-      // Simulates: remove med-2, med-1 should remain.
-      store.seed({'pet-1': [_makeMedication(id: 'med-1')]});
+    test(
+      'medication remains when a different medication id is removed (seed simulation)',
+      () {
+        // Simulates: remove med-2, med-1 should remain.
+        store.seed({
+          'pet-1': [_makeMedication(id: 'med-1')],
+        });
 
-      expect(store.getMedications('pet-1').length, 1);
-      expect(store.getMedications('pet-1').first.id, 'med-1');
-    });
+        expect(store.getMedications('pet-1').length, 1);
+        expect(store.getMedications('pet-1').first.id, 'med-1');
+      },
+    );
 
-    test('pet list is not affected when another pet has a medication removed (seed simulation)', () {
-      // Simulates: remove from pet-does-not-exist, pet-1 is unaffected.
-      store.seed({'pet-1': [_makeMedication(id: 'med-1')]});
+    test(
+      'pet list is not affected when another pet has a medication removed (seed simulation)',
+      () {
+        // Simulates: remove from pet-does-not-exist, pet-1 is unaffected.
+        store.seed({
+          'pet-1': [_makeMedication(id: 'med-1')],
+        });
 
-      expect(store.getMedications('pet-1').length, 1);
-    });
+        expect(store.getMedications('pet-1').length, 1);
+      },
+    );
 
     test('seed does not notify listeners again when state is unchanged', () {
       // Simulates: no-op removal scenario — listener count from seed only.
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.seed({'pet-1': [_makeMedication(id: 'med-1')]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1')],
+      });
 
       // Only one notification from the seed call — not from a phantom removal.
       expect(callCount, 1);
@@ -201,32 +231,47 @@ void main() {
   });
 
   group('MedicationStore updateMedication', () {
-    test('updateMedication with unknown pet id returns early — list unchanged', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1')]});
+    test(
+      'updateMedication with unknown pet id returns early — list unchanged',
+      () {
+        store.seed({
+          'pet-1': [_makeMedication(id: 'med-1')],
+        });
 
-      final updated = _makeMedication(id: 'med-1', name: 'Changed');
-      // list == null for pet-does-not-exist → early return before Firebase.
-      store.updateMedication('pet-does-not-exist', 'med-1', updated);
+        final updated = _makeMedication(id: 'med-1', name: 'Changed');
+        // list == null for pet-does-not-exist → early return before Firebase.
+        store.updateMedication('pet-does-not-exist', 'med-1', updated);
 
-      expect(store.getMedications('pet-1').first.name, 'Furosemide');
-    });
+        expect(store.getMedications('pet-1').first.name, 'Furosemide');
+      },
+    );
 
-    test('updateMedication with unknown medication id returns early — list unchanged', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1')]});
+    test(
+      'updateMedication with unknown medication id returns early — list unchanged',
+      () {
+        store.seed({
+          'pet-1': [_makeMedication(id: 'med-1')],
+        });
 
-      final updated = _makeMedication(id: 'nonexistent', name: 'Changed');
-      // idx == -1 → early return before Firebase.
-      store.updateMedication('pet-1', 'nonexistent', updated);
+        final updated = _makeMedication(id: 'nonexistent', name: 'Changed');
+        // idx == -1 → early return before Firebase.
+        store.updateMedication('pet-1', 'nonexistent', updated);
 
-      expect(store.getMedications('pet-1').first.name, 'Furosemide');
-    });
+        expect(store.getMedications('pet-1').first.name, 'Furosemide');
+      },
+    );
 
-    test('updateMedication result verified via seed — updated field is reflected', () {
-      // Simulate the post-update state using seed.
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', name: 'Updated Name')]});
+    test(
+      'updateMedication result verified via seed — updated field is reflected',
+      () {
+        // Simulate the post-update state using seed.
+        store.seed({
+          'pet-1': [_makeMedication(id: 'med-1', name: 'Updated Name')],
+        });
 
-      expect(store.getMedications('pet-1').first.name, 'Updated Name');
-    });
+        expect(store.getMedications('pet-1').first.name, 'Updated Name');
+      },
+    );
 
     test('updateMedication preserves other medications in the list', () {
       store.seed({
@@ -245,7 +290,9 @@ void main() {
 
   group('MedicationStore toggleMedication', () {
     test('toggleMedication with unknown pet returns early — no change', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', isActive: true)]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1', isActive: true)],
+      });
 
       // list == null → early return before Firebase.
       store.toggleMedication('pet-does-not-exist', 'med-1');
@@ -253,34 +300,46 @@ void main() {
       expect(store.getMedications('pet-1').first.isActive, isTrue);
     });
 
-    test('toggleMedication with unknown medication id returns early — no change', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', isActive: true)]});
+    test(
+      'toggleMedication with unknown medication id returns early — no change',
+      () {
+        store.seed({
+          'pet-1': [_makeMedication(id: 'med-1', isActive: true)],
+        });
 
-      // idx == -1 → early return before Firebase.
-      store.toggleMedication('pet-1', 'nonexistent-id');
+        // idx == -1 → early return before Firebase.
+        store.toggleMedication('pet-1', 'nonexistent-id');
 
-      expect(store.getMedications('pet-1').first.isActive, isTrue);
-    });
+        expect(store.getMedications('pet-1').first.isActive, isTrue);
+      },
+    );
 
-    test('toggled result via seed — inactive becomes visible in getActiveMedications', () {
-      // Simulate result: med-1 is now inactive.
-      store.seed({
-        'pet-1': [
-          _makeMedication(id: 'med-1', isActive: false),
-          _makeMedication(id: 'med-2', name: 'Other', isActive: true),
-        ],
-      });
+    test(
+      'toggled result via seed — inactive becomes visible in getActiveMedications',
+      () {
+        // Simulate result: med-1 is now inactive.
+        store.seed({
+          'pet-1': [
+            _makeMedication(id: 'med-1', isActive: false),
+            _makeMedication(id: 'med-2', name: 'Other', isActive: true),
+          ],
+        });
 
-      expect(store.getActiveMedications('pet-1').length, 1);
-      expect(store.getActiveMedications('pet-1').first.id, 'med-2');
-    });
+        expect(store.getActiveMedications('pet-1').length, 1);
+        expect(store.getActiveMedications('pet-1').first.id, 'med-2');
+      },
+    );
 
     test('toggled result via seed — active state is reflected', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', isActive: false)]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1', isActive: false)],
+      });
       expect(store.getActiveMedications('pet-1'), isEmpty);
 
       // Simulate toggle result.
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', isActive: true)]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1', isActive: true)],
+      });
       expect(store.getActiveMedications('pet-1').length, 1);
     });
   });
@@ -332,42 +391,57 @@ void main() {
   //  we simulate the state transitions using seed() as the source of truth.)
   // ---------------------------------------------------------------------------
   group('MedicationStore toggleMedication — seed simulation extended', () {
-    test('result when active flipped to inactive: getActiveMedications shrinks', () {
-      // Simulate: med-1 was active, now toggled to inactive
-      store.seed({
-        'pet-1': [
-          _makeMedication(id: 'med-1', isActive: false),  // result after toggle
-          _makeMedication(id: 'med-2', name: 'Other', isActive: true),
-        ],
-      });
+    test(
+      'result when active flipped to inactive: getActiveMedications shrinks',
+      () {
+        // Simulate: med-1 was active, now toggled to inactive
+        store.seed({
+          'pet-1': [
+            _makeMedication(
+              id: 'med-1',
+              isActive: false,
+            ), // result after toggle
+            _makeMedication(id: 'med-2', name: 'Other', isActive: true),
+          ],
+        });
 
-      expect(store.getActiveMedications('pet-1').length, 1);
-      expect(store.getActiveMedications('pet-1').first.id, 'med-2');
-    });
+        expect(store.getActiveMedications('pet-1').length, 1);
+        expect(store.getActiveMedications('pet-1').first.id, 'med-2');
+      },
+    );
 
-    test('result when inactive flipped to active: getActiveMedications grows', () {
-      // Simulate: med-1 was inactive, now toggled to active
-      store.seed({
-        'pet-1': [
-          _makeMedication(id: 'med-1', isActive: true),  // result after toggle
-        ],
-      });
+    test(
+      'result when inactive flipped to active: getActiveMedications grows',
+      () {
+        // Simulate: med-1 was inactive, now toggled to active
+        store.seed({
+          'pet-1': [
+            _makeMedication(id: 'med-1', isActive: true), // result after toggle
+          ],
+        });
 
-      expect(store.getActiveMedications('pet-1').length, 1);
-    });
+        expect(store.getActiveMedications('pet-1').length, 1);
+      },
+    );
 
     test('double toggle restores original active state (seed simulation)', () {
       // First toggle: active → inactive
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', isActive: false)]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1', isActive: false)],
+      });
       expect(store.getMedications('pet-1').first.isActive, isFalse);
 
       // Second toggle: inactive → active
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', isActive: true)]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1', isActive: true)],
+      });
       expect(store.getMedications('pet-1').first.isActive, isTrue);
     });
 
     test('toggleMedication with unknown pet is no-op (early return)', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', isActive: true)]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1', isActive: true)],
+      });
 
       // list == null → early return, no ReminderService call, no Firebase call
       store.toggleMedication('pet-does-not-exist', 'med-1');
@@ -375,20 +449,27 @@ void main() {
       expect(store.getMedications('pet-1').first.isActive, isTrue);
     });
 
-    test('toggleMedication with unknown medication id is no-op (early return)', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', isActive: true)]});
+    test(
+      'toggleMedication with unknown medication id is no-op (early return)',
+      () {
+        store.seed({
+          'pet-1': [_makeMedication(id: 'med-1', isActive: true)],
+        });
 
-      // idx == -1 → early return before ReminderService or Firebase
-      store.toggleMedication('pet-1', 'nonexistent-id');
+        // idx == -1 → early return before ReminderService or Firebase
+        store.toggleMedication('pet-1', 'nonexistent-id');
 
-      expect(store.getMedications('pet-1').first.isActive, isTrue);
-    });
+        expect(store.getMedications('pet-1').first.isActive, isTrue);
+      },
+    );
 
     test('seed notifies listeners when representing toggle result', () {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', isActive: false)]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1', isActive: false)],
+      });
 
       expect(callCount, 1);
     });
@@ -400,7 +481,9 @@ void main() {
   // ---------------------------------------------------------------------------
   group('MedicationStore updateMedication — seed simulation extended', () {
     test('updated name is reflected in getMedications (seed simulation)', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', name: 'Renamed')]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1', name: 'Renamed')],
+      });
 
       expect(store.getMedications('pet-1').first.name, 'Renamed');
     });
@@ -413,18 +496,21 @@ void main() {
       expect(store.getMedications('pet-1').first.dosage, '20mg');
     });
 
-    test('update replaces correct element while preserving others (seed simulation)', () {
-      store.seed({
-        'pet-1': [
-          _makeMedication(id: 'med-1', name: 'First'),
-          _makeMedication(id: 'med-2', name: 'UpdatedSecond'),
-        ],
-      });
+    test(
+      'update replaces correct element while preserving others (seed simulation)',
+      () {
+        store.seed({
+          'pet-1': [
+            _makeMedication(id: 'med-1', name: 'First'),
+            _makeMedication(id: 'med-2', name: 'UpdatedSecond'),
+          ],
+        });
 
-      final meds = store.getMedications('pet-1');
-      expect(meds.firstWhere((m) => m.id == 'med-2').name, 'UpdatedSecond');
-      expect(meds.firstWhere((m) => m.id == 'med-1').name, 'First');
-    });
+        final meds = store.getMedications('pet-1');
+        expect(meds.firstWhere((m) => m.id == 'med-2').name, 'UpdatedSecond');
+        expect(meds.firstWhere((m) => m.id == 'med-1').name, 'First');
+      },
+    );
 
     test('list length stays the same after update (seed simulation)', () {
       store.seed({
@@ -438,22 +524,37 @@ void main() {
     });
 
     test('updateMedication with unknown pet returns early — no change', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1')]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1')],
+      });
 
       // list == null → early return, no Firebase call
-      store.updateMedication('no-such-pet', 'med-1', _makeMedication(id: 'med-1', name: 'X'));
+      store.updateMedication(
+        'no-such-pet',
+        'med-1',
+        _makeMedication(id: 'med-1', name: 'X'),
+      );
 
       expect(store.getMedications('pet-1').first.name, 'Furosemide');
     });
 
-    test('updateMedication with unknown medication id returns early — no change', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1')]});
+    test(
+      'updateMedication with unknown medication id returns early — no change',
+      () {
+        store.seed({
+          'pet-1': [_makeMedication(id: 'med-1')],
+        });
 
-      // idx == -1 → early return
-      store.updateMedication('pet-1', 'no-such-id', _makeMedication(id: 'no-such-id', name: 'X'));
+        // idx == -1 → early return
+        store.updateMedication(
+          'pet-1',
+          'no-such-id',
+          _makeMedication(id: 'no-such-id', name: 'X'),
+        );
 
-      expect(store.getMedications('pet-1').first.name, 'Furosemide');
-    });
+        expect(store.getMedications('pet-1').first.name, 'Furosemide');
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------
@@ -461,14 +562,19 @@ void main() {
   // (Real removeMedication calls ReminderService + Firebase; use seed.)
   // ---------------------------------------------------------------------------
   group('MedicationStore removeMedication — seed simulation extended', () {
-    test('after removal the correct medication is absent (seed simulation)', () {
-      // Simulate: med-2 was removed, med-1 remains
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', name: 'Keep')]});
+    test(
+      'after removal the correct medication is absent (seed simulation)',
+      () {
+        // Simulate: med-2 was removed, med-1 remains
+        store.seed({
+          'pet-1': [_makeMedication(id: 'med-1', name: 'Keep')],
+        });
 
-      final meds = store.getMedications('pet-1');
-      expect(meds.length, 1);
-      expect(meds.first.id, 'med-1');
-    });
+        final meds = store.getMedications('pet-1');
+        expect(meds.length, 1);
+        expect(meds.first.id, 'med-1');
+      },
+    );
 
     test('after removing sole item the list is empty (seed simulation)', () {
       store.seed({'pet-1': []});
@@ -476,38 +582,49 @@ void main() {
       expect(store.getMedications('pet-1'), isEmpty);
     });
 
-    test('getActiveMedications count decreases after removal (seed simulation)', () {
-      store.seed({
-        'pet-1': [_makeMedication(id: 'med-2', name: 'Second', isActive: true)],
-      });
+    test(
+      'getActiveMedications count decreases after removal (seed simulation)',
+      () {
+        store.seed({
+          'pet-1': [
+            _makeMedication(id: 'med-2', name: 'Second', isActive: true),
+          ],
+        });
 
-      expect(store.getActiveMedications('pet-1').length, 1);
-    });
+        expect(store.getActiveMedications('pet-1').length, 1);
+      },
+    );
 
     test('seed notifies listeners representing removal result', () {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.seed({'pet-1': []});  // simulates removal of the last medication
+      store.seed({'pet-1': []}); // simulates removal of the last medication
 
       expect(callCount, 1);
     });
 
-    test('unrelated pet data is unaffected after a removal (seed simulation)', () {
-      // Simulate: only pet-2 had a medication removed; pet-1 is untouched.
-      store.seed({
-        'pet-1': [_makeMedication(id: 'med-1', name: 'Untouched')],
-      });
+    test(
+      'unrelated pet data is unaffected after a removal (seed simulation)',
+      () {
+        // Simulate: only pet-2 had a medication removed; pet-1 is untouched.
+        store.seed({
+          'pet-1': [_makeMedication(id: 'med-1', name: 'Untouched')],
+        });
 
-      expect(store.getMedications('pet-1').length, 1);
-      expect(store.getMedications('pet-1').first.name, 'Untouched');
-    });
+        expect(store.getMedications('pet-1').length, 1);
+        expect(store.getMedications('pet-1').first.name, 'Untouched');
+      },
+    );
 
-    test('zero active medications after last active med removed (seed simulation)', () {
-      // Simulate state after the sole active medication was removed.
-      store.seed({'pet-1': []});
-      expect(store.getActiveMedications('pet-1'), isEmpty);
-    });
+    test(
+      'zero active medications after last active med removed (seed simulation)',
+      () {
+        // Simulate state after the sole active medication was removed.
+        store.seed({'pet-1': []});
+        expect(store.getActiveMedications('pet-1'), isEmpty);
+      },
+    );
   });
 
   // ---------------------------------------------------------------------------
@@ -538,7 +655,9 @@ void main() {
     });
 
     test('getActiveMedications returns unmodifiable list', () {
-      store.seed({'pet-1': [_makeMedication(id: 'med-1', isActive: true)]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'med-1', isActive: true)],
+      });
 
       final active = store.getActiveMedications('pet-1');
       expect(
@@ -575,7 +694,10 @@ void main() {
 
     test('returns only active meds with reminders enabled and an end date', () {
       final due = endReminderMed(id: 'due');
-      final noReminder = endReminderMed(id: 'noReminder', remindersEnabled: false);
+      final noReminder = endReminderMed(
+        id: 'noReminder',
+        remindersEnabled: false,
+      );
       final inactive = endReminderMed(id: 'inactive', isActive: false);
       final noEndDate = Medication(
         id: 'noEndDate',
@@ -595,7 +717,9 @@ void main() {
     });
 
     test('returns empty when no meds have an end reminder', () {
-      store.seed({'pet-1': [_makeMedication()]});
+      store.seed({
+        'pet-1': [_makeMedication()],
+      });
       expect(store.getMedicationsWithEndReminder(), isEmpty);
     });
   });
@@ -618,8 +742,13 @@ void main() {
     });
 
     test('appends to an existing pet bucket', () async {
-      store.seed({'pet-1': [_makeMedication(id: 'm1')]});
-      await store.addMedication('pet-1', _makeMedication(id: 'm2', name: 'Two'));
+      store.seed({
+        'pet-1': [_makeMedication(id: 'm1')],
+      });
+      await store.addMedication(
+        'pet-1',
+        _makeMedication(id: 'm2', name: 'Two'),
+      );
 
       expect(store.getMedications('pet-1').map((m) => m.id), ['m1', 'm2']);
     });
@@ -627,7 +756,9 @@ void main() {
 
   group('MedicationStore updateMedication (real, local-only path)', () {
     test('replaces the matching medication and notifies', () async {
-      store.seed({'pet-1': [_makeMedication(id: 'm1', name: 'Old')]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'm1', name: 'Old')],
+      });
       int calls = 0;
       store.addListener(() => calls++);
 
@@ -642,7 +773,9 @@ void main() {
     });
 
     test('returns early for unknown pet without notifying', () async {
-      store.seed({'pet-1': [_makeMedication(id: 'm1')]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'm1')],
+      });
       int calls = 0;
       store.addListener(() => calls++);
 
@@ -653,15 +786,18 @@ void main() {
   });
 
   group('MedicationStore fetchForUser / refresh', () {
-    test('fetchForUser without Firebase swallows the error and notifies', () async {
-      int calls = 0;
-      store.addListener(() => calls++);
+    test(
+      'fetchForUser without Firebase swallows the error and notifies',
+      () async {
+        int calls = 0;
+        store.addListener(() => calls++);
 
-      await store.fetchForUser('uid-1');
+        await store.fetchForUser('uid-1');
 
-      // The Firebase call throws (no app initialised); the catch path notifies.
-      expect(calls, 1);
-    });
+        // The Firebase call throws (no app initialised); the catch path notifies.
+        expect(calls, 1);
+      },
+    );
 
     test('refresh is a no-op before any fetch (null current uid)', () async {
       int calls = 0;
@@ -680,12 +816,13 @@ void main() {
         'pet-2': [_makeMedication(id: 'm2'), _makeMedication(id: 'm3')],
       });
 
-      expect(store.allMedications.map((m) => m.id).toSet(),
-          {'m1', 'm2', 'm3'});
+      expect(store.allMedications.map((m) => m.id).toSet(), {'m1', 'm2', 'm3'});
     });
 
     test('returns an unmodifiable list', () {
-      store.seed({'pet-1': [_makeMedication(id: 'm1')]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'm1')],
+      });
       expect(
         () => store.allMedications.add(_makeMedication(id: 'x')),
         throwsUnsupportedError,
@@ -695,7 +832,9 @@ void main() {
 
   group('MedicationStore clearData (with data)', () {
     test('empties all buckets and notifies', () {
-      store.seed({'pet-1': [_makeMedication(id: 'm1')]});
+      store.seed({
+        'pet-1': [_makeMedication(id: 'm1')],
+      });
       int calls = 0;
       store.addListener(() => calls++);
 

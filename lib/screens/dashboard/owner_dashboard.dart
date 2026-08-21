@@ -54,9 +54,7 @@ class OwnerDashboard extends StatelessWidget {
     await reminderStore.removeReminder(petId, reminder.id);
     if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.reminderDeleted),
-      ),
+      SnackBar(content: Text(AppLocalizations.of(context)!.reminderDeleted)),
     );
   }
 
@@ -74,9 +72,7 @@ class OwnerDashboard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     if (petStore.isLoading) {
-      final loader = Center(
-        child: CircularProgressIndicator(color: c.primary),
-      );
+      final loader = Center(child: CircularProgressIndicator(color: c.primary));
       if (!showScaffold) return Container(color: c.background, child: loader);
       return Scaffold(backgroundColor: c.background, body: loader);
     }
@@ -90,27 +86,37 @@ class OwnerDashboard extends StatelessWidget {
   }
 
   Widget _buildEmptyState(
-      BuildContext context, AppSemanticColors c, AppLocalizations l10n) {
+    BuildContext context,
+    AppSemanticColors c,
+    AppLocalizations l10n,
+  ) {
     final emptyContent = SafeArea(
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacingTokens.xl),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.xl),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.pets,
-                  size: 64,
-                  color: c.textPrimary.withValues(alpha: 0.3)),
+              Icon(
+                Icons.pets,
+                size: 64,
+                color: c.textPrimary.withValues(alpha: 0.3),
+              ),
               const SizedBox(height: AppSpacingTokens.md),
-              Text(l10n.noPetsYet,
-                  style: AppSemanticTextStyles.title3
-                      .copyWith(color: c.textPrimary)),
+              Text(
+                l10n.noPetsYet,
+                style: AppSemanticTextStyles.title3.copyWith(
+                  color: c.textPrimary,
+                ),
+              ),
               const SizedBox(height: AppSpacingTokens.sm),
-              Text(l10n.addYourFirstPet,
-                  style: AppSemanticTextStyles.body
-                      .copyWith(color: c.textPrimary),
-                  textAlign: TextAlign.center),
+              Text(
+                l10n.addYourFirstPet,
+                style: AppSemanticTextStyles.body.copyWith(
+                  color: c.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: AppSpacingTokens.lg),
               PrimaryButton(
                 label: l10n.getStarted,
@@ -129,8 +135,12 @@ class OwnerDashboard extends StatelessWidget {
     return Scaffold(backgroundColor: c.background, body: emptyContent);
   }
 
-  Widget _buildActivePetHome(BuildContext context, AppSemanticColors c,
-      AppLocalizations l10n, Pet pet) {
+  Widget _buildActivePetHome(
+    BuildContext context,
+    AppSemanticColors c,
+    AppLocalizations l10n,
+    Pet pet,
+  ) {
     final access = petStore.accessForPet(pet);
     final latest = measurementStore.latestForPet(pet.id ?? '');
     final subtitle = latest != null
@@ -145,11 +155,13 @@ class OwnerDashboard extends StatelessWidget {
           physics: const AlwaysScrollableScrollPhysics(),
           child: Center(
             child: ConstrainedBox(
-              constraints:
-                  BoxConstraints(maxWidth: responsiveMaxWidth(context)),
+              constraints: BoxConstraints(
+                maxWidth: responsiveMaxWidth(context),
+              ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacingTokens.xl),
+                  horizontal: AppSpacingTokens.xl,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -161,8 +173,9 @@ class OwnerDashboard extends StatelessWidget {
                       children: [
                         Text(
                           l10n.yourPets,
-                          style: AppSemanticTextStyles.headingH2
-                              .copyWith(color: c.textPrimary),
+                          style: AppSemanticTextStyles.headingH2.copyWith(
+                            color: c.textPrimary,
+                          ),
                         ),
                         PrimaryButton(
                           label: l10n.addPet,
@@ -190,8 +203,9 @@ class OwnerDashboard extends StatelessWidget {
                         color: c.accentPurple,
                         size: 90,
                       ),
-                      onLongPress:
-                          access.canDeletePet ? () => confirmDeletePet(context, pet) : null,
+                      onLongPress: access.canDeletePet
+                          ? () => confirmDeletePet(context, pet)
+                          : null,
                     ),
 
                     const SizedBox(height: AppSpacingTokens.md),
@@ -293,23 +307,27 @@ class OwnerDashboard extends StatelessWidget {
                           if (reminders.isEmpty)
                             Padding(
                               padding: const EdgeInsets.only(
-                                  top: AppSpacingTokens.md),
+                                top: AppSpacingTokens.md,
+                              ),
                               child: Text(
                                 l10n.noRemindersYet,
                                 style: AppSemanticTextStyles.pcBodyMuted,
                               ),
                             )
                           else
-                            ...reminders.map((reminder) => Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: AppSpacingTokens.md),
-                                  child: _ReminderTile(
-                                    reminder: reminder,
-                                    petName: pet.name,
-                                    onDelete: () =>
-                                        _deleteReminder(context, reminder),
-                                  ),
-                                )),
+                            ...reminders.map(
+                              (reminder) => Padding(
+                                padding: const EdgeInsets.only(
+                                  top: AppSpacingTokens.md,
+                                ),
+                                child: _ReminderTile(
+                                  reminder: reminder,
+                                  petName: pet.name,
+                                  onDelete: () =>
+                                      _deleteReminder(context, reminder),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -320,8 +338,9 @@ class OwnerDashboard extends StatelessWidget {
                     PrimaryButton(
                       label: l10n.measure,
                       variant: PrimaryButtonVariant.filled,
-                      onPressed: () =>
-                          context.go(AppRoutes.shell(tab: AppRoutes.tabMeasure)),
+                      onPressed: () => context.go(
+                        AppRoutes.shell(tab: AppRoutes.tabMeasure),
+                      ),
                     ),
                     const SizedBox(height: AppSpacingTokens.md),
                     PrimaryButton(
@@ -380,8 +399,9 @@ class _ReminderTile extends StatelessWidget {
             children: [
               Text(
                 formatReminderDate(reminder.date, l10n.localeName),
-                style: AppSemanticTextStyles.bodySm
-                    .copyWith(color: c.textSecondary),
+                style: AppSemanticTextStyles.bodySm.copyWith(
+                  color: c.textSecondary,
+                ),
               ),
               const SizedBox(width: AppSpacingTokens.sm),
               _PetChip(petName: petName),
@@ -397,15 +417,16 @@ class _ReminderTile extends StatelessWidget {
                   children: [
                     Text(
                       reminder.title,
-                      style: AppSemanticTextStyles.pcBodySemibold
-                          .copyWith(color: c.textPrimary),
+                      style: AppSemanticTextStyles.pcBodySemibold.copyWith(
+                        color: c.textPrimary,
+                      ),
                     ),
-                    if (reminder.detail != null &&
-                        reminder.detail!.isNotEmpty)
+                    if (reminder.detail != null && reminder.detail!.isNotEmpty)
                       Text(
                         reminder.detail!,
-                        style: AppSemanticTextStyles.bodySm
-                            .copyWith(color: c.textSecondary),
+                        style: AppSemanticTextStyles.bodySm.copyWith(
+                          color: c.textSecondary,
+                        ),
                       ),
                   ],
                 ),
@@ -416,11 +437,7 @@ class _ReminderTile extends StatelessWidget {
                   behavior: HitTestBehavior.opaque,
                   child: Padding(
                     padding: const EdgeInsets.only(left: AppSpacingTokens.sm),
-                    child: Icon(
-                      Icons.close,
-                      size: 18,
-                      color: c.textTertiary,
-                    ),
+                    child: Icon(Icons.close, size: 18, color: c.textTertiary),
                   ),
                 ),
             ],
@@ -450,8 +467,9 @@ class _PetChip extends StatelessWidget {
       ),
       child: Text(
         petName,
-        style: AppSemanticTextStyles.labelSSemibold
-            .copyWith(color: c.textPrimary),
+        style: AppSemanticTextStyles.labelSSemibold.copyWith(
+          color: c.textPrimary,
+        ),
       ),
     );
   }

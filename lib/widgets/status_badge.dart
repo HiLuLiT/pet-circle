@@ -33,12 +33,7 @@ enum StatusBadgeStatus { normal, elevated, alert, active, invited }
 ///   * green/mint/primary (success-ish) family                                    → [active]
 ///   * anything else (blue/periwinkle/purple/unknown) — falls back to            → [normal]
 class StatusBadge extends StatelessWidget {
-  const StatusBadge({
-    super.key,
-    required this.label,
-    this.color,
-    this.status,
-  });
+  const StatusBadge({super.key, required this.label, this.color, this.status});
 
   /// Display text inside the pill.
   final String label;
@@ -64,6 +59,7 @@ class StatusBadge extends StatelessWidget {
       fontFamily: AppTypography.fontFamily,
       fontSize: 13,
       fontWeight: FontWeight.w700,
+      fontVariations: AppTypography.axesBold,
       height: 1.0,
       color: text,
     );
@@ -84,10 +80,7 @@ class StatusBadge extends StatelessWidget {
             Container(
               width: 9,
               height: 9,
-              decoration: BoxDecoration(
-                color: dot,
-                shape: BoxShape.circle,
-              ),
+              decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
             ),
             const SizedBox(width: 7),
           ],

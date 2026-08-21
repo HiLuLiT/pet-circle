@@ -109,7 +109,10 @@ void main() {
     });
 
     test('unknown string defaults to member', () {
-      expect(CareCirclePermissions.fromString('unknown'), CareCircleRole.member);
+      expect(
+        CareCirclePermissions.fromString('unknown'),
+        CareCircleRole.member,
+      );
     });
 
     test('empty string defaults to member', () {

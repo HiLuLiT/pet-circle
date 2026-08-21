@@ -41,10 +41,7 @@ void main() {
       });
 
       test('background is pcBg (warm)', () {
-        expect(
-          AppSemanticColors.light.background,
-          equals(AppPrimitives.pcBg),
-        );
+        expect(AppSemanticColors.light.background, equals(AppPrimitives.pcBg));
       });
 
       test('error is pcBlush', () {
@@ -60,7 +57,10 @@ void main() {
       });
 
       test('info is pcPeriwinkle', () {
-        expect(AppSemanticColors.light.info, equals(AppPrimitives.pcPeriwinkle));
+        expect(
+          AppSemanticColors.light.info,
+          equals(AppPrimitives.pcPeriwinkle),
+        );
       });
 
       test('textPrimary is pcInk', () {
@@ -85,7 +85,10 @@ void main() {
       });
 
       test('divider is pcHairline', () {
-        expect(AppSemanticColors.light.divider, equals(AppPrimitives.pcHairline));
+        expect(
+          AppSemanticColors.light.divider,
+          equals(AppPrimitives.pcHairline),
+        );
       });
 
       test('disabled is pcInkTertiary', () {
@@ -134,10 +137,7 @@ void main() {
           AppSemanticColors.light.accentButterCream,
           equals(AppPrimitives.pcButterCream),
         );
-        expect(
-          AppPrimitives.pcButterCream,
-          equals(const Color(0xFFE8E4D8)),
-        );
+        expect(AppPrimitives.pcButterCream, equals(const Color(0xFFE8E4D8)));
       });
       test('accentButterCream is theme-independent (dark == light)', () {
         expect(
@@ -217,10 +217,7 @@ void main() {
       });
 
       test('onPrimary is pcInk', () {
-        expect(
-          AppSemanticColors.dark.onPrimary,
-          equals(AppPrimitives.pcInk),
-        );
+        expect(AppSemanticColors.dark.onPrimary, equals(AppPrimitives.pcInk));
       });
 
       test('surface is inkDarker', () {
@@ -319,8 +316,10 @@ void main() {
       });
 
       test('lerp at t=0.5 returns an intermediate color', () {
-        final result =
-            AppSemanticColors.light.lerp(AppSemanticColors.dark, 0.5);
+        final result = AppSemanticColors.light.lerp(
+          AppSemanticColors.dark,
+          0.5,
+        );
         final expectedPrimary = Color.lerp(
           AppSemanticColors.light.primary,
           AppSemanticColors.dark.primary,
@@ -337,22 +336,30 @@ void main() {
       test('lerp with non-AppSemanticColors returns self', () {
         // lerp checks `other is! AppSemanticColors` — pass a different type.
         // We achieve this via the ThemeExtension<T>.lerp signature coercion.
-        final result = AppSemanticColors.light
-            .lerp(AppSemanticColors.light, 0.0);
+        final result = AppSemanticColors.light.lerp(
+          AppSemanticColors.light,
+          0.0,
+        );
         expect(result.primary, equals(AppSemanticColors.light.primary));
       });
     });
 
     group('of(context) — widget test', () {
-      testWidgets('resolves light theme extension from context', (tester) async {
+      testWidgets('resolves light theme extension from context', (
+        tester,
+      ) async {
         AppSemanticColors? resolved;
 
-        await tester.pumpWidget(testApp(Builder(
-          builder: (context) {
-            resolved = AppSemanticColors.of(context);
-            return const SizedBox();
-          },
-        )));
+        await tester.pumpWidget(
+          testApp(
+            Builder(
+              builder: (context) {
+                resolved = AppSemanticColors.of(context);
+                return const SizedBox();
+              },
+            ),
+          ),
+        );
 
         expect(resolved, isNotNull);
         expect(resolved!.primary, equals(AppPrimitives.pcPurple));
@@ -361,39 +368,47 @@ void main() {
       testWidgets('resolves dark theme extension from context', (tester) async {
         AppSemanticColors? resolved;
 
-        await tester.pumpWidget(testApp(
-          Builder(
-            builder: (context) {
-              resolved = AppSemanticColors.of(context);
-              return const SizedBox();
-            },
+        await tester.pumpWidget(
+          testApp(
+            Builder(
+              builder: (context) {
+                resolved = AppSemanticColors.of(context);
+                return const SizedBox();
+              },
+            ),
+            darkMode: true,
           ),
-          darkMode: true,
-        ));
+        );
 
         expect(resolved, isNotNull);
         expect(resolved!.primary, equals(AppPrimitives.pcPurpleTile));
       });
 
-      testWidgets('light theme primary differs from dark theme primary (static check)',
-          (tester) async {
-        // Verify via the static constants rather than two successive pumps
-        // (which can cause the tester to cache the first theme for the second).
-        expect(
-          AppSemanticColors.light.primary,
-          isNot(equals(AppSemanticColors.dark.primary)),
-        );
-      });
+      testWidgets(
+        'light theme primary differs from dark theme primary (static check)',
+        (tester) async {
+          // Verify via the static constants rather than two successive pumps
+          // (which can cause the tester to cache the first theme for the second).
+          expect(
+            AppSemanticColors.light.primary,
+            isNot(equals(AppSemanticColors.dark.primary)),
+          );
+        },
+      );
 
       testWidgets('all color properties are non-null', (tester) async {
         late AppSemanticColors colors;
 
-        await tester.pumpWidget(testApp(Builder(
-          builder: (context) {
-            colors = AppSemanticColors.of(context);
-            return const SizedBox();
-          },
-        )));
+        await tester.pumpWidget(
+          testApp(
+            Builder(
+              builder: (context) {
+                colors = AppSemanticColors.of(context);
+                return const SizedBox();
+              },
+            ),
+          ),
+        );
 
         expect(colors.primary, isNotNull);
         expect(colors.onPrimary, isNotNull);

@@ -78,10 +78,7 @@ void main() {
 
   group('decodeNotificationArgs', () {
     test('decodes a JSON string array', () {
-      expect(
-        decodeNotificationArgs('["a@b.com","Rex"]'),
-        ['a@b.com', 'Rex'],
-      );
+      expect(decodeNotificationArgs('["a@b.com","Rex"]'), ['a@b.com', 'Rex']);
     });
 
     test('returns an empty list for a non-string', () {
@@ -109,8 +106,12 @@ void main() {
     });
 
     test('stringifies non-string list members', () {
-      expect(decodeNotificationArgs('[1,2.5,true,null]'),
-          ['1', '2.5', 'true', 'null']);
+      expect(decodeNotificationArgs('[1,2.5,true,null]'), [
+        '1',
+        '2.5',
+        'true',
+        'null',
+      ]);
     });
 
     test('preserves order, matching the localizer positional args', () {
@@ -125,10 +126,9 @@ void main() {
     test('handles unicode payloads', () {
       // Escapes on both sides rather than literal Hebrew, so the assertion
       // cannot be misread when the file is rendered with bidi reordering.
-      expect(
-        decodeNotificationArgs('["\\u05e8\\u05e7\\u05e1"]'),
-        ['\u05e8\u05e7\u05e1'],
-      );
+      expect(decodeNotificationArgs('["\\u05e8\\u05e7\\u05e1"]'), [
+        '\u05e8\u05e7\u05e1',
+      ]);
     });
   });
 
@@ -138,16 +138,16 @@ void main() {
 
     // The exact data map `onInvitationStatusChanged` sends.
     Map<String, dynamic> payload() => {
-          'type': 'careCircle',
-          'route': '/shell',
-          'petId': 'pet-1',
-          'petName': 'Rex',
-          'invitedEmail': 'a@b.com',
-          'titleKey': 'inviteAcceptedTitle',
-          'bodyKey': 'inviteAcceptedBody',
-          'args': '["a@b.com","Rex"]',
-          'notificationId': 'srv-doc-123',
-        };
+      'type': 'careCircle',
+      'route': '/shell',
+      'petId': 'pet-1',
+      'petName': 'Rex',
+      'invitedEmail': 'a@b.com',
+      'titleKey': 'inviteAcceptedTitle',
+      'bodyKey': 'inviteAcceptedBody',
+      'args': '["a@b.com","Rex"]',
+      'notificationId': 'srv-doc-123',
+    };
 
     test('keeps the server document ID so markRead can find the doc', () {
       expect(_fromPayload(payload()).id, 'srv-doc-123');

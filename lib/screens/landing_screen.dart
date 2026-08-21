@@ -5,18 +5,19 @@ import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
-import 'package:pet_circle/widgets/mascot.dart';
+import 'package:pet_circle/widgets/pounding_heart_hero.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 
 /// Marketing landing (Figma Welcome, DS node 402:1682). [AppRoutes.welcome] `/`.
-class LandingScreen extends StatefulWidget {
+class LandingScreen extends StatelessWidget {
   const LandingScreen({super.key});
 
-  @override
-  State<LandingScreen> createState() => _LandingScreenState();
-}
+  /// Vertical rhythm from Figma: the gaps above the hero, above the CTA, and
+  /// below it measure 112 : 140 : 164 in the 852-tall frame.
+  static const int _flexAboveHero = 27;
+  static const int _flexAboveCta = 34;
+  static const int _flexBelowCta = 39;
 
-class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -25,116 +26,62 @@ class _LandingScreenState extends State<LandingScreen> {
     return Scaffold(
       backgroundColor: c.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            const Spacer(flex: 5),
-            Center(
-              child: Container(
-                width: 280,
-                height: 280,
-                decoration: BoxDecoration(
-                  color: c.accentPeriwinkleTile,
-                  shape: BoxShape.circle,
-                ),
-                child: Align(
-                  alignment: const Alignment(0, 0.15),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      _MascotBubble(
-                        breed: MascotBreed.fluffy,
-                        tileColor: c.accentMintTile,
-                        mascotColor: c.accentMint,
-                        bubbleSize: 72,
-                        mascotSize: 54,
+        // Scroll only when the viewport is too short for the fixed-height
+        // content; IntrinsicHeight bounds the column so Spacer stays legal.
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
+                  children: [
+                    const Spacer(flex: _flexAboveHero),
+                    const PoundingHeartHero(),
+                    const SizedBox(height: AppSpacingTokens.pcLg),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacingTokens.xl,
                       ),
-                      const SizedBox(width: AppSpacingTokens.sm),
-                      _MascotBubble(
-                        breed: MascotBreed.floppy,
-                        tileColor: c.accentPurpleTile,
-                        mascotColor: c.accentPurple,
-                        bubbleSize: 110,
-                        mascotSize: 82,
+                      child: Column(
+                        children: [
+                          Text(
+                            l10n.welcomeTagline,
+                            style: AppSemanticTextStyles.pcDisplayL.copyWith(
+                              color: c.textPrimary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: AppSpacingTokens.md),
+                          Text(
+                            l10n.landingSubtitle,
+                            style: AppSemanticTextStyles.labelLRegular.copyWith(
+                              color: c.textSecondary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: AppSpacingTokens.sm),
-                      _MascotBubble(
-                        breed: MascotBreed.whiskers,
-                        tileColor: c.accentBlushTile,
-                        mascotColor: c.accentBlush,
-                        bubbleSize: 72,
-                        mascotSize: 54,
+                    ),
+                    const Spacer(flex: _flexAboveCta),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacingTokens.xl,
                       ),
-                    ],
-                  ),
+                      child: PrimaryButton(
+                        label: l10n.getStarted,
+                        variant: PrimaryButtonVariant.filled,
+                        borderRadius: AppRadiiTokens.pcPill,
+                        onPressed: () => context.push(AppRoutes.signup),
+                      ),
+                    ),
+                    const Spacer(flex: _flexBelowCta),
+                  ],
                 ),
               ),
             ),
-            const Spacer(flex: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacingTokens.xl),
-              child: Column(
-                children: [
-                  Text(
-                    l10n.welcomeTagline,
-                    style: AppSemanticTextStyles.pcDisplayL.copyWith(
-                      color: c.textPrimary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.pcMd),
-                  Text(
-                    l10n.landingSubtitle,
-                    style: AppSemanticTextStyles.labelLRegular.copyWith(
-                      color: c.textSecondary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.pcMd),
-                  PrimaryButton(
-                    label: l10n.getStarted,
-                    variant: PrimaryButtonVariant.filled,
-                    onPressed: () => context.push(AppRoutes.signup),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacingTokens.xl),
-          ],
+          ),
         ),
       ),
-    );
-  }
-}
-
-/// A single mascot silhouette inside a circular tinted bubble (per the Figma
-/// "Welcome" composition).
-class _MascotBubble extends StatelessWidget {
-  const _MascotBubble({
-    required this.breed,
-    required this.tileColor,
-    required this.mascotColor,
-    required this.bubbleSize,
-    required this.mascotSize,
-  });
-
-  final MascotBreed breed;
-  final Color tileColor;
-  final Color mascotColor;
-  final double bubbleSize;
-  final double mascotSize;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: bubbleSize,
-      height: bubbleSize,
-      alignment: Alignment.bottomCenter,
-      decoration: BoxDecoration(
-        color: tileColor,
-        shape: BoxShape.circle,
-      ),
-      child: Mascot(breed: breed, color: mascotColor, size: mascotSize),
     );
   }
 }

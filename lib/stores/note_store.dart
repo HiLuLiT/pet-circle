@@ -52,11 +52,13 @@ class NoteStore extends ChangeNotifier {
     for (final id in petIds) {
       if (_pendingWritePetIds.contains(id)) continue;
       futures.add(
-        NoteService.fetch(id).then((list) {
-          _notes[id] = list;
-        }).catchError((Object e) {
-          debugPrint('[NoteStore] Failed to fetch for pet $id: $e');
-        }),
+        NoteService.fetch(id)
+            .then((list) {
+              _notes[id] = list;
+            })
+            .catchError((Object e) {
+              debugPrint('[NoteStore] Failed to fetch for pet $id: $e');
+            }),
       );
     }
     await Future.wait(futures);

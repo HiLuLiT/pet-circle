@@ -35,8 +35,8 @@ class Pet {
     this.diagnosis,
     this.ownerId,
     List<PendingInvite> pendingInvites = const [],
-  })  : careCircle = List.unmodifiable(careCircle),
-        pendingInvites = List.unmodifiable(pendingInvites);
+  }) : careCircle = List.unmodifiable(careCircle),
+       pendingInvites = List.unmodifiable(pendingInvites);
 
   final String? id;
   final String name;
@@ -87,13 +87,20 @@ class Pet {
         ? Map<String, dynamic>.from(careCircleRaw)
         : <String, dynamic>{};
     final careCircle = careCircleData.entries
-        .map((e) => CareCircleMember.fromFirestore(
-              e.key,
-              e.value is Map ? Map<String, dynamic>.from(e.value as Map) : <String, dynamic>{}))
+        .map(
+          (e) => CareCircleMember.fromFirestore(
+            e.key,
+            e.value is Map
+                ? Map<String, dynamic>.from(e.value as Map)
+                : <String, dynamic>{},
+          ),
+        )
         .toList();
 
     final measurementRaw = data['latestMeasurement'];
-    final measurementData = measurementRaw is Map ? Map<String, dynamic>.from(measurementRaw) : null;
+    final measurementData = measurementRaw is Map
+        ? Map<String, dynamic>.from(measurementRaw)
+        : null;
     final latestMeasurement = measurementData != null
         ? Measurement(
             bpm: measurementData['bpm'] ?? 0,

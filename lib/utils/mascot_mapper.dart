@@ -10,16 +10,8 @@ import 'package:pet_circle/widgets/mascot.dart';
 MascotBreed mascotBreedFor(String breedAndAge) {
   final String lower = breedAndAge.toLowerCase();
 
-  const List<String> floppyKeywords = [
-    'retriever',
-    'labrador',
-    'spaniel',
-  ];
-  const List<String> perkyKeywords = [
-    'shepherd',
-    'husky',
-    'collie',
-  ];
+  const List<String> floppyKeywords = ['retriever', 'labrador', 'spaniel'];
+  const List<String> perkyKeywords = ['shepherd', 'husky', 'collie'];
   const List<String> fluffyKeywords = [
     'poodle',
     'bichon',
@@ -33,11 +25,7 @@ MascotBreed mascotBreedFor(String breedAndAge) {
     'whippet',
     'dachshund',
   ];
-  const List<String> whiskersKeywords = [
-    'cat',
-    'persian',
-    'siamese',
-  ];
+  const List<String> whiskersKeywords = ['cat', 'persian', 'siamese'];
 
   if (floppyKeywords.any(lower.contains)) return MascotBreed.floppy;
   if (perkyKeywords.any(lower.contains)) return MascotBreed.perky;

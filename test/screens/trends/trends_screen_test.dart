@@ -49,8 +49,9 @@ void main() {
       expect(find.text('Last 30 days'), findsOneWidget);
     });
 
-    testWidgets('opening the period dropdown and selecting updates the value',
-        (tester) async {
+    testWidgets('opening the period dropdown and selecting updates the value', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(600, 1400);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -118,8 +119,9 @@ void main() {
     // "There should be exactly one item with [DropdownButton]'s value".
     // The value is now a locale-independent [TrendsPeriod] enum, so switching
     // locale must not throw.
-    testWidgets('period selector survives a locale switch (regression)',
-        (tester) async {
+    testWidgets('period selector survives a locale switch (regression)', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(600, 1400);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);

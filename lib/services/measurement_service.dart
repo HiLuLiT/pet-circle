@@ -18,9 +18,9 @@ class MeasurementService {
 
   /// Fetch all measurements for a pet (one-time read).
   static Future<List<Measurement>> fetch(String petId) async {
-    final snapshot = await _ref(petId)
-        .orderBy('recordedAt', descending: true)
-        .get();
+    final snapshot = await _ref(
+      petId,
+    ).orderBy('recordedAt', descending: true).get();
     final list = <Measurement>[];
     for (final doc in snapshot.docs) {
       try {
@@ -34,10 +34,9 @@ class MeasurementService {
 
   @Deprecated('Use fetch instead')
   static Stream<List<Measurement>> stream(String petId) {
-    return _ref(petId)
-        .orderBy('recordedAt', descending: true)
-        .snapshots()
-        .map((snapshot) {
+    return _ref(petId).orderBy('recordedAt', descending: true).snapshots().map((
+      snapshot,
+    ) {
       final list = <Measurement>[];
       for (final doc in snapshot.docs) {
         try {
@@ -65,10 +64,9 @@ class MeasurementService {
   }
 
   static Future<void> _syncLatest(String petId) async {
-    final snapshot = await _ref(petId)
-        .orderBy('recordedAt', descending: true)
-        .limit(1)
-        .get();
+    final snapshot = await _ref(
+      petId,
+    ).orderBy('recordedAt', descending: true).limit(1).get();
 
     if (snapshot.docs.isEmpty) {
       await _petsCollection.doc(petId).update({

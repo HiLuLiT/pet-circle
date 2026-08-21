@@ -34,10 +34,7 @@ const _kTabCount = kEnableCircleTab ? 5 : 4;
 int _clampTabIndex(int index) => index.clamp(0, _kTabCount - 1);
 
 class MainShell extends StatefulWidget {
-  const MainShell({
-    super.key,
-    this.initialIndex = 0,
-  });
+  const MainShell({super.key, this.initialIndex = 0});
 
   final int initialIndex;
 
@@ -80,7 +77,9 @@ class _MainShellState extends State<MainShell> {
       context: context,
       backgroundColor: c.background,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadiiTokens.lg)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppRadiiTokens.lg),
+        ),
       ),
       builder: (context) {
         final screenHeight = MediaQuery.sizeOf(context).height;
@@ -113,22 +112,24 @@ class _MainShellState extends State<MainShell> {
                             width: 36,
                             height: 36,
                             child: DogPhoto(
-                                endpoint: pet.imageUrl, fit: BoxFit.cover),
+                              endpoint: pet.imageUrl,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                         title: Text(
                           pet.name,
-                          style: AppSemanticTextStyles.body.copyWith(
-                            color: c.textPrimary,
-                            fontWeight: isSelected
-                                ? FontWeight.w700
-                                : FontWeight.w400,
-                          ),
+                          style: AppSemanticTextStyles.body
+                              .withWeight(
+                                isSelected ? FontWeight.w700 : FontWeight.w400,
+                              )
+                              .copyWith(color: c.textPrimary),
                         ),
                         subtitle: Text(
                           pet.breedAndAge,
-                          style: AppSemanticTextStyles.caption
-                              .copyWith(color: c.textPrimary),
+                          style: AppSemanticTextStyles.caption.copyWith(
+                            color: c.textPrimary,
+                          ),
                         ),
                         trailing: isSelected
                             ? Icon(Icons.check_circle, color: c.primaryLight)
@@ -174,8 +175,9 @@ class _MainShellState extends State<MainShell> {
                 userImageUrl: user?.avatarUrl ?? '',
                 petName: pet?.name,
                 petImageUrl: pet?.imageUrl,
-                onPetSelectorTap:
-                    petStore.ownerPets.length <= 1 ? null : _showPetSwitcher,
+                onPetSelectorTap: petStore.ownerPets.length <= 1
+                    ? null
+                    : _showPetSwitcher,
                 onAvatarTap: () => showModalBottomSheet<void>(
                   context: context,
                   isScrollControlled: true,
@@ -272,10 +274,16 @@ class _MainShellState extends State<MainShell> {
     // IndexedStack in build() and BottomNavBar.
     final labels = kEnableCircleTab
         ? allLabels
-        : [for (var i = 0; i < allLabels.length; i++) if (i != 2) allLabels[i]];
+        : [
+            for (var i = 0; i < allLabels.length; i++)
+              if (i != 2) allLabels[i],
+          ];
     final icons = kEnableCircleTab
         ? allIcons
-        : [for (var i = 0; i < allIcons.length; i++) if (i != 2) allIcons[i]];
+        : [
+            for (var i = 0; i < allIcons.length; i++)
+              if (i != 2) allIcons[i],
+          ];
     final activeIcons = kEnableCircleTab
         ? allActiveIcons
         : [
@@ -286,34 +294,35 @@ class _MainShellState extends State<MainShell> {
     return Theme(
       data: Theme.of(context).copyWith(
         navigationRailTheme: NavigationRailThemeData(
-          selectedLabelTextStyle:
-              AppSemanticTextStyles.caption.copyWith(color: c.textPrimary),
-          unselectedLabelTextStyle: AppSemanticTextStyles.caption
-              .copyWith(color: c.textPrimary.withValues(alpha: 0.5)),
+          selectedLabelTextStyle: AppSemanticTextStyles.caption.copyWith(
+            color: c.textPrimary,
+          ),
+          unselectedLabelTextStyle: AppSemanticTextStyles.caption.copyWith(
+            color: c.textPrimary.withValues(alpha: 0.5),
+          ),
         ),
       ),
       child: NavigationRail(
-      selectedIndex: _selectedIndex,
-      onDestinationSelected: _onDestinationSelected,
-      backgroundColor: c.background,
-      labelType: showLabels
-          ? NavigationRailLabelType.all
-          : NavigationRailLabelType.none,
-      indicatorColor: c.surface,
-      selectedIconTheme: IconThemeData(color: c.textPrimary),
-      unselectedIconTheme: IconThemeData(color: c.textPrimary, opacity: 0.3),
-      destinations: List.generate(labels.length, (i) {
-        return NavigationRailDestination(
-          icon: Opacity(
-            opacity: 0.3,
-            child: Icon(icons[i], size: 28, color: c.textPrimary),
-          ),
-          selectedIcon:
-              Icon(activeIcons[i], size: 28, color: c.textPrimary),
-          label: Text(labels[i]),
-        );
-      }),
-    ),
+        selectedIndex: _selectedIndex,
+        onDestinationSelected: _onDestinationSelected,
+        backgroundColor: c.background,
+        labelType: showLabels
+            ? NavigationRailLabelType.all
+            : NavigationRailLabelType.none,
+        indicatorColor: c.surface,
+        selectedIconTheme: IconThemeData(color: c.textPrimary),
+        unselectedIconTheme: IconThemeData(color: c.textPrimary, opacity: 0.3),
+        destinations: List.generate(labels.length, (i) {
+          return NavigationRailDestination(
+            icon: Opacity(
+              opacity: 0.3,
+              child: Icon(icons[i], size: 28, color: c.textPrimary),
+            ),
+            selectedIcon: Icon(activeIcons[i], size: 28, color: c.textPrimary),
+            label: Text(labels[i]),
+          );
+        }),
+      ),
     );
   }
 }

@@ -37,14 +37,13 @@ class FirestoreInvitationRepository implements InvitationRepository {
     required String invitedEmail,
     required String invitedByUid,
     required String invitedByName,
-  }) =>
-      InvitationService.createInvitation(
-        petId: petId,
-        petName: petName,
-        invitedEmail: invitedEmail,
-        invitedByUid: invitedByUid,
-        invitedByName: invitedByName,
-      );
+  }) => InvitationService.createInvitation(
+    petId: petId,
+    petName: petName,
+    invitedEmail: invitedEmail,
+    invitedByUid: invitedByUid,
+    invitedByName: invitedByName,
+  );
 
   @override
   Future<AcceptResult> acceptInvitation({
@@ -53,14 +52,13 @@ class FirestoreInvitationRepository implements InvitationRepository {
     required String email,
     required String displayName,
     required String avatarUrl,
-  }) =>
-      InvitationService.acceptInvitation(
-        token: token,
-        uid: uid,
-        email: email,
-        displayName: displayName,
-        avatarUrl: avatarUrl,
-      );
+  }) => InvitationService.acceptInvitation(
+    token: token,
+    uid: uid,
+    email: email,
+    displayName: displayName,
+    avatarUrl: avatarUrl,
+  );
 
   @override
   Future<List<Invitation>> getPendingInvitationsForEmail(String email) =>
@@ -71,12 +69,11 @@ class FirestoreInvitationRepository implements InvitationRepository {
     required String petId,
     required String email,
     required String invitedByUid,
-  }) =>
-      InvitationService.validateInvitation(
-        petId: petId,
-        email: email,
-        invitedByUid: invitedByUid,
-      );
+  }) => InvitationService.validateInvitation(
+    petId: petId,
+    email: email,
+    invitedByUid: invitedByUid,
+  );
 
   @override
   Future<void> cancelInvitation(String token) =>

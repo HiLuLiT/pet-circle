@@ -50,7 +50,8 @@ class _VetDashboardState extends State<VetDashboard> {
       uid: userStore.currentUserUid ?? '',
       email: userStore.currentUserEmail ?? '',
       displayName: userStore.currentUserDisplayName ?? '',
-      avatarUrl: userStore.currentUserAvatarUrl ??
+      avatarUrl:
+          userStore.currentUserAvatarUrl ??
           'https://ui-avatars.com/api/?name=${Uri.encodeComponent(userStore.currentUserDisplayName ?? '')}&background=E8B4B8&color=5B2C3F',
     );
     if (!mounted) return;
@@ -58,7 +59,9 @@ class _VetDashboardState extends State<VetDashboard> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          result.success ? l10n.requestAccepted : _invitationErrorText(l10n, result.errorCode),
+          result.success
+              ? l10n.requestAccepted
+              : _invitationErrorText(l10n, result.errorCode),
         ),
       ),
     );
@@ -86,15 +89,19 @@ class _VetDashboardState extends State<VetDashboard> {
     await invitationStore.declineInvitation(inv.id);
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.requestDeclined)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.requestDeclined)));
   }
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([petStore, measurementStore, invitationStore]),
+      listenable: Listenable.merge([
+        petStore,
+        measurementStore,
+        invitationStore,
+      ]),
       builder: (context, _) {
         final c = AppSemanticColors.of(context);
         final pets = petStore.allClinicPets;
@@ -111,7 +118,9 @@ class _VetDashboardState extends State<VetDashboard> {
         }
 
         final normalCount = pets.where((p) => p.statusLabel == 'Normal').length;
-        final elevatedCount = pets.where((p) => p.statusLabel != 'Normal').length;
+        final elevatedCount = pets
+            .where((p) => p.statusLabel != 'Normal')
+            .length;
 
         final content = SafeArea(
           child: Padding(
@@ -119,72 +128,76 @@ class _VetDashboardState extends State<VetDashboard> {
             child: SingleChildScrollView(
               child: Center(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: responsiveMaxWidth(context)),
+                  constraints: BoxConstraints(
+                    maxWidth: responsiveMaxWidth(context),
+                  ),
                   child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: AppSpacingTokens.md),
-                  if (invitationStore.pendingInvitations.isNotEmpty) ...[
-                    _PendingRequestsSection(
-                      invitations: invitationStore.pendingInvitations,
-                      processingTokens: invitationStore.processingTokens,
-                      onAccept: _acceptInvitation,
-                      onDecline: _declineInvitation,
-                    ),
-                    const SizedBox(height: AppSpacingTokens.lg),
-                  ],
-                  Text(
-                    l10n.clinicOverview,
-                    style: AppSemanticTextStyles.title3.copyWith(color: c.textPrimary),
-                  ),
-                  Text(
-                    l10n.patientsInYourCare(pets.length),
-                    style: AppSemanticTextStyles.bodyMuted,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.lg),
-                  ResponsiveGrid(
-                    maxCrossAxisCount: 3,
-                    minItemWidth: 280,
-                    children: pets
-                        .map(
-                          (pet) => _VetPetCard(
-                            data: pet,
-                            onTap: () => context.push(
-                              AppRoutes.petDetail(pet.id ?? ''),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                  const SizedBox(height: AppSpacingTokens.lg),
-                  ResponsiveGrid(
-                    maxCrossAxisCount: 3,
-                    minItemWidth: 280,
-                    childAspectRatio: 3.3,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SummaryCard(
-                        iconColor: c.primaryLight.withValues(alpha: 0.15),
-                        icon: Icons.check_circle_outline,
-                        value: '$normalCount',
-                        label: l10n.normalStatus,
+                      const SizedBox(height: AppSpacingTokens.md),
+                      if (invitationStore.pendingInvitations.isNotEmpty) ...[
+                        _PendingRequestsSection(
+                          invitations: invitationStore.pendingInvitations,
+                          processingTokens: invitationStore.processingTokens,
+                          onAccept: _acceptInvitation,
+                          onDecline: _declineInvitation,
+                        ),
+                        const SizedBox(height: AppSpacingTokens.lg),
+                      ],
+                      Text(
+                        l10n.clinicOverview,
+                        style: AppSemanticTextStyles.title3.copyWith(
+                          color: c.textPrimary,
+                        ),
                       ),
-                      SummaryCard(
-                        iconColor: c.error.withValues(alpha: 0.15),
-                        icon: Icons.warning_amber_outlined,
-                        value: '$elevatedCount',
-                        label: l10n.needAttention,
+                      Text(
+                        l10n.patientsInYourCare(pets.length),
+                        style: AppSemanticTextStyles.bodyMuted,
                       ),
-                      SummaryCard(
-                        iconColor: c.primaryLight.withValues(alpha: 0.1),
-                        icon: Icons.bar_chart,
-                        value: '${measurementStore.thisWeekCount}',
-                        label: l10n.measurementsThisWeek,
+                      const SizedBox(height: AppSpacingTokens.lg),
+                      ResponsiveGrid(
+                        maxCrossAxisCount: 3,
+                        minItemWidth: 280,
+                        children: pets
+                            .map(
+                              (pet) => _VetPetCard(
+                                data: pet,
+                                onTap: () => context.push(
+                                  AppRoutes.petDetail(pet.id ?? ''),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                      const SizedBox(height: AppSpacingTokens.lg),
+                      ResponsiveGrid(
+                        maxCrossAxisCount: 3,
+                        minItemWidth: 280,
+                        childAspectRatio: 3.3,
+                        children: [
+                          SummaryCard(
+                            iconColor: c.primaryLight.withValues(alpha: 0.15),
+                            icon: Icons.check_circle_outline,
+                            value: '$normalCount',
+                            label: l10n.normalStatus,
+                          ),
+                          SummaryCard(
+                            iconColor: c.error.withValues(alpha: 0.15),
+                            icon: Icons.warning_amber_outlined,
+                            value: '$elevatedCount',
+                            label: l10n.needAttention,
+                          ),
+                          SummaryCard(
+                            iconColor: c.primaryLight.withValues(alpha: 0.1),
+                            icon: Icons.bar_chart,
+                            value: '${measurementStore.thisWeekCount}',
+                            label: l10n.measurementsThisWeek,
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
+                ),
               ),
             ),
           ),
@@ -194,10 +207,7 @@ class _VetDashboardState extends State<VetDashboard> {
           return Container(color: c.background, child: content);
         }
 
-        return Scaffold(
-          backgroundColor: c.background,
-          body: content,
-        );
+        return Scaffold(backgroundColor: c.background, body: content);
       },
     );
   }
@@ -228,12 +238,17 @@ class _PendingRequestsSection extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(Icons.notification_important_outlined,
-                size: 20, color: c.error),
+            Icon(
+              Icons.notification_important_outlined,
+              size: 20,
+              color: c.error,
+            ),
             const SizedBox(width: AppSpacingTokens.sm),
             Text(
               l10n.pendingRequests,
-              style: AppSemanticTextStyles.headingLg.copyWith(color: c.textPrimary),
+              style: AppSemanticTextStyles.headingLg.copyWith(
+                color: c.textPrimary,
+              ),
             ),
           ],
         ),
@@ -255,8 +270,9 @@ class _PendingRequestsSection extends StatelessWidget {
                         height: 40,
                         decoration: BoxDecoration(
                           color: c.primaryLight.withValues(alpha: 0.15),
-                          borderRadius:
-                              BorderRadius.circular(AppRadiiTokens.lg),
+                          borderRadius: BorderRadius.circular(
+                            AppRadiiTokens.lg,
+                          ),
                         ),
                         child: Icon(Icons.pets, size: 20, color: c.primary),
                       ),
@@ -267,13 +283,15 @@ class _PendingRequestsSection extends StatelessWidget {
                           children: [
                             Text(
                               inv.petName,
-                              style: AppSemanticTextStyles.body.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: c.textPrimary),
+                              style: AppSemanticTextStyles.body
+                                  .withWeight(FontWeight.w600)
+                                  .copyWith(color: c.textPrimary),
                             ),
                             Text(
                               l10n.petAssociationRequest(
-                                  inv.invitedByName, inv.petName),
+                                inv.invitedByName,
+                                inv.petName,
+                              ),
                               style: AppSemanticTextStyles.caption,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
@@ -288,11 +306,13 @@ class _PendingRequestsSection extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed:
-                            isProcessing ? null : () => onDecline(inv),
-                        child: Text(l10n.declineRequest,
-                            style: AppSemanticTextStyles.caption
-                                .copyWith(color: c.error)),
+                        onPressed: isProcessing ? null : () => onDecline(inv),
+                        child: Text(
+                          l10n.declineRequest,
+                          style: AppSemanticTextStyles.caption.copyWith(
+                            color: c.error,
+                          ),
+                        ),
                       ),
                       const SizedBox(width: AppSpacingTokens.sm),
                       SizedBox(
@@ -302,24 +322,28 @@ class _PendingRequestsSection extends StatelessWidget {
                             backgroundColor: c.primary,
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacingTokens.md),
+                              horizontal: AppSpacingTokens.md,
+                            ),
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  AppRadiiTokens.borderRadiusFull,
+                              borderRadius: AppRadiiTokens.borderRadiusFull,
                             ),
                           ),
-                          onPressed:
-                              isProcessing ? null : () => onAccept(inv),
+                          onPressed: isProcessing ? null : () => onAccept(inv),
                           child: isProcessing
                               ? SizedBox(
                                   width: 16,
                                   height: 16,
                                   child: CircularProgressIndicator(
-                                      strokeWidth: 2, color: c.background),
+                                    strokeWidth: 2,
+                                    color: c.background,
+                                  ),
                                 )
-                              : Text(l10n.acceptRequest,
-                                  style: AppSemanticTextStyles.caption
-                                      .copyWith(color: c.background)),
+                              : Text(
+                                  l10n.acceptRequest,
+                                  style: AppSemanticTextStyles.caption.copyWith(
+                                    color: c.background,
+                                  ),
+                                ),
                         ),
                       ),
                     ],
@@ -365,15 +389,14 @@ class _VetPetCard extends StatelessWidget {
       media: ClipOval(child: DogPhoto(endpoint: data.imageUrl)),
       onTap: onTap,
       trailing: const _ViewOnlyBadge(),
-      footer: _OwnerLabel(
-        name: _getOwnerName(data.careCircle, l10n.unknown),
-      ),
+      footer: _OwnerLabel(name: _getOwnerName(data.careCircle, l10n.unknown)),
     );
   }
 
   String _getOwnerName(List<CareCircleMember> circle, String fallback) {
-    final owner =
-        circle.where((m) => m.role == CareCircleRole.owner).firstOrNull;
+    final owner = circle
+        .where((m) => m.role == CareCircleRole.owner)
+        .firstOrNull;
     return owner?.name ?? fallback;
   }
 }
@@ -388,7 +411,9 @@ class _ViewOnlyBadge extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacingTokens.sm, vertical: AppSpacingTokens.xs),
+        horizontal: AppSpacingTokens.sm,
+        vertical: AppSpacingTokens.xs,
+      ),
       decoration: BoxDecoration(
         color: c.textPrimary.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(AppRadiiTokens.sm),

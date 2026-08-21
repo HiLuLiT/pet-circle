@@ -323,7 +323,10 @@ void main() {
       expect(original.copyWith(id: 'new-id').id, 'new-id');
       expect(original.copyWith(name: 'New Name').name, 'New Name');
       expect(original.copyWith(dosage: '20mg').dosage, '20mg');
-      expect(original.copyWith(frequency: 'Once daily').frequency, 'Once daily');
+      expect(
+        original.copyWith(frequency: 'Once daily').frequency,
+        'Once daily',
+      );
       expect(
         original.copyWith(startDate: DateTime(2026, 1, 1)).startDate,
         DateTime(2026, 1, 1),
@@ -332,10 +335,16 @@ void main() {
         original.copyWith(endDate: DateTime(2026, 6, 1)).endDate,
         DateTime(2026, 6, 1),
       );
-      expect(original.copyWith(prescribedBy: 'Dr. Jones').prescribedBy, 'Dr. Jones');
+      expect(
+        original.copyWith(prescribedBy: 'Dr. Jones').prescribedBy,
+        'Dr. Jones',
+      );
       expect(original.copyWith(purpose: 'New purpose').purpose, 'New purpose');
       expect(original.copyWith(notes: 'New notes').notes, 'New notes');
-      expect(original.copyWith(remindersEnabled: false).remindersEnabled, isFalse);
+      expect(
+        original.copyWith(remindersEnabled: false).remindersEnabled,
+        isFalse,
+      );
       expect(original.copyWith(isActive: false).isActive, isFalse);
     });
   });
@@ -405,8 +414,10 @@ void main() {
 
     test('false when reminders disabled', () {
       expect(
-        makeMed(endDate: DateTime(2026, 6, 1), remindersEnabled: false)
-            .hasEndReminder,
+        makeMed(
+          endDate: DateTime(2026, 6, 1),
+          remindersEnabled: false,
+        ).hasEndReminder,
         isFalse,
       );
     });

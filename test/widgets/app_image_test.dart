@@ -10,21 +10,25 @@ void main() {
   group('AppImage', () {
     // ── Smoke ───────────────────────────────────────────────────────────────
     testWidgets('renders without error', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppImage.asset('assets/images/test.png', width: 100, height: 100),
-      ));
+      await tester.pumpWidget(
+        testApp(
+          const AppImage.asset(
+            'assets/images/test.png',
+            width: 100,
+            height: 100,
+          ),
+        ),
+      );
       expect(find.byType(AppImage), findsOneWidget);
     });
 
     // ── Variant / state tests ──────────────────────────────────────────────
     testWidgets('shows fallback when asset fails to load', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppImage.asset(
-          'assets/nonexistent.png',
-          width: 80,
-          height: 80,
+      await tester.pumpWidget(
+        testApp(
+          const AppImage.asset('assets/nonexistent.png', width: 80, height: 80),
         ),
-      ));
+      );
       // Pump to trigger errorBuilder
       await tester.pumpAndSettle();
 
@@ -33,66 +37,72 @@ void main() {
     });
 
     testWidgets('uses custom fallback icon', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppImage.asset(
-          'assets/nonexistent.png',
-          width: 80,
-          height: 80,
-          fallbackIcon: Icons.broken_image,
+      await tester.pumpWidget(
+        testApp(
+          const AppImage.asset(
+            'assets/nonexistent.png',
+            width: 80,
+            height: 80,
+            fallbackIcon: Icons.broken_image,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.broken_image), findsOneWidget);
     });
 
     testWidgets('respects width and height', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppImage.asset(
-          'assets/nonexistent.png',
-          width: 120,
-          height: 90,
+      await tester.pumpWidget(
+        testApp(
+          const AppImage.asset(
+            'assets/nonexistent.png',
+            width: 120,
+            height: 90,
+          ),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       // Fallback container should have specified dimensions
-      final containers = tester.widgetList<Container>(find.byType(Container))
-          .where((c) =>
-              c.constraints?.maxWidth == 120 && c.constraints?.maxHeight == 90);
+      final containers = tester
+          .widgetList<Container>(find.byType(Container))
+          .where(
+            (c) =>
+                c.constraints?.maxWidth == 120 &&
+                c.constraints?.maxHeight == 90,
+          );
       // The Container gets width/height, which creates constraints
     });
 
     // ── Theme token tests ───────────────────────────────────────────────────
     testWidgets('fallback bg is surfaceRecessed', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppImage.asset(
-          'assets/nonexistent.png',
-          width: 60,
-          height: 60,
+      await tester.pumpWidget(
+        testApp(
+          const AppImage.asset('assets/nonexistent.png', width: 60, height: 60),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
-      final containers = tester.widgetList<Container>(find.byType(Container))
+      final containers = tester
+          .widgetList<Container>(find.byType(Container))
           .where((c) {
-        final decoration = c.decoration;
-        if (decoration is BoxDecoration) {
-          return decoration.color == AppSemanticColors.light.surfaceRecessed;
-        }
-        return false;
-      });
+            final decoration = c.decoration;
+            if (decoration is BoxDecoration) {
+              return decoration.color ==
+                  AppSemanticColors.light.surfaceRecessed;
+            }
+            return false;
+          });
       expect(containers.isNotEmpty, isTrue);
     });
 
     testWidgets('fallback icon color is textTertiary', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppImage.asset(
-          'assets/nonexistent.png',
-          width: 60,
-          height: 60,
+      await tester.pumpWidget(
+        testApp(
+          const AppImage.asset('assets/nonexistent.png', width: 60, height: 60),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
       final icon = tester.widget<Icon>(
@@ -102,23 +112,22 @@ void main() {
     });
 
     testWidgets('fallback border radius is lg (16)', (tester) async {
-      await tester.pumpWidget(testApp(
-        const AppImage.asset(
-          'assets/nonexistent.png',
-          width: 60,
-          height: 60,
+      await tester.pumpWidget(
+        testApp(
+          const AppImage.asset('assets/nonexistent.png', width: 60, height: 60),
         ),
-      ));
+      );
       await tester.pumpAndSettle();
 
-      final containers = tester.widgetList<Container>(find.byType(Container))
+      final containers = tester
+          .widgetList<Container>(find.byType(Container))
           .where((c) {
-        final decoration = c.decoration;
-        if (decoration is BoxDecoration) {
-          return decoration.borderRadius == AppRadiiTokens.borderRadiusLg;
-        }
-        return false;
-      });
+            final decoration = c.decoration;
+            if (decoration is BoxDecoration) {
+              return decoration.borderRadius == AppRadiiTokens.borderRadiusLg;
+            }
+            return false;
+          });
       expect(containers.isNotEmpty, isTrue);
     });
   });

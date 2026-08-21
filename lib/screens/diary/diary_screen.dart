@@ -28,8 +28,9 @@ class DiaryScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             l10n.comingSoon,
-            style:
-                AppSemanticTextStyles.bodyMuted.copyWith(color: c.textSecondary),
+            style: AppSemanticTextStyles.bodyMuted.copyWith(
+              color: c.textSecondary,
+            ),
           ),
         ],
       ),

@@ -57,29 +57,36 @@ class _MedicationScreenState extends State<MedicationScreen> {
       return v;
     }
 
-    const header = 'Medication,Dosage,Frequency,Start Date,End Date,Status,Prescribed By,Purpose,Notes';
-    final csvLines = meds.map((m) {
-      final status = m.isActive ? 'Ongoing' : 'Completed';
-      return [
-        csvEscape(m.name),
-        csvEscape(m.dosage),
-        csvEscape(m.frequency),
-        fmtDate(m.startDate),
-        fmtDate(m.endDate),
-        status,
-        csvEscape(m.prescribedBy),
-        csvEscape(m.purpose),
-        csvEscape(m.notes),
-      ].join(',');
-    }).join('\n');
+    const header =
+        'Medication,Dosage,Frequency,Start Date,End Date,Status,Prescribed By,Purpose,Notes';
+    final csvLines = meds
+        .map((m) {
+          final status = m.isActive ? 'Ongoing' : 'Completed';
+          return [
+            csvEscape(m.name),
+            csvEscape(m.dosage),
+            csvEscape(m.frequency),
+            fmtDate(m.startDate),
+            fmtDate(m.endDate),
+            status,
+            csvEscape(m.prescribedBy),
+            csvEscape(m.purpose),
+            csvEscape(m.notes),
+          ].join(',');
+        })
+        .join('\n');
     final csvData = '$header\n$csvLines';
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadiiTokens.lg)),
-        title: Text(l10n.exportMedicationLog, style: AppSemanticTextStyles.headingLg),
+          borderRadius: BorderRadius.circular(AppRadiiTokens.lg),
+        ),
+        title: Text(
+          l10n.exportMedicationLog,
+          style: AppSemanticTextStyles.headingLg,
+        ),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,9 +100,13 @@ class _MedicationScreenState extends State<MedicationScreen> {
                   color: c.background,
                   borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
                 ),
-                child: Text(csvData,
-                    style: AppSemanticTextStyles.caption
-                        .copyWith(fontFamily: 'monospace', fontSize: 10)),
+                child: Text(
+                  csvData,
+                  style: AppSemanticTextStyles.caption.copyWith(
+                    fontFamily: 'monospace',
+                    fontSize: 10,
+                  ),
+                ),
               ),
             ],
           ),
@@ -103,8 +114,10 @@ class _MedicationScreenState extends State<MedicationScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.close,
-                style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
+            child: Text(
+              l10n.close,
+              style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
+            ),
           ),
           TextButton(
             onPressed: () async {
@@ -127,10 +140,13 @@ class _MedicationScreenState extends State<MedicationScreen> {
             style: TextButton.styleFrom(
               backgroundColor: c.primaryLight,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadiiTokens.sm)),
+                borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
+              ),
             ),
-            child: Text(l10n.downloadCsv,
-                style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary)),
+            child: Text(
+              l10n.downloadCsv,
+              style: AppSemanticTextStyles.body.copyWith(color: c.textPrimary),
+            ),
           ),
         ],
       ),
@@ -154,60 +170,65 @@ class _MedicationScreenState extends State<MedicationScreen> {
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               child: Padding(
-              padding: const EdgeInsets.all(AppSpacingTokens.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: AppSpacingTokens.md),
-                  Text(l10n.medicationManagement,
-                      style: AppSemanticTextStyles.headingH2),
-                  const SizedBox(height: AppSpacingTokens.sm),
-                  Text(
-                    '$petName • $count ${l10n.activeTreatments.toLowerCase()}',
-                    style: AppSemanticTextStyles.pcLabelMuted,
-                  ),
-                  const SizedBox(height: AppSpacingTokens.lg),
-                  _ActiveMedicationsList(
-                    onEdit:
-                        access.canManageMedication ? _openMedicationSheet : null,
-                  ),
-                  if (access.canManageMedication) ...[
+                padding: const EdgeInsets.all(AppSpacingTokens.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     const SizedBox(height: AppSpacingTokens.md),
-                    PrimaryButton(
-                      label: l10n.addMedication,
-                      variant: PrimaryButtonVariant.secondary,
-                      onPressed: _openMedicationSheet,
-                      trailingIcon: const Icon(Icons.add_circle_outline),
+                    Text(
+                      l10n.medicationManagement,
+                      style: AppSemanticTextStyles.headingH2,
+                    ),
+                    const SizedBox(height: AppSpacingTokens.sm),
+                    Text(
+                      '$petName • $count ${l10n.activeTreatments.toLowerCase()}',
+                      style: AppSemanticTextStyles.pcLabelMuted,
+                    ),
+                    const SizedBox(height: AppSpacingTokens.lg),
+                    _ActiveMedicationsList(
+                      onEdit: access.canManageMedication
+                          ? _openMedicationSheet
+                          : null,
+                    ),
+                    if (access.canManageMedication) ...[
+                      const SizedBox(height: AppSpacingTokens.md),
+                      PrimaryButton(
+                        label: l10n.addMedication,
+                        variant: PrimaryButtonVariant.secondary,
+                        onPressed: _openMedicationSheet,
+                        trailingIcon: const Icon(Icons.add_circle_outline),
+                      ),
+                    ],
+                    const SizedBox(height: AppSpacingTokens.lg),
+                    _SectionCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.clinicalRecordInformation,
+                            style: AppSemanticTextStyles.headingH2,
+                          ),
+                          const SizedBox(height: AppSpacingTokens.sm),
+                          Text(
+                            l10n.clinicalRecordDisclaimer,
+                            style: AppSemanticTextStyles.pcBodyMuted,
+                          ),
+                          const SizedBox(height: AppSpacingTokens.md),
+                          PrimaryButton(
+                            label: l10n.exportMedicationLog,
+                            variant: PrimaryButtonVariant.filled,
+                            onPressed: _exportMedicationLog,
+                            trailingIcon: const Icon(
+                              Icons.file_download_outlined,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
-                  const SizedBox(height: AppSpacingTokens.lg),
-                  _SectionCard(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.clinicalRecordInformation,
-                          style: AppSemanticTextStyles.headingH2,
-                        ),
-                        const SizedBox(height: AppSpacingTokens.sm),
-                        Text(
-                          l10n.clinicalRecordDisclaimer,
-                          style: AppSemanticTextStyles.pcBodyMuted,
-                        ),
-                        const SizedBox(height: AppSpacingTokens.md),
-                        PrimaryButton(
-                          label: l10n.exportMedicationLog,
-                          variant: PrimaryButtonVariant.filled,
-                          onPressed: _exportMedicationLog,
-                          trailingIcon: const Icon(Icons.file_download_outlined),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
           ),
         );
       },
@@ -246,13 +267,18 @@ class _ActiveMedicationsList extends StatelessWidget {
             Container(
               width: 64,
               height: 64,
-              decoration:
-                  BoxDecoration(color: c.accentBlushTile, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: c.accentBlushTile,
+                shape: BoxShape.circle,
+              ),
               child: Icon(Icons.medication, color: c.accentBlush),
             ),
             const SizedBox(height: AppSpacingTokens.sm + 4),
-            Text(l10n.noMedicationsRecorded,
-                style: AppSemanticTextStyles.headingLg, textAlign: TextAlign.center),
+            Text(
+              l10n.noMedicationsRecorded,
+              style: AppSemanticTextStyles.headingLg,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: AppSpacingTokens.xs),
             Text(
               l10n.keepTrackOfMedications(petName),
@@ -286,20 +312,29 @@ class _ActiveMedicationsList extends StatelessWidget {
                       color: c.accentBlushTile,
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.medication, color: c.accentBlush, size: 20),
+                    child: Icon(
+                      Icons.medication,
+                      color: c.accentBlush,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: AppSpacingTokens.sm + 4),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(med.name,
-                            style: AppSemanticTextStyles.body.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: c.textPrimary)),
-                        Text('${med.dosage} • ${localizeFrequency(med.frequency, l10n)}',
-                            style: AppSemanticTextStyles.caption
-                                .copyWith(color: c.textPrimary)),
+                        Text(
+                          med.name,
+                          style: AppSemanticTextStyles.body
+                              .withWeight(FontWeight.w600)
+                              .copyWith(color: c.textPrimary),
+                        ),
+                        Text(
+                          '${med.dosage} • ${localizeFrequency(med.frequency, l10n)}',
+                          style: AppSemanticTextStyles.caption.copyWith(
+                            color: c.textPrimary,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -308,9 +343,12 @@ class _ActiveMedicationsList extends StatelessWidget {
                     children: [
                       _medicationBadge(med, l10n),
                       const SizedBox(height: AppSpacingTokens.xs),
-                      Text(dateStr,
-                          style: AppSemanticTextStyles.caption
-                              .copyWith(color: c.textPrimary)),
+                      Text(
+                        dateStr,
+                        style: AppSemanticTextStyles.caption.copyWith(
+                          color: c.textPrimary,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -330,7 +368,8 @@ class _ActiveMedicationsList extends StatelessWidget {
 StatusBadge _medicationBadge(Medication med, AppLocalizations l10n) {
   final now = DateTime.now();
   final isPastDue =
-      med.endDate != null && med.endDate!.isBefore(DateTime(now.year, now.month, now.day));
+      med.endDate != null &&
+      med.endDate!.isBefore(DateTime(now.year, now.month, now.day));
   if (isPastDue && !med.isActive) {
     return StatusBadge(label: l10n.expired, status: StatusBadgeStatus.alert);
   }
