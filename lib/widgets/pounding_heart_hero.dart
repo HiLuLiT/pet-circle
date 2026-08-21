@@ -36,15 +36,20 @@ import 'package:pet_circle/widgets/app_image.dart';
 class PoundingHeartHero extends StatefulWidget {
   const PoundingHeartHero({
     super.key,
-    this.pulseStrength = 0.11,
-    this.tempo = 1.0,
+    this.pulseStrength = 0.08,
+    this.tempo = 0.7,
   });
 
-  /// How far the heart swells on each beat. The design exposes this as a
-  /// 0.03-0.25 range with 0.11 as the default.
+  /// How far the heart swells on each beat. Range 0.03-0.25.
+  ///
+  /// The default tracks the `data-props` default in `Pounding Heart.dc.html`,
+  /// which is the tuned composition. Note that `heart-scene.jsx`'s own `??`
+  /// fallback and the `standalone-src` variant both still say 0.11 — the
+  /// authored value lives in the .dc.html's `data-props`, so read it there.
   final double pulseStrength;
 
-  /// Heartbeat speed multiplier. Design range 0.5-1.8, default 1.
+  /// Heartbeat speed multiplier. Range 0.5-1.8. Also from the .dc.html
+  /// `data-props` default, not the .jsx fallback.
   final double tempo;
 
   /// Natural size of the composition, from the Figma "Object" layer and
