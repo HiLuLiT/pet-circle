@@ -4,6 +4,8 @@ import 'package:pet_circle/screens/onboarding/onboarding_flow.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step1.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step2.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step3.dart';
+import 'package:pet_circle/screens/onboarding/onboarding_step4.dart';
+import 'package:pet_circle/screens/onboarding/onboarding_step5.dart';
 import 'package:pet_circle/widgets/onboarding_shell.dart';
 
 import '../../helpers/mock_stores.dart';
@@ -68,14 +70,23 @@ void main() {
       },
     );
 
-    testWidgets('PageView has exactly 3 children (not 4)', (tester) async {
+    testWidgets('PageView is the 3 form steps plus the All Set step', (
+      tester,
+    ) async {
       await tester.pumpWidget(testApp(const OnboardingFlow()));
       await tester.pumpAndSettle();
 
-      // The PageView inside OnboardingFlow should have 3 pages.
+      // 3 form steps + Figma "Step 5 (All Set)" (424:6047). OnboardingStep4
+      // (care-circle invites) is still deliberately not wired in.
       final pageView = tester.widget<PageView>(find.byType(PageView));
       final delegate = pageView.childrenDelegate as SliverChildListDelegate;
-      expect(delegate.children.length, 3);
+      expect(delegate.children.length, 4);
+      expect(delegate.children.last, isA<OnboardingStep5>());
+      expect(
+        delegate.children.whereType<OnboardingStep4>(),
+        isEmpty,
+        reason: 'OnboardingStep4 must stay unwired',
+      );
     });
   });
 

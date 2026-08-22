@@ -187,6 +187,11 @@
   "unknown": "Unknown",
   "normal": "Normal",
 
+  "allSetTitle": "You're all set!",
+  "allSetSubtitle": "{petName}'s profile is ready. Let's take the first measurement together.",
+  "@allSetSubtitle": { "placeholders": { "petName": { "type": "String" } } },
+  "enterPetCircle": "Enter Pet Circle",
+
   "setupPetProfile": "Setup pet profile",
   "tellUsAboutYourPet": "Tell us about your pet",
   "medicalInfoDescription": "This helps us provide more accurate monitoring recommendations.",

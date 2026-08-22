@@ -15,6 +15,7 @@ import 'package:pet_circle/theme/tokens/colors.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step1.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step2.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_step3.dart';
+import 'package:pet_circle/screens/onboarding/onboarding_step5.dart';
 
 class OnboardingFlow extends StatefulWidget {
   const OnboardingFlow({super.key});
@@ -31,6 +32,11 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   String _diagnosis = '';
   int _targetRate = 30;
   bool _isSubmitting = false;
+
+  /// Name of the pet created by [_onComplete], shown on the "All set" step.
+  /// Read from the created record rather than the form so the confirmation
+  /// matches what was actually persisted (including the 'New Pet' fallback).
+  String _createdPetName = '';
 
   @override
   void dispose() {
@@ -82,7 +88,14 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
 
       if (!mounted) return;
 
-      context.go(AppRoutes.shell());
+      // The pet now exists, so the "profile is ready" confirmation is true.
+      // '/onboarding' is a public path in the router, so marking onboarding
+      // complete above does not bounce us off this route.
+      setState(() {
+        _isSubmitting = false;
+        _createdPetName = createdPet.name;
+      });
+      _goTo(3);
     } catch (e) {
       if (!mounted) return;
       debugPrint('[OnboardingFlow] Failed to create pet: $e');
@@ -95,7 +108,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   }
 
   void _goTo(int index) {
-    if (index < 0 || index > 2) return;
+    if (index < 0 || index > 3) return;
     _controller.animateToPage(
       index,
       duration: const Duration(milliseconds: 300),
@@ -142,6 +155,10 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           onTargetRateChanged: (rate) => _targetRate = rate,
           initialTargetRate: _targetRate,
           isNextLoading: _isSubmitting,
+        ),
+        OnboardingStep5(
+          petName: _createdPetName,
+          onEnter: () => context.go(AppRoutes.shell()),
         ),
       ],
     );

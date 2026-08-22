@@ -560,6 +560,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get normal => 'Normal';
 
   @override
+  String get allSetTitle => 'You\'re all set!';
+
+  @override
+  String allSetSubtitle(String petName) {
+    return '$petName\'s profile is ready. Let\'s take the first measurement together.';
+  }
+
+  @override
+  String get enterPetCircle => 'Enter Pet Circle';
+
+  @override
   String get setupPetProfile => 'Setup pet profile';
 
   @override

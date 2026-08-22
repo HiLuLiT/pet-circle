@@ -1148,6 +1148,24 @@ abstract class AppLocalizations {
   /// **'Normal'**
   String get normal;
 
+  /// No description provided for @allSetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re all set!'**
+  String get allSetTitle;
+
+  /// No description provided for @allSetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{petName}\'s profile is ready. Let\'s take the first measurement together.'**
+  String allSetSubtitle(String petName);
+
+  /// No description provided for @enterPetCircle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Pet Circle'**
+  String get enterPetCircle;
+
   /// No description provided for @setupPetProfile.
   ///
   /// In en, this message translates to:

@@ -3,6 +3,10 @@ class AppAssets {
   static const onboardingCalendarIcon = 'assets/figma/onboarding_calendar.svg';
   static const onboardingPulseIcon = 'assets/figma/onboarding_pulse.svg';
 
+  /// Onboarding "You're all set!" mascot — Figma node 601:1260 ("Object")
+  /// inside Step 5 (424:6047). Renders at 136.093x162.697 (aspect 266/318).
+  static const onboardingAllSetDog = 'assets/figma/onboarding_all_set_dog.png';
+
   // Welcome
   static const welcomeGraphic = 'assets/figma/welcome.svg';
   static const welcomeCat = 'assets/figma/welcome_cat.svg';
