@@ -2,7 +2,7 @@
 
 > Living user story map for Pet Circle. Tracks implementation status of every user story by role. Consult when working on any screen to understand what is done, what is partial, and what is missing. UPDATE this file after completing work on any story.
 
-Last updated: 2026-07-29 (Phase 2 audit: FCM push + invitation email confirmed shipped; BUG-038..042 fixed)
+Last updated: 2026-08-23 (added B29: onboarding "All set" confirmation step from Figma 424:6047)
 
 ## Update Protocol
 
@@ -28,7 +28,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 
 ---
 
-## Status: DONE (63 stories) -- Phase 1 Complete + Phase 2 Partial
+## Status: DONE (64 stories) -- Phase 1 Complete + Phase 2 Partial
 
 ### Authentication & Onboarding
 - A1: Welcome screen with sign-up and sign-in buttons
@@ -43,6 +43,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - B4: Onboarding Step 4 -- care circle emails + role selection (Admin/Member/Viewer)
 - B25: Onboarding Back/Next buttons with persistent state (AutomaticKeepAliveClientMixin)
 - B26: Pet creation writes to Firestore via `PetStore.createPetWithFirestore()`, auto-adds owner as Admin
+- B29: Onboarding "All set" confirmation step (Figma 424:6047) -- `onboarding_step5.dart`, the 4th page of the flow. Renders *after* the pet is persisted, so "profile is ready" is true; its "Enter Pet Circle" CTA is what navigates to the shell. No `OnboardingShell` chrome (no back, no progress, no step label), per the frame
 
 ### Owner Experience
 - B5: Owner home -- active-pet-focused dashboard (Figma 402:1978): hero `PetCard` (mascot, SPR subtitle), latest-reading card, Care Circle card, Reminders card, Measure/Trends actions, empty-state CTA

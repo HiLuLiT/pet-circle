@@ -187,6 +187,11 @@
   "unknown": "לא ידוע",
   "normal": "תקין",
 
+  "allSetTitle": "הכול מוכן!",
+  "allSetSubtitle": "הפרופיל של {petName} מוכן. בואו נבצע יחד את המדידה הראשונה.",
+  "@allSetSubtitle": { "placeholders": { "petName": { "type": "String" } } },
+  "enterPetCircle": "כניסה ל-Pet Circle",
+
   "setupPetProfile": "הגדרת פרופיל חיית מחמד",
   "tellUsAboutYourPet": "ספר/י לנו על חיית המחמד שלך",
   "medicalInfoDescription": "מידע זה עוזר לנו לספק המלצות ניטור מדויקות יותר.",

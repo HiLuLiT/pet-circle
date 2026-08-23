@@ -558,6 +558,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get normal => 'תקין';
 
   @override
+  String get allSetTitle => 'הכול מוכן!';
+
+  @override
+  String allSetSubtitle(String petName) {
+    return 'הפרופיל של $petName מוכן. בואו נבצע יחד את המדידה הראשונה.';
+  }
+
+  @override
+  String get enterPetCircle => 'כניסה ל-Pet Circle';
+
+  @override
   String get setupPetProfile => 'הגדרת פרופיל חיית מחמד';
 
   @override
