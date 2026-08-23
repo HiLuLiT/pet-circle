@@ -58,7 +58,7 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 | Widget | File | Used In |
 |--------|------|---------|
 | `BreedSearchField` | `lib/widgets/breed_search_field.dart` | Onboarding Step 1, Pet Detail edit sheet |
-| `OnboardingShell` | `lib/widgets/onboarding_shell.dart` | All 4 onboarding steps (Back/Next buttons) |
+| `OnboardingShell` | `lib/widgets/onboarding_shell.dart` | Onboarding steps 1-3 (Back/Next buttons). Step 5 deliberately has no shell chrome; step 4 is dead code |
 | `BottomNavBar` | `lib/widgets/bottom_nav_bar.dart` | MainShell (Home, Trends, Measure, Medication) |
 
 ## Remaining Work
@@ -81,7 +81,7 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 | Care circle pending invites | Displayed on `circle_screen.dart` with owner-only cancel; the invitee-side decline on `vet_dashboard.dart` is still denied by the rules (see above) |
 | Reminders fire no notification | `Reminder` (vet visit, grooming) persists to `pets/{petId}/reminders` but schedules no local notification and sends no push. `ReminderService` has ID namespaces for medication/measurement/weekly but none for reminders |
 | Dead settings | `emergencyAlerts` and the medication morning/evening times persist to Firestore but drive no behaviour |
-| Dead code | `onboarding_step4.dart` is unreferenced outside its own test (`onboarding_flow.dart` wires only steps 1-3), and the `PetService` medication methods target `pets/{petId}/medications`, which has no rule and so is denied |
+| Dead code | `onboarding_step4.dart` is unreferenced outside its own test (`onboarding_flow.dart` wires steps 1-3 plus step 5), and the `PetService` medication methods target `pets/{petId}/medications`, which has no rule and so is denied |
 | CSV file download | Export dialogs show preview but don't write actual files |
 
 ## Feature Backlog
