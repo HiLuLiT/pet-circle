@@ -151,6 +151,20 @@ void main() {
       expect(size.height, closeTo(162.697, 0.01));
     });
 
+    testWidgets('mascot asset is the animated WebP, not a still frame', (
+      tester,
+    ) async {
+      await pumpStep5(tester);
+
+      final image = tester.widget<Image>(find.byType(Image));
+      final name = (image.image as AssetImage).assetName;
+
+      // Animated WebP is played natively by [Image]; a .png here would mean
+      // the animation was silently swapped back for a still.
+      expect(name, endsWith('.webp'));
+      expect(name, AppAssets.onboardingAllSetDog);
+    });
+
     testWidgets('CTA is a full-width filled PrimaryButton, 329x54', (
       tester,
     ) async {

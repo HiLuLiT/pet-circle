@@ -5,7 +5,14 @@ class AppAssets {
 
   /// Onboarding "You're all set!" mascot — Figma node 601:1260 ("Object")
   /// inside Step 5 (424:6047). Renders at 136.093x162.697 (aspect 266/318).
-  static const onboardingAllSetDog = 'assets/figma/onboarding_all_set_dog.png';
+  ///
+  /// Animated WebP (48 frames, ~2s waving loop, transparent). Flutter's
+  /// [Image] plays animated WebP natively, so this needs no extra package.
+  /// Pre-scaled to the render box rather than shipped at source resolution:
+  /// every frame is decoded at the asset's own size, so an oversized asset
+  /// costs both bundle size and per-frame decode for no visible gain.
+  static const onboardingAllSetDog =
+      'assets/figma/onboarding_all_set_dog.webp';
 
   // Welcome
   static const welcomeGraphic = 'assets/figma/welcome.svg';
