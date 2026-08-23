@@ -78,6 +78,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
       );
 
       final createdPet = await petStore.createPetWithFirestore(pet);
+
+      // Open the app on the pet that was just created. Without this the header
+      // switcher and dashboard show whatever was active before -- index 0 --
+      // which is wrong whenever this flow was entered as "Add pet" from the
+      // dashboard. Must happen *before* the refresh below: fetchForUser()
+      // re-resolves the active index from the previously active pet's id, so
+      // selecting first is what makes the choice survive the refetch.
+      petStore.setActivePet(createdPet);
+
       await settingsStore.updateThresholds(elevated: _targetRate);
 
       // Mark onboarding as complete
