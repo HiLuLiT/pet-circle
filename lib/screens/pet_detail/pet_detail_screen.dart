@@ -286,7 +286,18 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         if (access.canEditPet)
           IconButton(
             icon: Icon(Icons.edit, color: c.background),
+            tooltip: l10n.editPet,
             onPressed: _showEditSheet,
+          ),
+        // The app bar is pinned, so this is the one delete affordance that is
+        // visible without scrolling. The button further down the page sits
+        // past ~1000px of content on a phone, which is why deletion still
+        // read as missing after it was added.
+        if (access.canDeletePet)
+          IconButton(
+            icon: Icon(Icons.delete_outline, color: c.background),
+            tooltip: l10n.deletePet,
+            onPressed: _handleDelete,
           ),
       ],
       flexibleSpace: FlexibleSpaceBar(
