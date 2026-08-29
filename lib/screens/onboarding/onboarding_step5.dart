@@ -12,6 +12,11 @@ import 'package:pet_circle/widgets/primary_button.dart';
 /// [OnboardingShell] chrome: no Back button, no progress bar, no step label —
 /// the Figma frame holds only the mascot, the two lines of copy and the CTA.
 ///
+/// The mascot is an animated WebP (a ~2s waving loop). [Image] plays animated
+/// WebP natively, so no package or controller is involved -- and because the
+/// animation shares the still's 266:318 aspect, none of the geometry below had
+/// to change when it replaced the PNG.
+///
 /// Geometry is taken verbatim from the 393x852 frame: the mascot frame sits at
 /// y=109 (65 below the 44pt status bar), the copy block at y=316 and the button
 /// at y=444, all on a 32pt horizontal margin.
