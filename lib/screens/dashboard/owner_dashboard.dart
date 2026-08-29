@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/app_routes.dart';
@@ -198,8 +200,10 @@ class OwnerDashboard extends StatelessWidget {
                           fit: BoxFit.contain,
                         ),
                       ),
+                      // Shortcut only -- the discoverable delete lives on the
+                      // pet detail screen.
                       onLongPress: access.canDeletePet
-                          ? () => confirmDeletePet(context, pet)
+                          ? () => unawaited(confirmDeletePet(context, pet))
                           : null,
                     ),
 

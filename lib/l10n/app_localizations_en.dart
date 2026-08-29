@@ -945,6 +945,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get petDeleted => 'Pet deleted';
 
   @override
+  String get petDeleteFailed => 'Couldn\'t delete pet. Please try again.';
+
+  @override
   String deletePetConfirmation(String name) {
     return 'Delete $name? This will remove all associated data.';
   }

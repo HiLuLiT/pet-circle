@@ -1850,6 +1850,12 @@ abstract class AppLocalizations {
   /// **'Pet deleted'**
   String get petDeleted;
 
+  /// No description provided for @petDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t delete pet. Please try again.'**
+  String get petDeleteFailed;
+
   /// No description provided for @deletePetConfirmation.
   ///
   /// In en, this message translates to:

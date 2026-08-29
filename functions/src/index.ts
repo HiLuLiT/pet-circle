@@ -25,6 +25,9 @@ export { onInvitationCreated } from "./invitation-email";
 // ── Invitation push notification (Firestore trigger) ────────────────
 export { onInvitationStatusChanged } from "./invitation-notification";
 
+// ── Pet deletion cleanup (Firestore trigger) ────────────────────────
+export { onPetDeleted } from "./pet-cleanup";
+
 // ── OTP functions (callable) ────────────────────────────────────────
 
 function redactEmail(email: string): string {

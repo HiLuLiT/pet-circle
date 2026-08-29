@@ -1050,6 +1050,82 @@ No `firestore.rules` change was needed — the rules never enumerate keys inside
 value, plus the legacy-document and malformed-input fallbacks);
 `test/stores/settings_store_test.dart` → `seedFromAppUser restores a persisted mode on cold start`.
 
+## BUG-050: Deleting a pet could delete the wrong one, reported false success, and orphaned its data
+
+**Found during:** Auditing pet deletion after it was reported as missing functionality (it was not
+missing -- it was unreachable, which is BUG-051).
+**Severity:** High
+**Status:** Fixed
+
+**Symptom:** Five distinct failures around one action:
+1. With two pets sharing a name, deleting one removed the *other*.
+2. A rejected Firestore delete still showed "Pet deleted"; the pet then reappeared.
+3. Deleting the active pet silently moved the header switcher onto a neighbour.
+4. Deleting from the pet detail screen left the user on a detail view for a pet that no longer existed.
+5. Every measurement, note, medication and reminder the pet owned survived the delete forever.
+
+**Root cause:**
+1. `PetStore.removePetWithFirestore(String name)` resolved the target with `getPetByName` and
+   `indexWhere((p) => p.name == name)`. Names are not unique, so it took whichever duplicate came
+   first. `removePet(String name)` had the same flaw.
+2. `confirmDeletePet` called the store without `await`, then showed the success snackbar
+   unconditionally. The store rethrows after rolling back on a Firestore error, so the failure
+   surfaced only as an unhandled async error.
+3. `_activePetIndex` was never adjusted on removal -- the `activePetIndex` getter merely clamps, so
+   a removal at or before the selection slid it onto a different pet.
+4. Nothing popped the route after a successful delete.
+5. `PetService.deletePet` deletes only `/pets/{petId}`. Firestore does not cascade, and the security
+   rules resolve subcollection access *through* the parent document, so once it is gone the
+   subcollections are unreachable and undeletable by any client while still consuming storage.
+   Members other than the deleter also kept a dangling `users/{uid}.petIds` entry, and invitations
+   for the pet were left pointing at nothing.
+
+**Fix:** Keyed both removal paths on the pet id (`removePetById`, `removePetWithFirestore(petId)`)
+and made them bail when no local pet matches. Added `_reindexActiveAfterRemoval`, which keeps the
+selection on the same pet and falls back to the previous neighbour when the active pet itself is
+deleted. Made `confirmDeletePet` async: it awaits the store, shows `petDeleted` only on success and
+the new `petDeleteFailed` on failure, and returns whether the delete happened so the pet detail
+screen can pop. Added the `onPetDeleted` Cloud Function, which recursively deletes the pet's
+subcollections with the Admin SDK, clears the petId from every care-circle member's `petIds`, and
+deletes invitations still pointing at it.
+
+**Files changed:**
+- `lib/stores/pet_store.dart`
+- `lib/utils/pet_delete_dialog.dart`
+- `lib/screens/pet_detail/pet_detail_screen.dart`
+- `lib/screens/dashboard/owner_dashboard.dart`
+- `lib/l10n/app_en.arb`, `lib/l10n/app_he.arb`
+- `functions/src/pet-cleanup.ts`, `functions/src/index.ts`
+
+**Regression test:** `test/stores/pet_store_test.dart` -> "deletion is keyed on id, not name" and
+"active selection survives a removal"; `functions/test/pet-cleanup.test.js`.
+
+---
+
+## BUG-051: Pet deletion had no discoverable entry point
+
+**Found during:** User reported pet deletion as missing functionality.
+**Severity:** Medium
+**Status:** Fixed
+
+**Symptom:** Users concluded the app could not delete a pet at all.
+
+**Root cause:** Deletion existed but was reachable only by long-pressing the home hero pet card --
+a gesture with no affordance -- or through a trash icon nested inside the pet detail *edit* sheet,
+four taps deep. Neither advertises itself, and nothing in Settings or the pet switcher mentioned
+deletion.
+
+**Fix:** Added a visible owner-only "Delete Pet" button to the pet detail screen, using
+`PrimaryButton` in its outlined variant tinted with `c.error`. The long-press remains as a shortcut.
+
+**Files changed:**
+- `lib/screens/pet_detail/pet_detail_screen.dart`
+
+**Regression test:** `test/screens/pet_detail/pet_detail_screen_test.dart` -> "delete affordance"
+group (owner sees the button, it opens the dialog, cancel keeps the pet, non-owners see nothing).
+
+---
+
 ---
 
 <!-- Template for new entries:

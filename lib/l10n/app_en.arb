@@ -321,6 +321,7 @@
   "editPet": "Edit Pet",
   "deletePet": "Delete Pet",
   "petDeleted": "Pet deleted",
+  "petDeleteFailed": "Couldn't delete pet. Please try again.",
   "deletePetConfirmation": "Delete {name}? This will remove all associated data.",
   "@deletePetConfirmation": { "placeholders": { "name": { "type": "String" } } },
   "petUpdated": "Pet updated",

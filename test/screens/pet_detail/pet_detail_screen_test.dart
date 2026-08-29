@@ -8,6 +8,7 @@ import 'package:pet_circle/screens/pet_detail/pet_detail_sections.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/note_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 
 import '../../helpers/test_app.dart';
@@ -428,8 +429,90 @@ void main() {
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Delete Pet'), findsNothing);
+      // The page itself now carries a permanent "Delete Pet" button, so the
+      // dialog's absence is what this asserts -- not the absence of the text.
+      expect(find.byType(AlertDialog), findsNothing);
       expect(petStore.ownerPets.length, before);
+    });
+  });
+
+  group('PetDetailScreen delete affordance', () {
+    Future<void> pumpDetail(WidgetTester tester, Pet pet) async {
+      tester.view.physicalSize = const Size(600, 2600);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final oldHandler = FlutterError.onError;
+      FlutterError.onError = (details) {
+        final msg = details.exceptionAsString();
+        if (msg.contains('overflowed') || msg.contains('HTTP request failed')) {
+          return;
+        }
+        oldHandler?.call(details);
+      };
+      addTearDown(() => FlutterError.onError = oldHandler);
+
+      await tester.pumpWidget(testApp(PetDetailScreen(pet: pet)));
+      await tester.pumpAndSettle();
+    }
+
+    Finder deleteButton() => find.byWidgetPredicate(
+      (w) => w is PrimaryButton && w.label == 'Delete Pet',
+    );
+
+    testWidgets('owner sees a visible Delete Pet button', (tester) async {
+      // The only pre-existing ways in were a long-press with no affordance and
+      // a trash icon buried in the edit sheet -- neither discoverable.
+      await pumpDetail(tester, testPet());
+
+      expect(deleteButton(), findsOneWidget);
+    });
+
+    testWidgets('tapping it opens the confirmation dialog', (tester) async {
+      await pumpDetail(tester, testPet());
+
+      await tester.ensureVisible(deleteButton());
+      await tester.pumpAndSettle();
+      await tester.tap(deleteButton());
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(
+        find.textContaining('This will remove all associated data'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('cancelling the dialog keeps the pet', (tester) async {
+      final before = petStore.ownerPets.length;
+      await pumpDetail(tester, testPet());
+
+      await tester.ensureVisible(deleteButton());
+      await tester.pumpAndSettle();
+      await tester.tap(deleteButton());
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsNothing);
+      expect(petStore.ownerPets.length, before);
+    });
+
+    testWidgets('a non-owner gets no delete affordance', (tester) async {
+      // accessForPet resolves ownership off the signed-in uid; a pet owned by
+      // somebody else must not expose the control at all.
+      // PetDetailScreen re-resolves `_pet` from the store by id, so a copy
+      // sharing an id would be replaced by the owned original. Use an id the
+      // store does not hold.
+      final foreign = testPet().copyWith(
+        id: 'not-in-store',
+        ownerId: 'someone-else',
+        careCircle: const [],
+      );
+      await pumpDetail(tester, foreign);
+
+      expect(deleteButton(), findsNothing);
     });
   });
 }
