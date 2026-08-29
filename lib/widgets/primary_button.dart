@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/physics.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
+import 'package:pet_circle/theme/tokens/motion.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/theme/tokens/typography.dart';
 
@@ -208,10 +210,13 @@ class PrimaryButton extends StatelessWidget {
       ),
     );
 
-    final button = TextButton(
-      style: bStyle,
-      onPressed: isEnabled ? onPressed : null,
-      child: buttonChild,
+    final button = _PressableScale(
+      enabled: isEnabled,
+      child: TextButton(
+        style: bStyle,
+        onPressed: isEnabled ? onPressed : null,
+        child: buttonChild,
+      ),
     );
 
     if (isFullWidth) {
@@ -273,7 +278,14 @@ class PrimaryButton extends StatelessWidget {
       shape: const RoundedRectangleBorder(),
     );
 
-    return TextButton(style: bStyle, onPressed: onPressed, child: buttonChild);
+    return _PressableScale(
+      enabled: isEnabled,
+      child: TextButton(
+        style: bStyle,
+        onPressed: onPressed,
+        child: buttonChild,
+      ),
+    );
   }
 
   // ── miniPrimary variant (Figma 474:2550) ─────────────────────────────────
@@ -334,15 +346,102 @@ class PrimaryButton extends StatelessWidget {
       ),
     );
 
-    final button = TextButton(
-      style: bStyle,
-      onPressed: onPressed,
-      child: buttonChild,
+    final button = _PressableScale(
+      enabled: isEnabled,
+      child: TextButton(
+        style: bStyle,
+        onPressed: onPressed,
+        child: buttonChild,
+      ),
     );
 
     if (isFullWidth) {
       return SizedBox(width: double.infinity, child: button);
     }
     return button;
+  }
+}
+
+/// Instant tap-down feedback for [PrimaryButton] (apple-design skill §1/§4):
+/// scales down to 0.97 the moment the pointer touches down — not on
+/// release, unlike Material's default ripple — and settles back via a
+/// critically-damped spring rather than a fixed `Duration`/`Curve`.
+///
+/// Wraps rather than replaces the underlying [TextButton] with a raw
+/// [Listener] (not a [GestureDetector]) so the button's own tap handling,
+/// hit-testing, and hover/focus behavior are completely untouched.
+class _PressableScale extends StatefulWidget {
+  const _PressableScale({required this.enabled, required this.child});
+
+  final bool enabled;
+  final Widget child;
+
+  @override
+  State<_PressableScale> createState() => _PressableScaleState();
+}
+
+class _PressableScaleState extends State<_PressableScale>
+    with SingleTickerProviderStateMixin {
+  static const double _pressedScale = 0.97;
+
+  // Press-down must read as instantaneous (skill §1), so its response is
+  // tighter than the 0.3s "default UI spring"; damping stays critical
+  // (1.0) — a pressed button overshooting past its own rest size on the
+  // way down would look like a glitch, not a bounce (skill §4).
+  static const double _pressResponse = 0.12;
+  static const double _releaseResponse = 0.28;
+
+  late final AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController.unbounded(vsync: this, value: 1.0);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _animateTo(double target, double response) {
+    if (AppMotionTokens.reducedMotionOf(context)) {
+      _controller.value = target;
+      return;
+    }
+    _controller.animateWith(
+      SpringSimulation(
+        AppMotionTokens.spring(response: response),
+        _controller.value,
+        target,
+        _controller.velocity,
+      ),
+    );
+  }
+
+  void _onPointerDown(PointerDownEvent _) {
+    if (!widget.enabled) return;
+    _animateTo(_pressedScale, _pressResponse);
+  }
+
+  void _release() {
+    if (!widget.enabled) return;
+    _animateTo(1.0, _releaseResponse);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: _onPointerDown,
+      onPointerUp: (_) => _release(),
+      onPointerCancel: (_) => _release(),
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) =>
+            Transform.scale(scale: _controller.value, child: child),
+        child: widget.child,
+      ),
+    );
   }
 }
