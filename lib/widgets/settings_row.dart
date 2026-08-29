@@ -10,6 +10,7 @@ class SettingsRow extends StatelessWidget {
     required this.title,
     this.description,
     this.iconAsset,
+    this.iconColor,
     this.trailing,
     this.onTap,
   });
@@ -17,6 +18,12 @@ class SettingsRow extends StatelessWidget {
   final String title;
   final String? description;
   final String? iconAsset;
+
+  /// Glyph color for [iconAsset]. The Figma-exported settings SVGs hardcode a
+  /// near-black maroon fill, so the icon MUST be re-tinted via a
+  /// `ColorFilter` or it stays unreadable in dark mode. Defaults to
+  /// `c.textPrimary`, matching the row title.
+  final Color? iconColor;
   final Widget? trailing;
   final VoidCallback? onTap;
 
@@ -35,7 +42,15 @@ class SettingsRow extends StatelessWidget {
         child: Row(
           children: [
             if (iconAsset != null) ...[
-              SvgPicture.asset(iconAsset!, width: 16, height: 16),
+              SvgPicture.asset(
+                iconAsset!,
+                width: 16,
+                height: 16,
+                colorFilter: ColorFilter.mode(
+                  iconColor ?? c.textPrimary,
+                  BlendMode.srcIn,
+                ),
+              ),
               const SizedBox(width: AppSpacingTokens.sm),
             ],
             Expanded(
