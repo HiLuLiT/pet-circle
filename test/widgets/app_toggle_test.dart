@@ -98,9 +98,11 @@ void main() {
         expect(midFlight.left, lessThan(21));
 
         await tester.pumpAndSettle();
+        // SpringSimulation stops once within its default tolerance of the
+        // target (~1e-3), not at the exact value — assert closeTo, not ==.
         expect(
           tester.widget<Positioned>(find.byType(Positioned)).left,
-          21,
+          closeTo(21, 0.01),
         );
       },
     );
