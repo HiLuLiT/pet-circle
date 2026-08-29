@@ -40,6 +40,20 @@ void main() {
       expect(find.byType(OwnerDashboard), findsOneWidget);
     });
 
+    testWidgets('delete is on the home screen itself', (tester) async {
+      // Three attempts put delete on pet detail. The user is looking at Home.
+      // This asserts the control is visible here, with no navigation and no
+      // scrolling, and that it opens the confirmation.
+      await pumpDashboard(tester);
+
+      final trash = find.byIcon(Icons.delete_outline);
+      expect(trash, findsOneWidget);
+
+      await tester.tap(trash);
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsOneWidget);
+    });
+
     testWidgets('hero pet card opens pet detail', (tester) async {
       // Regression: the hero card carried only onLongPress, and nothing else
       // in the owner flow linked to pet detail -- only the vet dashboard did.
