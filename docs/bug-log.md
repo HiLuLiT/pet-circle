@@ -1126,6 +1126,32 @@ group (owner sees the button, it opens the dialog, cancel keeps the pet, non-own
 
 ---
 
+## BUG-052: Owners had no route into the pet detail screen
+
+**Found during:** User reported the new "Delete Pet" control as still not visible after BUG-051.
+**Severity:** High
+**Status:** Fixed
+
+**Symptom:** Nothing an owner could tap led to pet detail, so measurement history, clinical notes,
+the care circle section and every delete affordance were unreachable from the owner's own home
+screen. Deletion was only ever possible via the undiscoverable long-press on the hero card.
+
+**Root cause:** When home moved to the Figma 402:1978 hero layout, the hero `PetCard` was given
+`onLongPress` but no `onTap`. `vet_dashboard.dart` was left as the only file in the app referencing
+`AppRoutes.petDetail`. The user story map still listed B6 ("Pet card tap navigates to pet detail")
+as DONE, which is why the gap went unnoticed -- including by the BUG-051 fix, which placed a delete
+button on a screen owners could not open.
+
+**Fix:** Restored `onTap` on the hero pet card, pushing `AppRoutes.petDetail(pet.id)`.
+
+**Files changed:**
+- `lib/screens/dashboard/owner_dashboard.dart`
+
+**Regression test:** `test/screens/dashboard/owner_dashboard_test.dart` -> 'hero pet card opens pet
+detail' asserts the card's `onTap` is non-null.
+
+---
+
 ---
 
 <!-- Template for new entries:

@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/theme/app_assets.dart';
 import 'package:pet_circle/widgets/mascot.dart';
+import 'package:pet_circle/widgets/pet_card.dart';
 import 'package:pet_circle/screens/dashboard/add_reminder_sheet.dart';
 import 'package:pet_circle/screens/dashboard/owner_dashboard.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
@@ -37,6 +38,35 @@ void main() {
     testWidgets('renders without error', (tester) async {
       await pumpDashboard(tester);
       expect(find.byType(OwnerDashboard), findsOneWidget);
+    });
+
+    testWidgets('delete is on the home screen itself', (tester) async {
+      // Three attempts put delete on pet detail. The user is looking at Home.
+      // This asserts the control is visible here, with no navigation and no
+      // scrolling, and that it opens the confirmation.
+      await pumpDashboard(tester);
+
+      final trash = find.byIcon(Icons.delete_outline);
+      expect(trash, findsOneWidget);
+
+      await tester.tap(trash);
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsOneWidget);
+    });
+
+    testWidgets('hero pet card opens pet detail', (tester) async {
+      // Regression: the hero card carried only onLongPress, and nothing else
+      // in the owner flow linked to pet detail -- only the vet dashboard did.
+      // That left measurement history, clinical notes, care circle and delete
+      // unreachable for the pet's own owner.
+      await pumpDashboard(tester);
+
+      final card = tester.widget<PetCard>(find.byType(PetCard).first);
+      expect(
+        card.onTap,
+        isNotNull,
+        reason: 'tapping the hero pet card must navigate to pet detail',
+      );
     });
 
     testWidgets('shows Your pets heading', (tester) async {
