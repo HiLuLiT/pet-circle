@@ -61,12 +61,14 @@ void main() {
     });
 
     // ── Knob position tests ─────────────────────────────────────────────────
+    // The knob's position is spring-driven (AnimationController +
+    // SpringSimulation, apple-design skill §4) rather than an
+    // AnimatedPositioned on a fixed duration/curve, so it settles rather
+    // than eases — see `lib/theme/tokens/motion.dart`.
     testWidgets('knob positioned left: 21 when value is true', (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: true)));
 
-      final positioned = tester.widget<AnimatedPositioned>(
-        find.byType(AnimatedPositioned),
-      );
+      final positioned = tester.widget<Positioned>(find.byType(Positioned));
       expect(positioned.left, 21);
       expect(positioned.top, 3);
     });
@@ -74,21 +76,61 @@ void main() {
     testWidgets('knob positioned left: 3 when value is false', (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: false)));
 
-      final positioned = tester.widget<AnimatedPositioned>(
-        find.byType(AnimatedPositioned),
-      );
+      final positioned = tester.widget<Positioned>(find.byType(Positioned));
       expect(positioned.left, 3);
       expect(positioned.top, 3);
     });
 
-    testWidgets('animation duration is 200ms', (tester) async {
-      await tester.pumpWidget(testApp(const AppToggle(value: false)));
+    testWidgets(
+      'knob springs to the new target and settles there when value changes',
+      (tester) async {
+        await tester.pumpWidget(testApp(const AppToggle(value: false)));
+        expect(
+          tester.widget<Positioned>(find.byType(Positioned)).left,
+          3,
+        );
 
-      final positioned = tester.widget<AnimatedPositioned>(
-        find.byType(AnimatedPositioned),
-      );
-      expect(positioned.duration, const Duration(milliseconds: 200));
-    });
+        await tester.pumpWidget(testApp(const AppToggle(value: true)));
+        // Mid-flight: the spring has started moving but has not arrived yet.
+        await tester.pump(const Duration(milliseconds: 16));
+        final midFlight = tester.widget<Positioned>(find.byType(Positioned));
+        expect(midFlight.left, greaterThan(3));
+        expect(midFlight.left, lessThan(21));
+
+        await tester.pumpAndSettle();
+        expect(
+          tester.widget<Positioned>(find.byType(Positioned)).left,
+          21,
+        );
+      },
+    );
+
+    testWidgets(
+      'reduced motion jumps the knob straight to the target with no spring',
+      (tester) async {
+        await tester.pumpWidget(
+          MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: testApp(const AppToggle(value: false)),
+          ),
+        );
+
+        await tester.pumpWidget(
+          MediaQuery(
+            data: const MediaQueryData(disableAnimations: true),
+            child: testApp(const AppToggle(value: true)),
+          ),
+        );
+        // A single, zero-duration frame is enough: reduced motion sets the
+        // controller's value directly instead of starting a simulation.
+        await tester.pump();
+
+        expect(
+          tester.widget<Positioned>(find.byType(Positioned)).left,
+          21,
+        );
+      },
+    );
 
     testWidgets('knob is a white 22x22 circle', (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: true)));
