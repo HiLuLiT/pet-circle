@@ -1420,13 +1420,30 @@ class AppLocalizationsHe extends AppLocalizations {
   String get medicationDeleted => 'התרופה נמחקה';
 
   @override
-  String get medicationReminderTimes => 'שעות תזכורת תרופות';
+  String get medicationRemindersLabel => 'הזכירו לי לתת את התרופה';
 
   @override
-  String get morningReminder => 'בוקר';
+  String get medicationRemindersDesc =>
+      'קבלו התראה יומית בכל שעת מנה, ותזכורת בסיום מהלך הטיפול.';
 
   @override
-  String get eveningReminder => 'ערב';
+  String get medicationReminderTime => 'שעת התזכורת';
+
+  @override
+  String get medicationFirstDoseTime => 'מנה ראשונה';
+
+  @override
+  String get medicationSecondDoseTime => 'מנה שנייה';
+
+  @override
+  String medicationDoseTitle(String medName) {
+    return 'הגיע הזמן ל$medName';
+  }
+
+  @override
+  String medicationDoseBody(String petName, String dosage, String medName) {
+    return 'תנו ל$petName מנה של $dosage מ$medName';
+  }
 
   @override
   String recordingsInPeriod(String petName, int shown, int total) {

@@ -220,10 +220,6 @@ void main() {
       expect(settings.measurementReminderDays, [1, 3, 5]);
       expect(settings.measurementReminderHour, 20);
       expect(settings.measurementReminderMinute, 0);
-      expect(settings.medicationMorningHour, 9);
-      expect(settings.medicationMorningMinute, 0);
-      expect(settings.medicationEveningHour, 21);
-      expect(settings.medicationEveningMinute, 0);
     });
 
     test('creates with custom notification preferences', () {
@@ -233,10 +229,6 @@ void main() {
         measurementReminderDays: [1, 2, 3, 4, 5, 6, 7],
         measurementReminderHour: 8,
         measurementReminderMinute: 30,
-        medicationMorningHour: 7,
-        medicationMorningMinute: 15,
-        medicationEveningHour: 19,
-        medicationEveningMinute: 45,
       );
 
       expect(settings.measurementRemindersEnabled, isFalse);
@@ -244,10 +236,6 @@ void main() {
       expect(settings.measurementReminderDays, [1, 2, 3, 4, 5, 6, 7]);
       expect(settings.measurementReminderHour, 8);
       expect(settings.measurementReminderMinute, 30);
-      expect(settings.medicationMorningHour, 7);
-      expect(settings.medicationMorningMinute, 15);
-      expect(settings.medicationEveningHour, 19);
-      expect(settings.medicationEveningMinute, 45);
     });
 
     test('fromMap reads notification preferences', () {
@@ -257,10 +245,6 @@ void main() {
         'measurementReminderDays': [1, 4],
         'measurementReminderHour': 18,
         'measurementReminderMinute': 15,
-        'medicationMorningHour': 8,
-        'medicationMorningMinute': 30,
-        'medicationEveningHour': 20,
-        'medicationEveningMinute': 0,
       });
 
       expect(settings.measurementRemindersEnabled, isFalse);
@@ -268,10 +252,6 @@ void main() {
       expect(settings.measurementReminderDays, [1, 4]);
       expect(settings.measurementReminderHour, 18);
       expect(settings.measurementReminderMinute, 15);
-      expect(settings.medicationMorningHour, 8);
-      expect(settings.medicationMorningMinute, 30);
-      expect(settings.medicationEveningHour, 20);
-      expect(settings.medicationEveningMinute, 0);
     });
 
     test('fromMap uses defaults for missing notification preferences', () {
@@ -282,10 +262,6 @@ void main() {
       expect(settings.measurementReminderDays, [1, 3, 5]);
       expect(settings.measurementReminderHour, 20);
       expect(settings.measurementReminderMinute, 0);
-      expect(settings.medicationMorningHour, 9);
-      expect(settings.medicationMorningMinute, 0);
-      expect(settings.medicationEveningHour, 21);
-      expect(settings.medicationEveningMinute, 0);
     });
 
     test('toMap includes notification preferences', () {
@@ -312,10 +288,6 @@ void main() {
         measurementReminderDays: [1, 2, 3, 4, 5, 6, 7],
         measurementReminderHour: 6,
         measurementReminderMinute: 45,
-        medicationMorningHour: 7,
-        medicationMorningMinute: 0,
-        medicationEveningHour: 22,
-        medicationEveningMinute: 30,
       );
 
       final roundtripped = UserSettings.fromMap(original.toMap());
@@ -340,22 +312,6 @@ void main() {
         roundtripped.measurementReminderMinute,
         original.measurementReminderMinute,
       );
-      expect(
-        roundtripped.medicationMorningHour,
-        original.medicationMorningHour,
-      );
-      expect(
-        roundtripped.medicationMorningMinute,
-        original.medicationMorningMinute,
-      );
-      expect(
-        roundtripped.medicationEveningHour,
-        original.medicationEveningHour,
-      );
-      expect(
-        roundtripped.medicationEveningMinute,
-        original.medicationEveningMinute,
-      );
     });
 
     test('copyWith updates notification preferences', () {
@@ -365,16 +321,12 @@ void main() {
         measurementReminderFrequency: 2,
         measurementReminderDays: [2, 5],
         measurementReminderHour: 19,
-        medicationMorningHour: 7,
-        medicationEveningHour: 22,
       );
 
       expect(updated.measurementRemindersEnabled, isFalse);
       expect(updated.measurementReminderFrequency, 2);
       expect(updated.measurementReminderDays, [2, 5]);
       expect(updated.measurementReminderHour, 19);
-      expect(updated.medicationMorningHour, 7);
-      expect(updated.medicationEveningHour, 22);
       // Original unchanged
       expect(original.measurementRemindersEnabled, isTrue);
       expect(original.measurementReminderFrequency, 3);

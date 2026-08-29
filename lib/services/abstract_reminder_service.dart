@@ -14,6 +14,18 @@ abstract class AbstractReminderService {
   });
   Future<void> cancelMedicationReminder(String medicationId);
 
+  /// Schedule recurring daily dose reminders for [med], one per entry in
+  /// [times] (canonical 24h `"HH:mm"` strings).
+  Future<void> scheduleMedicationDoseReminders(
+    Medication med, {
+    required List<String> times,
+    required String title,
+    required String body,
+  });
+
+  /// Cancel every dose reminder slot belonging to [medicationId].
+  Future<void> cancelMedicationDoseReminders(String medicationId);
+
   Future<void> cancelAllReminders();
 
   /// Schedule recurring measurement reminders on specific weekdays.

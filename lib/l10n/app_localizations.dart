@@ -2696,23 +2696,47 @@ abstract class AppLocalizations {
   /// **'Medication deleted'**
   String get medicationDeleted;
 
-  /// No description provided for @medicationReminderTimes.
+  /// No description provided for @medicationRemindersLabel.
   ///
   /// In en, this message translates to:
-  /// **'Medication Reminder Times'**
-  String get medicationReminderTimes;
+  /// **'Remind me to give this medication'**
+  String get medicationRemindersLabel;
 
-  /// No description provided for @morningReminder.
+  /// No description provided for @medicationRemindersDesc.
   ///
   /// In en, this message translates to:
-  /// **'Morning'**
-  String get morningReminder;
+  /// **'Get a daily notification at each dose time, and a reminder when the course ends.'**
+  String get medicationRemindersDesc;
 
-  /// No description provided for @eveningReminder.
+  /// No description provided for @medicationReminderTime.
   ///
   /// In en, this message translates to:
-  /// **'Evening'**
-  String get eveningReminder;
+  /// **'Reminder time'**
+  String get medicationReminderTime;
+
+  /// No description provided for @medicationFirstDoseTime.
+  ///
+  /// In en, this message translates to:
+  /// **'First dose'**
+  String get medicationFirstDoseTime;
+
+  /// No description provided for @medicationSecondDoseTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Second dose'**
+  String get medicationSecondDoseTime;
+
+  /// No description provided for @medicationDoseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Time for {medName}'**
+  String medicationDoseTitle(String medName);
+
+  /// No description provided for @medicationDoseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Give {petName} their {dosage} dose of {medName}'**
+  String medicationDoseBody(String petName, String dosage, String medName);
 
   /// No description provided for @recordingsInPeriod.
   ///

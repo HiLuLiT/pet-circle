@@ -429,4 +429,97 @@ void main() {
       );
     });
   });
+
+  group('Medication reminderTimes', () {
+    test('defaults to an empty list', () {
+      expect(_makeMedication().reminderTimes, isEmpty);
+    });
+
+    test('round-trips through toFirestore / fromFirestore', () {
+      final med = _makeMedication().copyWith(
+        remindersEnabled: true,
+        reminderTimes: const ['09:00', '21:00'],
+      );
+
+      final map = med.toFirestore();
+      expect(map['reminderTimes'], ['09:00', '21:00']);
+
+      final restored = Medication.fromFirestore(
+        FakeDocumentSnapshot('med-1', Map<String, dynamic>.from(map)),
+      );
+      expect(restored.reminderTimes, ['09:00', '21:00']);
+      expect(restored.remindersEnabled, isTrue);
+    });
+
+    test('fromFirestore tolerates a missing or non-list value', () {
+      final missing = Medication.fromFirestore(
+        FakeDocumentSnapshot('med-1', {
+          'petId': 'pet-1',
+          'name': 'Furosemide',
+          'dosage': '10mg',
+          'frequency': 'Once daily',
+          'startDate': Timestamp.fromDate(DateTime(2025, 1, 1)),
+        }),
+      );
+      expect(missing.reminderTimes, isEmpty);
+
+      final wrongType = Medication.fromFirestore(
+        FakeDocumentSnapshot('med-2', {
+          'petId': 'pet-1',
+          'name': 'Furosemide',
+          'dosage': '10mg',
+          'frequency': 'Once daily',
+          'startDate': Timestamp.fromDate(DateTime(2025, 1, 1)),
+          'reminderTimes': 'not-a-list',
+        }),
+      );
+      expect(wrongType.reminderTimes, isEmpty);
+
+      final mixed = Medication.fromFirestore(
+        FakeDocumentSnapshot('med-3', {
+          'petId': 'pet-1',
+          'name': 'Furosemide',
+          'dosage': '10mg',
+          'frequency': 'Once daily',
+          'startDate': Timestamp.fromDate(DateTime(2025, 1, 1)),
+          'reminderTimes': ['09:00', 7, null],
+        }),
+      );
+      expect(mixed.reminderTimes, ['09:00']);
+    });
+
+    test('copyWith replaces the list without mutating the original', () {
+      final original = _makeMedication().copyWith(
+        reminderTimes: const ['09:00'],
+      );
+      final updated = original.copyWith(reminderTimes: const ['08:00', '20:00']);
+
+      expect(original.reminderTimes, ['09:00']);
+      expect(updated.reminderTimes, ['08:00', '20:00']);
+    });
+
+    test('copyWith preserves reminderTimes when omitted', () {
+      final original = _makeMedication().copyWith(
+        reminderTimes: const ['09:00', '21:00'],
+      );
+      expect(original.copyWith(name: 'Other').reminderTimes, [
+        '09:00',
+        '21:00',
+      ]);
+    });
+
+    test('hasDoseReminders requires active + enabled + non-empty times', () {
+      final base = _makeMedication().copyWith(
+        remindersEnabled: true,
+        reminderTimes: const ['09:00'],
+      );
+      expect(base.hasDoseReminders, isTrue);
+      expect(base.copyWith(isActive: false).hasDoseReminders, isFalse);
+      expect(base.copyWith(remindersEnabled: false).hasDoseReminders, isFalse);
+      expect(
+        base.copyWith(reminderTimes: const []).hasDoseReminders,
+        isFalse,
+      );
+    });
+  });
 }
