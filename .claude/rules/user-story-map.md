@@ -47,7 +47,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 
 ### Owner Experience
 - B5: Owner home -- active-pet-focused dashboard (Figma 402:1978): hero `PetCard` (mascot, SPR subtitle), latest-reading card, Care Circle card, Reminders card, Measure/Trends actions, empty-state CTA
-- B6: Pet card tap navigates to pet detail
+- B6: Pet card tap navigates to pet detail. NOTE: this regressed when the home screen moved to the Figma 402:1978 hero layout -- the hero `PetCard` carried only `onLongPress`, and `vet_dashboard.dart` was the *only* file linking to `AppRoutes.petDetail`, so owners had no route into pet detail at all (and therefore no route to the delete affordances). Restored, and pinned by `owner_dashboard_test.dart` -> 'hero pet card opens pet detail'
 - B27: Reminders -- per-pet Firestore subcollection (`Reminder` model, `ReminderStore`, `PetService` CRUD), add/edit/delete bottom sheet from the home Reminders card
 - B28: Header pet-name + pet switcher now visible/enabled on every tab (previously hidden on Home)
 - B7: Quick-action Measure / Trends buttons per pet
