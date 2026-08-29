@@ -461,6 +461,37 @@ void main() {
       (w) => w is PrimaryButton && w.label == 'Delete Pet',
     );
 
+    testWidgets('delete is reachable without scrolling at all', (tester) async {
+      // Regression: the page-bottom button sits past ~1000px of content on a
+      // 393x852 phone, so it was invisible on arrival and deletion still read
+      // as missing. The pinned app bar action is what fixes that.
+      tester.view.physicalSize = const Size(393, 852);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final oldHandler = FlutterError.onError;
+      FlutterError.onError = (details) {
+        final msg = details.exceptionAsString();
+        if (msg.contains('overflowed') || msg.contains('HTTP request failed')) {
+          return;
+        }
+        oldHandler?.call(details);
+      };
+      addTearDown(() => FlutterError.onError = oldHandler);
+
+      await tester.pumpWidget(testApp(PetDetailScreen(pet: testPet())));
+      await tester.pumpAndSettle();
+
+      final appBarDelete = find.byIcon(Icons.delete_outline);
+      expect(appBarDelete, findsOneWidget);
+
+      // No scroll — tap it straight away.
+      await tester.tap(appBarDelete);
+      await tester.pumpAndSettle();
+      expect(find.byType(AlertDialog), findsOneWidget);
+    });
+
     testWidgets('owner sees a visible Delete Pet button', (tester) async {
       // The only pre-existing ways in were a long-press with no affordance and
       // a trash icon buried in the edit sheet -- neither discoverable.
@@ -513,6 +544,7 @@ void main() {
       await pumpDetail(tester, foreign);
 
       expect(deleteButton(), findsNothing);
+      expect(find.byIcon(Icons.delete_outline), findsNothing);
     });
   });
 }
