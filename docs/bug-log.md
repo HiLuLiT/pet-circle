@@ -1295,6 +1295,50 @@ through to its light value" sweep.
 
 ---
 
+## BUG-056: Pet detail screen removed at user request
+
+**Severity:** N/A (product decision, not a defect)
+**Status:** Fixed
+**Found during:** the user reached the screen by swiping on the home screen and reported it as a
+mistake.
+
+**Symptom:** The user swiped from the home screen, landed on the pet detail screen, did not
+recognise it, and asked for it to be removed.
+
+**Root cause:** Not a code defect. No swipe gesture reaches this screen -- there is no `PageView`,
+`PageController` or `onHorizontalDrag` in the shell, the dashboard or the nav bar, and the only
+entry points were a **tap** on the home hero pet card (`owner_dashboard.dart`) and a tap on a vet
+patient card (`vet_dashboard.dart`). On web a two-finger swipe is browser back/forward, so a swipe
+would replay a history entry created by an earlier tap. The screen itself was working as designed
+and had been made reachable from Home two commits earlier (BUG-052).
+
+The removal was raised with the user together with its cost -- it withdraws stories B6, M2 and C3,
+reverts BUG-051 and BUG-052, and drops the pet edit flow -- and confirmed.
+
+**Fix:** Deleted `lib/screens/pet_detail/` (screen, sections, widgets), the `AppRoutes.petDetail`
+path builder and the `pet/:petId` sub-route, and both call sites. `_VetPetCard.onTap` is optional,
+so the vet card simply stops being tappable.
+
+Pet **delete** deliberately survives: `confirmDeletePet()` is a shared util in
+`lib/utils/pet_delete_dialog.dart` that the home hero card already calls from both a trailing trash
+button and a long-press, so M3 is unaffected. Pet **edit** (M2) is withdrawn -- the edit sheet lived
+inside the deleted screen and had no other host.
+
+**Files changed:**
+- `lib/screens/pet_detail/` (deleted)
+- `lib/app_routes.dart`
+- `lib/screens/dashboard/owner_dashboard.dart`
+- `lib/screens/dashboard/vet_dashboard.dart`
+- `.claude/rules/user-story-map.md`, `.claude/rules/screen-completion-guide.md`
+
+**Regression test:** `test/navigation/app_routes_test.dart` -> 'no pet detail route is declared'
+(source-level, because `buildRouter()` reaches for `FirebaseAnalytics` and cannot run under
+`flutter_test`); `test/screens/dashboard/owner_dashboard_test.dart` -> 'hero pet card does not
+navigate anywhere', which also pins that long-press delete survived. The three pet-detail test files
+were deleted with the screen.
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

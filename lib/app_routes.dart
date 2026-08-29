@@ -1,6 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pet_circle/config/app_config.dart'
     show kEnableCircleTab, kEnableFirebase;
@@ -12,11 +11,9 @@ import 'package:pet_circle/screens/dashboard/vet_dashboard.dart';
 import 'package:pet_circle/screens/invite/invite_screen.dart';
 import 'package:pet_circle/screens/main_shell.dart';
 import 'package:pet_circle/screens/onboarding/onboarding_flow.dart';
-import 'package:pet_circle/screens/pet_detail/pet_detail_screen.dart';
 import 'package:pet_circle/screens/auth/create_account_screen.dart';
 import 'package:pet_circle/screens/landing_screen.dart';
 import 'package:pet_circle/services/deep_link_service.dart';
-import 'package:pet_circle/stores/pet_store.dart';
 
 /// Named path constants for use with context.go() / context.push().
 class AppRoutes {
@@ -34,9 +31,6 @@ class AppRoutes {
     if (tab == 0) return '/shell';
     return '/shell?tab=$tab';
   }
-
-  /// Build pet detail path.
-  static String petDetail(String petId) => '/shell/pet/$petId';
 
   // -- Bottom-nav tab indices --
   //
@@ -188,22 +182,6 @@ GoRouter buildRouter() {
           final tabIndex = int.tryParse(tabStr ?? '') ?? 0;
           return MainShell(initialIndex: tabIndex);
         },
-        routes: [
-          GoRoute(
-            path: 'pet/:petId',
-            builder: (_, state) {
-              final petId = state.pathParameters['petId'] ?? '';
-              final pet = petStore.getPetById(petId);
-              if (pet == null) {
-                return const Scaffold(
-                  // TODO: Use l10n.petNotFound once BuildContext is available here
-                  body: Center(child: Text('Pet not found')),
-                );
-              }
-              return PetDetailScreen(pet: pet);
-            },
-          ),
-        ],
       ),
     ],
   );
