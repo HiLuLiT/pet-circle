@@ -943,6 +943,9 @@ class AppLocalizationsHe extends AppLocalizations {
   String get petDeleted => 'חיית מחמד נמחקה';
 
   @override
+  String get petDeleteFailed => 'מחיקת חיית המחמד נכשלה. נסו שוב.';
+
+  @override
   String deletePetConfirmation(String name) {
     return 'למחוק את $name? פעולה זו תסיר את כל הנתונים הקשורים.';
   }

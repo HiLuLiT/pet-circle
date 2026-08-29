@@ -64,7 +64,7 @@ void main() {
       expect(store.ownerPets.length, 2);
     });
 
-    test('removePet decreases ownerPets length', () {
+    test('removePetById decreases ownerPets length', () {
       store.seed(
         ownerPets: [
           _makePet('A', id: 'a1'),
@@ -74,18 +74,18 @@ void main() {
       );
       expect(store.ownerPets.length, 2);
 
-      store.removePet('A');
+      store.removePetById('a1');
       expect(store.ownerPets.length, 1);
       expect(store.ownerPets.first.name, 'B');
     });
 
-    test('removePet with non-existent name does nothing', () {
+    test('removePetById with non-existent id does nothing', () {
       store.seed(
         ownerPets: [_makePet('A', id: 'a1')],
         clinicPets: [],
       );
 
-      store.removePet('DoesNotExist');
+      store.removePetById('no-such-id');
       expect(store.ownerPets.length, 1);
     });
   });
@@ -144,7 +144,7 @@ void main() {
       expect(callCount, 1);
     });
 
-    test('notifyListeners is called on removePet', () {
+    test('notifyListeners is called on removePetById', () {
       store.seed(
         ownerPets: [_makePet('Z', id: 'z1')],
         clinicPets: [],
@@ -153,7 +153,7 @@ void main() {
       int callCount = 0;
       store.addListener(() => callCount++);
 
-      store.removePet('Z');
+      store.removePetById('z1');
       expect(callCount, 1);
     });
 
@@ -289,14 +289,87 @@ void main() {
     );
   });
 
-  group('PetStore removePet', () {
-    test('removePet removes from both ownerPets and clinicPets', () {
+  group('PetStore deletion is keyed on id, not name', () {
+    test('removePetById deletes the right pet when two share a name', () {
+      // Names are not unique. The old name-keyed removal took out whichever
+      // duplicate came first, which is how you delete the wrong animal.
+      store.seed(
+        ownerPets: [
+          _makePet('Rex', id: 'rex-first'),
+          _makePet('Rex', id: 'rex-second'),
+        ],
+        clinicPets: [],
+      );
+
+      store.removePetById('rex-second');
+
+      expect(store.ownerPets.length, 1);
+      expect(store.ownerPets.single.id, 'rex-first');
+    });
+  });
+
+  group('PetStore active selection survives a removal', () {
+    setUp(() {
+      store.seed(
+        ownerPets: [
+          _makePet('A', id: 'a1'),
+          _makePet('B', id: 'b1'),
+          _makePet('C', id: 'c1'),
+        ],
+        clinicPets: [],
+      );
+    });
+
+    test('removing a pet before the active one keeps the same pet active', () {
+      store.setActivePetIndex(2); // C
+      store.removePetById('a1');
+
+      // C moved from index 2 to 1 -- the selection has to follow it, not sit
+      // on whatever now occupies index 2.
+      expect(store.activePet!.id, 'c1');
+      expect(store.activePetIndex, 1);
+    });
+
+    test('removing a pet after the active one leaves the selection alone', () {
+      store.setActivePetIndex(0); // A
+      store.removePetById('c1');
+
+      expect(store.activePet!.id, 'a1');
+      expect(store.activePetIndex, 0);
+    });
+
+    test('removing the active pet falls back to the previous neighbour', () {
+      store.setActivePetIndex(1); // B
+      store.removePetById('b1');
+
+      expect(store.activePet!.id, 'a1');
+    });
+
+    test('removing the active head pet falls back to the new head', () {
+      store.setActivePetIndex(0); // A
+      store.removePetById('a1');
+
+      expect(store.activePet!.id, 'b1');
+      expect(store.activePetIndex, 0);
+    });
+
+    test('removing the last remaining pet leaves no active pet', () {
+      store.seed(ownerPets: [_makePet('Solo', id: 's1')], clinicPets: []);
+      store.removePetById('s1');
+
+      expect(store.activePet, isNull);
+      expect(store.activePetIndex, 0);
+    });
+  });
+
+  group('PetStore removePetById', () {
+    test('removePetById removes from both ownerPets and clinicPets', () {
       store.seed(
         ownerPets: [_makePet('Rex', id: 'r1')],
         clinicPets: [_makePet('Rex', id: 'r1')],
       );
 
-      store.removePet('Rex');
+      store.removePetById('r1');
 
       expect(store.ownerPets, isEmpty);
       expect(store.allClinicPets, isEmpty);
@@ -315,8 +388,8 @@ void main() {
       store.setActivePetIndex(1);
       expect(store.activePetIndex, 1);
 
-      store.removePet('B');
-      // Index was 1, but list now has only 1 element — clamped to 0.
+      store.removePetById('b1');
+      // The active pet itself went; selection falls back to its neighbour.
       expect(store.activePetIndex, 0);
     });
 
@@ -384,23 +457,23 @@ void main() {
     });
   });
 
-  group('PetStore removePetWithFirestore (local equivalent via removePet)', () {
+  group('PetStore removePetWithFirestore (local equivalent via removePetById)', () {
     test(
-      'removePet simulates non-Firebase removePet — pet absent from ownerPets',
+      'removePetById simulates non-Firebase removal — pet absent from ownerPets',
       () {
         store.seed(
           ownerPets: [_makePet('Buddy', id: 'b1')],
           clinicPets: [_makePet('Buddy', id: 'b1')],
         );
 
-        store.removePet('Buddy');
+        store.removePetById('b1');
 
         expect(store.ownerPets, isEmpty);
         expect(store.allClinicPets, isEmpty);
       },
     );
 
-    test('removePetWithFirestore with non-existent name does nothing', () async {
+    test('removePetWithFirestore with non-existent id does nothing', () async {
       store.seed(
         ownerPets: [_makePet('Buddy', id: 'b1')],
         clinicPets: [],
@@ -408,7 +481,7 @@ void main() {
 
       // No Firebase is triggered when pet is not found (getPetByName returns null
       // → petId is null → kEnableFirebase block is skipped).
-      await store.removePetWithFirestore('NoSuchPet');
+      await store.removePetWithFirestore('no-such-id');
 
       expect(store.ownerPets.length, 1);
     });

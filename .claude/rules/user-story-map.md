@@ -2,7 +2,7 @@
 
 > Living user story map for Pet Circle. Tracks implementation status of every user story by role. Consult when working on any screen to understand what is done, what is partial, and what is missing. UPDATE this file after completing work on any story.
 
-Last updated: 2026-08-23 (added B29: onboarding "All set" confirmation step from Figma 424:6047)
+Last updated: 2026-08-29 (M3 pet deletion made discoverable and correct -- BUG-050 / BUG-051)
 
 ## Update Protocol
 
@@ -70,7 +70,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - B24: Push / emergency notification toggles wired to Firestore-backed `settingsStore`
 - M1: "Add Pet" button on owner dashboard navigates to onboarding
 - M2: Edit pet profile -- admin-only, bottom sheet with searchable breed dropdown + Firestore persistence
-- M3: Delete pet -- admin-only; long-press on the home hero pet card, or the explicit trash icon button in the pet detail edit sheet, both sharing `confirmDeletePet()` (`lib/utils/pet_delete_dialog.dart`)
+- M3: Delete pet -- owner-only. Primary entry point is the visible "Delete Pet" button on the pet detail screen; the home hero card long-press and the edit-sheet trash icon remain as shortcuts. All three share `confirmDeletePet()` (`lib/utils/pet_delete_dialog.dart`), which awaits the delete and reports success or failure honestly. Removal is keyed on pet **id**, keeps the active selection on the same pet, and pops the detail route once the pet is gone. Server-side cascade (subcollections, member `petIds`, dangling invitations) runs in the `onPetDeleted` Cloud Function -- Firestore does not cascade on its own. See BUG-050 / BUG-051
 - M5: Global pet switcher in header -- `petStore.activePetIndex` shared across all screens
 - M6: User profile management -- edit name/photo from settings
 - M7: Sign out from settings drawer with confirmation

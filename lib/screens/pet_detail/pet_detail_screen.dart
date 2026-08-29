@@ -19,6 +19,7 @@ import 'package:pet_circle/theme/tokens/spacing.dart';
 import 'package:pet_circle/widgets/app_input_decoration.dart';
 import 'package:pet_circle/widgets/breed_search_field.dart';
 import 'package:pet_circle/widgets/dog_photo.dart';
+import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/status_badge.dart';
 
 class PetDetailScreen extends StatefulWidget {
@@ -84,7 +85,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                       GestureDetector(
                         onTap: () {
                           Navigator.pop(ctx);
-                          confirmDeletePet(context, _pet);
+                          _handleDelete();
                         },
                         child: Container(
                           width: 36,
@@ -205,9 +206,21 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     );
   }
 
+  /// Confirm + delete, then leave the screen.
+  ///
+  /// This route is bound to a pet id; once the pet is gone the screen is
+  /// showing a record that no longer exists, so a successful delete has to
+  /// pop it rather than leave a stale detail view on the stack.
+  Future<void> _handleDelete() async {
+    final deleted = await confirmDeletePet(context, _pet);
+    if (!deleted || !mounted) return;
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = AppSemanticColors.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: c.background,
       body: ListenableBuilder(
@@ -232,6 +245,20 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                     ),
                     const SizedBox(height: AppSpacingTokens.lg),
                     PetCareCircle(pet: _pet),
+                    // Deleting a pet used to be reachable only by long-pressing
+                    // the home hero card, or via a trash icon nested inside the
+                    // edit sheet -- neither of which advertises itself. This is
+                    // the discoverable entry point.
+                    if (petStore.accessForPet(_pet).canDeletePet) ...[
+                      const SizedBox(height: AppSpacingTokens.lg),
+                      PrimaryButton(
+                        label: l10n.deletePet,
+                        variant: PrimaryButtonVariant.outlined,
+                        foregroundColor: c.error,
+                        fullWidth: true,
+                        onPressed: _handleDelete,
+                      ),
+                    ],
                     const SizedBox(height: AppSpacingTokens.xl + 8),
                   ]),
                 ),

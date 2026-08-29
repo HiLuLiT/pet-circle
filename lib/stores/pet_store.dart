@@ -226,22 +226,38 @@ class PetStore extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> removePetWithFirestore(String name) async {
-    final pet = getPetByName(name);
-    final petId = pet?.id;
-    final ownerIdx = _ownerPets.indexWhere((p) => p.name == name);
-    final clinicIdx = _clinicPets.indexWhere((p) => p.name == name);
+  /// Remove the pet with [petId] locally, then delete it in Firestore.
+  ///
+  /// Keyed on the pet **id**, not the name: names are not unique, so a
+  /// name-keyed lookup deletes whichever duplicate happens to sort first.
+  ///
+  /// Rethrows on a Firestore failure after rolling the local lists — and the
+  /// active selection — back, so callers can surface the error instead of
+  /// reporting a success that did not happen.
+  Future<void> removePetWithFirestore(String petId) async {
+    final ownerIdx = _ownerPets.indexWhere((p) => p.id == petId);
+    final clinicIdx = _clinicPets.indexWhere((p) => p.id == petId);
+
+    // Nothing here by that id — don't reach for Firestore. The store only
+    // deletes pets it actually holds, and the old name-keyed version bailed
+    // the same way (an unknown name resolved to a null id).
+    if (ownerIdx == -1 && clinicIdx == -1) return;
+
+    final activeIdxBefore = activePetIndex;
 
     // Mark as pending delete so the stream listener filters it out.
-    if (petId != null) _pendingDeletes.add(petId);
+    _pendingDeletes.add(petId);
 
     final removedOwner = ownerIdx != -1 ? _ownerPets.removeAt(ownerIdx) : null;
     final removedClinic = clinicIdx != -1
         ? _clinicPets.removeAt(clinicIdx)
         : null;
-    if (removedOwner != null || removedClinic != null) notifyListeners();
+    if (removedOwner != null || removedClinic != null) {
+      _reindexActiveAfterRemoval(ownerIdx, activeIdxBefore);
+      notifyListeners();
+    }
 
-    if (kEnableFirebase && petId != null) {
+    if (kEnableFirebase) {
       try {
         final uid = userStore.currentUserUid;
         await PetService.deletePet(petId);
@@ -259,17 +275,51 @@ class PetStore extends ChangeNotifier {
             removedClinic,
           );
         }
+        _activePetIndex = activeIdxBefore;
         notifyListeners();
         rethrow;
       }
     }
     // Clear pending delete after Firestore has processed it.
-    if (petId != null) _pendingDeletes.remove(petId);
+    _pendingDeletes.remove(petId);
   }
 
-  void removePet(String name) {
-    _ownerPets.removeWhere((p) => p.name == name);
-    _clinicPets.removeWhere((p) => p.name == name);
+  /// Keep the active selection on the *same* pet after a removal.
+  ///
+  /// [activePetIndex] only clamps, which silently slides the selection onto a
+  /// neighbour whenever a pet at or before it disappears — the header switcher
+  /// then shows a pet the user never picked. [removedOwnerIndex] is the index
+  /// the pet occupied in `_ownerPets` before it was removed, and
+  /// [activeIndexBefore] the selection as it stood at that moment.
+  void _reindexActiveAfterRemoval(
+    int removedOwnerIndex,
+    int activeIndexBefore,
+  ) {
+    if (removedOwnerIndex == -1) return;
+    if (_ownerPets.isEmpty) {
+      _activePetIndex = 0;
+    } else if (removedOwnerIndex < activeIndexBefore) {
+      // A pet ahead of the selection vanished — shift down to follow it.
+      _activePetIndex = activeIndexBefore - 1;
+    } else if (removedOwnerIndex == activeIndexBefore) {
+      // The active pet itself went; fall back to the previous neighbour, or
+      // the new head when it was already first.
+      _activePetIndex = (activeIndexBefore - 1).clamp(0, _ownerPets.length - 1);
+    } else {
+      _activePetIndex = activeIndexBefore;
+    }
+  }
+
+  /// Local-only removal by pet **id** (mock mode / tests).
+  ///
+  /// Id-keyed for the same reason as [removePetWithFirestore]: pet names are
+  /// not unique, so removing by name can take out the wrong animal.
+  void removePetById(String petId) {
+    final ownerIdx = _ownerPets.indexWhere((p) => p.id == petId);
+    final activeIdxBefore = activePetIndex;
+    _ownerPets.removeWhere((p) => p.id == petId);
+    _clinicPets.removeWhere((p) => p.id == petId);
+    _reindexActiveAfterRemoval(ownerIdx, activeIdxBefore);
     notifyListeners();
   }
 

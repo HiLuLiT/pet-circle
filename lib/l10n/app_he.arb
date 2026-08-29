@@ -321,6 +321,7 @@
   "editPet": "עריכת חיית מחמד",
   "deletePet": "מחיקת חיית מחמד",
   "petDeleted": "חיית מחמד נמחקה",
+  "petDeleteFailed": "מחיקת חיית המחמד נכשלה. נסו שוב.",
   "deletePetConfirmation": "למחוק את {name}? פעולה זו תסיר את כל הנתונים הקשורים.",
   "@deletePetConfirmation": { "placeholders": { "name": { "type": "String" } } },
   "petUpdated": "חיית מחמד עודכנה",
