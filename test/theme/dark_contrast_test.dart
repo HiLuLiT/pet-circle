@@ -349,6 +349,8 @@ void main() {
       check('statusAlertText', light.statusAlertText, dark.statusAlertText);
       check('statusActiveText', light.statusActiveText, dark.statusActiveText);
       check('knobFill', light.knobFill, dark.knobFill);
+      check('toggleTrackOn', light.toggleTrackOn, dark.toggleTrackOn);
+      check('toggleTrackOff', light.toggleTrackOff, dark.toggleTrackOff);
       check('disabledSurface', light.disabledSurface, dark.disabledSurface);
 
       expect(

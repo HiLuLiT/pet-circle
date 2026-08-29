@@ -1154,7 +1154,7 @@ detail' asserts the card's `onTap` is non-null.
 
 ---
 
-## BUG-050: Settings icons rendered maroon/red in dark mode
+## BUG-053: Settings icons rendered maroon/red in dark mode
 
 **Severity:** Medium
 **Status:** Fixed
@@ -1192,7 +1192,7 @@ colour, rather than relying on a screenshot.
 
 ---
 
-## BUG-051: Medication reminders never fired
+## BUG-054: Medication reminders never fired
 
 **Severity:** High
 **Status:** Fixed
@@ -1254,6 +1254,44 @@ frequency, and preserved across a frequency change); `test/models/medication_tes
 (`reminderTimes` round-trip and defensive parse); `test/widgets/reminder_time_row_test.dart`;
 `test/screens/measurement/measurement_reminders_sheet_test.dart` (cadence and time write through to
 `settingsStore`).
+
+---
+
+## BUG-055: Dark-mode switches were unreadable — on and off looked identical
+
+**Severity:** Medium
+**Status:** Fixed
+**Found during:** manual dark-mode review of the Settings screen.
+
+**Symptom:** In dark mode a switch was a near-black pill on a near-black card. Worse than being
+dim, the on and off states looked the same — only the knob position told you which was which.
+
+**Root cause:** `AppToggle` read its track from the accent *tiles* — `accentPurpleTile` when on,
+`accentButterCream` when off. A tile is a recessed **background wash**; in dark those resolve to
+`pcDarkPurpleWash #251F33` and `pcDarkButterCream #2A2620`, both L* ~13. Measured against
+`pcDarkSurface #211F1B` that is **1.04:1** and **1.09:1** — invisible — and the two states sit at
+**1.06:1** from each other. In light mode the same tokens are a light lavender and a cream on a
+white card, which reads fine, so the defect only ever appeared in dark.
+
+**Fix:** A switch track is a filled *control surface*, not a background wash, so it now has its own
+semantic pair — `toggleTrackOn` / `toggleTrackOff` — following the precedent already set by
+`knobFill` (added for exactly this reason: `surface` inverts). Light keeps the same two primitives,
+so light rendering is byte-identical and still matches Figma Toggle `465:3781`. Dark maps on to the
+bright brand accent `pcDarkPurple` and off to the neutral `pcDarkDivider`, giving **7.16:1** for the
+on track against a card and **5.28:1** between the two states. The off track stays deliberately
+quiet (1.35:1, matching light mode’s 1.27:1) because the knob carries it at 9.85:1.
+
+The 10 other uses of `accentPurpleTile`/`accentButterCream` are genuine backgrounds and were left
+alone.
+
+**Files changed:**
+- `lib/theme/semantic/color_scheme.dart`
+- `lib/widgets/app_toggle.dart`
+
+**Regression test:** `test/widgets/app_toggle_test.dart` — asserts the dark on-track clears 4.5:1
+against a card, that on/off clear 3:1 against each other, and that the knob stays legible on the off
+track; `test/theme/dark_contrast_test.dart` — both new fields added to the "no dark field falls
+through to its light value" sweep.
 
 ---
 

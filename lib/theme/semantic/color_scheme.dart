@@ -46,6 +46,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.disabledSurface,
     required this.disabledOnSurface,
     required this.knobFill,
+    required this.toggleTrackOn,
+    required this.toggleTrackOff,
     required this.accentPurple,
     required this.accentPurpleTile,
     required this.accentPeriwinkle,
@@ -112,6 +114,19 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   /// The moving knob of a switch or toggle. Reads as "the lightest thing in the
   /// control" in both themes, so it cannot be [surface] (which inverts).
   final Color knobFill;
+
+  /// Track of a switch in its **on** state.
+  ///
+  /// Deliberately not [accentPurpleTile]: a tile is a *recessed background
+  /// wash*, and in dark mode that wash sits at the same luminance as the card
+  /// behind it (1.04:1), so an on switch read as a dark hole and was
+  /// indistinguishable from an off one (1.06:1). A switch track is a filled
+  /// control surface, so dark uses the bright accent instead.
+  final Color toggleTrackOn;
+
+  /// Track of a switch in its **off** state — a quiet neutral that still
+  /// separates the control from the surface it sits on.
+  final Color toggleTrackOff;
   final Color accentPurple;
   final Color accentPurpleTile;
   final Color accentPeriwinkle;
@@ -170,6 +185,10 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     disabledSurface: AppPrimitives.pcDisabledSurface,
     disabledOnSurface: AppPrimitives.pcDisabledOnSurface,
     knobFill: AppPrimitives.pcSurface,
+    // Unchanged from when these were read straight off the accent tiles, so
+    // light-mode switches render exactly as the Figma Toggle (465:3781) spec.
+    toggleTrackOn: AppPrimitives.pcPurpleTile,
+    toggleTrackOff: AppPrimitives.pcButterCream,
     accentPurple: AppPrimitives.pcPurple,
     accentPurpleTile: AppPrimitives.pcPurpleTile,
     accentPeriwinkle: AppPrimitives.pcPeriwinkle,
@@ -228,6 +247,11 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     disabledSurface: AppPrimitives.pcDarkElevated,
     disabledOnSurface: AppPrimitives.pcDarkInkDisabled,
     knobFill: AppPrimitives.pcDarkInk,
+    // The bright brand accent, not pcDarkPurpleWash: 7.16:1 on a card versus
+    // the wash's 1.04:1, and 5.28:1 against the off track so the two states
+    // are told apart by colour and not only by knob position.
+    toggleTrackOn: AppPrimitives.pcDarkPurple,
+    toggleTrackOff: AppPrimitives.pcDarkDivider,
     // Accents: the *tile* is a dedicated dark wash, the *accent* the bright
     // foreground. Note accentPurple/accentPurpleTile deliberately swap register
     // relative to light — pcPurpleTile is the dark foreground.
@@ -292,6 +316,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? disabledSurface,
     Color? disabledOnSurface,
     Color? knobFill,
+    Color? toggleTrackOn,
+    Color? toggleTrackOff,
     Color? accentPurple,
     Color? accentPurpleTile,
     Color? accentPeriwinkle,
@@ -345,6 +371,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       disabledSurface: disabledSurface ?? this.disabledSurface,
       disabledOnSurface: disabledOnSurface ?? this.disabledOnSurface,
       knobFill: knobFill ?? this.knobFill,
+      toggleTrackOn: toggleTrackOn ?? this.toggleTrackOn,
+      toggleTrackOff: toggleTrackOff ?? this.toggleTrackOff,
       accentPurple: accentPurple ?? this.accentPurple,
       accentPurpleTile: accentPurpleTile ?? this.accentPurpleTile,
       accentPeriwinkle: accentPeriwinkle ?? this.accentPeriwinkle,
@@ -407,6 +435,8 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
         t,
       )!,
       knobFill: Color.lerp(knobFill, other.knobFill, t)!,
+      toggleTrackOn: Color.lerp(toggleTrackOn, other.toggleTrackOn, t)!,
+      toggleTrackOff: Color.lerp(toggleTrackOff, other.toggleTrackOff, t)!,
       accentPurple: Color.lerp(accentPurple, other.accentPurple, t)!,
       accentPurpleTile: Color.lerp(
         accentPurpleTile,

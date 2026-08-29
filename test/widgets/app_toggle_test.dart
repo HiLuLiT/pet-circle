@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
@@ -14,18 +16,20 @@ void main() {
     });
 
     // ── Background color tests ──────────────────────────────────────────────
-    testWidgets('value: true uses accentPurpleTile background', (tester) async {
+    testWidgets('value: true uses toggleTrackOn background', (tester) async {
       await tester.pumpWidget(testApp(const AppToggle(value: true)));
 
       final container = tester.widget<AnimatedContainer>(
         find.byType(AnimatedContainer),
       );
       final decoration = container.decoration as BoxDecoration;
-      expect(decoration.color, AppSemanticColors.light.accentPurpleTile);
+      expect(decoration.color, AppSemanticColors.light.toggleTrackOn);
+      // Light is unchanged by the dark-contrast fix: still Candy/Purple/Tile.
+      expect(decoration.color, const Color(0xFFC3AEF0));
     });
 
     testWidgets(
-      'value: false uses accentButterCream (#E8E4D8) off background',
+      'value: false uses toggleTrackOff (#E8E4D8) off background',
       (tester) async {
         await tester.pumpWidget(testApp(const AppToggle(value: false)));
 
@@ -33,11 +37,71 @@ void main() {
           find.byType(AnimatedContainer),
         );
         final decoration = container.decoration as BoxDecoration;
-        expect(decoration.color, AppSemanticColors.light.accentButterCream);
+        expect(decoration.color, AppSemanticColors.light.toggleTrackOff);
         // Token resolves to the Candy/Butter/Cream primitive.
         expect(decoration.color, const Color(0xFFE8E4D8));
       },
     );
+
+    // ── Dark mode contrast (BUG-055) ────────────────────────────────────────
+    // The track used to read the accent *tiles*, which are recessed background
+    // washes: in dark both landed within 1.1:1 of the card behind them, and
+    // within 1.06:1 of each other, so an on switch was indistinguishable from
+    // an off one. These assert the states are separable by colour alone.
+    double luminanceOf(Color c) {
+      double channel(double v) =>
+          v <= 0.03928 ? v / 12.92 : math.pow((v + 0.055) / 1.055, 2.4) as double;
+      return 0.2126 * channel(c.r) +
+          0.7152 * channel(c.g) +
+          0.0722 * channel(c.b);
+    }
+
+    double contrast(Color a, Color b) {
+      final la = luminanceOf(a);
+      final lb = luminanceOf(b);
+      final hi = math.max(la, lb);
+      final lo = math.min(la, lb);
+      return (hi + 0.05) / (lo + 0.05);
+    }
+
+    testWidgets('dark on-track separates from the card it sits on', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        testApp(const AppToggle(value: true), darkMode: true),
+      );
+
+      final decoration =
+          tester
+                  .widget<AnimatedContainer>(find.byType(AnimatedContainer))
+                  .decoration
+              as BoxDecoration;
+      expect(decoration.color, AppSemanticColors.dark.toggleTrackOn);
+      expect(
+        contrast(decoration.color!, AppSemanticColors.dark.surface),
+        greaterThan(4.5),
+        reason: 'an on switch must be clearly visible against a card',
+      );
+    });
+
+    testWidgets('dark on and off tracks are distinguishable from each other', (
+      tester,
+    ) async {
+      final dark = AppSemanticColors.dark;
+      expect(
+        contrast(dark.toggleTrackOn, dark.toggleTrackOff),
+        greaterThan(3.0),
+        reason:
+            'state must be readable from colour, not only knob position; '
+            'the accent tiles this replaced sat at 1.06:1',
+      );
+    });
+
+    testWidgets('dark knob stays legible on both tracks', (tester) async {
+      final dark = AppSemanticColors.dark;
+      // The knob carries the off state, where the track is deliberately quiet.
+      expect(contrast(dark.knobFill, dark.toggleTrackOff), greaterThan(4.5));
+    });
 
     // ── Size & shape ────────────────────────────────────────────────────────
     testWidgets('has fixed pill size 46x28', (tester) async {
