@@ -80,7 +80,7 @@ Active pet: global via petStore.activePetIndex, switched from header pet chip
 | Care circle role change | Can remove members but can't change existing roles |
 | Care circle pending invites | Displayed on `circle_screen.dart` with owner-only cancel; the invitee-side decline on `vet_dashboard.dart` is still denied by the rules (see above) |
 | Reminders fire no notification | `Reminder` (vet visit, grooming) persists to `pets/{petId}/reminders` but schedules no local notification and sends no push. `ReminderService` has ID namespaces for medication/measurement/weekly but none for reminders |
-| Dead settings | `emergencyAlerts` and the medication morning/evening times persist to Firestore but drive no behaviour |
+| Dead settings | `emergencyAlerts` persists to Firestore but drives no behaviour. (The global medication morning/evening times were also dead; they have been removed in favour of per-medication `reminderTimes` set in the Add/Edit Medication sheet) |
 | Dead code | `onboarding_step4.dart` is unreferenced outside its own test (`onboarding_flow.dart` wires steps 1-3 plus step 5), and the `PetService` medication methods target `pets/{petId}/medications`, which has no rule and so is denied |
 | Pet delete cascade is fire-and-forget | `onPetDeleted` cleans subcollections, member `petIds` and dangling invitations *after* the client has already reported success. A trigger failure is logged but invisible to the user, and pets deleted before this function existed still have orphaned subcollections -- a one-off backfill was not run |
 | CSV file download | Export dialogs show preview but don't write actual files |
