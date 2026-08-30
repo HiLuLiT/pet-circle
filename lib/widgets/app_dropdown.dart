@@ -92,17 +92,25 @@ class _AppDropdownState extends State<AppDropdown> {
     super.didUpdateWidget(old);
     if (!widget.overlayMode) return;
 
+    // Every branch defers to a post-frame callback: `didUpdateWidget` runs
+    // during the build phase, and `markNeedsBuild` on an overlay entry throws
+    // there ("setState() or markNeedsBuild() called during build"). The
+    // re-checks inside each callback matter because `isOpen` can flip again
+    // before the frame ends — a fast double-tap used to leave an insert
+    // scheduled after the matching remove had already run.
     if (widget.isOpen && !old.isOpen) {
-      // Schedule after frame so the trigger is fully laid out before we
-      // measure its position.
+      // Deferring also lets the trigger finish laying out before we measure
+      // its position.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _insertOverlay();
+        if (mounted && widget.isOpen) _insertOverlay();
       });
     } else if (!widget.isOpen && old.isOpen) {
       _removeOverlay();
     } else if (widget.isOpen && _overlayEntry != null) {
       // Value changed while open — refresh the selected highlight.
-      _overlayEntry!.markNeedsBuild();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.isOpen) _overlayEntry?.markNeedsBuild();
+      });
     }
   }
 
@@ -172,18 +180,28 @@ class _AppDropdownState extends State<AppDropdown> {
     _overlayEntry = null;
   }
 
-  /// The barrier sits under the list and is translucent, so a tap on an
-  /// option hits both. Ignore pointers that land inside the list — otherwise
-  /// the overlay would be torn down before the option's tap resolves.
+  /// The barrier is translucent, so a pointer that lands on the list or on
+  /// the trigger hits the barrier *as well as* the widget itself. Both must
+  /// be excluded:
+  ///
+  ///   • the list — or the overlay would be torn down before an option's tap
+  ///     resolves;
+  ///   • the trigger — or a tap on it would dismiss here and then be toggled
+  ///     straight back open by the trigger's own `onTap`, leaving the list
+  ///     open and re-entering `didUpdateWidget` mid-build.
   void _onBarrierPointerDown(PointerDownEvent event) {
-    final listBox = _listKey.currentContext?.findRenderObject() as RenderBox?;
-    if (listBox != null &&
-        (listBox.localToGlobal(Offset.zero) & listBox.size).contains(
-          event.position,
-        )) {
+    if (_hitTest(_listKey, event.position) ||
+        _hitTest(_triggerKey, event.position)) {
       return;
     }
     _requestDismiss();
+  }
+
+  /// Whether [position] (in global coordinates) falls inside [key]'s box.
+  bool _hitTest(GlobalKey key, Offset position) {
+    final box = key.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null) return false;
+    return (box.localToGlobal(Offset.zero) & box.size).contains(position);
   }
 
   /// Asks the owner to close the list. The owner drives [isOpen], so the

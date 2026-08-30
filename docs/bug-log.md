@@ -1491,6 +1491,45 @@ changes or the active pet changes.
 
 ---
 
+## BUG-063: Trends period trigger clipped its label, and re-tapping it threw
+
+**Severity:** High
+**Status:** Fixed
+**Found during:** manual review of the Trends screen, after BUG-061 / BUG-062.
+
+**Symptom:** Two problems with the period selector. The trigger showed "All measure…" — the new
+default label did not fit. And tapping the trigger a second time (or a few times) turned the screen
+red with `setState() or markNeedsBuild() called during build. This _OverlayEntryWidget widget
+cannot be marked as needing to build…`.
+
+**Root cause:** Two distinct causes.
+
+The label was clipped because the trigger sat in a hard-coded `SizedBox(width: 165)`. That was wide
+enough for "Last 30 days" but not for "All measurements", which BUG-062 made the default.
+
+The crash is a regression from BUG-061's barrier. The barrier is translucent by design, so a pointer
+that lands on the trigger hits *both* the barrier and the trigger: the barrier called `onDismiss`
+(`isOpen` → false) and the trigger's own `onTap` toggled it straight back (`isOpen` → true). The
+list therefore stayed open, and the rebuild re-entered `didUpdateWidget` on the "value changed while
+open" branch, which called `_overlayEntry!.markNeedsBuild()`. `didUpdateWidget` runs during the
+build phase, and unlike `OverlayEntry.remove()` — which defers itself when called from
+`persistentCallbacks` — `markNeedsBuild()` has no such guard, so it throws. The latent
+`markNeedsBuild` hazard pre-dated BUG-061; any parent rebuild while the list was open could hit it.
+
+**Fix:** `_onBarrierPointerDown` now excludes the trigger's rect as well as the list's, so a tap on
+the trigger is handled once, by the trigger. Both remaining `didUpdateWidget` branches were moved
+into post-frame callbacks that re-check `mounted && widget.isOpen`, which also fixes a fast
+double-tap leaving an insert scheduled after its matching remove had run. The trigger's fixed
+`SizedBox` was replaced with `Expanded`, so it takes the row's spare width and the option list
+(which is measured from the trigger) widens with it.
+
+**Files changed:**
+- `lib/widgets/app_dropdown.dart`
+- `lib/screens/trends/trends_screen.dart`
+- `test/screens/trends/trends_screen_test.dart` (repeat-tap and flexible-width regressions)
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

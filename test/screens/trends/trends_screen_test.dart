@@ -5,6 +5,7 @@ import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/screens/trends/trends_screen.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
+import 'package:pet_circle/widgets/app_dropdown.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 import '../../helpers/test_app.dart';
@@ -132,6 +133,77 @@ void main() {
 
       expect(find.text('Last 24 hours'), findsNothing);
       expect(find.text('All measurements'), findsOneWidget);
+    });
+
+    // BUG-063: the barrier is translucent, so a tap on the trigger hit both
+    // it and the trigger. The barrier closed the list and the trigger's own
+    // onTap immediately re-opened it — leaving it open, and re-entering
+    // didUpdateWidget mid-build, where markNeedsBuild on the overlay entry
+    // throws "setState() or markNeedsBuild() called during build".
+    testWidgets('tapping the trigger repeatedly toggles cleanly, no exception', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(600, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const TrendsScreen()));
+      await tester.pumpAndSettle();
+
+      for (var i = 0; i < 3; i++) {
+        await tester.tap(find.text('All measurements').first);
+        await tester.pumpAndSettle();
+        expect(
+          find.text('Last 24 hours'),
+          findsOneWidget,
+          reason: 'tap ${i * 2 + 1} should open the list',
+        );
+
+        await tester.tap(find.text('All measurements').first);
+        await tester.pumpAndSettle();
+        expect(
+          find.text('Last 24 hours'),
+          findsNothing,
+          reason: 'tap ${i * 2 + 2} should close the list',
+        );
+      }
+
+      expect(tester.takeException(), isNull);
+    });
+
+    // BUG-063: the trigger sat in a fixed 165px box, so "All measurements"
+    // — the new default, and longer than every "Last N days" label — was
+    // rendered with an ellipsis. It now takes the row's spare width.
+    //
+    // This asserts the box flexes rather than asserting glyph widths: the
+    // widget-test font is a fixed-advance stub whose metrics say nothing
+    // about whether real Instrument Sans fits.
+    testWidgets('the period trigger takes the row width instead of a fixed box', (
+      tester,
+    ) async {
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      // 600+, like the other tests here: at phone widths the stub test font
+      // overflows the unrelated metric row.
+      tester.view.physicalSize = const Size(600, 1400);
+      await tester.pumpWidget(testApp(const TrendsScreen()));
+      await tester.pumpAndSettle();
+      final narrow = tester.getSize(find.byType(AppDropdown)).width;
+
+      tester.view.physicalSize = const Size(900, 1400);
+      await tester.pumpWidget(testApp(const TrendsScreen()));
+      await tester.pumpAndSettle();
+      final wide = tester.getSize(find.byType(AppDropdown)).width;
+
+      expect(
+        wide,
+        greaterThan(narrow),
+        reason: 'the trigger is still a fixed-width box, so long labels clip',
+      );
+      expect(narrow, isNot(165.0));
     });
 
     testWidgets('history is paginated and "Show more" reveals the next page', (

@@ -357,8 +357,10 @@ class _TrendsScreenState extends State<TrendsScreen>
                           // visibly shift down each time the list opens (BUG-031).
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(
-                              width: 165,
+                            // Flexible, not a fixed width: the longest label
+                            // ("All measurements", and longer still in
+                            // Hebrew) was ellipsised inside the old 165px box.
+                            Expanded(
                               child: AppDropdown(
                                 label: '',
                                 value: _periodLabel(_selectedPeriod, l10n),
