@@ -187,29 +187,9 @@ class _TrendsScreenState extends State<TrendsScreen>
           borderRadius: AppRadiiTokens.borderRadiusCard,
         ),
         title: Text(l10n.exportLabel, style: AppSemanticTextStyles.headingH2),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l10n.csvPreview, style: AppSemanticTextStyles.pcBody),
-              SizedBox(height: AppSpacingTokens.pcSm),
-              Container(
-                padding: EdgeInsets.all(AppSpacingTokens.pcSm),
-                decoration: BoxDecoration(
-                  color: c.background,
-                  borderRadius: AppRadiiTokens.borderRadiusField,
-                ),
-                child: Text(
-                  csvData,
-                  style: AppSemanticTextStyles.pcCaption.copyWith(
-                    fontFamily: 'monospace',
-                    fontSize: 10,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        content: Text(
+          l10n.exportMeasurementsCsvDescription,
+          style: AppSemanticTextStyles.pcBody,
         ),
         actions: [
           TextButton(

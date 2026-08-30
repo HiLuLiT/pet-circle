@@ -745,7 +745,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get endDateOptional => 'End Date (Optional)';
 
   @override
-  String get csvPreview => 'CSV Preview:';
+  String get exportMeasurementsCsvDescription =>
+      'Download your measurement history as a CSV file.';
+
+  @override
+  String get exportMedicationsCsvDescription =>
+      'Download your medication log as a CSV file.';
 
   @override
   String get downloadCsv => 'Download CSV';
