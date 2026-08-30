@@ -202,7 +202,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
     }
 
-    testWidgets('tapping export button opens dialog with csv preview', (
+    testWidgets('tapping export button opens the export dialog', (
       tester,
     ) async {
       setViewSize(tester);
@@ -215,8 +215,11 @@ void main() {
       await tester.tap(exportBtn);
       await tester.pumpAndSettle();
 
-      // Dialog should appear with CSV Preview label
-      expect(find.text('CSV Preview:'), findsOneWidget);
+      // Dialog explains the download; it no longer dumps a raw CSV preview
+      expect(
+        find.text('Download your medication log as a CSV file.'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('export dialog has close and download buttons', (tester) async {
@@ -242,7 +245,10 @@ void main() {
       await tester.tap(find.text('Close'));
       await tester.pumpAndSettle();
 
-      expect(find.text('CSV Preview:'), findsNothing);
+      expect(
+        find.text('Download your medication log as a CSV file.'),
+        findsNothing,
+      );
     });
   });
 

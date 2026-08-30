@@ -1484,11 +1484,17 @@ abstract class AppLocalizations {
   /// **'End Date (Optional)'**
   String get endDateOptional;
 
-  /// No description provided for @csvPreview.
+  /// No description provided for @exportMeasurementsCsvDescription.
   ///
   /// In en, this message translates to:
-  /// **'CSV Preview:'**
-  String get csvPreview;
+  /// **'Download your measurement history as a CSV file.'**
+  String get exportMeasurementsCsvDescription;
+
+  /// No description provided for @exportMedicationsCsvDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Download your medication log as a CSV file.'**
+  String get exportMedicationsCsvDescription;
 
   /// No description provided for @downloadCsv.
   ///

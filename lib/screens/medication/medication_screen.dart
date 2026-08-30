@@ -87,29 +87,9 @@ class _MedicationScreenState extends State<MedicationScreen> {
           l10n.exportMedicationLog,
           style: AppSemanticTextStyles.headingLg,
         ),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l10n.csvPreview, style: AppSemanticTextStyles.body),
-              const SizedBox(height: AppSpacingTokens.sm + 4),
-              Container(
-                padding: const EdgeInsets.all(AppSpacingTokens.sm + 4),
-                decoration: BoxDecoration(
-                  color: c.background,
-                  borderRadius: BorderRadius.circular(AppRadiiTokens.sm),
-                ),
-                child: Text(
-                  csvData,
-                  style: AppSemanticTextStyles.caption.copyWith(
-                    fontFamily: 'monospace',
-                    fontSize: 10,
-                  ),
-                ),
-              ),
-            ],
-          ),
+        content: Text(
+          l10n.exportMedicationsCsvDescription,
+          style: AppSemanticTextStyles.body,
         ),
         actions: [
           TextButton(
