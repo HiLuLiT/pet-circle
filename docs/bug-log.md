@@ -1430,6 +1430,67 @@ This is pre-existing and app-wide, not specific to notifications. It is recorded
 
 ---
 
+## BUG-061: The Trends period list stayed open, floating over whatever you scrolled to
+
+**Severity:** Medium
+**Status:** Fixed
+**Found during:** manual review of the Trends screen.
+
+**Symptom:** Opening the period dropdown and then scrolling left the option list hanging in the
+middle of the screen, detached from its trigger and painted over the content the user had scrolled
+to. Nothing dismissed it except picking an option.
+
+**Root cause:** `AppDropdown`'s `overlayMode` inserts the option list into the root `Overlay`, at
+absolute screen coordinates measured once, when it opens (`_insertOverlay`). The root overlay sits
+above the whole app, so the entry neither moved with the trigger nor was clipped by the scroll
+viewport, and there was no barrier or scroll hook to close it.
+
+**Fix:** The overlay entry now also renders a full-screen translucent `Listener` barrier beneath the
+list: a pointer down anywhere outside the list asks the owner to close it. The barrier is
+translucent, not opaque, so the same drag that dismisses the list still scrolls the page underneath
+instead of being swallowed. Pointer-downs inside the list's own rect are ignored, so option taps
+still resolve. Mouse-wheel scrolling emits no pointer-down, so `_insertOverlay` additionally
+listens to the enclosing `Scrollable`'s `ScrollPosition` and dismisses on any scroll. Closing is
+routed through a new optional `onDismiss` callback (falling back to `onTap`) — the owner still
+drives `isOpen`, so the entry is torn down by `didUpdateWidget` as before.
+
+**Files changed:**
+- `lib/widgets/app_dropdown.dart`
+- `lib/screens/trends/trends_screen.dart` (passes `onDismiss: _closePeriod`)
+- `test/screens/trends/trends_screen_test.dart` (dismiss-on-scroll and tap-outside regressions)
+
+---
+
+## BUG-062: Trends defaulted to a "Custom range" option that filtered nothing
+
+**Severity:** Low
+**Status:** Fixed
+**Found during:** manual review of the Trends screen.
+
+**Symptom:** The period dropdown's last option was labelled "Custom range", but choosing it opened
+no range picker — it simply showed every measurement. The screen defaulted to "Last 30 days", so
+older readings were invisible until the user found the mislabelled option.
+
+**Root cause:** `TrendsPeriod.customRange` was a placeholder for an unbuilt custom-range picker.
+`_periodToDuration` returned `null` for it and `_filterByPeriod` treats `null` as "no filter", so
+its actual behaviour was always "all measurements" — the label was the only thing wrong.
+
+**Fix:** Renamed the member to `TrendsPeriod.allMeasurements` with the l10n key `allMeasurements`
+("All measurements" / "כל המדידות"), moved it to the head of the enum so it leads the option list,
+and made it the default period. Behaviour is unchanged; the label now matches it. Since the default
+is now unbounded, the measurement history is paginated — 10 rows at a time behind a "Show N more"
+button with a "Showing X of Y" footer — because the history renders inside a
+`SingleChildScrollView` and would otherwise build every row up front. Paging resets when the period
+changes or the active pet changes.
+
+**Files changed:**
+- `lib/screens/trends/trends_screen.dart`
+- `lib/l10n/app_en.arb`, `lib/l10n/app_he.arb` (`customRange` → `allMeasurements`, plus
+  `showMoreMeasurements` and `showingOfTotalMeasurements`)
+- `test/screens/trends/trends_screen_test.dart`
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

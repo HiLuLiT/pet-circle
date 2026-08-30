@@ -772,7 +772,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get last90Days => 'Last 90 days';
 
   @override
-  String get customRange => 'Custom range';
+  String get allMeasurements => 'All measurements';
+
+  @override
+  String showMoreMeasurements(int count) {
+    return 'Show $count more';
+  }
+
+  @override
+  String showingOfTotalMeasurements(int shown, int total) {
+    return 'Showing $shown of $total';
+  }
 
   @override
   String get range => 'Range';

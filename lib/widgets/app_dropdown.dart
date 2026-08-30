@@ -34,6 +34,7 @@ class AppDropdown extends StatefulWidget {
     this.onOptionSelected,
     this.placeholder,
     this.overlayMode = false,
+    this.onDismiss,
   });
 
   final String label;
@@ -41,6 +42,13 @@ class AppDropdown extends StatefulWidget {
   final VoidCallback onTap;
   final bool isOpen;
   final AnimationController? chevronController;
+
+  /// Called when the open list should close without a selection — a tap
+  /// outside it, or a scroll of the surrounding view. Falls back to [onTap]
+  /// (which callers implement as a toggle) when omitted.
+  ///
+  /// Only meaningful in [overlayMode]; the inline list has no barrier.
+  final VoidCallback? onDismiss;
 
   /// Optional list of options. When provided together with [isOpen] = true,
   /// the widget renders an option list.
@@ -68,7 +76,16 @@ class _AppDropdownState extends State<AppDropdown> {
   // Key used to measure the trigger's position and width when inserting the
   // overlay entry.
   final _triggerKey = GlobalKey();
+  final _listKey = GlobalKey();
   OverlayEntry? _overlayEntry;
+
+  /// The scroll position of the nearest enclosing scrollable, tracked only
+  /// while the overlay is open. The overlay is positioned in absolute screen
+  /// coordinates captured at open time, so once the page scrolls it is no
+  /// longer anchored to its trigger — and, being in the root [Overlay], it
+  /// would keep floating over whatever the user scrolled to. Dismissing on
+  /// scroll is what keeps the two from drifting apart (BUG-061).
+  ScrollPosition? _scrollPosition;
 
   @override
   void didUpdateWidget(covariant AppDropdown old) {
@@ -98,7 +115,9 @@ class _AppDropdownState extends State<AppDropdown> {
   void _insertOverlay() {
     _removeOverlay();
 
-    final box = _triggerKey.currentContext?.findRenderObject() as RenderBox?;
+    final triggerContext = _triggerKey.currentContext;
+    if (triggerContext == null) return;
+    final box = triggerContext.findRenderObject() as RenderBox?;
     if (box == null) return;
     final origin = box.localToGlobal(Offset.zero);
     final triggerSize = box.size;
@@ -108,29 +127,70 @@ class _AppDropdownState extends State<AppDropdown> {
         // Resolve colors from the overlay context — the Overlay inherits the
         // MaterialApp theme so AppSemanticColors is always available.
         final c = AppSemanticColors.of(ctx);
-        return Positioned(
-          left: origin.dx,
-          top: origin.dy + triggerSize.height + AppSpacingTokens.pcXs,
-          width: triggerSize.width,
-          child: Material(
-            color: Colors.transparent,
-            child: _OpenList(
-              options: widget.options ?? [],
-              selectedValue: widget.value,
-              onSelected: widget.onOptionSelected,
-              colors: c,
+        return Stack(
+          children: [
+            // Transparent barrier: touching anywhere outside the list closes
+            // it. It is translucent rather than opaque so the gesture still
+            // reaches the content underneath — a drag both dismisses the list
+            // and scrolls the page, instead of being swallowed by a barrier.
+            Positioned.fill(
+              child: Listener(
+                behavior: HitTestBehavior.translucent,
+                onPointerDown: _onBarrierPointerDown,
+              ),
             ),
-          ),
+            Positioned(
+              left: origin.dx,
+              top: origin.dy + triggerSize.height + AppSpacingTokens.pcXs,
+              width: triggerSize.width,
+              child: Material(
+                color: Colors.transparent,
+                child: _OpenList(
+                  key: _listKey,
+                  options: widget.options ?? [],
+                  selectedValue: widget.value,
+                  onSelected: widget.onOptionSelected,
+                  colors: c,
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
 
-    Overlay.of(_triggerKey.currentContext!).insert(_overlayEntry!);
+    _scrollPosition = Scrollable.maybeOf(triggerContext)?.position;
+    _scrollPosition?.addListener(_requestDismiss);
+
+    Overlay.of(triggerContext).insert(_overlayEntry!);
   }
 
   void _removeOverlay() {
+    _scrollPosition?.removeListener(_requestDismiss);
+    _scrollPosition = null;
     _overlayEntry?.remove();
     _overlayEntry = null;
+  }
+
+  /// The barrier sits under the list and is translucent, so a tap on an
+  /// option hits both. Ignore pointers that land inside the list — otherwise
+  /// the overlay would be torn down before the option's tap resolves.
+  void _onBarrierPointerDown(PointerDownEvent event) {
+    final listBox = _listKey.currentContext?.findRenderObject() as RenderBox?;
+    if (listBox != null &&
+        (listBox.localToGlobal(Offset.zero) & listBox.size).contains(
+          event.position,
+        )) {
+      return;
+    }
+    _requestDismiss();
+  }
+
+  /// Asks the owner to close the list. The owner drives [isOpen], so the
+  /// overlay is torn down by the resulting `didUpdateWidget`, not here.
+  void _requestDismiss() {
+    if (!widget.isOpen) return;
+    (widget.onDismiss ?? widget.onTap)();
   }
 
   @override
@@ -279,6 +339,7 @@ class _Chevron extends StatelessWidget {
 
 class _OpenList extends StatelessWidget {
   const _OpenList({
+    super.key,
     required this.options,
     required this.selectedValue,
     required this.onSelected,

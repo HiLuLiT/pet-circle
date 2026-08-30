@@ -1,4 +1,4 @@
-import 'dart:math' show max;
+import 'dart:math' show max, min;
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -25,13 +25,15 @@ import 'package:fl_chart/fl_chart.dart';
 /// The selected value is stored as one of these stable enum members rather
 /// than a localized display string, so switching the app locale never leaves
 /// the [DropdownButton] with a value that no longer matches any item.
+/// Declaration order is the dropdown's option order: the unfiltered default
+/// first, then narrowest to widest window.
 enum TrendsPeriod {
+  allMeasurements,
   last24Hours,
   last3Days,
   last7Days,
   last30Days,
   last90Days,
-  customRange,
 }
 
 class TrendsScreen extends StatefulWidget {
@@ -45,17 +47,43 @@ class TrendsScreen extends StatefulWidget {
 
 class _TrendsScreenState extends State<TrendsScreen>
     with SingleTickerProviderStateMixin {
-  TrendsPeriod _selectedPeriod = TrendsPeriod.last30Days;
+  /// How many history rows are added per "Show more" tap, and how many are
+  /// visible before the first one. The default period is now unfiltered, so
+  /// the history can be arbitrarily long — rendering it whole would build
+  /// every row inside the enclosing [SingleChildScrollView] up front.
+  static const int _historyPageSize = 10;
+
+  TrendsPeriod _selectedPeriod = TrendsPeriod.allMeasurements;
   bool _isPeriodOpen = false;
+  int _visibleHistoryCount = _historyPageSize;
+  String? _historyPetId;
   late final AnimationController _chevronController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 200),
   );
 
   @override
+  void initState() {
+    super.initState();
+    _historyPetId = petStore.activePet?.id;
+    petStore.addListener(_resetHistoryOnPetChange);
+  }
+
+  @override
   void dispose() {
+    petStore.removeListener(_resetHistoryOnPetChange);
     _chevronController.dispose();
     super.dispose();
+  }
+
+  /// Switching pets swaps the whole history out, so a page depth paged into
+  /// the previous pet's list would be meaningless for the new one.
+  void _resetHistoryOnPetChange() {
+    final petId = petStore.activePet?.id;
+    if (petId == _historyPetId) return;
+    _historyPetId = petId;
+    if (!mounted) return;
+    setState(() => _visibleHistoryCount = _historyPageSize);
   }
 
   void _togglePeriodOpen() {
@@ -66,6 +94,14 @@ class _TrendsScreenState extends State<TrendsScreen>
       } else {
         _chevronController.reverse();
       }
+    });
+  }
+
+  void _closePeriod() {
+    if (!_isPeriodOpen) return;
+    setState(() {
+      _isPeriodOpen = false;
+      _chevronController.reverse();
     });
   }
 
@@ -86,6 +122,8 @@ class _TrendsScreenState extends State<TrendsScreen>
     setState(() {
       _selectedPeriod = period;
       _isPeriodOpen = false;
+      // A new window is a new list — start it back at the first page.
+      _visibleHistoryCount = _historyPageSize;
       _chevronController.reverse();
     });
   }
@@ -102,8 +140,8 @@ class _TrendsScreenState extends State<TrendsScreen>
         return l10n.last30Days;
       case TrendsPeriod.last90Days:
         return l10n.last90Days;
-      case TrendsPeriod.customRange:
-        return l10n.customRange;
+      case TrendsPeriod.allMeasurements:
+        return l10n.allMeasurements;
     }
   }
 
@@ -119,7 +157,7 @@ class _TrendsScreenState extends State<TrendsScreen>
         return const Duration(days: 30);
       case TrendsPeriod.last90Days:
         return const Duration(days: 90);
-      case TrendsPeriod.customRange:
+      case TrendsPeriod.allMeasurements:
         return null;
     }
   }
@@ -273,6 +311,9 @@ class _TrendsScreenState extends State<TrendsScreen>
         final petId = petStore.activePet?.id ?? '';
         final allMeasurements = measurementStore.getMeasurements(petId);
         final filtered = _filterByPeriod(allMeasurements);
+        final shownCount = _visibleHistoryCount.clamp(0, filtered.length);
+        final visibleHistory = filtered.take(shownCount).toList();
+        final remainingCount = filtered.length - shownCount;
 
         final content = SafeArea(
           child: RefreshIndicator(
@@ -330,6 +371,7 @@ class _TrendsScreenState extends State<TrendsScreen>
                                 onOptionSelected: (label) =>
                                     _selectPeriodLabel(label, l10n),
                                 overlayMode: true,
+                                onDismiss: _closePeriod,
                               ),
                             ),
                             const SizedBox(width: AppSpacingTokens.sm),
@@ -365,7 +407,7 @@ class _TrendsScreenState extends State<TrendsScreen>
                             style: AppSemanticTextStyles.headingH2,
                           ),
                           const SizedBox(height: AppSpacingTokens.pcSm),
-                          ...filtered.map((m) {
+                          ...visibleHistory.map((m) {
                             final dateStr =
                                 '${m.recordedAt.month}/${m.recordedAt.day} · ${m.recordedAt.hour.toString().padLeft(2, '0')}:${m.recordedAt.minute.toString().padLeft(2, '0')}';
                             final status = settingsStore.classifyStatus(m.bpm);
@@ -442,6 +484,28 @@ class _TrendsScreenState extends State<TrendsScreen>
                               ),
                             );
                           }),
+                          if (remainingCount > 0)
+                            PrimaryButton(
+                              label: l10n.showMoreMeasurements(
+                                min(remainingCount, _historyPageSize),
+                              ),
+                              variant: PrimaryButtonVariant.outlined,
+                              fullWidth: true,
+                              onPressed: () => setState(() {
+                                _visibleHistoryCount =
+                                    shownCount + _historyPageSize;
+                              }),
+                            ),
+                          const SizedBox(height: AppSpacingTokens.pcSm),
+                          Center(
+                            child: Text(
+                              l10n.showingOfTotalMeasurements(
+                                shownCount,
+                                filtered.length,
+                              ),
+                              style: AppSemanticTextStyles.pcCaption,
+                            ),
+                          ),
                         ],
                       ],
                     ),

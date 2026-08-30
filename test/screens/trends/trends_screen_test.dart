@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/l10n/app_localizations.dart';
+import 'package:pet_circle/models/measurement.dart';
 import 'package:pet_circle/screens/trends/trends_screen.dart';
+import 'package:pet_circle/stores/measurement_store.dart';
+import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/app_theme.dart';
 
 import '../../helpers/test_app.dart';
@@ -45,8 +48,8 @@ void main() {
       await tester.pumpWidget(testApp(const TrendsScreen()));
       await tester.pumpAndSettle();
 
-      // Default period is "Last 30 days"
-      expect(find.text('Last 30 days'), findsOneWidget);
+      // Default period is the unfiltered "All measurements".
+      expect(find.text('All measurements'), findsOneWidget);
     });
 
     testWidgets('opening the period dropdown and selecting updates the value', (
@@ -62,11 +65,11 @@ void main() {
 
       // Closed: only the trigger shows the current value, the other options
       // are not rendered yet.
-      expect(find.text('Last 30 days'), findsOneWidget);
+      expect(find.text('All measurements'), findsOneWidget);
       expect(find.text('Last 24 hours'), findsNothing);
 
       // Tap the trigger to open the inline option list.
-      await tester.tap(find.text('Last 30 days'));
+      await tester.tap(find.text('All measurements'));
       await tester.pumpAndSettle();
 
       // The selected option now appears in both the trigger and the open
@@ -79,7 +82,134 @@ void main() {
 
       expect(find.text('Last 24 hours'), findsOneWidget);
       // The previously-selected label is no longer shown anywhere.
-      expect(find.text('Last 30 days'), findsNothing);
+      expect(find.text('All measurements'), findsNothing);
+    });
+
+    // BUG-061: the open list lives in the root Overlay and is positioned in
+    // absolute screen coordinates captured when it opens. Left alone it kept
+    // floating over whatever the user scrolled to, detached from its trigger.
+    testWidgets('scrolling the page closes the open period list', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(600, 900);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const TrendsScreen()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('All measurements'));
+      await tester.pumpAndSettle();
+      expect(find.text('Last 24 hours'), findsOneWidget);
+
+      await tester.drag(find.byType(TrendsScreen), const Offset(0, -200));
+      await tester.pumpAndSettle();
+
+      // The list is gone and the trigger still shows the unchanged value.
+      expect(find.text('Last 24 hours'), findsNothing);
+      expect(find.text('All measurements'), findsOneWidget);
+    });
+
+    testWidgets('tapping outside the open period list closes it', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(600, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(testApp(const TrendsScreen()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('All measurements'));
+      await tester.pumpAndSettle();
+      expect(find.text('Last 24 hours'), findsOneWidget);
+
+      // Top-left corner is the barrier, well clear of the list itself.
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Last 24 hours'), findsNothing);
+      expect(find.text('All measurements'), findsOneWidget);
+    });
+
+    testWidgets('history is paginated and "Show more" reveals the next page', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(600, 4000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      // 25 readings — more than the 10-per-page history window.
+      final petId = petStore.ownerPets.first.id!;
+      measurementStore.seed({
+        petId: List.generate(
+          25,
+          (i) => Measurement(
+            bpm: 20 + i,
+            recordedAt: DateTime.now().subtract(Duration(minutes: i + 1)),
+          ),
+        ),
+      });
+
+      await tester.pumpWidget(testApp(const TrendsScreen()));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Showing 10 of 25'), findsOneWidget);
+      expect(find.text('Show 10 more'), findsOneWidget);
+      // 11th reading (bpm 30) is on the next page.
+      expect(find.text('30 BPM'), findsNothing);
+
+      await tester.tap(find.text('Show 10 more'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Showing 20 of 25'), findsOneWidget);
+      expect(find.text('30 BPM'), findsOneWidget);
+
+      // Last page is partial, so the button offers only the remainder.
+      expect(find.text('Show 5 more'), findsOneWidget);
+      await tester.tap(find.text('Show 5 more'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Showing 25 of 25'), findsOneWidget);
+      expect(find.textContaining('Show '), findsNothing);
+    });
+
+    testWidgets('narrowing the period resets history back to the first page', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(600, 4000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      final petId = petStore.ownerPets.first.id!;
+      measurementStore.seed({
+        petId: List.generate(
+          25,
+          (i) => Measurement(
+            bpm: 20 + i,
+            recordedAt: DateTime.now().subtract(Duration(minutes: i + 1)),
+          ),
+        ),
+      });
+
+      await tester.pumpWidget(testApp(const TrendsScreen()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Show 10 more'));
+      await tester.pumpAndSettle();
+      expect(find.text('Showing 20 of 25'), findsOneWidget);
+
+      // All 25 readings fall inside 24 hours, so only the paging resets.
+      await tester.tap(find.text('All measurements'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Last 24 hours'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Showing 10 of 25'), findsOneWidget);
     });
 
     testWidgets('shows export button', (tester) async {
@@ -114,7 +244,7 @@ void main() {
 
     // Regression: the period selector used to store its value as a localized
     // display string. When the app locale changed while the screen stayed
-    // mounted, the DropdownButton's value (e.g. "Last 30 days") no longer
+    // mounted, the DropdownButton's value (e.g. "All measurements") no longer
     // matched any of its now-Hebrew items, throwing the framework assertion
     // "There should be exactly one item with [DropdownButton]'s value".
     // The value is now a locale-independent [TrendsPeriod] enum, so switching
@@ -146,7 +276,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Default English label is shown for the selected period.
-      expect(find.text('Last 30 days'), findsOneWidget);
+      expect(find.text('All measurements'), findsOneWidget);
 
       // Switch to Hebrew while the same TrendsScreen State stays mounted.
       localeNotifier.value = const Locale('he');
@@ -155,7 +285,7 @@ void main() {
       // No DropdownButton assertion, and the English label is gone (the
       // dropdown re-rendered its label in Hebrew while keeping the same value).
       expect(tester.takeException(), isNull);
-      expect(find.text('Last 30 days'), findsNothing);
+      expect(find.text('All measurements'), findsNothing);
     });
   });
 }

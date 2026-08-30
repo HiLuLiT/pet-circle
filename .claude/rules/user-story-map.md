@@ -2,7 +2,7 @@
 
 > Living user story map for Pet Circle. Tracks implementation status of every user story by role. Consult when working on any screen to understand what is done, what is partial, and what is missing. UPDATE this file after completing work on any story.
 
-Last updated: 2026-08-30 (/pc-phase HIGH findings closed -- BUG-057..059 fixed, BUG-060 open)
+Last updated: 2026-08-30 (Trends period dropdown anchored + defaulted to all measurements -- BUG-061 / BUG-062)
 
 ## Update Protocol
 
@@ -55,7 +55,11 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - B9: Configurable timer durations (15s / 30s / 60s)
 - B10: "Add to Graph" saves measurement for active pet via `measurementStore` + Firestore subcollection
 - B11: Unified health trends -- single scrollable view with stats, chart, history
-- B12: Trends time-range filtering -- period dropdown filters chart + stats
+- B12: Trends time-range filtering -- period dropdown filters chart + stats. Defaults to "All
+  measurements" (the option formerly mislabelled "Custom range", which never filtered anything --
+  BUG-062), so the history list is paginated 10 rows at a time behind a "Show N more" button. The
+  open option list is dismissed by a tap outside or by scrolling; it used to hang over whatever the
+  user scrolled to (BUG-061)
 - B13: Medication add/edit wired to `medicationStore` + Firestore subcollection
 - B14: Export measurement data -- CSV preview dialog
 - B15: Pet detail reads from Firestore-backed `noteStore` and `measurementStore`

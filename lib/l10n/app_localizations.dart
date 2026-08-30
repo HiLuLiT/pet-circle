@@ -1538,11 +1538,23 @@ abstract class AppLocalizations {
   /// **'Last 90 days'**
   String get last90Days;
 
-  /// No description provided for @customRange.
+  /// No description provided for @allMeasurements.
   ///
   /// In en, this message translates to:
-  /// **'Custom range'**
-  String get customRange;
+  /// **'All measurements'**
+  String get allMeasurements;
+
+  /// No description provided for @showMoreMeasurements.
+  ///
+  /// In en, this message translates to:
+  /// **'Show {count} more'**
+  String showMoreMeasurements(int count);
+
+  /// No description provided for @showingOfTotalMeasurements.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing {shown} of {total}'**
+  String showingOfTotalMeasurements(int shown, int total);
 
   /// No description provided for @range.
   ///
