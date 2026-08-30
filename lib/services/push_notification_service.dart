@@ -9,7 +9,6 @@ import 'package:flutter/foundation.dart'
 import 'package:flutter/widgets.dart' show WidgetsBinding;
 import 'package:pet_circle/config/app_config.dart' show appLocale;
 import 'package:pet_circle/l10n/app_localizations.dart';
-import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/services/abstract_push_notification_service.dart';
 import 'package:pet_circle/services/reminder_service.dart';
 import 'package:pet_circle/stores/notification_store.dart';
@@ -193,28 +192,17 @@ class PushNotificationService implements AbstractPushNotificationService {
     final body = notification.body ?? '';
     final data = message.data;
 
-    // Use the Firestore document ID the server put in the payload, so the
-    // in-app row is keyed by the same ID as the persisted document and
-    // markRead can find it. Falls back to messageId for payloads sent by an
-    // older function version. See docs/bug-log.md BUG-038.
-    final serverId = parseNotificationId(data['notificationId']);
-    final fallbackId =
-        message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString();
-    final notificationId = serverId ?? fallbackId;
-
-    final type = _notificationTypeFromData(data);
-    final appNotification = AppNotification(
-      id: notificationId,
+    // The mapping — including preferring the server's Firestore document ID so
+    // markRead can find the persisted doc (BUG-038) — lives in
+    // utils/push_payload.dart so it is unit-testable without a Firebase
+    // binding. Keep this call thin; do not re-inline the field mapping here.
+    final appNotification = appNotificationFromPushData(
+      data,
       title: title,
       body: body,
-      type: type,
+      fallbackId:
+          message.messageId ?? DateTime.now().millisecondsSinceEpoch.toString(),
       createdAt: DateTime.now(),
-      petName: data['petName'],
-      route: data['route'],
-      petId: data['petId'],
-      titleKey: data['titleKey'] as String?,
-      bodyKey: data['bodyKey'] as String?,
-      args: decodeNotificationArgs(data['args']),
     );
 
     // Localize the heads-up banner too. Without this, a push arriving while
@@ -223,7 +211,7 @@ class PushNotificationService implements AbstractPushNotificationService {
     final l10n = lookupAppLocalizations(appLocale.value);
     final localized = localizeNotification(appNotification, l10n);
 
-    final notifId = notificationId.hashCode & 0x7FFFFFFF;
+    final notifId = appNotification.id.hashCode & 0x7FFFFFFF;
     await ReminderService.instance.showImmediateNotification(
       notifId,
       localized.title,
@@ -232,21 +220,6 @@ class PushNotificationService implements AbstractPushNotificationService {
     );
 
     notificationStore.addLocal(appNotification);
-  }
-
-  NotificationType _notificationTypeFromData(Map<String, dynamic> data) {
-    final type = data['type'] as String?;
-    switch (type) {
-      case 'medication':
-        return NotificationType.medication;
-      case 'careCircle':
-        return NotificationType.careCircle;
-      case 'report':
-        return NotificationType.report;
-      case 'measurement':
-      default:
-        return NotificationType.measurement;
-    }
   }
 
   // ── Notification tap routing ──────────────────────────────────────

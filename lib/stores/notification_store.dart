@@ -117,12 +117,22 @@ class NotificationStore extends ChangeNotifier {
     }
   }
 
-  Future<void> markRead(String id) async {
+  /// Set [isRead] on the notification with [id], if it is still present.
+  ///
+  /// Always re-resolves the index by ID. Holding an index across an `await` is
+  /// unsafe here: [addLocal] inserts at position 0 from the FCM foreground
+  /// handler and [fetchForUser] replaces the list wholesale from
+  /// pull-to-refresh, so a stale index can address a different row — or be out
+  /// of range entirely. See docs/bug-log.md BUG-058.
+  void _setReadState(String id, {required bool isRead}) {
     final idx = _notifications.indexWhere((n) => n.id == id);
-    if (idx != -1 && !_notifications[idx].isRead) {
-      _notifications[idx] = _notifications[idx].copyWith(isRead: true);
-      notifyListeners();
-    }
+    if (idx == -1 || _notifications[idx].isRead == isRead) return;
+    _notifications[idx] = _notifications[idx].copyWith(isRead: isRead);
+    notifyListeners();
+  }
+
+  Future<void> markRead(String id) async {
+    _setReadState(id, isRead: true);
 
     final uid = userStore.currentUserUid;
     if (kEnableFirebase && uid != null && uid.isNotEmpty) {
@@ -142,17 +152,22 @@ class NotificationStore extends ChangeNotifier {
           );
           return;
         }
-        if (idx != -1) {
-          _notifications[idx] = _notifications[idx].copyWith(isRead: false);
-          notifyListeners();
-        }
+        _setReadState(id, isRead: false);
         rethrow;
       }
     }
   }
 
   Future<void> markAllRead() async {
-    final previous = List<AppNotification>.of(_notifications);
+    // Capture the IDs that this call actually flips, so a failure reverts only
+    // those. Restoring a wholesale snapshot would discard any notification
+    // added while the write was in flight.
+    final flipped = _notifications
+        .where((n) => !n.isRead)
+        .map((n) => n.id)
+        .toList(growable: false);
+    if (flipped.isEmpty) return;
+
     _notifications = _notifications
         .map((n) => n.isRead ? n : n.copyWith(isRead: true))
         .toList();
@@ -163,8 +178,9 @@ class NotificationStore extends ChangeNotifier {
       try {
         await NotificationService.markAllRead(uid);
       } catch (e) {
-        _notifications = previous;
-        notifyListeners();
+        for (final id in flipped) {
+          _setReadState(id, isRead: false);
+        }
         rethrow;
       }
     }

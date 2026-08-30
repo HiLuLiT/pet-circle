@@ -5,22 +5,18 @@ import 'package:pet_circle/models/app_notification.dart';
 import 'package:pet_circle/utils/notification_localizer.dart';
 import 'package:pet_circle/utils/push_payload.dart';
 
-/// Builds an [AppNotification] the way `PushNotificationService`
-/// `_handleForegroundMessage` does, from an FCM `data` map.
+/// Calls the production mapping used by `PushNotificationService`
+/// `_handleForegroundMessage`, supplying the frozen English strings the server
+/// sends for the OS banner. Deliberately delegates rather than reimplementing:
+/// an earlier version of this file hand-copied the field mapping, so a
+/// regression in the real handler would have left these tests green.
 AppNotification _fromPayload(Map<String, dynamic> data) {
-  return AppNotification(
-    id: parseNotificationId(data['notificationId']) ?? 'fallback-id',
-    // The frozen English strings the server sends for the OS banner.
+  return appNotificationFromPushData(
+    data,
     title: 'a@b.com joined Rex\'s care circle',
     body: 'Your invitation was accepted',
-    type: NotificationType.careCircle,
+    fallbackId: 'fallback-id',
     createdAt: DateTime(2026, 1, 1),
-    petName: data['petName'],
-    route: data['route'],
-    petId: data['petId'],
-    titleKey: data['titleKey'] as String?,
-    bodyKey: data['bodyKey'] as String?,
-    args: decodeNotificationArgs(data['args']),
   );
 }
 
@@ -129,6 +125,25 @@ void main() {
       expect(decodeNotificationArgs('["\\u05e8\\u05e7\\u05e1"]'), [
         '\u05e8\u05e7\u05e1',
       ]);
+    });
+  });
+
+  group('notificationTypeFromPushData', () {
+    test('maps each known type', () {
+      expect(notificationTypeFromPushData({'type': 'medication'}),
+          NotificationType.medication);
+      expect(notificationTypeFromPushData({'type': 'careCircle'}),
+          NotificationType.careCircle);
+      expect(notificationTypeFromPushData({'type': 'report'}),
+          NotificationType.report);
+      expect(notificationTypeFromPushData({'type': 'measurement'}),
+          NotificationType.measurement);
+    });
+
+    test('defaults to measurement for unknown or missing type', () {
+      expect(notificationTypeFromPushData({'type': 'bogus'}),
+          NotificationType.measurement);
+      expect(notificationTypeFromPushData({}), NotificationType.measurement);
     });
   });
 

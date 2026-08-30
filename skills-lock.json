@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "claude-devfleet": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "skillPath": "skills/claude-devfleet/SKILL.md",
+      "computedHash": "bcaacc009f12b852fa4fd015b234619eb125296314c8acb50bb0a65e17ecfb99"
+    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",

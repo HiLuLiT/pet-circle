@@ -109,6 +109,19 @@ service cloud.firestore {
           request.auth.uid in request.resource.data.memberUids &&
           request.resource.data.memberUids.size() ==
               resource.data.memberUids.size() + 1 &&
+          // Every existing member must survive the write. The size check alone
+          // did not enforce this: an invitee could submit a correctly-sized
+          // list containing only themselves (padded with duplicates) and
+          // silently evict every other member from the pet, since
+          // isPetMemberData() gates reads on memberUids while careCircle keeps
+          // rendering the evicted entries. Only the owner survived, via the
+          // separate ownerId branch. See docs/bug-log.md BUG-057.
+          resource.data.memberUids.hasOnly(
+              request.resource.data.memberUids) &&
+          // Reject duplicate padding, which would otherwise let the size check
+          // pass without genuinely adding a distinct member.
+          request.resource.data.memberUids.toSet().size() ==
+              request.resource.data.memberUids.size() &&
           request.resource.data.pendingInvites[acceptedInvitationToken()] ==
               null &&
           request.resource.data.careCircle[request.auth.uid] != null &&
