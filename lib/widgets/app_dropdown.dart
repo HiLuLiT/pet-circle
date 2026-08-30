@@ -34,6 +34,7 @@ class AppDropdown extends StatefulWidget {
     this.onOptionSelected,
     this.placeholder,
     this.overlayMode = false,
+    this.onDismiss,
   });
 
   final String label;
@@ -41,6 +42,13 @@ class AppDropdown extends StatefulWidget {
   final VoidCallback onTap;
   final bool isOpen;
   final AnimationController? chevronController;
+
+  /// Called when the open list should close without a selection — a tap
+  /// outside it, or a scroll of the surrounding view. Falls back to [onTap]
+  /// (which callers implement as a toggle) when omitted.
+  ///
+  /// Only meaningful in [overlayMode]; the inline list has no barrier.
+  final VoidCallback? onDismiss;
 
   /// Optional list of options. When provided together with [isOpen] = true,
   /// the widget renders an option list.
@@ -68,24 +76,41 @@ class _AppDropdownState extends State<AppDropdown> {
   // Key used to measure the trigger's position and width when inserting the
   // overlay entry.
   final _triggerKey = GlobalKey();
+  final _listKey = GlobalKey();
   OverlayEntry? _overlayEntry;
+
+  /// The scroll position of the nearest enclosing scrollable, tracked only
+  /// while the overlay is open. The overlay is positioned in absolute screen
+  /// coordinates captured at open time, so once the page scrolls it is no
+  /// longer anchored to its trigger — and, being in the root [Overlay], it
+  /// would keep floating over whatever the user scrolled to. Dismissing on
+  /// scroll is what keeps the two from drifting apart (BUG-061).
+  ScrollPosition? _scrollPosition;
 
   @override
   void didUpdateWidget(covariant AppDropdown old) {
     super.didUpdateWidget(old);
     if (!widget.overlayMode) return;
 
+    // Every branch defers to a post-frame callback: `didUpdateWidget` runs
+    // during the build phase, and `markNeedsBuild` on an overlay entry throws
+    // there ("setState() or markNeedsBuild() called during build"). The
+    // re-checks inside each callback matter because `isOpen` can flip again
+    // before the frame ends — a fast double-tap used to leave an insert
+    // scheduled after the matching remove had already run.
     if (widget.isOpen && !old.isOpen) {
-      // Schedule after frame so the trigger is fully laid out before we
-      // measure its position.
+      // Deferring also lets the trigger finish laying out before we measure
+      // its position.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _insertOverlay();
+        if (mounted && widget.isOpen) _insertOverlay();
       });
     } else if (!widget.isOpen && old.isOpen) {
       _removeOverlay();
     } else if (widget.isOpen && _overlayEntry != null) {
       // Value changed while open — refresh the selected highlight.
-      _overlayEntry!.markNeedsBuild();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.isOpen) _overlayEntry?.markNeedsBuild();
+      });
     }
   }
 
@@ -98,7 +123,9 @@ class _AppDropdownState extends State<AppDropdown> {
   void _insertOverlay() {
     _removeOverlay();
 
-    final box = _triggerKey.currentContext?.findRenderObject() as RenderBox?;
+    final triggerContext = _triggerKey.currentContext;
+    if (triggerContext == null) return;
+    final box = triggerContext.findRenderObject() as RenderBox?;
     if (box == null) return;
     final origin = box.localToGlobal(Offset.zero);
     final triggerSize = box.size;
@@ -108,29 +135,80 @@ class _AppDropdownState extends State<AppDropdown> {
         // Resolve colors from the overlay context — the Overlay inherits the
         // MaterialApp theme so AppSemanticColors is always available.
         final c = AppSemanticColors.of(ctx);
-        return Positioned(
-          left: origin.dx,
-          top: origin.dy + triggerSize.height + AppSpacingTokens.pcXs,
-          width: triggerSize.width,
-          child: Material(
-            color: Colors.transparent,
-            child: _OpenList(
-              options: widget.options ?? [],
-              selectedValue: widget.value,
-              onSelected: widget.onOptionSelected,
-              colors: c,
+        return Stack(
+          children: [
+            // Transparent barrier: touching anywhere outside the list closes
+            // it. It is translucent rather than opaque so the gesture still
+            // reaches the content underneath — a drag both dismisses the list
+            // and scrolls the page, instead of being swallowed by a barrier.
+            Positioned.fill(
+              child: Listener(
+                behavior: HitTestBehavior.translucent,
+                onPointerDown: _onBarrierPointerDown,
+              ),
             ),
-          ),
+            Positioned(
+              left: origin.dx,
+              top: origin.dy + triggerSize.height + AppSpacingTokens.pcXs,
+              width: triggerSize.width,
+              child: Material(
+                color: Colors.transparent,
+                child: _OpenList(
+                  key: _listKey,
+                  options: widget.options ?? [],
+                  selectedValue: widget.value,
+                  onSelected: widget.onOptionSelected,
+                  colors: c,
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
 
-    Overlay.of(_triggerKey.currentContext!).insert(_overlayEntry!);
+    _scrollPosition = Scrollable.maybeOf(triggerContext)?.position;
+    _scrollPosition?.addListener(_requestDismiss);
+
+    Overlay.of(triggerContext).insert(_overlayEntry!);
   }
 
   void _removeOverlay() {
+    _scrollPosition?.removeListener(_requestDismiss);
+    _scrollPosition = null;
     _overlayEntry?.remove();
     _overlayEntry = null;
+  }
+
+  /// The barrier is translucent, so a pointer that lands on the list or on
+  /// the trigger hits the barrier *as well as* the widget itself. Both must
+  /// be excluded:
+  ///
+  ///   • the list — or the overlay would be torn down before an option's tap
+  ///     resolves;
+  ///   • the trigger — or a tap on it would dismiss here and then be toggled
+  ///     straight back open by the trigger's own `onTap`, leaving the list
+  ///     open and re-entering `didUpdateWidget` mid-build.
+  void _onBarrierPointerDown(PointerDownEvent event) {
+    if (_hitTest(_listKey, event.position) ||
+        _hitTest(_triggerKey, event.position)) {
+      return;
+    }
+    _requestDismiss();
+  }
+
+  /// Whether [position] (in global coordinates) falls inside [key]'s box.
+  bool _hitTest(GlobalKey key, Offset position) {
+    final box = key.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null) return false;
+    return (box.localToGlobal(Offset.zero) & box.size).contains(position);
+  }
+
+  /// Asks the owner to close the list. The owner drives [isOpen], so the
+  /// overlay is torn down by the resulting `didUpdateWidget`, not here.
+  void _requestDismiss() {
+    if (!widget.isOpen) return;
+    (widget.onDismiss ?? widget.onTap)();
   }
 
   @override
@@ -279,6 +357,7 @@ class _Chevron extends StatelessWidget {
 
 class _OpenList extends StatelessWidget {
   const _OpenList({
+    super.key,
     required this.options,
     required this.selectedValue,
     required this.onSelected,

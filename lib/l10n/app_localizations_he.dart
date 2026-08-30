@@ -770,7 +770,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get last90Days => '90 ימים אחרונים';
 
   @override
-  String get customRange => 'טווח מותאם אישית';
+  String get allMeasurements => 'כל המדידות';
+
+  @override
+  String showMoreMeasurements(int count) {
+    return 'הצג $count נוספות';
+  }
+
+  @override
+  String showingOfTotalMeasurements(int shown, int total) {
+    return 'מוצגות $shown מתוך $total';
+  }
 
   @override
   String get range => 'טווח';

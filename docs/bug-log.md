@@ -1430,6 +1430,106 @@ This is pre-existing and app-wide, not specific to notifications. It is recorded
 
 ---
 
+## BUG-061: The Trends period list stayed open, floating over whatever you scrolled to
+
+**Severity:** Medium
+**Status:** Fixed
+**Found during:** manual review of the Trends screen.
+
+**Symptom:** Opening the period dropdown and then scrolling left the option list hanging in the
+middle of the screen, detached from its trigger and painted over the content the user had scrolled
+to. Nothing dismissed it except picking an option.
+
+**Root cause:** `AppDropdown`'s `overlayMode` inserts the option list into the root `Overlay`, at
+absolute screen coordinates measured once, when it opens (`_insertOverlay`). The root overlay sits
+above the whole app, so the entry neither moved with the trigger nor was clipped by the scroll
+viewport, and there was no barrier or scroll hook to close it.
+
+**Fix:** The overlay entry now also renders a full-screen translucent `Listener` barrier beneath the
+list: a pointer down anywhere outside the list asks the owner to close it. The barrier is
+translucent, not opaque, so the same drag that dismisses the list still scrolls the page underneath
+instead of being swallowed. Pointer-downs inside the list's own rect are ignored, so option taps
+still resolve. Mouse-wheel scrolling emits no pointer-down, so `_insertOverlay` additionally
+listens to the enclosing `Scrollable`'s `ScrollPosition` and dismisses on any scroll. Closing is
+routed through a new optional `onDismiss` callback (falling back to `onTap`) — the owner still
+drives `isOpen`, so the entry is torn down by `didUpdateWidget` as before.
+
+**Files changed:**
+- `lib/widgets/app_dropdown.dart`
+- `lib/screens/trends/trends_screen.dart` (passes `onDismiss: _closePeriod`)
+- `test/screens/trends/trends_screen_test.dart` (dismiss-on-scroll and tap-outside regressions)
+
+---
+
+## BUG-062: Trends defaulted to a "Custom range" option that filtered nothing
+
+**Severity:** Low
+**Status:** Fixed
+**Found during:** manual review of the Trends screen.
+
+**Symptom:** The period dropdown's last option was labelled "Custom range", but choosing it opened
+no range picker — it simply showed every measurement. The screen defaulted to "Last 30 days", so
+older readings were invisible until the user found the mislabelled option.
+
+**Root cause:** `TrendsPeriod.customRange` was a placeholder for an unbuilt custom-range picker.
+`_periodToDuration` returned `null` for it and `_filterByPeriod` treats `null` as "no filter", so
+its actual behaviour was always "all measurements" — the label was the only thing wrong.
+
+**Fix:** Renamed the member to `TrendsPeriod.allMeasurements` with the l10n key `allMeasurements`
+("All measurements" / "כל המדידות"), moved it to the head of the enum so it leads the option list,
+and made it the default period. Behaviour is unchanged; the label now matches it. Since the default
+is now unbounded, the measurement history is paginated — 10 rows at a time behind a "Show N more"
+button with a "Showing X of Y" footer — because the history renders inside a
+`SingleChildScrollView` and would otherwise build every row up front. Paging resets when the period
+changes or the active pet changes.
+
+**Files changed:**
+- `lib/screens/trends/trends_screen.dart`
+- `lib/l10n/app_en.arb`, `lib/l10n/app_he.arb` (`customRange` → `allMeasurements`, plus
+  `showMoreMeasurements` and `showingOfTotalMeasurements`)
+- `test/screens/trends/trends_screen_test.dart`
+
+---
+
+## BUG-063: Trends period trigger clipped its label, and re-tapping it threw
+
+**Severity:** High
+**Status:** Fixed
+**Found during:** manual review of the Trends screen, after BUG-061 / BUG-062.
+
+**Symptom:** Two problems with the period selector. The trigger showed "All measure…" — the new
+default label did not fit. And tapping the trigger a second time (or a few times) turned the screen
+red with `setState() or markNeedsBuild() called during build. This _OverlayEntryWidget widget
+cannot be marked as needing to build…`.
+
+**Root cause:** Two distinct causes.
+
+The label was clipped because the trigger sat in a hard-coded `SizedBox(width: 165)`. That was wide
+enough for "Last 30 days" but not for "All measurements", which BUG-062 made the default.
+
+The crash is a regression from BUG-061's barrier. The barrier is translucent by design, so a pointer
+that lands on the trigger hits *both* the barrier and the trigger: the barrier called `onDismiss`
+(`isOpen` → false) and the trigger's own `onTap` toggled it straight back (`isOpen` → true). The
+list therefore stayed open, and the rebuild re-entered `didUpdateWidget` on the "value changed while
+open" branch, which called `_overlayEntry!.markNeedsBuild()`. `didUpdateWidget` runs during the
+build phase, and unlike `OverlayEntry.remove()` — which defers itself when called from
+`persistentCallbacks` — `markNeedsBuild()` has no such guard, so it throws. The latent
+`markNeedsBuild` hazard pre-dated BUG-061; any parent rebuild while the list was open could hit it.
+
+**Fix:** `_onBarrierPointerDown` now excludes the trigger's rect as well as the list's, so a tap on
+the trigger is handled once, by the trigger. Both remaining `didUpdateWidget` branches were moved
+into post-frame callbacks that re-check `mounted && widget.isOpen`, which also fixes a fast
+double-tap leaving an insert scheduled after its matching remove had run. The trigger's fixed
+`SizedBox` was replaced with `Expanded`, so it takes the row's spare width and the option list
+(which is measured from the trigger) widens with it.
+
+**Files changed:**
+- `lib/widgets/app_dropdown.dart`
+- `lib/screens/trends/trends_screen.dart`
+- `test/screens/trends/trends_screen_test.dart` (repeat-tap and flexible-width regressions)
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]
