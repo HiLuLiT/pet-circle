@@ -16,7 +16,6 @@ import 'package:pet_circle/screens/settings/settings_care_circle_widgets.dart';
 import 'package:pet_circle/screens/settings/settings_dialogs.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
 import 'package:pet_circle/widgets/round_icon_button.dart';
-import 'package:pet_circle/widgets/segmented_control.dart';
 
 /// Push notification categories
 /// - Medicine reminders: upcoming doses, missed doses
@@ -129,6 +128,7 @@ class _SettingsContentState extends State<SettingsContent>
                           return SettingsToggleRow(
                             iconAsset: settingsMoonAsset,
                             iconTileColor: c.accentPeriwinkleTile,
+                            iconColor: c.accentPeriwinkle,
                             label: l10n.darkMode,
                             description: l10n.switchToADarkerTheme,
                             isOn: isDark,
@@ -220,56 +220,10 @@ class _SettingsContentState extends State<SettingsContent>
                         isOn: settingsStore.emergencyAlerts,
                         onChanged: settingsStore.toggleEmergencyAlerts,
                       ),
-                      const SizedBox(height: 12),
-                      SettingsToggleRow(
-                        label: l10n.measurementReminders,
-                        description: l10n.measurementRemindersDesc,
-                        isOn: settingsStore.measurementRemindersEnabled,
-                        onChanged: settingsStore.toggleMeasurementReminders,
-                      ),
-                      if (settingsStore.measurementRemindersEnabled) ...[
-                        const SizedBox(height: 12),
-                        _MeasurementReminderFrequencyRow(
-                          currentFrequency:
-                              settingsStore.measurementReminderFrequency,
-                        ),
-                        const SizedBox(height: 8),
-                        _MeasurementReminderTimeRow(
-                          hour: settingsStore.measurementReminderHour,
-                          minute: settingsStore.measurementReminderMinute,
-                        ),
-                      ],
-                      const SizedBox(height: 16),
-                      Divider(color: c.divider, height: 1),
-                      const SizedBox(height: 12),
-                      Text(
-                        l10n.medicationReminderTimes,
-                        style: AppSemanticTextStyles.label.copyWith(
-                          color: c.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      _MedicationTimeRow(
-                        label: l10n.morningReminder,
-                        hour: settingsStore.medicationMorningHour,
-                        minute: settingsStore.medicationMorningMinute,
-                        onChanged: (h, m) async {
-                          await settingsStore.setMedicationMorningTime(h, m);
-                          if (!mounted) return;
-                          setState(() {});
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      _MedicationTimeRow(
-                        label: l10n.eveningReminder,
-                        hour: settingsStore.medicationEveningHour,
-                        minute: settingsStore.medicationEveningMinute,
-                        onChanged: (h, m) async {
-                          await settingsStore.setMedicationEveningTime(h, m);
-                          if (!mounted) return;
-                          setState(() {});
-                        },
-                      ),
+                      // Measurement reminders now live behind the bell in the
+                      // Measure tab (MeasurementRemindersSheet), next to the
+                      // feature they control; medication reminders are set
+                      // per-medication in the Add/Edit Medication sheet.
                     ],
                   ),
                 ),
@@ -395,141 +349,6 @@ class _SettingsContentState extends State<SettingsContent>
           );
         },
       ),
-    );
-  }
-}
-
-// ── Measurement reminder helper widgets ──────────────────────────────
-
-class _MeasurementReminderFrequencyRow extends StatelessWidget {
-  const _MeasurementReminderFrequencyRow({required this.currentFrequency});
-
-  final int currentFrequency;
-  static const _options = [2, 3, 7];
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppSemanticColors.of(context);
-    final current = currentFrequency;
-    final labels = {
-      2: l10n.frequencyTwoPerWeek,
-      3: l10n.frequencyThreePerWeek,
-      7: l10n.frequencyDaily,
-    };
-    // Stack the label above the control rather than side-by-side: the
-    // segmented control needs the full row width for the longer localized
-    // segment labels (e.g. Hebrew "2 פעמים בשבוע"). In a side-by-side Row the
-    // control consumed nearly all the width, squeezing the label column until
-    // the label wrapped one character per line.
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.measurementReminderFrequency,
-          style: AppSemanticTextStyles.bodySm.copyWith(color: c.textSecondary),
-        ),
-        const SizedBox(height: 8),
-        AppSegmentedControl(
-          options: _options.map((v) => labels[v]!).toList(),
-          value: labels[current]!,
-          onChanged: (label) async {
-            final idx = _options.indexWhere((v) => labels[v] == label);
-            if (idx >= 0) {
-              await settingsStore.setMeasurementReminderFrequency(
-                _options[idx],
-              );
-            }
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class _MedicationTimeRow extends StatelessWidget {
-  const _MedicationTimeRow({
-    required this.label,
-    required this.hour,
-    required this.minute,
-    required this.onChanged,
-  });
-
-  final String label;
-  final int hour;
-  final int minute;
-  final void Function(int hour, int minute) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = AppSemanticColors.of(context);
-    final time = TimeOfDay(hour: hour, minute: minute);
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: AppSemanticTextStyles.bodySm.copyWith(
-              color: c.textSecondary,
-            ),
-          ),
-        ),
-        TextButton(
-          onPressed: () async {
-            final picked = await showTimePicker(
-              context: context,
-              initialTime: time,
-              initialEntryMode: TimePickerEntryMode.input,
-            );
-            if (picked != null) {
-              onChanged(picked.hour, picked.minute);
-            }
-          },
-          child: Text(time.format(context)),
-        ),
-      ],
-    );
-  }
-}
-
-class _MeasurementReminderTimeRow extends StatelessWidget {
-  const _MeasurementReminderTimeRow({required this.hour, required this.minute});
-
-  final int hour;
-  final int minute;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final c = AppSemanticColors.of(context);
-    final time = TimeOfDay(hour: hour, minute: minute);
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            l10n.measurementReminderTime,
-            style: AppSemanticTextStyles.bodySm.copyWith(
-              color: c.textSecondary,
-            ),
-          ),
-        ),
-        TextButton(
-          onPressed: () async {
-            final picked = await showTimePicker(
-              context: context,
-              initialTime: time,
-              initialEntryMode: TimePickerEntryMode.input,
-            );
-            if (picked != null) {
-              await settingsStore.setMeasurementReminderTime(
-                picked.hour,
-                picked.minute,
-              );
-            }
-          },
-          child: Text(time.format(context)),
-        ),
-      ],
     );
   }
 }

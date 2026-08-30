@@ -6,14 +6,19 @@ import 'package:pet_circle/theme/tokens/motion.dart';
 /// A 46x28 pill-shaped on/off switch widget.
 ///
 /// Implements the PC v3 / Claude-Design palette toggle:
-/// - On  : background = `AppSemanticColors.of(context).accentPurpleTile`
-/// - Off : background = `AppSemanticColors.of(context).accentButterCream`
-///   (`#E8E4D8` Candy/Butter/Cream, per Figma Toggle `465:3781`)
+/// - On  : background = `AppSemanticColors.of(context).toggleTrackOn`
+/// - Off : background = `AppSemanticColors.of(context).toggleTrackOff`
+///   (light `#C3AEF0` / `#E8E4D8`, per Figma Toggle `465:3781`)
 /// - Knob: 22x22 white circle, spring-driven between `left: 3` and `left: 21`
 ///   (apple-design skill §4 — a critically-damped spring settles more
 ///   naturally than a fixed-duration ease, and animates from wherever the
 ///   knob currently is if toggled again mid-flight)
 /// - Disabled: wrapped in `Opacity(0.5)` and ignores taps
+///
+/// The track reads its own semantic pair rather than the accent *tiles* it
+/// used to: a tile is a recessed background wash, and in dark mode both washes
+/// landed within 1.1:1 of the card behind them, so on and off were the same
+/// near-black pill and only the knob's position distinguished them.
 ///
 /// This is a *binary* switch — distinct from the segmented [TogglePill] widget
 /// in `toggle_pill.dart`.
@@ -93,8 +98,8 @@ class _AppToggleState extends State<AppToggle>
   Widget build(BuildContext context) {
     final semanticColors = AppSemanticColors.of(context);
     final Color background = widget.value
-        ? semanticColors.accentPurpleTile
-        : semanticColors.accentButterCream;
+        ? semanticColors.toggleTrackOn
+        : semanticColors.toggleTrackOff;
 
     final Widget pill = AnimatedContainer(
       duration: AppToggle._colorDuration,

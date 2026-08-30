@@ -82,6 +82,7 @@ class SettingsToggleRow extends StatelessWidget {
     this.description,
     this.iconAsset,
     this.iconTileColor,
+    this.iconColor,
     this.onChanged,
   });
 
@@ -94,6 +95,12 @@ class SettingsToggleRow extends StatelessWidget {
   /// `c.accentPeriwinkleTile` for Dark mode, `c.accentBlushTile` for
   /// VisionRR). Ignored when [iconAsset] is null.
   final Color? iconTileColor;
+
+  /// Glyph color for [iconAsset]. The Figma-exported SVGs hardcode a
+  /// near-black maroon fill, so the icon MUST be re-tinted via a
+  /// `ColorFilter` or it stays unreadable on the dark-mode tile. Defaults to
+  /// `c.accentPeriwinkle`, pairing with the default periwinkle tile.
+  final Color? iconColor;
   final VoidCallback? onChanged;
 
   @override
@@ -124,6 +131,10 @@ class SettingsToggleRow extends StatelessWidget {
                         iconAsset!,
                         width: 24,
                         height: 24,
+                        colorFilter: ColorFilter.mode(
+                          iconColor ?? c.accentPeriwinkle,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                   ),
@@ -198,6 +209,10 @@ class LanguageRow extends StatelessWidget {
                         settingsGlobeAsset,
                         width: 24,
                         height: 24,
+                        colorFilter: ColorFilter.mode(
+                          c.accentMint,
+                          BlendMode.srcIn,
+                        ),
                       ),
                     ),
                   ),
@@ -322,7 +337,15 @@ class ActionRow extends StatelessWidget {
               child: Center(
                 child:
                     iconWidget ??
-                    SvgPicture.asset(iconAsset!, width: 24, height: 24),
+                    SvgPicture.asset(
+                      iconAsset!,
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        c.textPrimary,
+                        BlendMode.srcIn,
+                      ),
+                    ),
               ),
             ),
             const SizedBox(width: 12),

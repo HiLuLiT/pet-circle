@@ -21,14 +21,19 @@ class InviteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final c = AppSemanticColors.of(context);
     return PrimaryButton(
       label: l10n.inviteAnother,
       variant: PrimaryButtonVariant.secondary,
       onPressed: onTap,
+      // The exported SVG hardcodes a near-black maroon fill, so it must be
+      // re-tinted to the secondary button's own foreground (`onSurface`) or
+      // it goes unreadable on the dark-mode purple tile.
       trailingIcon: SvgPicture.asset(
         settingsInviteAsset,
         width: 24,
         height: 24,
+        colorFilter: ColorFilter.mode(c.onSurface, BlendMode.srcIn),
       ),
     );
   }
@@ -104,6 +109,7 @@ class CareCircleItem extends StatelessWidget {
                     settingsTrashAsset,
                     width: 16,
                     height: 16,
+                    colorFilter: ColorFilter.mode(c.error, BlendMode.srcIn),
                   ),
                 ),
               ),

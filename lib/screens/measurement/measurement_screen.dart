@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableVisionRR;
 import 'package:pet_circle/l10n/app_localizations.dart';
 import 'package:pet_circle/models/measurement.dart';
+import 'package:pet_circle/screens/measurement/measurement_reminders_sheet.dart';
 import 'package:pet_circle/stores/measurement_store.dart';
 import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/stores/settings_store.dart';
@@ -31,6 +32,16 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
   int _selectedTab = 0;
   int _selectedDuration = 60;
 
+  void _openRemindersSheet() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const MeasurementRemindersSheet(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -40,7 +51,14 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
       // (or whatever value it showed on first build) because saving a
       // measurement only calls measurementStore.notifyListeners(), which
       // nothing here was listening to (see BUG-033).
-      listenable: Listenable.merge([petStore, userStore, measurementStore]),
+      // settingsStore is merged in so the reminders bell reflects the toggle
+      // the moment it is flipped inside MeasurementRemindersSheet.
+      listenable: Listenable.merge([
+        petStore,
+        userStore,
+        measurementStore,
+        settingsStore,
+      ]),
       builder: (context, _) {
         final c = AppSemanticColors.of(context);
         final l10n = AppLocalizations.of(context)!;
@@ -104,9 +122,30 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        l10n.measureRespiratoryRate,
-                        style: AppSemanticTextStyles.headingH2,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              l10n.measureRespiratoryRate,
+                              style: AppSemanticTextStyles.headingH2,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacingTokens.pcSm),
+                          RoundIconButton(
+                            icon: Icon(
+                              settingsStore.measurementRemindersEnabled
+                                  ? Icons.notifications_active_outlined
+                                  : Icons.notifications_none,
+                              color: c.textPrimary,
+                            ),
+                            variant: RoundIconButtonVariant.ghost,
+                            size: 40,
+                            iconSize: 22,
+                            semanticLabel: l10n.measurementReminders,
+                            onTap: _openRemindersSheet,
+                          ),
+                        ],
                       ),
                       const SizedBox(height: AppSpacingTokens.pcLg),
                       // VisionRR camera mode is not shipped yet; when disabled

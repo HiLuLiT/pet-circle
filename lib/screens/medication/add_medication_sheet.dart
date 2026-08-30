@@ -8,7 +8,10 @@ import 'package:pet_circle/stores/pet_store.dart';
 import 'package:pet_circle/theme/semantic/color_scheme.dart';
 import 'package:pet_circle/theme/semantic/text_theme.dart';
 import 'package:pet_circle/theme/tokens/spacing.dart';
+import 'package:pet_circle/widgets/app_card.dart';
+import 'package:pet_circle/widgets/app_toggle.dart';
 import 'package:pet_circle/widgets/primary_button.dart';
+import 'package:pet_circle/widgets/reminder_time_row.dart';
 import 'package:pet_circle/widgets/round_icon_button.dart';
 
 import 'medication_form_widgets.dart';
@@ -29,6 +32,64 @@ class AddMedicationSheet extends StatefulWidget {
 class _AddMedicationSheetState extends State<AddMedicationSheet> {
   final _formKey = GlobalKey<FormState>();
   late String _frequency;
+
+  /// Default dose time per slot, used when a slot is first revealed.
+  /// Index 0 = 09:00 (once/first dose), index 1 = 21:00 (second dose).
+  static const List<TimeOfDay> _defaultDoseTimes = <TimeOfDay>[
+    TimeOfDay(hour: 9, minute: 0),
+    TimeOfDay(hour: 21, minute: 0),
+  ];
+
+  /// Number of dose-time rows implied by a canonical frequency value
+  /// (see `FrequencyChipSelector`). "As needed" has no fixed schedule.
+  static int _doseCountFor(String frequency) {
+    switch (frequency) {
+      case 'Once daily':
+        return 1;
+      case 'Twice daily':
+        return 2;
+      default:
+        return 0;
+    }
+  }
+
+  static String _formatTime(TimeOfDay t) =>
+      '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+
+  static TimeOfDay? _parseTime(String raw) {
+    final parts = raw.split(':');
+    if (parts.length != 2) return null;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return null;
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+  bool _remindersEnabled = false;
+  List<TimeOfDay> _reminderTimes = const [];
+
+  /// Grow/shrink [_reminderTimes] to [count], preserving already-chosen
+  /// values (grow appends the next default; shrink drops the tail).
+  static List<TimeOfDay> _resizeTimes(List<TimeOfDay> current, int count) {
+    if (current.length == count) return current;
+    if (current.length > count) {
+      return List<TimeOfDay>.unmodifiable(current.take(count));
+    }
+    return List<TimeOfDay>.unmodifiable([
+      ...current,
+      for (var i = current.length; i < count; i++)
+        _defaultDoseTimes[i < _defaultDoseTimes.length
+            ? i
+            : _defaultDoseTimes.length - 1],
+    ]);
+  }
+
+  /// The times to persist: empty unless reminders are on AND the frequency
+  /// defines a fixed dose schedule.
+  List<String> get _reminderTimeStrings => _remindersEnabled
+      ? _reminderTimes.map(_formatTime).toList(growable: false)
+      : const <String>[];
 
   late final TextEditingController _nameController;
   late final TextEditingController _dosageController;
@@ -62,6 +123,29 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     );
 
     _notesController = TextEditingController(text: med?.notes ?? '');
+
+    _remindersEnabled = med?.remindersEnabled ?? false;
+    final seeded = (med?.reminderTimes ?? const <String>[])
+        .map(_parseTime)
+        .whereType<TimeOfDay>()
+        .toList(growable: false);
+    _reminderTimes = _resizeTimes(seeded, _doseCountFor(_frequency));
+  }
+
+  void _onFrequencyChanged(String value) {
+    setState(() {
+      _frequency = value;
+      _reminderTimes = _resizeTimes(_reminderTimes, _doseCountFor(value));
+    });
+  }
+
+  void _onDoseTimeChanged(int index, TimeOfDay picked) {
+    setState(() {
+      _reminderTimes = List<TimeOfDay>.unmodifiable([
+        for (var i = 0; i < _reminderTimes.length; i++)
+          i == index ? picked : _reminderTimes[i],
+      ]);
+    });
   }
 
   @override
@@ -120,10 +204,12 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
     final startDate = _startDate ?? DateTime.now();
     final notes = _notesController.text.trim();
 
+    final reminderTimes = _reminderTimeStrings;
+
     if (_isEditing) {
-      // prescribedBy/purpose/remindersEnabled aren't collected by this form
-      // (not part of the Figma spec) — omitted here so copyWith preserves
-      // whatever the record already had rather than silently wiping it.
+      // prescribedBy/purpose aren't collected by this form (not part of the
+      // Figma spec) — omitted here so copyWith preserves whatever the record
+      // already had rather than silently wiping it.
       final updated = widget.medication!.copyWith(
         name: name,
         dosage: dosage,
@@ -132,6 +218,8 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         endDate: _endDate,
         clearEndDate: _endDate == null,
         notes: notes.isNotEmpty ? notes : null,
+        remindersEnabled: _remindersEnabled,
+        reminderTimes: reminderTimes,
       );
       medicationStore.updateMedication(petId, widget.medication!.id, updated);
 
@@ -150,6 +238,23 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
             widget.medication!.id,
           );
         }
+
+        if (updated.hasDoseReminders) {
+          ReminderService.instance.scheduleMedicationDoseReminders(
+            updated,
+            times: updated.reminderTimes,
+            title: l10n.medicationDoseTitle(updated.name),
+            body: l10n.medicationDoseBody(
+              petStore.activePet?.name ?? updated.name,
+              updated.dosage,
+              updated.name,
+            ),
+          );
+        } else {
+          ReminderService.instance.cancelMedicationDoseReminders(
+            widget.medication!.id,
+          );
+        }
       }
     } else {
       final newMed = Medication(
@@ -161,18 +266,34 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
         startDate: startDate,
         endDate: _endDate,
         notes: notes.isNotEmpty ? notes : null,
+        remindersEnabled: _remindersEnabled,
+        reminderTimes: reminderTimes,
       );
       medicationStore.addMedication(petId, newMed);
 
-      if (!kIsWeb && newMed.hasEndReminder) {
-        ReminderService.instance.scheduleMedicationReminder(
-          newMed,
-          title: l10n.medicationEndingTitle,
-          body: l10n.medicationEndingBody(
-            petStore.activePet?.name ?? newMed.name,
-            newMed.name,
-          ),
-        );
+      if (!kIsWeb) {
+        if (newMed.hasEndReminder) {
+          ReminderService.instance.scheduleMedicationReminder(
+            newMed,
+            title: l10n.medicationEndingTitle,
+            body: l10n.medicationEndingBody(
+              petStore.activePet?.name ?? newMed.name,
+              newMed.name,
+            ),
+          );
+        }
+        if (newMed.hasDoseReminders) {
+          ReminderService.instance.scheduleMedicationDoseReminders(
+            newMed,
+            times: newMed.reminderTimes,
+            title: l10n.medicationDoseTitle(newMed.name),
+            body: l10n.medicationDoseBody(
+              petStore.activePet?.name ?? newMed.name,
+              newMed.dosage,
+              newMed.name,
+            ),
+          );
+        }
       }
     }
 
@@ -328,7 +449,15 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
                   FrequencyChipSelector(
                     label: l10n.frequencyRequired,
                     value: _frequency,
-                    onChanged: (value) => setState(() => _frequency = value),
+                    onChanged: _onFrequencyChanged,
+                  ),
+                  const SizedBox(height: AppSpacingTokens.pcMd),
+                  _RemindersSection(
+                    enabled: _remindersEnabled,
+                    times: _reminderTimes,
+                    onEnabledChanged: (value) =>
+                        setState(() => _remindersEnabled = value),
+                    onTimeChanged: _onDoseTimeChanged,
                   ),
                   const SizedBox(height: AppSpacingTokens.pcMd),
                   Row(
@@ -384,6 +513,84 @@ class _AddMedicationSheetState extends State<AddMedicationSheet> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Per-medication reminders block
+// ---------------------------------------------------------------------------
+
+/// On/off switch plus the dose-time rows it reveals.
+///
+/// The number of rows is driven entirely by [times] — the parent derives it
+/// from the selected frequency, so "As needed" simply passes an empty list
+/// and the toggle then governs only the end-of-course reminder.
+class _RemindersSection extends StatelessWidget {
+  const _RemindersSection({
+    required this.enabled,
+    required this.times,
+    required this.onEnabledChanged,
+    required this.onTimeChanged,
+  });
+
+  final bool enabled;
+  final List<TimeOfDay> times;
+  final ValueChanged<bool> onEnabledChanged;
+  final void Function(int index, TimeOfDay picked) onTimeChanged;
+
+  String _labelFor(AppLocalizations l10n, int index) {
+    if (times.length == 1) return l10n.medicationReminderTime;
+    return index == 0
+        ? l10n.medicationFirstDoseTime
+        : l10n.medicationSecondDoseTime;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final c = AppSemanticColors.of(context);
+
+    return AppCard(
+      padding: const EdgeInsets.all(AppSpacingTokens.pcMd),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.medicationRemindersLabel,
+                      style: AppSemanticTextStyles.labelMSemibold,
+                    ),
+                    const SizedBox(height: AppSpacingTokens.pcXs),
+                    Text(
+                      l10n.medicationRemindersDesc,
+                      style: AppSemanticTextStyles.pcCaption.copyWith(
+                        color: c.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: AppSpacingTokens.pcMd),
+              AppToggle(value: enabled, onChanged: onEnabledChanged),
+            ],
+          ),
+          if (enabled && times.isNotEmpty) ...[
+            const SizedBox(height: AppSpacingTokens.pcSm),
+            for (var i = 0; i < times.length; i++)
+              ReminderTimeRow(
+                label: _labelFor(l10n, i),
+                value: times[i],
+                onChanged: (picked) => onTimeChanged(i, picked),
+              ),
+          ],
+        ],
       ),
     );
   }

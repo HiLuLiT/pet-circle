@@ -14,10 +14,6 @@ class UserSettings {
     this.measurementReminderDays = const [1, 3, 5],
     this.measurementReminderHour = 20,
     this.measurementReminderMinute = 0,
-    this.medicationMorningHour = 9,
-    this.medicationMorningMinute = 0,
-    this.medicationEveningHour = 21,
-    this.medicationEveningMinute = 0,
   });
 
   /// Light / dark / follow-the-OS. Defaults to [ThemeMode.system]: before this
@@ -52,17 +48,6 @@ class UserSettings {
   /// Minute (0–59) for measurement reminders.
   final int measurementReminderMinute;
 
-  /// Hour (0–23) for morning medication reminders.
-  final int medicationMorningHour;
-
-  /// Minute (0–59) for morning medication reminders.
-  final int medicationMorningMinute;
-
-  /// Hour (0–23) for evening medication reminders.
-  final int medicationEveningHour;
-
-  /// Minute (0–59) for evening medication reminders.
-  final int medicationEveningMinute;
 
   factory UserSettings.fromMap(Map<String, dynamic> data) {
     return UserSettings(
@@ -83,10 +68,6 @@ class UserSettings {
           const [1, 3, 5],
       measurementReminderHour: data['measurementReminderHour'] ?? 20,
       measurementReminderMinute: data['measurementReminderMinute'] ?? 0,
-      medicationMorningHour: data['medicationMorningHour'] ?? 9,
-      medicationMorningMinute: data['medicationMorningMinute'] ?? 0,
-      medicationEveningHour: data['medicationEveningHour'] ?? 21,
-      medicationEveningMinute: data['medicationEveningMinute'] ?? 0,
     );
   }
 
@@ -104,10 +85,6 @@ class UserSettings {
       'measurementReminderDays': measurementReminderDays,
       'measurementReminderHour': measurementReminderHour,
       'measurementReminderMinute': measurementReminderMinute,
-      'medicationMorningHour': medicationMorningHour,
-      'medicationMorningMinute': medicationMorningMinute,
-      'medicationEveningHour': medicationEveningHour,
-      'medicationEveningMinute': medicationEveningMinute,
     };
   }
 
@@ -135,10 +112,6 @@ class UserSettings {
     List<int>? measurementReminderDays,
     int? measurementReminderHour,
     int? measurementReminderMinute,
-    int? medicationMorningHour,
-    int? medicationMorningMinute,
-    int? medicationEveningHour,
-    int? medicationEveningMinute,
   }) {
     return UserSettings(
       themeMode: themeMode ?? this.themeMode,
@@ -158,14 +131,6 @@ class UserSettings {
           measurementReminderHour ?? this.measurementReminderHour,
       measurementReminderMinute:
           measurementReminderMinute ?? this.measurementReminderMinute,
-      medicationMorningHour:
-          medicationMorningHour ?? this.medicationMorningHour,
-      medicationMorningMinute:
-          medicationMorningMinute ?? this.medicationMorningMinute,
-      medicationEveningHour:
-          medicationEveningHour ?? this.medicationEveningHour,
-      medicationEveningMinute:
-          medicationEveningMinute ?? this.medicationEveningMinute,
     );
   }
 }

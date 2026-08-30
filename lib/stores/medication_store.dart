@@ -64,6 +64,7 @@ class MedicationStore extends ChangeNotifier {
 
     if (!kIsWeb) {
       ReminderService.instance.cancelMedicationReminder(medicationId);
+      ReminderService.instance.cancelMedicationDoseReminders(medicationId);
     }
 
     final uid = userStore.currentUserUid;
@@ -131,6 +132,7 @@ class MedicationStore extends ChangeNotifier {
 
     if (!kIsWeb && !toggled.isActive) {
       ReminderService.instance.cancelMedicationReminder(medicationId);
+      ReminderService.instance.cancelMedicationDoseReminders(medicationId);
     }
 
     final uid = userStore.currentUserUid;

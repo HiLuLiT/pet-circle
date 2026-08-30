@@ -1429,13 +1429,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get medicationDeleted => 'Medication deleted';
 
   @override
-  String get medicationReminderTimes => 'Medication Reminder Times';
+  String get medicationRemindersLabel => 'Remind me to give this medication';
 
   @override
-  String get morningReminder => 'Morning';
+  String get medicationRemindersDesc =>
+      'Get a daily notification at each dose time, and a reminder when the course ends.';
 
   @override
-  String get eveningReminder => 'Evening';
+  String get medicationReminderTime => 'Reminder time';
+
+  @override
+  String get medicationFirstDoseTime => 'First dose';
+
+  @override
+  String get medicationSecondDoseTime => 'Second dose';
+
+  @override
+  String medicationDoseTitle(String medName) {
+    return 'Time for $medName';
+  }
+
+  @override
+  String medicationDoseBody(String petName, String dosage, String medName) {
+    return 'Give $petName their $dosage dose of $medName';
+  }
 
   @override
   String recordingsInPeriod(String petName, int shown, int total) {

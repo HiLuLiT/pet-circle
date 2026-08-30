@@ -1154,6 +1154,147 @@ detail' asserts the card's `onTap` is non-null.
 
 ---
 
+## BUG-053: Settings icons rendered maroon/red in dark mode
+
+**Severity:** Medium
+**Status:** Fixed
+**Found during:** manual dark-mode review of the Settings screen.
+
+**Symptom:** In dark mode the Settings icons — the Dark mode moon, the Language globe, the care
+circle trash, the invite glyph — stayed a dark maroon `#440206` (and bright red `#FF3034` for the
+trash) sitting on the dark tile washes behind them. The moon in particular was close to invisible.
+
+**Root cause:** Not a palette defect. Every tile colour correctly swapped to its `pcDark*Tile`
+counterpart; the *icons* did not, because each was drawn with `SvgPicture.asset(...)` and **no
+`colorFilter`**. The Figma exports hardcode `stroke`/`fill="#440206"` (moon, globe, chevron, share,
+invite, configure, down) and `stroke="#FF3034"` (trash), so those literals rendered verbatim in both
+themes. Six call sites were affected. `ActionRow` in the same file was unaffected precisely because
+it uses the Material `Icon(color: c.accentPeriwinkle)` branch rather than the SVG branch.
+
+**Fix:** Applied `colorFilter: ColorFilter.mode(<semantic token>, BlendMode.srcIn)` at every call
+site, taking the colour from `AppSemanticColors.of(context)` so one asset serves both themes — the
+`.svg` files themselves were deliberately left untouched. `SettingsToggleRow` and the shared
+`SettingsRow` gained an optional `iconColor` parameter (defaulting to `c.accentPeriwinkle` and
+`c.textPrimary` respectively) to make the colour injectable. Tokens: moon → `accentPeriwinkle`,
+globe → `accentMint`, trash → `error`, invite → `onSurface` (matching the surrounding secondary
+button's own foreground), `ActionRow`'s SVG branch → `textPrimary`. Measured dark contrast for the
+trash icon — `pcDarkBlush #F0A0BC` on `pcDarkSurface #211F1B` — is 8.19:1, comfortably above AA.
+
+**Files changed:**
+- `lib/screens/settings/settings_widgets.dart`
+- `lib/screens/settings/settings_care_circle_widgets.dart`
+- `lib/screens/settings/settings_content.dart`
+- `lib/widgets/settings_row.dart`
+
+**Regression test:** `test/widgets/settings_icon_contrast_test.dart` — pumps each row under
+`buildDarkTheme()` and asserts the rendered `SvgPicture.colorFilter` equals the expected semantic
+colour, rather than relying on a screenshot.
+
+---
+
+## BUG-054: Medication reminders never fired
+
+**Severity:** High
+**Status:** Fixed
+**Found during:** relocating the notification settings out of the Settings screen.
+
+**Symptom:** No medication notification had ever been delivered. Settings offered global "Morning"
+and "Evening" medication reminder times, and they persisted to Firestore, but nothing was ever
+scheduled at those times or at any other time.
+
+**Root cause:** Two independent breaks that happened to hide each other.
+
+1. `Medication.remindersEnabled` was never set to `true` by any UI — the Add/Edit Medication sheet
+   didn't collect it, and a comment in `_save()` said so explicitly. Since
+   `hasEndReminder => isActive && remindersEnabled && endDate != null`, that getter was
+   unconditionally false, so the one scheduling call the app did make was never reached.
+2. The global Morning/Evening times were dead in a second, separate way:
+   `ReminderService.scheduleMedicationReminder` never read them. It schedules a single one-shot
+   notification at 09:00 on the medication's `endDate` — an end-of-course nudge, not a dose
+   reminder. Nothing in `lib/` read `medicationMorningHour`/`medicationEveningHour` at all.
+
+So the feature was mis-modelled as much as it was broken: per-medication dose times cannot come
+from one app-wide pair of times, since two medications on different schedules need different ones.
+
+**Fix:** Moved the control next to the medication it configures. `Medication` gained
+`List<String> reminderTimes` (canonical `"HH:mm"`, defensive parse on read), and the Add/Edit
+Medication sheet now collects both `remindersEnabled` and the dose times, deriving the row count
+from the chosen frequency (`Once daily` → 1 @ 09:00, `Twice daily` → 2 @ 09:00/21:00, `As needed` →
+none, since an as-needed medication has no fixed dose schedule). Changing frequency resizes the list
+while preserving already-chosen times. Added
+`ReminderService.scheduleMedicationDoseReminders`/`cancelMedicationDoseReminders` — recurring daily
+via `matchDateTimeComponents: DateTimeComponents.time`, in a fresh notification-ID namespace
+(`0x40000000 + _stableHash(medId) * 4 + slot`) that cannot collide with the existing medication-end,
+measurement, or weekly-summary allocations and cannot exceed the signed-32-bit ceiling.
+`MedicationStore` cancels dose reminders wherever it already cancelled end reminders. The dead
+`medicationMorning*`/`medicationEvening*` fields and their Settings UI were deleted; stale keys in
+existing Firestore documents are harmless because the rules never enumerate keys inside `settings`.
+
+Measurement reminders moved the same way, from Settings to a bell in the Measure tab
+(`MeasurementRemindersSheet`) — that path was already wired end to end via
+`settingsStore.onMeasurementReminderChanged`, so it was a UI relocation only.
+
+**Files changed:**
+- `lib/models/medication.dart`
+- `lib/models/user_settings.dart`
+- `lib/stores/settings_store.dart`
+- `lib/stores/medication_store.dart`
+- `lib/screens/medication/add_medication_sheet.dart`
+- `lib/screens/measurement/measurement_reminders_sheet.dart` (new)
+- `lib/screens/measurement/measurement_screen.dart`
+- `lib/screens/settings/settings_content.dart`
+- `lib/widgets/reminder_time_row.dart` (new)
+- `lib/services/abstract_reminder_service.dart`
+- `lib/services/reminder_service.dart`
+- `lib/services/web_reminder_service.dart`
+- `lib/l10n/app_en.arb`, `lib/l10n/app_he.arb`
+
+**Regression test:** `test/screens/medication/add_medication_sheet_test.dart` (dose times saved per
+frequency, and preserved across a frequency change); `test/models/medication_test.dart`
+(`reminderTimes` round-trip and defensive parse); `test/widgets/reminder_time_row_test.dart`;
+`test/screens/measurement/measurement_reminders_sheet_test.dart` (cadence and time write through to
+`settingsStore`).
+
+---
+
+## BUG-055: Dark-mode switches were unreadable — on and off looked identical
+
+**Severity:** Medium
+**Status:** Fixed
+**Found during:** manual dark-mode review of the Settings screen.
+
+**Symptom:** In dark mode a switch was a near-black pill on a near-black card. Worse than being
+dim, the on and off states looked the same — only the knob position told you which was which.
+
+**Root cause:** `AppToggle` read its track from the accent *tiles* — `accentPurpleTile` when on,
+`accentButterCream` when off. A tile is a recessed **background wash**; in dark those resolve to
+`pcDarkPurpleWash #251F33` and `pcDarkButterCream #2A2620`, both L* ~13. Measured against
+`pcDarkSurface #211F1B` that is **1.04:1** and **1.09:1** — invisible — and the two states sit at
+**1.06:1** from each other. In light mode the same tokens are a light lavender and a cream on a
+white card, which reads fine, so the defect only ever appeared in dark.
+
+**Fix:** A switch track is a filled *control surface*, not a background wash, so it now has its own
+semantic pair — `toggleTrackOn` / `toggleTrackOff` — following the precedent already set by
+`knobFill` (added for exactly this reason: `surface` inverts). Light keeps the same two primitives,
+so light rendering is byte-identical and still matches Figma Toggle `465:3781`. Dark maps on to the
+bright brand accent `pcDarkPurple` and off to the neutral `pcDarkDivider`, giving **7.16:1** for the
+on track against a card and **5.28:1** between the two states. The off track stays deliberately
+quiet (1.35:1, matching light mode’s 1.27:1) because the knob carries it at 9.85:1.
+
+The 10 other uses of `accentPurpleTile`/`accentButterCream` are genuine backgrounds and were left
+alone.
+
+**Files changed:**
+- `lib/theme/semantic/color_scheme.dart`
+- `lib/widgets/app_toggle.dart`
+
+**Regression test:** `test/widgets/app_toggle_test.dart` — asserts the dark on-track clears 4.5:1
+against a card, that on/off clear 3:1 against each other, and that the knob stays legible on the off
+track; `test/theme/dark_contrast_test.dart` — both new fields added to the "no dark field falls
+through to its light value" sweep.
+
+---
+
 <!-- Template for new entries:
 
 ## BUG-XXX: [Short title]

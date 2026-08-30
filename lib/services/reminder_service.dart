@@ -136,7 +136,7 @@ class ReminderService implements AbstractReminderService {
       hash = (hash * 0x01000193) & 0xFFFFFFFF;
     }
     // 28 bits: morning/evening IDs (hash*2 / *2+1) max out at 0x1FFFFFFF,
-    // staying clear of the 0x40000000 restock namespace below.
+    // staying clear of the 0x40000000 dose-reminder namespace below.
     return hash & 0x0FFFFFFF;
   }
 
@@ -218,6 +218,113 @@ class ReminderService implements AbstractReminderService {
     await _plugin.cancel(_medReminderId(medicationId));
     // Clear the legacy evening slot from the previous daily-reminder version.
     await _plugin.cancel(_legacyMedEveningId(medicationId));
+  }
+
+  // ── Medication dose reminders ────────────────────────────────────
+
+  /// Notification-ID namespace for recurring per-dose medication reminders.
+  ///
+  /// Every other allocation in this file lives below 0x20000000:
+  /// medication-end uses `_stableHash(id) * 2` (+1 for the legacy slot) over a
+  /// 28-bit hash, so it tops out at 0x1FFFFFFF, and the fixed measurement
+  /// (900000 + weekday) and weekly-summary (800000) IDs sit inside that same
+  /// low band. Dose IDs therefore start at 0x40000000 and are laid out as
+  ///
+  ///     0x40000000 + _stableHash(medId) * _maxDoseSlots + slotIndex
+  ///
+  /// which is deterministic across runs, unique per (medication, slot), and
+  /// bounded by 0x40000000 + 0x0FFFFFFF * 4 + 3 == 0x7FFFFFFF — the largest
+  /// signed 32-bit int, so it never wraps into another namespace.
+  static const int _doseBaseId = 0x40000000;
+
+  /// Number of reserved dose slots per medication (the ID stride).
+  /// "Twice daily" needs 2; the extra headroom keeps IDs stable if a future
+  /// frequency adds a third or fourth dose.
+  static const int _maxDoseSlots = 4;
+
+  int _doseReminderId(String medId, int slot) =>
+      _doseBaseId + _stableHash(medId) * _maxDoseSlots + slot;
+
+  /// Parse a canonical `"HH:mm"` string. Returns `null` when malformed or
+  /// out of range, so one bad entry cannot break the whole schedule.
+  static ({int hour, int minute})? _parseTimeOfDay(String raw) {
+    final parts = raw.split(':');
+    if (parts.length != 2) return null;
+    final hour = int.tryParse(parts[0]);
+    final minute = int.tryParse(parts[1]);
+    if (hour == null || minute == null) return null;
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+    return (hour: hour, minute: minute);
+  }
+
+  @override
+  Future<void> scheduleMedicationDoseReminders(
+    Medication med, {
+    required List<String> times,
+    required String title,
+    required String body,
+  }) async {
+    if (!_initialized) await init();
+
+    final permitted = await requestPermission();
+    if (!permitted) return;
+
+    await cancelMedicationDoseReminders(med.id);
+
+    if (!med.isActive || !med.remindersEnabled || times.isEmpty) return;
+
+    const androidDetails = AndroidNotificationDetails(
+      'medication_dose_reminders',
+      'Medication Dose Reminders',
+      channelDescription: 'Daily reminders to give your pet its medication',
+      importance: Importance.high,
+      priority: Priority.high,
+      groupKey: 'medication',
+    );
+
+    const darwinDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: darwinDetails,
+      macOS: darwinDetails,
+    );
+
+    final payload = json.encode({
+      'type': 'medicationDose',
+      'route': AppRoutes.shell(tab: AppRoutes.tabMedication),
+      'medicationId': med.id,
+    });
+
+    final slots = times.length < _maxDoseSlots ? times.length : _maxDoseSlots;
+    for (var slot = 0; slot < slots; slot++) {
+      final parsed = _parseTimeOfDay(times[slot]);
+      if (parsed == null) continue;
+      await _plugin.zonedSchedule(
+        _doseReminderId(med.id, slot),
+        title,
+        body,
+        _nextInstanceOfTime(parsed.hour, parsed.minute),
+        details,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        // Recurs every day at the same wall-clock time.
+        matchDateTimeComponents: DateTimeComponents.time,
+        payload: payload,
+      );
+    }
+  }
+
+  @override
+  Future<void> cancelMedicationDoseReminders(String medicationId) async {
+    for (var slot = 0; slot < _maxDoseSlots; slot++) {
+      await _plugin.cancel(_doseReminderId(medicationId, slot));
+    }
   }
 
   // ── Measurement reminders ───────────────────────────────────────
@@ -393,6 +500,24 @@ class ReminderService implements AbstractReminderService {
     );
 
     await _plugin.show(id, title, body, details, payload: payload);
+  }
+
+  /// Next occurrence of a time of day — today if it is still ahead,
+  /// otherwise tomorrow.
+  tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
+    final now = tz.TZDateTime.now(tz.local);
+    var scheduled = tz.TZDateTime(
+      tz.local,
+      now.year,
+      now.month,
+      now.day,
+      hour,
+      minute,
+    );
+    if (!scheduled.isAfter(now)) {
+      scheduled = scheduled.add(const Duration(days: 1));
+    }
+    return scheduled;
   }
 
   /// Next occurrence of a specific weekday and time.
