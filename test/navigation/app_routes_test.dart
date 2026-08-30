@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pet_circle/app_routes.dart';
 
@@ -60,20 +62,6 @@ void main() {
     });
   });
 
-  group('AppRoutes.petDetail()', () {
-    test('returns correct path for pet ID', () {
-      expect(AppRoutes.petDetail('pet123'), '/shell/pet/pet123');
-    });
-
-    test('returns correct path for another pet ID', () {
-      expect(AppRoutes.petDetail('abc-456'), '/shell/pet/abc-456');
-    });
-
-    test('returns correct path for short ID', () {
-      expect(AppRoutes.petDetail('abc'), '/shell/pet/abc');
-    });
-  });
-
   group('AppRoutes — removed constants', () {
     test('no roleSelection route constant exists', () {
       // AppRoutes should not expose a roleSelection field.
@@ -90,6 +78,24 @@ void main() {
       ];
       // None of the static constants should be '/role-selection'
       expect(members.contains('/role-selection'), isFalse);
+    });
+
+    test('no pet detail route is declared', () {
+      // PetDetailScreen and its '/shell/pet/:petId' route were removed at the
+      // user's request. This reads the source rather than calling
+      // buildRouter(), which reaches for FirebaseAnalytics and so cannot run
+      // under flutter_test without a live Firebase app.
+      final source = File('lib/app_routes.dart').readAsStringSync();
+      expect(
+        source.contains("'pet/"),
+        isFalse,
+        reason: 'a pet detail sub-route came back into the router',
+      );
+      expect(
+        source.contains('petDetail'),
+        isFalse,
+        reason: 'the petDetail path builder came back',
+      );
     });
   });
 }

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:pet_circle/app_routes.dart';
 import 'package:pet_circle/config/app_config.dart' show kEnableFirebase;
 import 'package:pet_circle/utils/responsive_utils.dart';
 import 'package:pet_circle/models/care_circle_member.dart';
@@ -159,14 +157,7 @@ class _VetDashboardState extends State<VetDashboard> {
                         maxCrossAxisCount: 3,
                         minItemWidth: 280,
                         children: pets
-                            .map(
-                              (pet) => _VetPetCard(
-                                data: pet,
-                                onTap: () => context.push(
-                                  AppRoutes.petDetail(pet.id ?? ''),
-                                ),
-                              ),
-                            )
+                            .map((pet) => _VetPetCard(data: pet))
                             .toList(),
                       ),
                       const SizedBox(height: AppSpacingTokens.lg),

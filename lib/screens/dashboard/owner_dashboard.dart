@@ -200,16 +200,8 @@ class OwnerDashboard extends StatelessWidget {
                           fit: BoxFit.contain,
                         ),
                       ),
-                      // Owners had no route into pet detail at all: only the
-                      // vet dashboard linked to it, so measurement history,
-                      // clinical notes, care circle and delete were all
-                      // unreachable from the owner's own home screen.
-                      onTap: pet.id != null
-                          ? () => context.push(AppRoutes.petDetail(pet.id!))
-                          : null,
                       // Delete, right on the card, on the screen the user is
-                      // actually looking at. Every earlier attempt put this on
-                      // pet detail, which owners could not even open.
+                      // actually looking at.
                       trailing: access.canDeletePet
                           ? IconButton(
                               icon: Icon(
@@ -221,8 +213,8 @@ class OwnerDashboard extends StatelessWidget {
                                   unawaited(confirmDeletePet(context, pet)),
                             )
                           : null,
-                      // Shortcut only -- the delete affordances live in the
-                      // pet detail app bar and at the foot of that page.
+                      // Second affordance for the same action as [trailing],
+                      // for anyone who reaches for a long-press first.
                       onLongPress: access.canDeletePet
                           ? () => unawaited(confirmDeletePet(context, pet))
                           : null,

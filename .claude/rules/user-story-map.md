@@ -47,7 +47,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 
 ### Owner Experience
 - B5: Owner home -- active-pet-focused dashboard (Figma 402:1978): hero `PetCard` (mascot, SPR subtitle), latest-reading card, Care Circle card, Reminders card, Measure/Trends actions, empty-state CTA
-- B6: Pet card tap navigates to pet detail. NOTE: this regressed when the home screen moved to the Figma 402:1978 hero layout -- the hero `PetCard` carried only `onLongPress`, and `vet_dashboard.dart` was the *only* file linking to `AppRoutes.petDetail`, so owners had no route into pet detail at all (and therefore no route to the delete affordances). Restored, and pinned by `owner_dashboard_test.dart` -> 'hero pet card opens pet detail'
+- ~~B6: Pet card tap navigates to pet detail~~ -- **REMOVED.** `PetDetailScreen` and its `/shell/pet/:petId` route were deleted at the user's request (BUG-056). Neither the hero pet card nor the vet patient card navigates anywhere now. This also withdraws C3 and the pet *edit* flow (M2); pet *delete* (M3) survives on the home card
 - B27: Reminders -- per-pet Firestore subcollection (`Reminder` model, `ReminderStore`, `PetService` CRUD), add/edit/delete bottom sheet from the home Reminders card
 - B28: Header pet-name + pet switcher now visible/enabled on every tab (previously hidden on Home)
 - B7: Quick-action Measure / Trends buttons per pet
@@ -69,8 +69,8 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 - B23: Share with vet dialog from settings
 - B24: Push / emergency notification toggles wired to Firestore-backed `settingsStore`
 - M1: "Add Pet" button on owner dashboard navigates to onboarding
-- M2: Edit pet profile -- admin-only, bottom sheet with searchable breed dropdown + Firestore persistence
-- M3: Delete pet -- owner-only. Primary entry point is the visible "Delete Pet" button on the pet detail screen; the home hero card long-press and the edit-sheet trash icon remain as shortcuts. All three share `confirmDeletePet()` (`lib/utils/pet_delete_dialog.dart`), which awaits the delete and reports success or failure honestly. Removal is keyed on pet **id**, keeps the active selection on the same pet, and pops the detail route once the pet is gone. Server-side cascade (subcollections, member `petIds`, dangling invitations) runs in the `onPetDeleted` Cloud Function -- Firestore does not cascade on its own. See BUG-050 / BUG-051
+- ~~M2: Edit pet profile~~ -- **REMOVED** with the pet detail screen (BUG-056); the edit sheet lived there and has no other host
+- M3: Delete pet -- owner-only. Since the pet detail screen was removed (BUG-056), the entry points are the trailing trash button on the home hero card and a long-press on that same card, both calling `confirmDeletePet()` (`lib/utils/pet_delete_dialog.dart`), which awaits the delete and reports success or failure honestly. Removal is keyed on pet **id** and keeps the active selection on the same pet. Server-side cascade (subcollections, member `petIds`, dangling invitations) runs in the `onPetDeleted` Cloud Function -- Firestore does not cascade on its own. See BUG-050 / BUG-051
 - M5: Global pet switcher in header -- `petStore.activePetIndex` shared across all screens
 - M6: User profile management -- edit name/photo from settings
 - M7: Sign out from settings drawer with confirmation
@@ -96,7 +96,7 @@ Global active pet tracked in `petStore.activePetIndex` -- shared across all scre
 ### Vet Experience
 - C1: Clinic overview dashboard from stores with real stats
 - C2: Summary stats from stores
-- C3: Patient card tap navigates to pet detail
+- ~~C3: Patient card tap navigates to pet detail~~ -- **REMOVED** with the pet detail screen (BUG-056)
 - C4: Clinical notes persisted via `noteStore` + Firestore subcollection
 - C5: Vet SRR trends -- data-driven chart
 - C6: Notifications from Firestore-backed `notificationStore`

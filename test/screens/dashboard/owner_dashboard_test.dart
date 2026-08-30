@@ -54,18 +54,19 @@ void main() {
       expect(find.byType(AlertDialog), findsOneWidget);
     });
 
-    testWidgets('hero pet card opens pet detail', (tester) async {
-      // Regression: the hero card carried only onLongPress, and nothing else
-      // in the owner flow linked to pet detail -- only the vet dashboard did.
-      // That left measurement history, clinical notes, care circle and delete
-      // unreachable for the pet's own owner.
+    testWidgets('hero pet card does not navigate anywhere', (tester) async {
+      // PetDetailScreen was removed at the user's request, so the hero card
+      // has no destination to open. Delete stays reachable here through the
+      // trailing trash button and the long-press, both of which call
+      // confirmDeletePet directly.
       await pumpDashboard(tester);
 
       final card = tester.widget<PetCard>(find.byType(PetCard).first);
+      expect(card.onTap, isNull);
       expect(
-        card.onTap,
+        card.onLongPress,
         isNotNull,
-        reason: 'tapping the hero pet card must navigate to pet detail',
+        reason: 'long-press delete must survive the pet detail removal',
       );
     });
 
